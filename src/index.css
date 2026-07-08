@@ -1,0 +1,12 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-primary: #2f6fed;
+  --color-success: #2e9b6f;
+  --color-error: #c4544d;
+  --color-background: #f7f8fa;
+  --color-text-primary: #1f2937;
+  --color-text-secondary: #6b7280;
+  --color-border: #e5e7eb;
+  --font-family-sans: 'Tajawal', 'IBM Plex Sans Arabic', sans-serif;
+}
