@@ -7,6 +7,13 @@ export interface Grade {
   order: number;
 }
 
+export interface Semester {
+  id: string;
+  gradeId: string;
+  name: string;
+  order: number;
+}
+
 export interface Subject {
   id: string;
   gradeId: string;
@@ -17,6 +24,7 @@ export interface Subject {
 export interface Unit {
   id: string;
   subjectId: string;
+  semesterId: string;
   title: string;
   order: number;
 }
