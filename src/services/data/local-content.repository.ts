@@ -1,38 +1,64 @@
-import type { Grade, Subject, Unit, Lesson } from '@shared-types/content.types';
+import type { Grade, Lesson, Semester, Subject, Unit } from '@shared-types/content.types';
 import {
   learningCatalogGrades,
+  learningCatalogSemesters,
   learningCatalogSubjects,
   learningCatalogUnits,
 } from '@content/seed/learning-catalog.seed';
 import { grade10PhysicsWavesLessons } from '@content/seed/grade10-physics-waves';
 
 /**
- * local-content.repository — الطبقة الوحيدة التي تستورد ملفات الـ seed.
- * دوال قراءة خالصة فقط: لا كتابة، لا شبكة، لا استنتاج (لا اشتقاق البنية من unitId).
- * مكوّنات الواجهة تستدعي هذه الدوال ولا تستورد الـ seed مباشرة.
+ * local-content.repository
  *
- * عند الانتقال إلى Supabase (Phase 2) تتبدّل هذه الطبقة وحدها، لا الشاشات.
+ * هذه هي الطبقة الوحيدة التي تستورد ملفات seed.
+ * مكوّنات الواجهة لا تستورد seed مباشرة.
+ *
+ * القاعدة:
+ * - لا كتابة.
+ * - لا شبكة.
+ * - لا Supabase.
+ * - لا AI.
+ * - لا اشتقاق Grade/Subject/Unit من unitId.
  */
 
 export function getGrades(): Grade[] {
-  return learningCatalogGrades;
+  return learningCatalogGrades.slice().sort((a, b) => a.order - b.order);
 }
 
-export function getSubjectsByGrade(gradeId: string): Subject[] {
-  return learningCatalogSubjects.filter((s) => s.gradeId === gradeId);
+export function getSemestersByGrade(gradeId: string): Semester[] {
+  return learningCatalogSemesters
+    .filter((semester) => semester.gradeId === gradeId)
+    .sort((a, b) => a.order - b.order);
+}
+
+export function getSubjectsBySemester(semesterId: string): Subject[] {
+  const subjectIdsInSemester = new Set(
+    learningCatalogUnits
+      .filter((unit) => unit.semesterId === semesterId)
+      .map((unit) => unit.subjectId),
+  );
+
+  return learningCatalogSubjects.filter((subject) => subjectIdsInSemester.has(subject.id));
+}
+
+export function getUnitsBySubjectAndSemester(subjectId: string, semesterId: string): Unit[] {
+  return learningCatalogUnits
+    .filter((unit) => unit.subjectId === subjectId && unit.semesterId === semesterId)
+    .sort((a, b) => a.order - b.order);
 }
 
 export function getUnitsBySubject(subjectId: string): Unit[] {
-  return learningCatalogUnits.filter((u) => u.subjectId === subjectId);
+  return learningCatalogUnits
+    .filter((unit) => unit.subjectId === subjectId)
+    .sort((a, b) => a.order - b.order);
 }
 
 export function getLessonsByUnit(unitId: string): Lesson[] {
   return grade10PhysicsWavesLessons
-    .filter((l) => l.unitId === unitId)
+    .filter((lesson) => lesson.unitId === unitId)
     .sort((a, b) => a.order - b.order);
 }
 
-// يُستخدم لاحقًا في 1-C (فتح درس مفرد) — موجود هنا كي لا تُكسر واجهة الـ repository لاحقًا.
 export function getLessonById(lessonId: string): Lesson | undefined {
-  return grade10PhysicsWavesLessons.find((l) => l.id === lessonId);
+  return grade10PhysicsWavesLessons.find((lesson) => lesson.id === lessonId);
 }
