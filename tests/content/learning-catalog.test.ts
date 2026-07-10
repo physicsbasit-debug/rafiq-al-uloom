@@ -109,7 +109,7 @@ describe('repository: القراءة', () => {
     const unitSubjectIds = new Set(
       learningCatalogUnits
         .filter((unit) => unit.semesterId === 'g10-sem2')
-        .map((unit) => unit.subjectId),
+        .map((unit) => unit.subjectId)
     );
 
     for (const subject of subjectsInSemester) {

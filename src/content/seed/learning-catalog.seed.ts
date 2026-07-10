@@ -16,9 +16,7 @@ import type { Grade, Semester, Subject, Unit } from '@shared-types/content.types
  * تم وضع وحدة الموجات في الفصل الدراسي الثاني مبدئيًا إلى أن يُثبَّت فهرس المنهج الرسمي.
  */
 
-export const learningCatalogGrades: Grade[] = [
-  { id: 'g10', name: 'الصف العاشر', order: 10 },
-];
+export const learningCatalogGrades: Grade[] = [{ id: 'g10', name: 'الصف العاشر', order: 10 }];
 
 export const learningCatalogSemesters: Semester[] = [
   { id: 'g10-sem1', gradeId: 'g10', name: 'الفصل الدراسي الأول', order: 1 },

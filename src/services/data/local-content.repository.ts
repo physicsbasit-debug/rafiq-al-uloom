@@ -35,7 +35,7 @@ export function getSubjectsBySemester(semesterId: string): Subject[] {
   const subjectIdsInSemester = new Set(
     learningCatalogUnits
       .filter((unit) => unit.semesterId === semesterId)
-      .map((unit) => unit.subjectId),
+      .map((unit) => unit.subjectId)
   );
 
   return learningCatalogSubjects.filter((subject) => subjectIdsInSemester.has(subject.id));

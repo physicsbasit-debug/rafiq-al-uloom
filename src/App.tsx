@@ -44,7 +44,11 @@ export default function App() {
 
       {step.name !== 'grade' ? (
         <div style={{ marginBottom: '1rem' }}>
-          <AppButton label="رجوع للبداية" variant="secondary" onClick={() => setStep({ name: 'grade' })} />
+          <AppButton
+            label="رجوع للبداية"
+            variant="secondary"
+            onClick={() => setStep({ name: 'grade' })}
+          />
         </div>
       ) : null}
 
