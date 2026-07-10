@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { AppButton } from '@design-system/components/AppButton';
 import { GradeSelection } from '@features/student/grade-selection/GradeSelection';
 import { LessonList } from '@features/student/lesson-list/LessonList';
+import { LessonView } from '@features/student/lesson-view/LessonView';
 import { SemesterSelection } from '@features/student/semester-selection/SemesterSelection';
 import { SubjectSelection } from '@features/student/subject-selection/SubjectSelection';
 import { UnitSelection } from '@features/student/unit-selection/UnitSelection';
@@ -10,10 +11,10 @@ import { UnitSelection } from '@features/student/unit-selection/UnitSelection';
  * App = نقطة تركيب التنقّل فقط.
  *
  * الرحلة الحالية:
- * الصف → الفصل الدراسي → المادة → الوحدة → الدروس.
+ * الصف → الفصل الدراسي → المادة → الوحدة → الدروس → عرض الدرس.
  *
  * لا توجد بيانات ثابتة هنا؛ كل البيانات تأتي من repository عبر الشاشات.
- * فتح صفحة الدرس الفعلية مؤجل إلى Phase 1-C.
+ * صفحة الدرس في Phase 1-C قراءة فقط: لا أسئلة، لا لعبة، لا mastery.
  */
 
 type Step =
@@ -22,7 +23,7 @@ type Step =
   | { name: 'subject'; semesterId: string }
   | { name: 'unit'; semesterId: string; subjectId: string }
   | { name: 'lessons'; unitId: string }
-  | { name: 'lesson-placeholder'; lessonId: string; unitId: string };
+  | { name: 'lesson'; lessonId: string; unitId: string };
 
 export default function App() {
   const [step, setStep] = useState<Step>({ name: 'grade' });
@@ -32,7 +33,7 @@ export default function App() {
       dir="rtl"
       style={{
         fontFamily: '"Tajawal", "IBM Plex Sans Arabic", sans-serif',
-        maxWidth: '640px',
+        maxWidth: '720px',
         margin: '0 auto',
         padding: '1.5rem',
         color: '#1F2937',
@@ -83,21 +84,15 @@ export default function App() {
       {step.name === 'lessons' ? (
         <LessonList
           unitId={step.unitId}
-          onSelectLesson={(lessonId) =>
-            setStep({ name: 'lesson-placeholder', lessonId, unitId: step.unitId })
-          }
+          onSelectLesson={(lessonId) => setStep({ name: 'lesson', lessonId, unitId: step.unitId })}
         />
       ) : null}
 
-      {step.name === 'lesson-placeholder' ? (
-        <section>
-          <h2>صفحة الدرس</h2>
-          <p style={{ color: '#6B7280' }}>قيد الإنشاء في المرحلة 1-C.</p>
-          <AppButton
-            label="العودة إلى الدروس"
-            onClick={() => setStep({ name: 'lessons', unitId: step.unitId })}
-          />
-        </section>
+      {step.name === 'lesson' ? (
+        <LessonView
+          lessonId={step.lessonId}
+          onBackToLessons={() => setStep({ name: 'lessons', unitId: step.unitId })}
+        />
       ) : null}
     </main>
   );

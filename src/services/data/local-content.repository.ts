@@ -1,11 +1,23 @@
-import type { Grade, Lesson, Semester, Subject, Unit } from '@shared-types/content.types';
+import type {
+  Grade,
+  Lesson,
+  Objective,
+  Semester,
+  Subject,
+  Unit,
+} from '@shared-types/content.types';
+import type { Experiment } from '@shared-types/experiment.types';
 import {
   learningCatalogGrades,
   learningCatalogSemesters,
   learningCatalogSubjects,
   learningCatalogUnits,
 } from '@content/seed/learning-catalog.seed';
-import { grade10PhysicsWavesLessons } from '@content/seed/grade10-physics-waves';
+import {
+  grade10PhysicsWavesExperiments,
+  grade10PhysicsWavesLessons,
+  grade10PhysicsWavesObjectives,
+} from '@content/seed/grade10-physics-waves';
 
 /**
  * local-content.repository
@@ -61,4 +73,12 @@ export function getLessonsByUnit(unitId: string): Lesson[] {
 
 export function getLessonById(lessonId: string): Lesson | undefined {
   return grade10PhysicsWavesLessons.find((lesson) => lesson.id === lessonId);
+}
+
+export function getObjectivesByLesson(lessonId: string): Objective[] {
+  return grade10PhysicsWavesObjectives.filter((objective) => objective.lessonId === lessonId);
+}
+
+export function getExperimentsByLesson(lessonId: string): Experiment[] {
+  return grade10PhysicsWavesExperiments.filter((experiment) => experiment.lessonId === lessonId);
 }

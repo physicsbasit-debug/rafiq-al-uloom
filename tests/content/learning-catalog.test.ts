@@ -7,9 +7,11 @@ import {
 } from '@content/seed/learning-catalog.seed';
 import { grade10PhysicsWavesLessons } from '@content/seed/grade10-physics-waves';
 import {
+  getExperimentsByLesson,
   getGrades,
   getLessonById,
   getLessonsByUnit,
+  getObjectivesByLesson,
   getSemestersByGrade,
   getSubjectsBySemester,
   getUnitsBySubject,
@@ -162,5 +164,19 @@ describe('repository: القراءة', () => {
 
     expect(lesson?.id).toBe('g10-phy-waves-l1');
     expect(getLessonById('no-such-lesson')).toBe(undefined);
+  });
+
+  it('getObjectivesByLesson يعيد هدفي الدرس الأول', () => {
+    const objectives = getObjectivesByLesson('g10-phy-waves-l1');
+
+    expect(objectives.length).toBe(2);
+    expect(objectives.every((objective) => objective.lessonId === 'g10-phy-waves-l1')).toBe(true);
+  });
+
+  it('getExperimentsByLesson يعيد تجربة الدرس الأول', () => {
+    const experiments = getExperimentsByLesson('g10-phy-waves-l1');
+
+    expect(experiments.length).toBe(1);
+    expect(experiments[0]?.lessonId).toBe('g10-phy-waves-l1');
   });
 });
