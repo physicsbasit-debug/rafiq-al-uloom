@@ -1,21 +1,26 @@
 import { useState } from 'react';
+import { AppButton } from '@design-system/components/AppButton';
 import { GradeSelection } from '@features/student/grade-selection/GradeSelection';
+import { LessonList } from '@features/student/lesson-list/LessonList';
+import { SemesterSelection } from '@features/student/semester-selection/SemesterSelection';
 import { SubjectSelection } from '@features/student/subject-selection/SubjectSelection';
 import { UnitSelection } from '@features/student/unit-selection/UnitSelection';
-import { LessonList } from '@features/student/lesson-list/LessonList';
-import { AppButton } from '@design-system/components/AppButton';
 
 /**
  * App = نقطة تركيب التنقّل فقط.
- * تنقّل قائم على حالة بسيطة (بلا تبعية react-router في هذه الدفعة).
- * لا بيانات ثابتة (صفوف/مواد/دروس) مكتوبة هنا — كلها تأتي من الـ repository عبر الشاشات.
- * فتح الدرس الفعلي مؤجل إلى 1-C (placeholder صريح الآن).
+ *
+ * الرحلة الحالية:
+ * الصف → الفصل الدراسي → المادة → الوحدة → الدروس.
+ *
+ * لا توجد بيانات ثابتة هنا؛ كل البيانات تأتي من repository عبر الشاشات.
+ * فتح صفحة الدرس الفعلية مؤجل إلى Phase 1-C.
  */
 
 type Step =
   | { name: 'grade' }
-  | { name: 'subject'; gradeId: string }
-  | { name: 'unit'; subjectId: string }
+  | { name: 'semester'; gradeId: string }
+  | { name: 'subject'; semesterId: string }
+  | { name: 'unit'; semesterId: string; subjectId: string }
   | { name: 'lessons'; unitId: string }
   | { name: 'lesson-placeholder'; lessonId: string; unitId: string };
 
@@ -39,23 +44,33 @@ export default function App() {
 
       {step.name !== 'grade' ? (
         <div style={{ marginBottom: '1rem' }}>
-          <AppButton label="رجوع" variant="secondary" onClick={() => setStep({ name: 'grade' })} />
+          <AppButton label="رجوع للبداية" variant="secondary" onClick={() => setStep({ name: 'grade' })} />
         </div>
       ) : null}
 
       {step.name === 'grade' ? (
-        <GradeSelection onSelectGrade={(gradeId) => setStep({ name: 'subject', gradeId })} />
+        <GradeSelection onSelectGrade={(gradeId) => setStep({ name: 'semester', gradeId })} />
+      ) : null}
+
+      {step.name === 'semester' ? (
+        <SemesterSelection
+          gradeId={step.gradeId}
+          onSelectSemester={(semesterId) => setStep({ name: 'subject', semesterId })}
+        />
       ) : null}
 
       {step.name === 'subject' ? (
         <SubjectSelection
-          gradeId={step.gradeId}
-          onSelectSubject={(subjectId) => setStep({ name: 'unit', subjectId })}
+          semesterId={step.semesterId}
+          onSelectSubject={(subjectId) =>
+            setStep({ name: 'unit', semesterId: step.semesterId, subjectId })
+          }
         />
       ) : null}
 
       {step.name === 'unit' ? (
         <UnitSelection
+          semesterId={step.semesterId}
           subjectId={step.subjectId}
           onSelectUnit={(unitId) => setStep({ name: 'lessons', unitId })}
         />
