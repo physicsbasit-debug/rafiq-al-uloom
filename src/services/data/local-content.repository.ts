@@ -1,5 +1,6 @@
 import type { Grade, Lesson, Objective, Semester, Subject, Unit } from '@shared-types/content.types';
 import type { Experiment } from '@shared-types/experiment.types';
+import type { Game } from '@shared-types/game.types';
 import type { Question } from '@shared-types/quiz.types';
 import {
   learningCatalogGrades,
@@ -9,6 +10,7 @@ import {
 } from '@content/seed/learning-catalog.seed';
 import {
   grade10PhysicsWavesExperiments,
+  grade10PhysicsWavesGames,
   grade10PhysicsWavesLessons,
   grade10PhysicsWavesObjectives,
   grade10PhysicsWavesReviewQuestions,
@@ -74,10 +76,20 @@ export function getObjectivesByLesson(lessonId: string): Objective[] {
   return grade10PhysicsWavesObjectives.filter((objective) => objective.lessonId === lessonId);
 }
 
+export function getObjectivesByIds(objectiveIds: string[]): Objective[] {
+  const requestedIds = new Set(objectiveIds);
+
+  return grade10PhysicsWavesObjectives.filter((objective) => requestedIds.has(objective.id));
+}
+
 export function getExperimentsByLesson(lessonId: string): Experiment[] {
   return grade10PhysicsWavesExperiments.filter((experiment) => experiment.lessonId === lessonId);
 }
 
 export function getReviewQuestionsByLesson(lessonId: string): Question[] {
   return grade10PhysicsWavesReviewQuestions.filter((question) => question.lessonId === lessonId);
+}
+
+export function getGamesByLesson(lessonId: string): Game[] {
+  return grade10PhysicsWavesGames.filter((game) => game.lessonId === lessonId);
 }

@@ -15,9 +15,15 @@ interface LessonViewProps {
   lessonId: string;
   onBackToLessons: () => void;
   onOpenReviewQuestions: () => void;
+  onOpenMatchingGame: () => void;
 }
 
-export function LessonView({ lessonId, onBackToLessons, onOpenReviewQuestions }: LessonViewProps) {
+export function LessonView({
+  lessonId,
+  onBackToLessons,
+  onOpenReviewQuestions,
+  onOpenMatchingGame,
+}: LessonViewProps) {
   const lesson = getLessonById(lessonId);
 
   if (!lesson) {
@@ -75,6 +81,7 @@ export function LessonView({ lessonId, onBackToLessons, onOpenReviewQuestions }:
         }}
       >
         <AppButton label="أسئلة المراجعة" onClick={onOpenReviewQuestions} />
+        <AppButton label="لعبة تعليمية" onClick={onOpenMatchingGame} />
         <AppButton label="العودة إلى الدروس" variant="secondary" onClick={onBackToLessons} />
       </div>
     </article>

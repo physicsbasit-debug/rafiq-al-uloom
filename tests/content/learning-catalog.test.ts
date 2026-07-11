@@ -6,15 +6,18 @@ import {
   learningCatalogUnits,
 } from '@content/seed/learning-catalog.seed';
 import {
+  grade10PhysicsWavesGames,
   grade10PhysicsWavesLessons,
   grade10PhysicsWavesMasteryQuestions,
   grade10PhysicsWavesReviewQuestions,
 } from '@content/seed/grade10-physics-waves';
 import {
   getExperimentsByLesson,
+  getGamesByLesson,
   getGrades,
   getLessonById,
   getLessonsByUnit,
+  getObjectivesByIds,
   getObjectivesByLesson,
   getReviewQuestionsByLesson,
   getSemestersByGrade,
@@ -178,6 +181,13 @@ describe('repository: القراءة', () => {
     expect(objectives.every((objective) => objective.lessonId === 'g10-phy-waves-l1')).toBe(true);
   });
 
+  it('getObjectivesByIds يعيد الأهداف المطلوبة فقط', () => {
+    const objectives = getObjectivesByIds(['l1-o1', 'l1-o2']);
+
+    expect(objectives.length).toBe(2);
+    expect(objectives.map((objective) => objective.id)).toEqual(['l1-o1', 'l1-o2']);
+  });
+
   it('getExperimentsByLesson يعيد تجربة الدرس الأول', () => {
     const experiments = getExperimentsByLesson('g10-phy-waves-l1');
 
@@ -199,6 +209,21 @@ describe('repository: القراءة', () => {
 
     for (const reviewId of reviewIds) {
       expect(masteryIds.has(reviewId)).toBe(false);
+    }
+  });
+
+  it('getGamesByLesson يعيد لعبة الدرس الأول فقط', () => {
+    const games = getGamesByLesson('g10-phy-waves-l1');
+
+    expect(games.length).toBe(1);
+    expect(games[0]?.lessonId).toBe('g10-phy-waves-l1');
+  });
+
+  it('كل لعبة مرتبطة بأهداف موجودة', () => {
+    for (const game of grade10PhysicsWavesGames) {
+      const objectives = getObjectivesByIds(game.objectiveIds);
+
+      expect(objectives.length).toBe(game.objectiveIds.length);
     }
   });
 });
