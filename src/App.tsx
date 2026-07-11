@@ -3,6 +3,7 @@ import { AppButton } from '@design-system/components/AppButton';
 import { GradeSelection } from '@features/student/grade-selection/GradeSelection';
 import { LessonList } from '@features/student/lesson-list/LessonList';
 import { LessonView } from '@features/student/lesson-view/LessonView';
+import { ReviewQuestionsView } from '@features/student/review-questions/ReviewQuestionsView';
 import { SemesterSelection } from '@features/student/semester-selection/SemesterSelection';
 import { SubjectSelection } from '@features/student/subject-selection/SubjectSelection';
 import { UnitSelection } from '@features/student/unit-selection/UnitSelection';
@@ -11,10 +12,10 @@ import { UnitSelection } from '@features/student/unit-selection/UnitSelection';
  * App = نقطة تركيب التنقّل فقط.
  *
  * الرحلة الحالية:
- * الصف → الفصل الدراسي → المادة → الوحدة → الدروس → عرض الدرس.
+ * الصف → الفصل الدراسي → المادة → الوحدة → الدروس → عرض الدرس → أسئلة المراجعة.
  *
  * لا توجد بيانات ثابتة هنا؛ كل البيانات تأتي من repository عبر الشاشات.
- * صفحة الدرس في Phase 1-C قراءة فقط: لا أسئلة، لا لعبة، لا mastery.
+ * أسئلة المراجعة في Phase 1-D بلا درجة نهائية ولا mastery.
  */
 
 type Step =
@@ -23,7 +24,8 @@ type Step =
   | { name: 'subject'; semesterId: string }
   | { name: 'unit'; semesterId: string; subjectId: string }
   | { name: 'lessons'; unitId: string }
-  | { name: 'lesson'; lessonId: string; unitId: string };
+  | { name: 'lesson'; lessonId: string; unitId: string }
+  | { name: 'review'; lessonId: string; unitId: string };
 
 export default function App() {
   const [step, setStep] = useState<Step>({ name: 'grade' });
@@ -92,6 +94,16 @@ export default function App() {
         <LessonView
           lessonId={step.lessonId}
           onBackToLessons={() => setStep({ name: 'lessons', unitId: step.unitId })}
+          onOpenReviewQuestions={() =>
+            setStep({ name: 'review', lessonId: step.lessonId, unitId: step.unitId })
+          }
+        />
+      ) : null}
+
+      {step.name === 'review' ? (
+        <ReviewQuestionsView
+          lessonId={step.lessonId}
+          onBackToLesson={() => setStep({ name: 'lesson', lessonId: step.lessonId, unitId: step.unitId })}
         />
       ) : null}
     </main>

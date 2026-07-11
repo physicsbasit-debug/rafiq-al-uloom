@@ -14,9 +14,10 @@ import {
 interface LessonViewProps {
   lessonId: string;
   onBackToLessons: () => void;
+  onOpenReviewQuestions: () => void;
 }
 
-export function LessonView({ lessonId, onBackToLessons }: LessonViewProps) {
+export function LessonView({ lessonId, onBackToLessons, onOpenReviewQuestions }: LessonViewProps) {
   const lesson = getLessonById(lessonId);
 
   if (!lesson) {
@@ -65,8 +66,16 @@ export function LessonView({ lessonId, onBackToLessons }: LessonViewProps) {
       <LessonMisconceptions misconceptions={lesson.misconceptions} />
       <LessonExperiments experiments={experiments} />
 
-      <div style={{ marginTop: '1.5rem' }}>
-        <AppButton label="العودة إلى الدروس" onClick={onBackToLessons} />
+      <div
+        style={{
+          marginTop: '1.5rem',
+          display: 'flex',
+          gap: '0.75rem',
+          flexWrap: 'wrap',
+        }}
+      >
+        <AppButton label="أسئلة المراجعة" onClick={onOpenReviewQuestions} />
+        <AppButton label="العودة إلى الدروس" variant="secondary" onClick={onBackToLessons} />
       </div>
     </article>
   );
