@@ -5,13 +5,18 @@ import {
   learningCatalogSubjects,
   learningCatalogUnits,
 } from '@content/seed/learning-catalog.seed';
-import { grade10PhysicsWavesLessons } from '@content/seed/grade10-physics-waves';
+import {
+  grade10PhysicsWavesLessons,
+  grade10PhysicsWavesMasteryQuestions,
+  grade10PhysicsWavesReviewQuestions,
+} from '@content/seed/grade10-physics-waves';
 import {
   getExperimentsByLesson,
   getGrades,
   getLessonById,
   getLessonsByUnit,
   getObjectivesByLesson,
+  getReviewQuestionsByLesson,
   getSemestersByGrade,
   getSubjectsBySemester,
   getUnitsBySubject,
@@ -111,7 +116,7 @@ describe('repository: القراءة', () => {
     const unitSubjectIds = new Set(
       learningCatalogUnits
         .filter((unit) => unit.semesterId === 'g10-sem2')
-        .map((unit) => unit.subjectId)
+        .map((unit) => unit.subjectId),
     );
 
     for (const subject of subjectsInSemester) {
@@ -178,5 +183,22 @@ describe('repository: القراءة', () => {
 
     expect(experiments.length).toBe(1);
     expect(experiments[0]?.lessonId).toBe('g10-phy-waves-l1');
+  });
+
+  it('getReviewQuestionsByLesson يعيد أسئلة مراجعة الدرس الأول فقط', () => {
+    const questions = getReviewQuestionsByLesson('g10-phy-waves-l1');
+
+    expect(questions.length).toBe(6);
+    expect(questions.every((question) => question.lessonId === 'g10-phy-waves-l1')).toBe(true);
+    expect(questions.every((question) => question.id.includes('-rq'))).toBe(true);
+  });
+
+  it('أسئلة المراجعة لا تتقاطع مع أسئلة الإتقان', () => {
+    const reviewIds = new Set(grade10PhysicsWavesReviewQuestions.map((question) => question.id));
+    const masteryIds = new Set(grade10PhysicsWavesMasteryQuestions.map((question) => question.id));
+
+    for (const reviewId of reviewIds) {
+      expect(masteryIds.has(reviewId)).toBe(false);
+    }
   });
 });
