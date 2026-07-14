@@ -47,7 +47,7 @@ export function createMatchingRound(game: Game): MatchingRound {
       id: `${game.id}-right-${index}`,
       text: item.right,
       pairId: createPairId(game.id, index),
-    })),
+    }))
   );
 
   return {
@@ -56,13 +56,16 @@ export function createMatchingRound(game: Game): MatchingRound {
   };
 }
 
-export function isMatchingCorrect(leftItem: MatchingLeftItem, rightItem: MatchingRightItem): boolean {
+export function isMatchingCorrect(
+  leftItem: MatchingLeftItem,
+  rightItem: MatchingRightItem
+): boolean {
   return leftItem.pairId === rightItem.pairId;
 }
 
 export function getMatchingAttemptResult(
   leftItem: MatchingLeftItem,
-  rightItem: MatchingRightItem,
+  rightItem: MatchingRightItem
 ): MatchingAttemptResult {
   const isCorrect = isMatchingCorrect(leftItem, rightItem);
 
@@ -80,5 +83,7 @@ export function isRightColumnRowByRow(round: MatchingRound): boolean {
     return false;
   }
 
-  return round.leftItems.every((leftItem, index) => leftItem.pairId === round.rightItems[index]?.pairId);
+  return round.leftItems.every(
+    (leftItem, index) => leftItem.pairId === round.rightItems[index]?.pairId
+  );
 }

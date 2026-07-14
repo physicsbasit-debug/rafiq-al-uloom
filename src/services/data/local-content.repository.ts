@@ -1,4 +1,11 @@
-import type { Grade, Lesson, Objective, Semester, Subject, Unit } from '@shared-types/content.types';
+import type {
+  Grade,
+  Lesson,
+  Objective,
+  Semester,
+  Subject,
+  Unit,
+} from '@shared-types/content.types';
 import type { Experiment } from '@shared-types/experiment.types';
 import type { Game } from '@shared-types/game.types';
 import type { Question } from '@shared-types/quiz.types';
@@ -45,7 +52,7 @@ export function getSubjectsBySemester(semesterId: string): Subject[] {
   const subjectIdsInSemester = new Set(
     learningCatalogUnits
       .filter((unit) => unit.semesterId === semesterId)
-      .map((unit) => unit.subjectId),
+      .map((unit) => unit.subjectId)
   );
 
   return learningCatalogSubjects.filter((subject) => subjectIdsInSemester.has(subject.id));

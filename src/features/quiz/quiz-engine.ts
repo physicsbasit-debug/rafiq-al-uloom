@@ -10,14 +10,21 @@ export interface QuestionFeedbackResult {
 }
 
 export function isChoiceIndexValid(question: Question, selectedIndex: number): boolean {
-  return Number.isInteger(selectedIndex) && selectedIndex >= 0 && selectedIndex < question.choices.length;
+  return (
+    Number.isInteger(selectedIndex) && selectedIndex >= 0 && selectedIndex < question.choices.length
+  );
 }
 
 export function isCorrectAnswer(question: Question, selectedIndex: number): boolean {
-  return isChoiceIndexValid(question, selectedIndex) && selectedIndex === question.correctAnswerIndex;
+  return (
+    isChoiceIndexValid(question, selectedIndex) && selectedIndex === question.correctAnswerIndex
+  );
 }
 
-export function getQuestionFeedback(question: Question, selectedIndex: number): QuestionFeedbackResult {
+export function getQuestionFeedback(
+  question: Question,
+  selectedIndex: number
+): QuestionFeedbackResult {
   const isValidChoice = isChoiceIndexValid(question, selectedIndex);
   const isCorrect = isCorrectAnswer(question, selectedIndex);
   const selectedChoice = isValidChoice ? question.choices[selectedIndex] : null;

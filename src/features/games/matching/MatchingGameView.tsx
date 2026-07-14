@@ -24,10 +24,12 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
   const games = getGamesByLesson(lessonId);
   const rounds = useMemo(
     () => games.map((game) => ({ game, round: createMatchingRound(game) })),
-    [games],
+    [games]
   );
 
-  const [selectedLeftByGame, setSelectedLeftByGame] = useState<Record<string, MatchingLeftItem | undefined>>({});
+  const [selectedLeftByGame, setSelectedLeftByGame] = useState<
+    Record<string, MatchingLeftItem | undefined>
+  >({});
   const [completedPairsByGame, setCompletedPairsByGame] = useState<Record<string, string[]>>({});
   const [feedback, setFeedback] = useState<FeedbackState | null>(null);
 
@@ -133,7 +135,9 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
                   }}
                 >
                   <strong>هذه اللعبة تختبر:</strong>
-                  <ul style={{ margin: '0.5rem 0 0', paddingInlineStart: '1.25rem', lineHeight: 1.8 }}>
+                  <ul
+                    style={{ margin: '0.5rem 0 0', paddingInlineStart: '1.25rem', lineHeight: 1.8 }}
+                  >
                     {gameObjectives.map((objective) => (
                       <li key={objective.id}>{objective.text}</li>
                     ))}
@@ -164,7 +168,11 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
                               textAlign: 'right',
                               border: selected ? '2px solid #2563EB' : '1px solid #D1D5DB',
                               borderRadius: '0.85rem',
-                              backgroundColor: completed ? '#ECFDF5' : selected ? '#EFF6FF' : '#F9FAFB',
+                              backgroundColor: completed
+                                ? '#ECFDF5'
+                                : selected
+                                  ? '#EFF6FF'
+                                  : '#F9FAFB',
                               color: '#1F2937',
                               padding: '0.8rem',
                               cursor: completed ? 'not-allowed' : 'pointer',
@@ -219,7 +227,9 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
                     />
                   ) : null}
 
-                  {isGameComplete ? <MatchingFeedback message="اكتملت جميع المطابقات بنجاح." isCorrect /> : null}
+                  {isGameComplete ? (
+                    <MatchingFeedback message="اكتملت جميع المطابقات بنجاح." isCorrect />
+                  ) : null}
                 </div>
               </article>
             );

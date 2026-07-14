@@ -10,10 +10,13 @@ export interface ScoreResult {
 
 export type AnswersByQuestionId = Record<string, number | undefined>;
 
-export function calculateScore(questions: Question[], answersByQuestionId: AnswersByQuestionId): ScoreResult {
+export function calculateScore(
+  questions: Question[],
+  answersByQuestionId: AnswersByQuestionId
+): ScoreResult {
   const totalQuestions = questions.length;
   const answeredQuestions = questions.filter(
-    (question) => answersByQuestionId[question.id] !== undefined,
+    (question) => answersByQuestionId[question.id] !== undefined
   ).length;
 
   const correctAnswers = questions.filter((question) => {
@@ -32,7 +35,10 @@ export function calculateScore(questions: Question[], answersByQuestionId: Answe
 
 export function areAllQuestionsAnswered(
   questions: Question[],
-  answersByQuestionId: AnswersByQuestionId,
+  answersByQuestionId: AnswersByQuestionId
 ): boolean {
-  return questions.length > 0 && questions.every((question) => answersByQuestionId[question.id] !== undefined);
+  return (
+    questions.length > 0 &&
+    questions.every((question) => answersByQuestionId[question.id] !== undefined)
+  );
 }

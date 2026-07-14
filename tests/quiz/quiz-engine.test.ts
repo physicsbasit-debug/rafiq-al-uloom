@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { grade10PhysicsWavesReviewQuestions } from '@content/seed/grade10-physics-waves';
-import { getQuestionFeedback, isChoiceIndexValid, isCorrectAnswer } from '@features/quiz/quiz-engine';
+import {
+  getQuestionFeedback,
+  isChoiceIndexValid,
+  isCorrectAnswer,
+} from '@features/quiz/quiz-engine';
 
 const question = grade10PhysicsWavesReviewQuestions[0];
 

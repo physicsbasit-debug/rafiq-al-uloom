@@ -5,7 +5,7 @@ import type { Question } from '@shared-types/quiz.types';
 import { areAllQuestionsAnswered, calculateScore, type AnswersByQuestionId } from '@utils/scoring';
 
 const questions = grade10PhysicsWavesMasteryQuestions.filter(
-  (question) => question.lessonId === 'g10-phy-waves-l1',
+  (question) => question.lessonId === 'g10-phy-waves-l1'
 );
 
 function getWrongChoiceIndex(question: Question): number {
@@ -57,7 +57,9 @@ describe('scoring: حساب درجة اختبار الإتقان', () => {
 
   it('يتحقق من اكتمال الإجابات قبل الإنهاء', () => {
     expect(areAllQuestionsAnswered(questions, buildAnswers(5))).toBe(true);
-    expect(areAllQuestionsAnswered(questions, { [questions[0].id]: questions[0].correctAnswerIndex })).toBe(false);
+    expect(
+      areAllQuestionsAnswered(questions, { [questions[0].id]: questions[0].correctAnswerIndex })
+    ).toBe(false);
   });
 
   it('يصنف 3/5 قريبًا من الإتقان و4/5 متقنًا', () => {
