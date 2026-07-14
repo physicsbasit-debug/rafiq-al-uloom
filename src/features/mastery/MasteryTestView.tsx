@@ -95,13 +95,13 @@ export function MasteryTestView({ lessonId, onBackToLesson }: MasteryTestViewPro
     const recommendation = getMasteryRecommendation(classification);
 
     setResult({
-      id: `mastery-${lessonId}-${Date.now()}`,
+      id: `mastery-${lessonId}-local-session`,
       studentId: 'local-session',
       lessonId,
       score: scoreResult.score,
       classification,
       recommendation,
-      createdAt: new Date().toISOString(),
+      createdAt: 'local-session',
     });
   }
 
@@ -137,7 +137,14 @@ export function MasteryTestView({ lessonId, onBackToLesson }: MasteryTestViewPro
                 <p style={{ margin: '0 0 0.35rem', color: '#6B7280', fontWeight: 700 }}>
                   سؤال {questionIndex + 1}
                 </p>
-                <h3 style={{ margin: '0 0 1rem', color: '#1F2937', fontSize: '1rem', lineHeight: 1.8 }}>
+                <h3
+                  style={{
+                    margin: '0 0 1rem',
+                    color: '#1F2937',
+                    fontSize: '1rem',
+                    lineHeight: 1.8,
+                  }}
+                >
                   {question.prompt}
                 </h3>
 
