@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AppButton } from '@design-system/components/AppButton';
 import { MatchingGameView } from '@features/games/matching/MatchingGameView';
+import { MasteryTestView } from '@features/mastery/MasteryTestView';
 import { GradeSelection } from '@features/student/grade-selection/GradeSelection';
 import { LessonList } from '@features/student/lesson-list/LessonList';
 import { LessonView } from '@features/student/lesson-view/LessonView';
@@ -13,10 +14,11 @@ import { UnitSelection } from '@features/student/unit-selection/UnitSelection';
  * App = نقطة تركيب التنقّل فقط.
  *
  * الرحلة الحالية:
- * الصف → الفصل الدراسي → المادة → الوحدة → الدروس → عرض الدرس → أسئلة المراجعة/لعبة المطابقة.
+ * الصف → الفصل الدراسي → المادة → الوحدة → الدروس → عرض الدرس
+ * ثم أسئلة المراجعة/لعبة المطابقة/اختبار الإتقان.
  *
  * لا توجد بيانات ثابتة هنا؛ كل البيانات تأتي من repository عبر الشاشات.
- * لعبة المطابقة في Phase 1-E تدريبية بلا درجة نهائية ولا mastery.
+ * اختبار الإتقان في Phase 1-F نتيجته في ذاكرة الجلسة فقط.
  */
 
 type Step =
@@ -27,7 +29,8 @@ type Step =
   | { name: 'lessons'; unitId: string }
   | { name: 'lesson'; lessonId: string; unitId: string }
   | { name: 'review'; lessonId: string; unitId: string }
-  | { name: 'game'; lessonId: string; unitId: string };
+  | { name: 'game'; lessonId: string; unitId: string }
+  | { name: 'mastery'; lessonId: string; unitId: string };
 
 export default function App() {
   const [step, setStep] = useState<Step>({ name: 'grade' });
@@ -102,6 +105,9 @@ export default function App() {
           onOpenMatchingGame={() =>
             setStep({ name: 'game', lessonId: step.lessonId, unitId: step.unitId })
           }
+          onOpenMasteryTest={() =>
+            setStep({ name: 'mastery', lessonId: step.lessonId, unitId: step.unitId })
+          }
         />
       ) : null}
 
@@ -116,6 +122,15 @@ export default function App() {
 
       {step.name === 'game' ? (
         <MatchingGameView
+          lessonId={step.lessonId}
+          onBackToLesson={() =>
+            setStep({ name: 'lesson', lessonId: step.lessonId, unitId: step.unitId })
+          }
+        />
+      ) : null}
+
+      {step.name === 'mastery' ? (
+        <MasteryTestView
           lessonId={step.lessonId}
           onBackToLesson={() =>
             setStep({ name: 'lesson', lessonId: step.lessonId, unitId: step.unitId })

@@ -17,6 +17,7 @@ import {
   getGrades,
   getLessonById,
   getLessonsByUnit,
+  getMasteryQuestionsByLesson,
   getObjectivesByIds,
   getObjectivesByLesson,
   getReviewQuestionsByLesson,
@@ -224,6 +225,26 @@ describe('repository: القراءة', () => {
       const objectives = getObjectivesByIds(game.objectiveIds);
 
       expect(objectives.length).toBe(game.objectiveIds.length);
+    }
+  });
+
+  it('getMasteryQuestionsByLesson يعيد أسئلة إتقان الدرس الأول فقط', () => {
+    const questions = getMasteryQuestionsByLesson('g10-phy-waves-l1');
+
+    expect(questions.length).toBe(5);
+    expect(questions.every((question) => question.lessonId === 'g10-phy-waves-l1')).toBe(true);
+    expect(questions.every((question) => question.id.includes('-mq'))).toBe(true);
+  });
+
+  it('أسئلة الإتقان لا تتسرّب من أسئلة المراجعة في كل الدروس', () => {
+    const reviewIds = new Set(grade10PhysicsWavesReviewQuestions.map((question) => question.id));
+    const lessonIds = new Set(grade10PhysicsWavesLessons.map((lesson) => lesson.id));
+
+    for (const lessonId of lessonIds) {
+      const masteryQuestions = getMasteryQuestionsByLesson(lessonId);
+
+      expect(masteryQuestions.length).toBe(5);
+      expect(masteryQuestions.every((question) => !reviewIds.has(question.id))).toBe(true);
     }
   });
 });

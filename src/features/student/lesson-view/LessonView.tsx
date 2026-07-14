@@ -16,6 +16,7 @@ interface LessonViewProps {
   onBackToLessons: () => void;
   onOpenReviewQuestions: () => void;
   onOpenMatchingGame: () => void;
+  onOpenMasteryTest: () => void;
 }
 
 export function LessonView({
@@ -23,6 +24,7 @@ export function LessonView({
   onBackToLessons,
   onOpenReviewQuestions,
   onOpenMatchingGame,
+  onOpenMasteryTest,
 }: LessonViewProps) {
   const lesson = getLessonById(lessonId);
 
@@ -82,6 +84,7 @@ export function LessonView({
       >
         <AppButton label="أسئلة المراجعة" onClick={onOpenReviewQuestions} />
         <AppButton label="لعبة تعليمية" onClick={onOpenMatchingGame} />
+        <AppButton label="اختبار الإتقان" onClick={onOpenMasteryTest} />
         <AppButton label="العودة إلى الدروس" variant="secondary" onClick={onBackToLessons} />
       </div>
     </article>

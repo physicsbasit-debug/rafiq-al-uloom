@@ -12,6 +12,7 @@ import {
   grade10PhysicsWavesExperiments,
   grade10PhysicsWavesGames,
   grade10PhysicsWavesLessons,
+  grade10PhysicsWavesMasteryQuestions,
   grade10PhysicsWavesObjectives,
   grade10PhysicsWavesReviewQuestions,
 } from '@content/seed/grade10-physics-waves';
@@ -88,6 +89,10 @@ export function getExperimentsByLesson(lessonId: string): Experiment[] {
 
 export function getReviewQuestionsByLesson(lessonId: string): Question[] {
   return grade10PhysicsWavesReviewQuestions.filter((question) => question.lessonId === lessonId);
+}
+
+export function getMasteryQuestionsByLesson(lessonId: string): Question[] {
+  return grade10PhysicsWavesMasteryQuestions.filter((question) => question.lessonId === lessonId);
 }
 
 export function getGamesByLesson(lessonId: string): Game[] {
