@@ -1,4 +1,5 @@
 import { AppCard } from '@design-system/components/AppCard';
+import { colors } from '@design-system/theme/colors';
 import { getSubjectsBySemester } from '@services/data/local-content.repository';
 
 interface SubjectSelectionProps {
@@ -11,22 +12,22 @@ export function SubjectSelection({ semesterId, onSelectSubject }: SubjectSelecti
 
   return (
     <section>
-      <h2 style={{ color: '#1F2937' }}>اختر المادة</h2>
+      <h2 style={{ margin: '0 0 0.9rem', color: colors.textPrimary }}>اختر المادة</h2>
 
       {subjects.length === 0 ? (
-        <p style={{ color: '#6B7280' }}>لا توجد مواد مضافة لهذا الفصل بعد.</p>
-      ) : (
-        <div style={{ display: 'grid', gap: '0.75rem' }}>
-          {subjects.map((subject) => (
-            <AppCard
-              key={subject.id}
-              title={subject.name}
-              accentColor={subject.themeColor}
-              onClick={() => onSelectSubject(subject.id)}
-            />
-          ))}
-        </div>
-      )}
+        <p style={{ color: colors.textSecondary }}>لا توجد مواد مرتبطة بهذا الفصل بعد.</p>
+      ) : null}
+
+      <div style={{ display: 'grid', gap: '0.8rem' }}>
+        {subjects.map((subject) => (
+          <AppCard
+            key={subject.id}
+            title={subject.name}
+            accentColor={subject.themeColor}
+            onClick={() => onSelectSubject(subject.id)}
+          />
+        ))}
+      </div>
     </section>
   );
 }

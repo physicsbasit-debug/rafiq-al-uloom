@@ -1,3 +1,4 @@
+import { colors } from '@design-system/theme/colors';
 import type { QuestionFeedbackResult } from '@features/quiz/quiz-engine';
 
 interface QuestionFeedbackProps {
@@ -5,37 +6,33 @@ interface QuestionFeedbackProps {
 }
 
 export function QuestionFeedback({ feedback }: QuestionFeedbackProps) {
-  const shouldShowCorrectAnswer = !feedback.isCorrect;
-
   return (
     <div
       role="status"
       style={{
-        marginTop: '0.85rem',
-        border: '1px solid #D1D5DB',
+        marginTop: '0.75rem',
+        border: `1px solid ${colors.border}`,
         borderRadius: '0.85rem',
-        padding: '0.85rem',
-        backgroundColor: feedback.isCorrect ? '#ECFDF5' : '#FEF2F2',
+        padding: '0.75rem',
+        backgroundColor: feedback.isCorrect ? colors.successSoft : colors.errorSoft,
       }}
     >
       <p
         style={{
-          margin: '0 0 0.5rem',
-          fontWeight: 800,
-          color: feedback.isCorrect ? '#047857' : '#B91C1C',
+          margin: '0 0 0.45rem',
+          fontWeight: 900,
+          color: feedback.isCorrect ? colors.successDark : colors.errorDark,
         }}
       >
-        {feedback.isCorrect ? '✓' : '✕'} {feedback.statusText}
+        {feedback.isCorrect ? '✓ إجابة صحيحة' : '✕ إجابة خاطئة'}
       </p>
-
-      {shouldShowCorrectAnswer ? (
-        <p style={{ margin: '0 0 0.5rem', color: '#374151', lineHeight: 1.8 }}>
+      {!feedback.isCorrect ? (
+        <p style={{ margin: '0 0 0.45rem', color: colors.textPrimary, lineHeight: 1.7 }}>
           <strong>الإجابة الصحيحة: </strong>
           {feedback.correctChoice}
         </p>
       ) : null}
-
-      <p style={{ margin: 0, color: '#374151', lineHeight: 1.8 }}>
+      <p style={{ margin: 0, color: colors.textPrimary, lineHeight: 1.7 }}>
         <strong>الشرح: </strong>
         {feedback.explanation}
       </p>

@@ -1,12 +1,68 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @theme {
   --color-primary: #2f6fed;
+  --color-primary-dark: #1d4ed8;
+  --color-primary-soft: #eff6ff;
   --color-success: #2e9b6f;
+  --color-success-dark: #047857;
+  --color-success-soft: #ecfdf5;
+  --color-warning: #b45309;
+  --color-warning-soft: #fffbeb;
   --color-error: #c4544d;
+  --color-error-dark: #b91c1c;
+  --color-error-soft: #fef2f2;
   --color-background: #f7f8fa;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f9fafb;
   --color-text-primary: #1f2937;
   --color-text-secondary: #6b7280;
   --color-border: #e5e7eb;
-  --font-family-sans: 'Tajawal', 'IBM Plex Sans Arabic', sans-serif;
+  --color-border-strong: #d1d5db;
+}
+
+:root {
+  font-family: "Tajawal", "IBM Plex Sans Arabic", system-ui, sans-serif;
+  color: var(--color-text-primary);
+  background: var(--color-background);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  background: var(--color-background);
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: var(--color-background);
+}
+
+button,
+[role="button"] {
+  min-height: 44px;
+}
+
+button:focus-visible,
+[role="button"]:focus-visible {
+  outline: 3px solid var(--color-primary-dark);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

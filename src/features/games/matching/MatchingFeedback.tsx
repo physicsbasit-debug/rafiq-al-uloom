@@ -1,3 +1,5 @@
+import { colors } from '@design-system/theme/colors';
+
 interface MatchingFeedbackProps {
   message: string;
   isCorrect: boolean;
@@ -8,13 +10,13 @@ export function MatchingFeedback({ message, isCorrect }: MatchingFeedbackProps) 
     <div
       role="status"
       style={{
-        border: '1px solid #D1D5DB',
+        border: `1px solid ${isCorrect ? colors.success : colors.error}`,
         borderRadius: '0.85rem',
-        padding: '0.8rem',
-        backgroundColor: isCorrect ? '#ECFDF5' : '#FEF2F2',
-        color: isCorrect ? '#047857' : '#B91C1C',
-        fontWeight: 800,
-        lineHeight: 1.8,
+        padding: '0.75rem',
+        backgroundColor: isCorrect ? colors.successSoft : colors.errorSoft,
+        color: isCorrect ? colors.successDark : colors.errorDark,
+        fontWeight: 900,
+        lineHeight: 1.7,
       }}
     >
       {isCorrect ? '✓' : '✕'} {message}

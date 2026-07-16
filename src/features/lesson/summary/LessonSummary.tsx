@@ -1,14 +1,23 @@
 import { SectionHeader } from '@design-system/components/SectionHeader';
+import { colors } from '@design-system/theme/colors';
 
-interface LessonSummaryProps {
+
+interface Props {
   summary: string;
 }
 
-export function LessonSummary({ summary }: LessonSummaryProps) {
+export function LessonSummary({ summary }: Props) {
   return (
-    <section style={{ marginBottom: '1.25rem' }}>
-      <SectionHeader title="ملخص الدرس" />
-      <p style={{ margin: 0, color: '#374151', lineHeight: 2 }}>{summary}</p>
+    <section
+      style={{
+        border: `1px solid ${colors.border}`,
+        borderRadius: '1rem',
+        padding: '1rem',
+        backgroundColor: colors.surface,
+      }}
+    >
+      <SectionHeader title="ملخص الدرس" icon="📝" />
+      <p style={{ margin: 0, color: colors.textPrimary, lineHeight: 1.95 }}>{summary}</p>
     </section>
   );
 }

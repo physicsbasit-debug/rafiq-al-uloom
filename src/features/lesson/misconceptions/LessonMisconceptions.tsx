@@ -1,26 +1,25 @@
 import { SectionHeader } from '@design-system/components/SectionHeader';
+import { colors } from '@design-system/theme/colors';
 
-interface LessonMisconceptionsProps {
+
+interface Props {
   misconceptions: string[];
 }
 
-export function LessonMisconceptions({ misconceptions }: LessonMisconceptionsProps) {
+export function LessonMisconceptions({ misconceptions }: Props) {
   return (
-    <section style={{ marginBottom: '1.25rem' }}>
-      <SectionHeader
-        title="أخطاء شائعة"
-        description="تنبيهات تساعد الطالب على تجنب الفهم الخاطئ للمفهوم."
-      />
-
-      {misconceptions.length === 0 ? (
-        <p style={{ color: '#6B7280' }}>لا توجد أخطاء شائعة مضافة بعد.</p>
-      ) : (
-        <ul style={{ margin: 0, paddingInlineStart: '1.25rem', lineHeight: 1.9 }}>
-          {misconceptions.map((misconception) => (
-            <li key={misconception}>{misconception}</li>
-          ))}
+    <section
+      style={{
+        border: `1px solid ${colors.border}`,
+        borderRadius: '1rem',
+        padding: '1rem',
+        backgroundColor: colors.surface,
+      }}
+    >
+      <SectionHeader title="أخطاء شائعة" icon="⚠️" />
+      <ul style={{ margin: 0, paddingInlineStart: '1.2rem', color: colors.textPrimary, lineHeight: 1.9 }}>
+          {misconceptions.map((misconception) => <li key={misconception}>{misconception}</li>)}
         </ul>
-      )}
     </section>
   );
 }

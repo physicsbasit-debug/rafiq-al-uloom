@@ -1,4 +1,5 @@
 import { AppCard } from '@design-system/components/AppCard';
+import { colors } from '@design-system/theme/colors';
 import { getSemestersByGrade } from '@services/data/local-content.repository';
 
 interface SemesterSelectionProps {
@@ -11,9 +12,8 @@ export function SemesterSelection({ gradeId, onSelectSemester }: SemesterSelecti
 
   return (
     <section>
-      <h2 style={{ color: '#1F2937' }}>اختر الفصل الدراسي</h2>
-
-      <div style={{ display: 'grid', gap: '0.75rem' }}>
+      <h2 style={{ margin: '0 0 0.9rem', color: colors.textPrimary }}>اختر الفصل الدراسي</h2>
+      <div style={{ display: 'grid', gap: '0.8rem' }}>
         {semesters.map((semester) => (
           <AppCard
             key={semester.id}

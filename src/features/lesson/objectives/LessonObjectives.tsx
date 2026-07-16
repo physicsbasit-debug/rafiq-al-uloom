@@ -1,24 +1,25 @@
-import type { Objective } from '@shared-types/content.types';
 import { SectionHeader } from '@design-system/components/SectionHeader';
+import { colors } from '@design-system/theme/colors';
+import type { Objective } from '@shared-types/content.types';
 
-interface LessonObjectivesProps {
+interface Props {
   objectives: Objective[];
 }
 
-export function LessonObjectives({ objectives }: LessonObjectivesProps) {
+export function LessonObjectives({ objectives }: Props) {
   return (
-    <section style={{ marginBottom: '1.25rem' }}>
-      <SectionHeader title="أهداف التعلم" />
-
-      {objectives.length === 0 ? (
-        <p style={{ color: '#6B7280' }}>لا توجد أهداف مرتبطة بهذا الدرس بعد.</p>
-      ) : (
-        <ul style={{ margin: 0, paddingInlineStart: '1.25rem', lineHeight: 1.9 }}>
-          {objectives.map((objective) => (
-            <li key={objective.id}>{objective.text}</li>
-          ))}
+    <section
+      style={{
+        border: `1px solid ${colors.border}`,
+        borderRadius: '1rem',
+        padding: '1rem',
+        backgroundColor: colors.surface,
+      }}
+    >
+      <SectionHeader title="أهداف التعلم" icon="🎯" />
+      <ul style={{ margin: 0, paddingInlineStart: '1.2rem', color: colors.textPrimary, lineHeight: 1.9 }}>
+          {objectives.map((objective) => <li key={objective.id}>{objective.text}</li>)}
         </ul>
-      )}
     </section>
   );
 }

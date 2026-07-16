@@ -1,4 +1,5 @@
 import { AppButton } from '@design-system/components/AppButton';
+import { colors } from '@design-system/theme/colors';
 import { LessonConcepts } from '@features/lesson/concepts/LessonConcepts';
 import { LessonExamples } from '@features/lesson/examples/LessonExamples';
 import { LessonExperiments } from '@features/lesson/experiments/LessonExperiments';
@@ -32,54 +33,32 @@ export function LessonView({
     return (
       <section>
         <h2>لم يتم العثور على الدرس</h2>
-        <p style={{ color: '#6B7280', lineHeight: 1.8 }}>
-          يبدو أن الدرس غير موجود في بيانات المحتوى الحالية.
-        </p>
         <AppButton label="العودة إلى الدروس" onClick={onBackToLessons} />
       </section>
     );
   }
 
-  const objectives = getObjectivesByLesson(lesson.id);
-  const experiments = getExperimentsByLesson(lesson.id);
-
   return (
-    <article>
-      <header style={{ marginBottom: '1.5rem' }}>
-        <p
-          style={{
-            margin: '0 0 0.4rem',
-            color: '#6B7280',
-            fontWeight: 700,
-          }}
-        >
+    <article style={{ display: 'grid', gap: '0.9rem' }}>
+      <header>
+        <p style={{ margin: '0 0 0.25rem', color: colors.textSecondary, fontWeight: 800 }}>
           درس قراءة
         </p>
-
-        <h2
-          style={{
-            margin: 0,
-            color: '#1F2937',
-            fontSize: '1.5rem',
-          }}
-        >
-          {lesson.title}
-        </h2>
+        <h2 style={{ margin: 0, color: colors.textPrimary }}>{lesson.title}</h2>
       </header>
 
-      <LessonObjectives objectives={objectives} />
+      <LessonObjectives objectives={getObjectivesByLesson(lesson.id)} />
       <LessonSummary summary={lesson.summary} />
       <LessonConcepts concepts={lesson.keyConcepts} />
       <LessonExamples examples={lesson.examples} />
       <LessonMisconceptions misconceptions={lesson.misconceptions} />
-      <LessonExperiments experiments={experiments} />
+      <LessonExperiments experiments={getExperimentsByLesson(lesson.id)} />
 
       <div
         style={{
-          marginTop: '1.5rem',
-          display: 'flex',
-          gap: '0.75rem',
-          flexWrap: 'wrap',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+          gap: '0.65rem',
         }}
       >
         <AppButton label="أسئلة المراجعة" onClick={onOpenReviewQuestions} />

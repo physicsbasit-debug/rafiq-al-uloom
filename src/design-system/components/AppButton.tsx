@@ -1,3 +1,5 @@
+import { colors } from '@design-system/theme/colors';
+
 interface AppButtonProps {
   label: string;
   onClick?: () => void;
@@ -5,9 +7,6 @@ interface AppButtonProps {
   disabled?: boolean;
 }
 
-/**
- * زر أساسي/ثانوي موحّد. حالة تعطيل واضحة بصريًا.
- */
 export function AppButton({
   label,
   onClick,
@@ -15,21 +14,32 @@ export function AppButton({
   disabled = false,
 }: AppButtonProps) {
   const isPrimary = variant === 'primary';
+
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={disabled}
       style={{
+        minHeight: '44px',
+        width: '100%',
         fontFamily: 'inherit',
-        fontSize: '0.95rem',
-        padding: '0.5rem 1rem',
-        borderRadius: '8px',
-        border: isPrimary ? 'none' : '1px solid #2F6FED',
-        background: isPrimary ? '#2F6FED' : 'transparent',
-        color: isPrimary ? '#FFFFFF' : '#2F6FED',
+        fontSize: '1rem',
+        fontWeight: 800,
+        padding: '0.7rem 1rem',
+        borderRadius: '0.85rem',
+        border: isPrimary ? `1px solid ${colors.primary}` : `1px solid ${colors.primary}`,
+        backgroundColor: disabled
+          ? colors.disabledBackground
+          : isPrimary
+            ? colors.primary
+            : colors.surface,
+        color: disabled
+          ? colors.disabledText
+          : isPrimary
+            ? colors.surface
+            : colors.primary,
         cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.55 : 1,
       }}
     >
       {label}
