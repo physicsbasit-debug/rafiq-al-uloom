@@ -51,7 +51,10 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
 
   function handleSelectRight(gameId: string, rightItem: MatchingRightItem) {
     const selectedLeft = selectedLeftByGame[gameId];
-    if (!selectedLeft || isPairCompleted(gameId, rightItem.pairId)) return;
+
+    if (!selectedLeft || isPairCompleted(gameId, rightItem.pairId)) {
+      return;
+    }
 
     const result = getMatchingAttemptResult(selectedLeft, rightItem);
     setFeedback({ gameId, result });
@@ -98,13 +101,42 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
               }}
             >
               <h3 style={{ margin: '0 0 0.35rem', color: colors.textPrimary }}>{game.title}</h3>
+
               <p style={{ margin: '0 0 0.75rem', color: colors.textSecondary, lineHeight: 1.7 }}>
                 {game.instructions}
               </p>
 
+              <section
+                style={{
+                  marginBottom: '0.9rem',
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: '0.85rem',
+                  padding: '0.75rem',
+                  backgroundColor: colors.surfaceMuted,
+                }}
+              >
+                <p style={{ margin: 0, color: colors.textPrimary, fontWeight: 900 }}>
+                  هذه اللعبة تختبر:
+                </p>
+
+                <ul
+                  style={{
+                    margin: '0.4rem 0 0',
+                    paddingInlineStart: '1.2rem',
+                    color: colors.textPrimary,
+                    lineHeight: 1.75,
+                  }}
+                >
+                  {gameObjectives.map((objective) => (
+                    <li key={objective.id}>{objective.text}</li>
+                  ))}
+                </ul>
+              </section>
+
               {!selectedLeft && !complete ? (
                 <>
                   <h4 style={{ color: colors.textPrimary }}>اختر عنصرًا</h4>
+
                   <div style={{ display: 'grid', gap: '0.6rem' }}>
                     {availableLeftItems.map((item) => (
                       <button
@@ -147,9 +179,11 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
                     <p style={{ margin: 0, color: colors.textSecondary, fontWeight: 800 }}>
                       العنصر المختار
                     </p>
+
                     <p style={{ margin: '0.25rem 0 0', color: colors.textPrimary, fontWeight: 900 }}>
                       {selectedLeft.text}
                     </p>
+
                     <button
                       type="button"
                       onClick={() => clearSelection(game.id)}
@@ -169,6 +203,7 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
                   </div>
 
                   <h4 style={{ color: colors.textPrimary }}>اختر المقابل</h4>
+
                   <div style={{ display: 'grid', gap: '0.6rem' }}>
                     {availableRightItems.map((item) => (
                       <button
