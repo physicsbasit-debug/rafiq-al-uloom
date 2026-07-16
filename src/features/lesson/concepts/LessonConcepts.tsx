@@ -1,7 +1,6 @@
 import { SectionHeader } from '@design-system/components/SectionHeader';
 import { colors } from '@design-system/theme/colors';
 
-
 interface Props {
   concepts: string[];
 }
@@ -17,9 +16,18 @@ export function LessonConcepts({ concepts }: Props) {
       }}
     >
       <SectionHeader title="المفاهيم الأساسية" icon="💡" />
-      <ul style={{ margin: 0, paddingInlineStart: '1.2rem', color: colors.textPrimary, lineHeight: 1.9 }}>
-          {concepts.map((concept) => <li key={concept}>{concept}</li>)}
-        </ul>
+      <ul
+        style={{
+          margin: 0,
+          paddingInlineStart: '1.2rem',
+          color: colors.textPrimary,
+          lineHeight: 1.9,
+        }}
+      >
+        {concepts.map((concept) => (
+          <li key={concept}>{concept}</li>
+        ))}
+      </ul>
     </section>
   );
 }

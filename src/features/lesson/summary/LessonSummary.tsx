@@ -1,7 +1,6 @@
 import { SectionHeader } from '@design-system/components/SectionHeader';
 import { colors } from '@design-system/theme/colors';
 
-
 interface Props {
   summary: string;
 }

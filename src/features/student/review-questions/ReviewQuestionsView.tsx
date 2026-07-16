@@ -15,7 +15,7 @@ export function ReviewQuestionsView({ lessonId, onBackToLesson }: ReviewQuestion
 
   function handleSelectChoice(questionId: string, choiceIndex: number) {
     setAnswers((current) =>
-      current[questionId] !== undefined ? current : { ...current, [questionId]: choiceIndex },
+      current[questionId] !== undefined ? current : { ...current, [questionId]: choiceIndex }
     );
   }
 

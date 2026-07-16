@@ -32,7 +32,14 @@ export function MultipleChoiceQuestionCard({
       <p style={{ margin: '0 0 0.3rem', color: colors.textSecondary, fontWeight: 800 }}>
         سؤال <bdi dir="ltr">{questionNumber}</bdi>
       </p>
-      <h3 style={{ margin: '0 0 0.8rem', color: colors.textPrimary, fontSize: '1rem', lineHeight: 1.8 }}>
+      <h3
+        style={{
+          margin: '0 0 0.8rem',
+          color: colors.textPrimary,
+          fontSize: '1rem',
+          lineHeight: 1.8,
+        }}
+      >
         {question.prompt}
       </h3>
 

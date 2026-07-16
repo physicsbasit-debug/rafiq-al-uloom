@@ -25,7 +25,7 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
   const games = getGamesByLesson(lessonId);
   const rounds = useMemo(
     () => games.map((game) => ({ game, round: createMatchingRound(game) })),
-    [games],
+    [games]
   );
   const [selectedLeftByGame, setSelectedLeftByGame] = useState<
     Record<string, MatchingLeftItem | undefined>
@@ -82,10 +82,10 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
           const selectedLeft = selectedLeftByGame[game.id];
           const completedCount = completedPairsByGame[game.id]?.length ?? 0;
           const availableLeftItems = round.leftItems.filter(
-            (item) => !isPairCompleted(game.id, item.pairId),
+            (item) => !isPairCompleted(game.id, item.pairId)
           );
           const availableRightItems = round.rightItems.filter(
-            (item) => !isPairCompleted(game.id, item.pairId),
+            (item) => !isPairCompleted(game.id, item.pairId)
           );
           const gameObjectives = getObjectivesByIds(game.objectiveIds);
           const complete = completedCount === round.leftItems.length;
@@ -180,7 +180,9 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
                       العنصر المختار
                     </p>
 
-                    <p style={{ margin: '0.25rem 0 0', color: colors.textPrimary, fontWeight: 900 }}>
+                    <p
+                      style={{ margin: '0.25rem 0 0', color: colors.textPrimary, fontWeight: 900 }}
+                    >
                       {selectedLeft.text}
                     </p>
 

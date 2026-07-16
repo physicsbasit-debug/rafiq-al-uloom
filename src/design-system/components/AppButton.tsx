@@ -34,11 +34,7 @@ export function AppButton({
           : isPrimary
             ? colors.primary
             : colors.surface,
-        color: disabled
-          ? colors.disabledText
-          : isPrimary
-            ? colors.surface
-            : colors.primary,
+        color: disabled ? colors.disabledText : isPrimary ? colors.surface : colors.primary,
         cursor: disabled ? 'not-allowed' : 'pointer',
       }}
     >

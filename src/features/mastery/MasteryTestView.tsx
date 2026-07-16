@@ -40,12 +40,26 @@ function ReviewItem({
         السؤال <bdi dir="ltr">{questionNumber}</bdi>
       </p>
       <h4 style={{ margin: '0 0 0.6rem', color: colors.textPrimary }}>{question.prompt}</h4>
-      <p style={{ color: feedback.isCorrect ? colors.successDark : colors.errorDark, fontWeight: 900 }}>
+      <p
+        style={{
+          color: feedback.isCorrect ? colors.successDark : colors.errorDark,
+          fontWeight: 900,
+        }}
+      >
         {feedback.isCorrect ? '✓ إجابة صحيحة' : '✕ إجابة خاطئة'}
       </p>
-      <p style={{ color: colors.textPrimary }}><strong>اختيارك: </strong>{feedback.selectedChoice}</p>
-      <p style={{ color: colors.textPrimary }}><strong>الإجابة الصحيحة: </strong>{feedback.correctChoice}</p>
-      <p style={{ color: colors.textPrimary, lineHeight: 1.7 }}><strong>الشرح: </strong>{feedback.explanation}</p>
+      <p style={{ color: colors.textPrimary }}>
+        <strong>اختيارك: </strong>
+        {feedback.selectedChoice}
+      </p>
+      <p style={{ color: colors.textPrimary }}>
+        <strong>الإجابة الصحيحة: </strong>
+        {feedback.correctChoice}
+      </p>
+      <p style={{ color: colors.textPrimary, lineHeight: 1.7 }}>
+        <strong>الشرح: </strong>
+        {feedback.explanation}
+      </p>
     </article>
   );
 }
@@ -105,7 +119,14 @@ export function MasteryTestView({ lessonId, onBackToLesson }: MasteryTestViewPro
               <p style={{ margin: '0 0 0.3rem', color: colors.textSecondary, fontWeight: 800 }}>
                 سؤال <bdi dir="ltr">{questionIndex + 1}</bdi>
               </p>
-              <h3 style={{ margin: '0 0 0.8rem', color: colors.textPrimary, fontSize: '1rem', lineHeight: 1.8 }}>
+              <h3
+                style={{
+                  margin: '0 0 0.8rem',
+                  color: colors.textPrimary,
+                  fontSize: '1rem',
+                  lineHeight: 1.8,
+                }}
+              >
                 {question.prompt}
               </h3>
               <div style={{ display: 'grid', gap: '0.55rem' }}>
@@ -155,7 +176,8 @@ export function MasteryTestView({ lessonId, onBackToLesson }: MasteryTestViewPro
           </p>
           <MasteryBadge classification={result.classification} />
           <p style={{ color: colors.textPrimary, lineHeight: 1.7 }}>
-            <strong>التوصية: </strong>{result.recommendation}
+            <strong>التوصية: </strong>
+            {result.recommendation}
           </p>
           <div style={{ display: 'grid', gap: '0.75rem' }}>
             {questions.map((question, index) => (

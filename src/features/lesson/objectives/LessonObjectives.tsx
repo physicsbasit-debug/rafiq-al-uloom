@@ -17,9 +17,18 @@ export function LessonObjectives({ objectives }: Props) {
       }}
     >
       <SectionHeader title="أهداف التعلم" icon="🎯" />
-      <ul style={{ margin: 0, paddingInlineStart: '1.2rem', color: colors.textPrimary, lineHeight: 1.9 }}>
-          {objectives.map((objective) => <li key={objective.id}>{objective.text}</li>)}
-        </ul>
+      <ul
+        style={{
+          margin: 0,
+          paddingInlineStart: '1.2rem',
+          color: colors.textPrimary,
+          lineHeight: 1.9,
+        }}
+      >
+        {objectives.map((objective) => (
+          <li key={objective.id}>{objective.text}</li>
+        ))}
+      </ul>
     </section>
   );
 }
