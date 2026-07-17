@@ -1,4 +1,7 @@
 import { colors } from '@design-system/theme/colors';
+import { radius } from '@design-system/theme/radius';
+import { spacing } from '@design-system/theme/spacing';
+import { typography } from '@design-system/theme/typography';
 
 interface ChoiceButtonProps {
   label: string;
@@ -9,14 +12,7 @@ interface ChoiceButtonProps {
   selectedHint?: string;
 }
 
-export function ChoiceButton({
-  label,
-  choice,
-  selected,
-  disabled,
-  onClick,
-  selectedHint,
-}: ChoiceButtonProps) {
+export function ChoiceButton({ label, choice, selected, disabled, onClick, selectedHint }: ChoiceButtonProps) {
   return (
     <button
       type="button"
@@ -29,17 +25,17 @@ export function ChoiceButton({
         display: 'grid',
         gridTemplateColumns: '2.2rem 1fr',
         alignItems: 'center',
-        gap: '0.7rem',
+        gap: spacing.md,
         textAlign: 'right',
         border: selected ? `2px solid ${colors.primary}` : `1px solid ${colors.borderStrong}`,
-        borderRadius: '0.9rem',
+        borderRadius: radius.lg,
         backgroundColor: selected ? colors.primarySoft : colors.surfaceMuted,
         color: colors.textPrimary,
-        padding: '0.65rem 0.8rem',
+        padding: `${spacing.md} ${spacing.md}`,
         cursor: disabled ? 'not-allowed' : 'pointer',
         fontFamily: 'inherit',
-        fontSize: '1rem',
-        lineHeight: 1.6,
+        fontSize: typography.fontSize.md,
+        lineHeight: typography.lineHeight.lg,
       }}
     >
       <span
@@ -50,7 +46,7 @@ export function ChoiceButton({
           placeItems: 'center',
           width: '2rem',
           height: '2rem',
-          borderRadius: '999px',
+          borderRadius: radius.pill,
           backgroundColor: selected ? colors.primary : colors.surface,
           color: selected ? colors.surface : colors.textPrimary,
           border: `1px solid ${selected ? colors.primary : colors.borderStrong}`,
@@ -59,14 +55,9 @@ export function ChoiceButton({
       >
         {label}
       </span>
-
       <span>
         {choice}
-        {selected && selectedHint ? (
-          <span style={{ marginInlineStart: '0.45rem', color: colors.textSecondary }}>
-            {selectedHint}
-          </span>
-        ) : null}
+        {selected && selectedHint ? <span style={{ marginInlineStart: spacing.sm, color: colors.textSecondary }}>{selectedHint}</span> : null}
       </span>
     </button>
   );
