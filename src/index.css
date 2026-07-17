@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @theme {
   --color-primary: #2f6fed;
@@ -19,10 +19,61 @@
   --color-text-secondary: #6b7280;
   --color-border: #e5e7eb;
   --color-border-strong: #d1d5db;
+  --color-focus: #1d4ed8;
+  --color-disabled-background: #e5e7eb;
+  --color-disabled-text: #6b7280;
+
+  --font-family-primary: "Tajawal", "IBM Plex Sans Arabic", sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --line-height-xs: 1.2;
+  --line-height-sm: 1.35;
+  --line-height-md: 1.5;
+  --line-height-lg: 1.65;
+  --line-height-xl: 1.8;
+  --line-height-2xl: 2;
+  --line-height-3xl: 2.2;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 0.75rem;
+  --spacing-lg: 1rem;
+  --spacing-xl: 1.5rem;
+  --spacing-2xl: 2rem;
+  --spacing-3xl: 3rem;
+
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+  --radius-pill: 999px;
+
+  --shadow-xs: 0 1px 2px rgb(31 41 55 / 0.06);
+  --shadow-sm: 0 2px 4px rgb(31 41 55 / 0.08);
+  --shadow-md: 0 4px 8px rgb(31 41 55 / 0.1);
+  --shadow-lg: 0 8px 16px rgb(31 41 55 / 0.12);
+  --shadow-xl: 0 12px 24px rgb(31 41 55 / 0.14);
+  --shadow-2xl: 0 16px 32px rgb(31 41 55 / 0.16);
+  --shadow-3xl: 0 24px 48px rgb(31 41 55 / 0.18);
+
+  --focus-ring-width: 3px;
+  --shadow-focus: 0 0 0 var(--focus-ring-width) var(--color-focus);
 }
 
 :root {
-  font-family: 'Tajawal', 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  font-family: "Tajawal", "IBM Plex Sans Arabic", system-ui, sans-serif;
   color: var(--color-text-primary);
   background: var(--color-background);
   font-synthesis: none;
@@ -46,13 +97,13 @@ body {
 }
 
 button,
-[role='button'] {
+[role="button"] {
   min-height: 44px;
 }
 
 button:focus-visible,
-[role='button']:focus-visible {
-  outline: 3px solid var(--color-primary-dark);
+[role="button"]:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
   outline-offset: 3px;
 }
 
