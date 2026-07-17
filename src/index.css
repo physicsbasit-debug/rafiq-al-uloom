@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --color-primary: #2f6fed;
@@ -23,7 +23,7 @@
   --color-disabled-background: #e5e7eb;
   --color-disabled-text: #6b7280;
 
-  --font-family-primary: "Tajawal", "IBM Plex Sans Arabic", sans-serif;
+  --font-family-primary: 'Tajawal', 'IBM Plex Sans Arabic', sans-serif;
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-md: 1rem;
@@ -73,7 +73,7 @@
 }
 
 :root {
-  font-family: "Tajawal", "IBM Plex Sans Arabic", system-ui, sans-serif;
+  font-family: 'Tajawal', 'IBM Plex Sans Arabic', system-ui, sans-serif;
   color: var(--color-text-primary);
   background: var(--color-background);
   font-synthesis: none;
@@ -97,12 +97,12 @@ body {
 }
 
 button,
-[role="button"] {
+[role='button'] {
   min-height: 44px;
 }
 
 button:focus-visible,
-[role="button"]:focus-visible {
+[role='button']:focus-visible {
   outline: var(--focus-ring-width) solid var(--color-focus);
   outline-offset: 3px;
 }
