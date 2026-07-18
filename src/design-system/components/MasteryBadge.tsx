@@ -1,4 +1,6 @@
 import { colors } from '@design-system/theme/colors';
+import { radius } from '@design-system/theme/radius';
+import { spacing } from '@design-system/theme/spacing';
 import type { MasteryClassification } from '@shared-types/mastery.types';
 
 interface MasteryBadgeProps {
@@ -20,10 +22,10 @@ export function MasteryBadge({ classification }: MasteryBadgeProps) {
         alignItems: 'center',
         minHeight: '36px',
         border: `1px solid ${style.foreground}`,
-        borderRadius: '999px',
+        borderRadius: radius.pill,
         backgroundColor: style.background,
         color: style.foreground,
-        padding: '0.35rem 0.75rem',
+        padding: `${spacing.xs} ${spacing.md}`,
         fontWeight: 900,
       }}
     >

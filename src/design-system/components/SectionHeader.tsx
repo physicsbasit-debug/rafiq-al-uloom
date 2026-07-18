@@ -1,4 +1,6 @@
 import { colors } from '@design-system/theme/colors';
+import { spacing } from '@design-system/theme/spacing';
+import { typography } from '@design-system/theme/typography';
 
 interface SectionHeaderProps {
   title: string;
@@ -8,15 +10,15 @@ interface SectionHeaderProps {
 
 export function SectionHeader({ title, icon, description }: SectionHeaderProps) {
   return (
-    <header style={{ marginBottom: '0.85rem' }}>
+    <header style={{ marginBottom: spacing.md }}>
       <h3
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '0.55rem',
+          gap: spacing.sm,
           margin: 0,
           color: colors.textPrimary,
-          fontSize: '1.15rem',
+          fontSize: typography.fontSize.lg,
         }}
       >
         {icon ? <span aria-hidden="true">{icon}</span> : null}
@@ -24,7 +26,13 @@ export function SectionHeader({ title, icon, description }: SectionHeaderProps) 
       </h3>
 
       {description ? (
-        <p style={{ margin: '0.35rem 0 0', color: colors.textSecondary, lineHeight: 1.7 }}>
+        <p
+          style={{
+            margin: `${spacing.xs} 0 0`,
+            color: colors.textSecondary,
+            lineHeight: typography.lineHeight.lg,
+          }}
+        >
           {description}
         </p>
       ) : null}
