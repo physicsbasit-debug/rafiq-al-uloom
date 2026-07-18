@@ -12,7 +12,14 @@ interface ChoiceButtonProps {
   selectedHint?: string;
 }
 
-export function ChoiceButton({ label, choice, selected, disabled, onClick, selectedHint }: ChoiceButtonProps) {
+export function ChoiceButton({
+  label,
+  choice,
+  selected,
+  disabled,
+  onClick,
+  selectedHint,
+}: ChoiceButtonProps) {
   return (
     <button
       type="button"
@@ -57,7 +64,11 @@ export function ChoiceButton({ label, choice, selected, disabled, onClick, selec
       </span>
       <span>
         {choice}
-        {selected && selectedHint ? <span style={{ marginInlineStart: spacing.sm, color: colors.textSecondary }}>{selectedHint}</span> : null}
+        {selected && selectedHint ? (
+          <span style={{ marginInlineStart: spacing.sm, color: colors.textSecondary }}>
+            {selectedHint}
+          </span>
+        ) : null}
       </span>
     </button>
   );
