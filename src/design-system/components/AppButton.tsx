@@ -31,19 +31,13 @@ export function AppButton({
         fontWeight: typography.fontWeight.bold,
         padding: `${spacing.md} ${spacing.lg}`,
         borderRadius: radius.md,
-        border: isPrimary
-          ? `1px solid ${colors.primary}`
-          : `1px solid ${colors.primary}`,
+        border: isPrimary ? `1px solid ${colors.primary}` : `1px solid ${colors.primary}`,
         backgroundColor: disabled
           ? colors.disabledBackground
           : isPrimary
             ? colors.primary
             : colors.surface,
-        color: disabled
-          ? colors.disabledText
-          : isPrimary
-            ? colors.surface
-            : colors.primary,
+        color: disabled ? colors.disabledText : isPrimary ? colors.surface : colors.primary,
         cursor: disabled ? 'not-allowed' : 'pointer',
       }}
     >
