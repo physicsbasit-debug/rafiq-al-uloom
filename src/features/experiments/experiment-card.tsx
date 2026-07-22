@@ -1,5 +1,8 @@
 import type { ReactNode } from 'react';
 import { colors } from '@design-system/theme/colors';
+import { radius } from '@design-system/theme/radius';
+import { spacing } from '@design-system/theme/spacing';
+import { typography } from '@design-system/theme/typography';
 import type { Experiment } from '@shared-types/experiment.types';
 
 interface ExperimentCardProps {
@@ -23,16 +26,16 @@ function DetailSection({ title, children }: DetailSectionProps) {
     <section
       style={{
         border: `1px solid ${colors.border}`,
-        borderRadius: '0.85rem',
-        padding: '0.8rem',
+        borderRadius: radius.md,
+        padding: spacing.md,
         backgroundColor: colors.surface,
       }}
     >
       <h5
         style={{
-          margin: '0 0 0.45rem',
+          margin: `0 0 ${spacing.sm}`,
           color: colors.textPrimary,
-          fontSize: '1rem',
+          fontSize: typography.fontSize.md,
         }}
       >
         {title}
@@ -47,17 +50,17 @@ export function ExperimentCard({ experiment }: ExperimentCardProps) {
     <article
       style={{
         border: `1px solid ${colors.border}`,
-        borderRadius: '0.95rem',
-        padding: '0.9rem',
+        borderRadius: radius.lg,
+        padding: spacing.lg,
         backgroundColor: colors.surfaceMuted,
       }}
     >
-      <header style={{ marginBottom: '0.8rem' }}>
+      <header style={{ marginBottom: spacing.md }}>
         <h4
           style={{
-            margin: '0 0 0.4rem',
+            margin: `0 0 ${spacing.sm}`,
             color: colors.textPrimary,
-            fontSize: '1.1rem',
+            fontSize: typography.fontSize.lg,
           }}
         >
           {experiment.title}
@@ -67,82 +70,43 @@ export function ExperimentCard({ experiment }: ExperimentCardProps) {
           style={{
             margin: 0,
             color: colors.textSecondary,
-            fontWeight: 800,
-            lineHeight: 1.7,
+            fontWeight: typography.fontWeight.bold,
+            lineHeight: typography.lineHeight.lg,
           }}
         >
           السلامة: {safetyLabels[experiment.safetyLevel]}
         </p>
       </header>
 
-      <div style={{ display: 'grid', gap: '0.7rem' }}>
+      <div style={{ display: 'grid', gap: spacing.md }}>
         <DetailSection title="هدف التجربة">
-          <p style={{ margin: 0, color: colors.textPrimary, lineHeight: 1.85 }}>
+          <p style={{ margin: 0, color: colors.textPrimary, lineHeight: typography.lineHeight.xl }}>
             {experiment.objective}
           </p>
         </DetailSection>
-
         <DetailSection title="الأدوات">
-          <ul
-            style={{
-              margin: 0,
-              paddingInlineStart: '1.2rem',
-              color: colors.textPrimary,
-              lineHeight: 1.85,
-            }}
-          >
-            {experiment.tools.map((tool) => (
-              <li key={tool}>{tool}</li>
-            ))}
+          <ul style={{ margin: 0, paddingInlineStart: spacing.lg, color: colors.textPrimary, lineHeight: typography.lineHeight.xl }}>
+            {experiment.tools.map((tool) => <li key={tool}>{tool}</li>)}
           </ul>
         </DetailSection>
-
         <DetailSection title="خطوات التنفيذ">
-          <ol
-            style={{
-              margin: 0,
-              paddingInlineStart: '1.35rem',
-              color: colors.textPrimary,
-              lineHeight: 1.9,
-            }}
-          >
-            {experiment.steps.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
+          <ol style={{ margin: 0, paddingInlineStart: spacing.xl, color: colors.textPrimary, lineHeight: typography.lineHeight.xl }}>
+            {experiment.steps.map((step) => <li key={step}>{step}</li>)}
           </ol>
         </DetailSection>
-
         <DetailSection title="احتياطات السلامة">
-          <ul
-            style={{
-              margin: 0,
-              paddingInlineStart: '1.2rem',
-              color: colors.textPrimary,
-              lineHeight: 1.85,
-            }}
-          >
-            {experiment.safetyNotes.map((note) => (
-              <li key={note}>{note}</li>
-            ))}
+          <ul style={{ margin: 0, paddingInlineStart: spacing.lg, color: colors.textPrimary, lineHeight: typography.lineHeight.xl }}>
+            {experiment.safetyNotes.map((note) => <li key={note}>{note}</li>)}
           </ul>
         </DetailSection>
-
         <DetailSection title="ملاحظة متوقعة">
-          <p style={{ margin: 0, color: colors.textPrimary, lineHeight: 1.85 }}>
-            {experiment.observationPrompt}
-          </p>
+          <p style={{ margin: 0, color: colors.textPrimary, lineHeight: typography.lineHeight.xl }}>{experiment.observationPrompt}</p>
         </DetailSection>
-
         <DetailSection title="استنتاج">
-          <p style={{ margin: 0, color: colors.textPrimary, lineHeight: 1.85 }}>
-            {experiment.conclusionPrompt}
-          </p>
+          <p style={{ margin: 0, color: colors.textPrimary, lineHeight: typography.lineHeight.xl }}>{experiment.conclusionPrompt}</p>
         </DetailSection>
-
         <DetailSection title="بديل منزلي">
-          <p style={{ margin: 0, color: colors.textPrimary, lineHeight: 1.85 }}>
-            {experiment.homeAlternative}
-          </p>
+          <p style={{ margin: 0, color: colors.textPrimary, lineHeight: typography.lineHeight.xl }}>{experiment.homeAlternative}</p>
         </DetailSection>
       </div>
     </article>

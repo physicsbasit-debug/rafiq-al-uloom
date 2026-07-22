@@ -1,5 +1,8 @@
 import { SectionHeader } from '@design-system/components/SectionHeader';
 import { colors } from '@design-system/theme/colors';
+import { radius } from '@design-system/theme/radius';
+import { spacing } from '@design-system/theme/spacing';
+import { typography } from '@design-system/theme/typography';
 
 interface Props {
   concepts: string[];
@@ -10,8 +13,8 @@ export function LessonConcepts({ concepts }: Props) {
     <section
       style={{
         border: `1px solid ${colors.border}`,
-        borderRadius: '1rem',
-        padding: '1rem',
+        borderRadius: radius.lg,
+        padding: spacing.lg,
         backgroundColor: colors.surface,
       }}
     >
@@ -19,9 +22,9 @@ export function LessonConcepts({ concepts }: Props) {
       <ul
         style={{
           margin: 0,
-          paddingInlineStart: '1.2rem',
+          paddingInlineStart: spacing.lg,
           color: colors.textPrimary,
-          lineHeight: 1.9,
+          lineHeight: typography.lineHeight.xl,
         }}
       >
         {concepts.map((concept) => (
