@@ -85,28 +85,61 @@ export function ExperimentCard({ experiment }: ExperimentCardProps) {
           </p>
         </DetailSection>
         <DetailSection title="الأدوات">
-          <ul style={{ margin: 0, paddingInlineStart: spacing.lg, color: colors.textPrimary, lineHeight: typography.lineHeight.xl }}>
-            {experiment.tools.map((tool) => <li key={tool}>{tool}</li>)}
+          <ul
+            style={{
+              margin: 0,
+              paddingInlineStart: spacing.lg,
+              color: colors.textPrimary,
+              lineHeight: typography.lineHeight.xl,
+            }}
+          >
+            {experiment.tools.map((tool) => (
+              <li key={tool}>{tool}</li>
+            ))}
           </ul>
         </DetailSection>
         <DetailSection title="خطوات التنفيذ">
-          <ol style={{ margin: 0, paddingInlineStart: spacing.xl, color: colors.textPrimary, lineHeight: typography.lineHeight.xl }}>
-            {experiment.steps.map((step) => <li key={step}>{step}</li>)}
+          <ol
+            style={{
+              margin: 0,
+              paddingInlineStart: spacing.xl,
+              color: colors.textPrimary,
+              lineHeight: typography.lineHeight.xl,
+            }}
+          >
+            {experiment.steps.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
           </ol>
         </DetailSection>
         <DetailSection title="احتياطات السلامة">
-          <ul style={{ margin: 0, paddingInlineStart: spacing.lg, color: colors.textPrimary, lineHeight: typography.lineHeight.xl }}>
-            {experiment.safetyNotes.map((note) => <li key={note}>{note}</li>)}
+          <ul
+            style={{
+              margin: 0,
+              paddingInlineStart: spacing.lg,
+              color: colors.textPrimary,
+              lineHeight: typography.lineHeight.xl,
+            }}
+          >
+            {experiment.safetyNotes.map((note) => (
+              <li key={note}>{note}</li>
+            ))}
           </ul>
         </DetailSection>
         <DetailSection title="ملاحظة متوقعة">
-          <p style={{ margin: 0, color: colors.textPrimary, lineHeight: typography.lineHeight.xl }}>{experiment.observationPrompt}</p>
+          <p style={{ margin: 0, color: colors.textPrimary, lineHeight: typography.lineHeight.xl }}>
+            {experiment.observationPrompt}
+          </p>
         </DetailSection>
         <DetailSection title="استنتاج">
-          <p style={{ margin: 0, color: colors.textPrimary, lineHeight: typography.lineHeight.xl }}>{experiment.conclusionPrompt}</p>
+          <p style={{ margin: 0, color: colors.textPrimary, lineHeight: typography.lineHeight.xl }}>
+            {experiment.conclusionPrompt}
+          </p>
         </DetailSection>
         <DetailSection title="بديل منزلي">
-          <p style={{ margin: 0, color: colors.textPrimary, lineHeight: typography.lineHeight.xl }}>{experiment.homeAlternative}</p>
+          <p style={{ margin: 0, color: colors.textPrimary, lineHeight: typography.lineHeight.xl }}>
+            {experiment.homeAlternative}
+          </p>
         </DetailSection>
       </div>
     </article>
