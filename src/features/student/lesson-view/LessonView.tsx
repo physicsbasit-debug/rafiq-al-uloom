@@ -1,5 +1,6 @@
 import { AppButton } from '@design-system/components/AppButton';
 import { colors } from '@design-system/theme/colors';
+import { spacing } from '@design-system/theme/spacing';
 import { LessonConcepts } from '@features/lesson/concepts/LessonConcepts';
 import { LessonExamples } from '@features/lesson/examples/LessonExamples';
 import { LessonExperiments } from '@features/lesson/experiments/LessonExperiments';
@@ -39,9 +40,15 @@ export function LessonView({
   }
 
   return (
-    <article style={{ display: 'grid', gap: '0.9rem' }}>
+    <article style={{ display: 'grid', gap: spacing.lg }}>
       <header>
-        <p style={{ margin: '0 0 0.25rem', color: colors.textSecondary, fontWeight: 800 }}>
+        <p
+          style={{
+            margin: `0 0 ${spacing.xs}`,
+            color: colors.textSecondary,
+            fontWeight: 800,
+          }}
+        >
           درس قراءة
         </p>
         <h2 style={{ margin: 0, color: colors.textPrimary }}>{lesson.title}</h2>
@@ -58,7 +65,7 @@ export function LessonView({
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-          gap: '0.65rem',
+          gap: spacing.md,
         }}
       >
         <AppButton label="أسئلة المراجعة" onClick={onOpenReviewQuestions} />
