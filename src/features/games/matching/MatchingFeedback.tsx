@@ -1,4 +1,7 @@
 import { colors } from '@design-system/theme/colors';
+import { radius } from '@design-system/theme/radius';
+import { spacing } from '@design-system/theme/spacing';
+import { typography } from '@design-system/theme/typography';
 
 interface MatchingFeedbackProps {
   message: string;
@@ -11,12 +14,12 @@ export function MatchingFeedback({ message, isCorrect }: MatchingFeedbackProps) 
       role="status"
       style={{
         border: `1px solid ${isCorrect ? colors.success : colors.error}`,
-        borderRadius: '0.85rem',
-        padding: '0.75rem',
+        borderRadius: radius.md,
+        padding: spacing.md,
         backgroundColor: isCorrect ? colors.successSoft : colors.errorSoft,
         color: isCorrect ? colors.successDark : colors.errorDark,
         fontWeight: 900,
-        lineHeight: 1.7,
+        lineHeight: typography.lineHeight.lg,
       }}
     >
       {isCorrect ? '✓' : '✕'} {message}

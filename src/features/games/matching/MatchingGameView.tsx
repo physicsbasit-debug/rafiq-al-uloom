@@ -1,6 +1,9 @@
 import { useMemo, useState } from 'react';
 import { AppButton } from '@design-system/components/AppButton';
 import { colors } from '@design-system/theme/colors';
+import { radius } from '@design-system/theme/radius';
+import { spacing } from '@design-system/theme/spacing';
+import { typography } from '@design-system/theme/typography';
 import {
   createMatchingRound,
   getMatchingAttemptResult,
@@ -70,14 +73,20 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
 
   return (
     <section>
-      <header style={{ marginBottom: '1rem' }}>
-        <p style={{ margin: '0 0 0.25rem', color: colors.textSecondary, fontWeight: 800 }}>
+      <header style={{ marginBottom: spacing.lg }}>
+        <p
+          style={{
+            margin: `0 0 ${spacing.xs}`,
+            color: colors.textSecondary,
+            fontWeight: 800,
+          }}
+        >
           لعبة تدريبية
         </p>
         <h2 style={{ margin: 0, color: colors.textPrimary }}>لعبة المطابقة</h2>
       </header>
 
-      <div style={{ display: 'grid', gap: '1rem' }}>
+      <div style={{ display: 'grid', gap: spacing.lg }}>
         {rounds.map(({ game, round }) => {
           const selectedLeft = selectedLeftByGame[game.id];
           const completedCount = completedPairsByGame[game.id]?.length ?? 0;
@@ -95,23 +104,31 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
               key={game.id}
               style={{
                 border: `1px solid ${colors.border}`,
-                borderRadius: '1rem',
-                padding: '1rem',
+                borderRadius: radius.lg,
+                padding: spacing.lg,
                 backgroundColor: colors.surface,
               }}
             >
-              <h3 style={{ margin: '0 0 0.35rem', color: colors.textPrimary }}>{game.title}</h3>
+              <h3 style={{ margin: `0 0 ${spacing.xs}`, color: colors.textPrimary }}>
+                {game.title}
+              </h3>
 
-              <p style={{ margin: '0 0 0.75rem', color: colors.textSecondary, lineHeight: 1.7 }}>
+              <p
+                style={{
+                  margin: `0 0 ${spacing.md}`,
+                  color: colors.textSecondary,
+                  lineHeight: typography.lineHeight.lg,
+                }}
+              >
                 {game.instructions}
               </p>
 
               <section
                 style={{
-                  marginBottom: '0.9rem',
+                  marginBottom: spacing.lg,
                   border: `1px solid ${colors.border}`,
-                  borderRadius: '0.85rem',
-                  padding: '0.75rem',
+                  borderRadius: radius.md,
+                  padding: spacing.md,
                   backgroundColor: colors.surfaceMuted,
                 }}
               >
@@ -121,10 +138,10 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
 
                 <ul
                   style={{
-                    margin: '0.4rem 0 0',
-                    paddingInlineStart: '1.2rem',
+                    margin: `${spacing.sm} 0 0`,
+                    paddingInlineStart: spacing.lg,
                     color: colors.textPrimary,
-                    lineHeight: 1.75,
+                    lineHeight: typography.lineHeight.xl,
                   }}
                 >
                   {gameObjectives.map((objective) => (
@@ -137,7 +154,7 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
                 <>
                   <h4 style={{ color: colors.textPrimary }}>اختر عنصرًا</h4>
 
-                  <div style={{ display: 'grid', gap: '0.6rem' }}>
+                  <div style={{ display: 'grid', gap: spacing.sm }}>
                     {availableLeftItems.map((item) => (
                       <button
                         key={item.id}
@@ -147,12 +164,12 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
                           minHeight: '50px',
                           textAlign: 'right',
                           border: `1px solid ${colors.borderStrong}`,
-                          borderRadius: '0.85rem',
+                          borderRadius: radius.md,
                           backgroundColor: colors.surfaceMuted,
                           color: colors.textPrimary,
-                          padding: '0.75rem',
+                          padding: spacing.md,
                           fontFamily: 'inherit',
-                          fontSize: '1rem',
+                          fontSize: typography.fontSize.md,
                           cursor: 'pointer',
                         }}
                       >
@@ -168,11 +185,11 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
                   <div
                     style={{
                       position: 'sticky',
-                      top: '0.5rem',
+                      top: spacing.sm,
                       zIndex: 1,
                       border: `2px solid ${colors.primary}`,
-                      borderRadius: '0.9rem',
-                      padding: '0.75rem',
+                      borderRadius: radius.lg,
+                      padding: spacing.md,
                       backgroundColor: colors.primarySoft,
                     }}
                   >
@@ -181,7 +198,11 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
                     </p>
 
                     <p
-                      style={{ margin: '0.25rem 0 0', color: colors.textPrimary, fontWeight: 900 }}
+                      style={{
+                        margin: `${spacing.xs} 0 0`,
+                        color: colors.textPrimary,
+                        fontWeight: 900,
+                      }}
                     >
                       {selectedLeft.text}
                     </p>
@@ -191,7 +212,7 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
                       onClick={() => clearSelection(game.id)}
                       style={{
                         minHeight: '44px',
-                        marginTop: '0.55rem',
+                        marginTop: spacing.sm,
                         border: 0,
                         background: 'transparent',
                         color: colors.primaryDark,
@@ -206,7 +227,7 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
 
                   <h4 style={{ color: colors.textPrimary }}>اختر المقابل</h4>
 
-                  <div style={{ display: 'grid', gap: '0.6rem' }}>
+                  <div style={{ display: 'grid', gap: spacing.sm }}>
                     {availableRightItems.map((item) => (
                       <button
                         key={item.id}
@@ -216,12 +237,12 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
                           minHeight: '50px',
                           textAlign: 'right',
                           border: `1px solid ${colors.borderStrong}`,
-                          borderRadius: '0.85rem',
+                          borderRadius: radius.md,
                           backgroundColor: colors.surfaceMuted,
                           color: colors.textPrimary,
-                          padding: '0.75rem',
+                          padding: spacing.md,
                           fontFamily: 'inherit',
-                          fontSize: '1rem',
+                          fontSize: typography.fontSize.md,
                           cursor: 'pointer',
                         }}
                       >
@@ -233,7 +254,7 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
               ) : null}
 
               {feedback?.gameId === game.id ? (
-                <div style={{ marginTop: '0.75rem' }}>
+                <div style={{ marginTop: spacing.md }}>
                   <MatchingFeedback
                     message={feedback.result.feedbackText}
                     isCorrect={feedback.result.isCorrect}
@@ -249,7 +270,7 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
         })}
       </div>
 
-      <div style={{ maxWidth: '220px', marginTop: '1rem' }}>
+      <div style={{ maxWidth: '220px', marginTop: spacing.lg }}>
         <AppButton label="العودة إلى الدرس" variant="secondary" onClick={onBackToLesson} />
       </div>
     </section>
