@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AppButton } from '@design-system/components/AppButton';
 import { colors } from '@design-system/theme/colors';
+import { spacing } from '@design-system/theme/spacing';
 import { MultipleChoiceQuestionCard } from '@features/quiz/multiple-choice/MultipleChoiceQuestionCard';
 import { getReviewQuestionsByLesson } from '@services/data/local-content.repository';
 
@@ -21,14 +22,20 @@ export function ReviewQuestionsView({ lessonId, onBackToLesson }: ReviewQuestion
 
   return (
     <section>
-      <header style={{ marginBottom: '1rem' }}>
-        <p style={{ margin: '0 0 0.25rem', color: colors.textSecondary, fontWeight: 800 }}>
+      <header style={{ marginBottom: spacing.lg }}>
+        <p
+          style={{
+            margin: `0 0 ${spacing.xs}`,
+            color: colors.textSecondary,
+            fontWeight: 800,
+          }}
+        >
           تدريب قصير
         </p>
         <h2 style={{ margin: 0, color: colors.textPrimary }}>أسئلة المراجعة</h2>
       </header>
 
-      <div style={{ display: 'grid', gap: '0.8rem' }}>
+      <div style={{ display: 'grid', gap: spacing.md }}>
         {questions.map((question, index) => (
           <MultipleChoiceQuestionCard
             key={question.id}
@@ -40,7 +47,7 @@ export function ReviewQuestionsView({ lessonId, onBackToLesson }: ReviewQuestion
         ))}
       </div>
 
-      <div style={{ maxWidth: '220px', marginTop: '1rem' }}>
+      <div style={{ maxWidth: '220px', marginTop: spacing.lg }}>
         <AppButton label="العودة إلى الدرس" variant="secondary" onClick={onBackToLesson} />
       </div>
     </section>
