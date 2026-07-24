@@ -193,7 +193,7 @@ export interface ContentRepository {
   getGamesByLesson(
     lessonId: string,
     options?: RepositoryRequestOptions,
-  ): Promise<MatchingGame[]>;
+  ): Promise<Game[]>;
 }
 ```
 
@@ -658,6 +658,9 @@ Async Local Repository Foundation
 - دعم `AbortSignal`.
 - تطبيق Local Provider.
 - اختبارات تكافؤ.
+- اختبارات `raceWithAbort` المناسبة لطبقة A1 فقط.
+- حالات 10.4 و10.5 و`request-version guard` مؤجلة صراحة إلى Phase 2-A2؛
+  لأنها تتطلب Query Hooks فعلية ودورة حياة React غير موجودة في A1.
 - لا تعديل Features.
 - لا Supabase.
 
