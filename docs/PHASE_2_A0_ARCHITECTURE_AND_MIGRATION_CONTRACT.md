@@ -134,66 +134,45 @@ export interface RepositoryRequestOptions {
 export interface ContentRepository {
   getGrades(options?: RepositoryRequestOptions): Promise<Grade[]>;
 
-  getSemestersByGrade(
-    gradeId: string,
-    options?: RepositoryRequestOptions,
-  ): Promise<Semester[]>;
+  getSemestersByGrade(gradeId: string, options?: RepositoryRequestOptions): Promise<Semester[]>;
 
-  getSubjectsBySemester(
-    semesterId: string,
-    options?: RepositoryRequestOptions,
-  ): Promise<Subject[]>;
+  getSubjectsBySemester(semesterId: string, options?: RepositoryRequestOptions): Promise<Subject[]>;
 
   getUnitsBySubjectAndSemester(
     subjectId: string,
     semesterId: string,
-    options?: RepositoryRequestOptions,
+    options?: RepositoryRequestOptions
   ): Promise<Unit[]>;
 
-  getUnitsBySubject(
-    subjectId: string,
-    options?: RepositoryRequestOptions,
-  ): Promise<Unit[]>;
+  getUnitsBySubject(subjectId: string, options?: RepositoryRequestOptions): Promise<Unit[]>;
 
-  getLessonsByUnit(
-    unitId: string,
-    options?: RepositoryRequestOptions,
-  ): Promise<Lesson[]>;
+  getLessonsByUnit(unitId: string, options?: RepositoryRequestOptions): Promise<Lesson[]>;
 
-  getLessonById(
-    lessonId: string,
-    options?: RepositoryRequestOptions,
-  ): Promise<Lesson | undefined>;
+  getLessonById(lessonId: string, options?: RepositoryRequestOptions): Promise<Lesson | undefined>;
 
-  getObjectivesByLesson(
-    lessonId: string,
-    options?: RepositoryRequestOptions,
-  ): Promise<Objective[]>;
+  getObjectivesByLesson(lessonId: string, options?: RepositoryRequestOptions): Promise<Objective[]>;
 
   getExperimentsByLesson(
     lessonId: string,
-    options?: RepositoryRequestOptions,
+    options?: RepositoryRequestOptions
   ): Promise<Experiment[]>;
 
   getReviewQuestionsByLesson(
     lessonId: string,
-    options?: RepositoryRequestOptions,
+    options?: RepositoryRequestOptions
   ): Promise<Question[]>;
 
   getMasteryQuestionsByLesson(
     lessonId: string,
-    options?: RepositoryRequestOptions,
+    options?: RepositoryRequestOptions
   ): Promise<Question[]>;
 
   getObjectivesByIds(
     objectiveIds: string[],
-    options?: RepositoryRequestOptions,
+    options?: RepositoryRequestOptions
   ): Promise<Objective[]>;
 
-  getGamesByLesson(
-    lessonId: string,
-    options?: RepositoryRequestOptions,
-  ): Promise<Game[]>;
+  getGamesByLesson(lessonId: string, options?: RepositoryRequestOptions): Promise<Game[]>;
 }
 ```
 
@@ -235,7 +214,7 @@ export interface ContentRepository {
 ```ts
 async function getLessonById(
   lessonId: string,
-  options?: RepositoryRequestOptions,
+  options?: RepositoryRequestOptions
 ): Promise<Lesson | undefined> {
   const { signal } = options ?? {};
 
@@ -353,10 +332,7 @@ reload
 هذا هو النص المرجعي المعتمد:
 
 ```ts
-export function raceWithAbort<T>(
-  promise: Promise<T>,
-  signal?: AbortSignal,
-): Promise<T> {
+export function raceWithAbort<T>(promise: Promise<T>, signal?: AbortSignal): Promise<T> {
   if (!signal) return promise;
 
   signal.throwIfAborted();
@@ -380,7 +356,7 @@ export function raceWithAbort<T>(
       (error) => {
         signal.removeEventListener('abort', handleAbort);
         reject(error);
-      },
+      }
     );
   });
 }
@@ -489,24 +465,17 @@ beforeEach(() => {
 
   process.on('unhandledRejection', unhandledRejectionHandler);
 
-  consoleErrorSpy = vi
-    .spyOn(console, 'error')
-    .mockImplementation((...args: unknown[]) => {
-      throw new Error(`Unexpected console.error: ${String(args[0])}`);
-    });
+  consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
+    throw new Error(`Unexpected console.error: ${String(args[0])}`);
+  });
 
-  consoleWarnSpy = vi
-    .spyOn(console, 'warn')
-    .mockImplementation((...args: unknown[]) => {
-      throw new Error(`Unexpected console.warn: ${String(args[0])}`);
-    });
+  consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
+    throw new Error(`Unexpected console.warn: ${String(args[0])}`);
+  });
 });
 
 afterEach(() => {
-  process.removeListener(
-    'unhandledRejection',
-    unhandledRejectionHandler,
-  );
+  process.removeListener('unhandledRejection', unhandledRejectionHandler);
 
   consoleErrorSpy.mockRestore();
   consoleWarnSpy.mockRestore();
@@ -548,10 +517,7 @@ export function createDeferred<T>(): Deferred<T> {
 الحالة الفعلية الحالية في الكود هي:
 
 ```ts
-type ContentStatus =
-  | 'draft'
-  | 'pending_review'
-  | 'approved';
+type ContentStatus = 'draft' | 'pending_review' | 'approved';
 ```
 
 لا تُغيَّر هذه الحالات داخل Phase 2-A0 أو Phase 2-A1.

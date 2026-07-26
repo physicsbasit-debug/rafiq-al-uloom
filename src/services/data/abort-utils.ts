@@ -1,7 +1,4 @@
-export function raceWithAbort<T>(
-  promise: Promise<T>,
-  signal?: AbortSignal,
-): Promise<T> {
+export function raceWithAbort<T>(promise: Promise<T>, signal?: AbortSignal): Promise<T> {
   if (!signal) return promise;
 
   signal.throwIfAborted();
@@ -25,7 +22,7 @@ export function raceWithAbort<T>(
       (error) => {
         signal.removeEventListener('abort', handleAbort);
         reject(error);
-      },
+      }
     );
   });
 }

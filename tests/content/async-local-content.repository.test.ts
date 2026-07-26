@@ -58,79 +58,77 @@ describe('async local content repository', () => {
 
     await expect(asyncLocalContentRepository.getGrades()).resolves.toEqual(grades);
     await expect(asyncLocalContentRepository.getSemestersByGrade(gradeId)).resolves.toEqual(
-      semesters,
+      semesters
+    );
+    await expect(asyncLocalContentRepository.getSubjectsBySemester(semesterId)).resolves.toEqual(
+      subjects
     );
     await expect(
-      asyncLocalContentRepository.getSubjectsBySemester(semesterId),
-    ).resolves.toEqual(subjects);
-    await expect(
-      asyncLocalContentRepository.getUnitsBySubjectAndSemester(subjectId, semesterId),
+      asyncLocalContentRepository.getUnitsBySubjectAndSemester(subjectId, semesterId)
     ).resolves.toEqual(units);
     await expect(asyncLocalContentRepository.getUnitsBySubject(subjectId)).resolves.toEqual(
-      localContent.getUnitsBySubject(subjectId),
+      localContent.getUnitsBySubject(subjectId)
     );
     await expect(asyncLocalContentRepository.getLessonsByUnit(unitId)).resolves.toEqual(lessons);
     await expect(asyncLocalContentRepository.getLessonById(lessonId)).resolves.toEqual(
-      localContent.getLessonById(lessonId),
+      localContent.getLessonById(lessonId)
     );
-    await expect(
-      asyncLocalContentRepository.getObjectivesByLesson(lessonId),
-    ).resolves.toEqual(objectives);
+    await expect(asyncLocalContentRepository.getObjectivesByLesson(lessonId)).resolves.toEqual(
+      objectives
+    );
     await expect(asyncLocalContentRepository.getObjectivesByIds(objectiveIds)).resolves.toEqual(
-      localContent.getObjectivesByIds(objectiveIds),
+      localContent.getObjectivesByIds(objectiveIds)
+    );
+    await expect(asyncLocalContentRepository.getExperimentsByLesson(lessonId)).resolves.toEqual(
+      localContent.getExperimentsByLesson(lessonId)
+    );
+    await expect(asyncLocalContentRepository.getReviewQuestionsByLesson(lessonId)).resolves.toEqual(
+      localContent.getReviewQuestionsByLesson(lessonId)
     );
     await expect(
-      asyncLocalContentRepository.getExperimentsByLesson(lessonId),
-    ).resolves.toEqual(localContent.getExperimentsByLesson(lessonId));
-    await expect(
-      asyncLocalContentRepository.getReviewQuestionsByLesson(lessonId),
-    ).resolves.toEqual(localContent.getReviewQuestionsByLesson(lessonId));
-    await expect(
-      asyncLocalContentRepository.getMasteryQuestionsByLesson(lessonId),
+      asyncLocalContentRepository.getMasteryQuestionsByLesson(lessonId)
     ).resolves.toEqual(localContent.getMasteryQuestionsByLesson(lessonId));
     await expect(asyncLocalContentRepository.getGamesByLesson(lessonId)).resolves.toEqual(
-      localContent.getGamesByLesson(lessonId),
+      localContent.getGamesByLesson(lessonId)
     );
   });
 
   it('يعيد القيم الفارغة نفسها للمعرفات غير الموجودة', async () => {
+    await expect(asyncLocalContentRepository.getSemestersByGrade('missing-grade')).resolves.toEqual(
+      []
+    );
     await expect(
-      asyncLocalContentRepository.getSemestersByGrade('missing-grade'),
-    ).resolves.toEqual([]);
-    await expect(
-      asyncLocalContentRepository.getSubjectsBySemester('missing-semester'),
+      asyncLocalContentRepository.getSubjectsBySemester('missing-semester')
     ).resolves.toEqual([]);
     await expect(
       asyncLocalContentRepository.getUnitsBySubjectAndSemester(
         'missing-subject',
-        'missing-semester',
-      ),
+        'missing-semester'
+      )
     ).resolves.toEqual([]);
-    await expect(
-      asyncLocalContentRepository.getUnitsBySubject('missing-subject'),
-    ).resolves.toEqual([]);
-    await expect(asyncLocalContentRepository.getLessonsByUnit('missing-unit')).resolves.toEqual(
-      [],
+    await expect(asyncLocalContentRepository.getUnitsBySubject('missing-subject')).resolves.toEqual(
+      []
     );
+    await expect(asyncLocalContentRepository.getLessonsByUnit('missing-unit')).resolves.toEqual([]);
     await expect(asyncLocalContentRepository.getLessonById('missing-lesson')).resolves.toBe(
-      undefined,
+      undefined
     );
     await expect(
-      asyncLocalContentRepository.getObjectivesByLesson('missing-lesson'),
+      asyncLocalContentRepository.getObjectivesByLesson('missing-lesson')
     ).resolves.toEqual([]);
     await expect(asyncLocalContentRepository.getObjectivesByIds([])).resolves.toEqual([]);
     await expect(
-      asyncLocalContentRepository.getExperimentsByLesson('missing-lesson'),
+      asyncLocalContentRepository.getExperimentsByLesson('missing-lesson')
     ).resolves.toEqual([]);
     await expect(
-      asyncLocalContentRepository.getReviewQuestionsByLesson('missing-lesson'),
+      asyncLocalContentRepository.getReviewQuestionsByLesson('missing-lesson')
     ).resolves.toEqual([]);
     await expect(
-      asyncLocalContentRepository.getMasteryQuestionsByLesson('missing-lesson'),
+      asyncLocalContentRepository.getMasteryQuestionsByLesson('missing-lesson')
     ).resolves.toEqual([]);
-    await expect(
-      asyncLocalContentRepository.getGamesByLesson('missing-lesson'),
-    ).resolves.toEqual([]);
+    await expect(asyncLocalContentRepository.getGamesByLesson('missing-lesson')).resolves.toEqual(
+      []
+    );
   });
 
   it('يرفض جميع الاستدعاءات عند وصول إشارة ملغاة مسبقًا', async () => {
@@ -143,44 +141,40 @@ describe('async local content repository', () => {
       name: 'AbortError',
     });
     await expect(
-      asyncLocalContentRepository.getSemestersByGrade('grade', options),
+      asyncLocalContentRepository.getSemestersByGrade('grade', options)
     ).rejects.toMatchObject({ name: 'AbortError' });
     await expect(
-      asyncLocalContentRepository.getSubjectsBySemester('semester', options),
+      asyncLocalContentRepository.getSubjectsBySemester('semester', options)
     ).rejects.toMatchObject({ name: 'AbortError' });
     await expect(
-      asyncLocalContentRepository.getUnitsBySubjectAndSemester(
-        'subject',
-        'semester',
-        options,
-      ),
+      asyncLocalContentRepository.getUnitsBySubjectAndSemester('subject', 'semester', options)
     ).rejects.toMatchObject({ name: 'AbortError' });
     await expect(
-      asyncLocalContentRepository.getUnitsBySubject('subject', options),
+      asyncLocalContentRepository.getUnitsBySubject('subject', options)
     ).rejects.toMatchObject({ name: 'AbortError' });
     await expect(
-      asyncLocalContentRepository.getLessonsByUnit('unit', options),
+      asyncLocalContentRepository.getLessonsByUnit('unit', options)
     ).rejects.toMatchObject({ name: 'AbortError' });
     await expect(
-      asyncLocalContentRepository.getLessonById('lesson', options),
+      asyncLocalContentRepository.getLessonById('lesson', options)
     ).rejects.toMatchObject({ name: 'AbortError' });
     await expect(
-      asyncLocalContentRepository.getObjectivesByLesson('lesson', options),
+      asyncLocalContentRepository.getObjectivesByLesson('lesson', options)
+    ).rejects.toMatchObject({ name: 'AbortError' });
+    await expect(asyncLocalContentRepository.getObjectivesByIds([], options)).rejects.toMatchObject(
+      { name: 'AbortError' }
+    );
+    await expect(
+      asyncLocalContentRepository.getExperimentsByLesson('lesson', options)
     ).rejects.toMatchObject({ name: 'AbortError' });
     await expect(
-      asyncLocalContentRepository.getObjectivesByIds([], options),
+      asyncLocalContentRepository.getReviewQuestionsByLesson('lesson', options)
     ).rejects.toMatchObject({ name: 'AbortError' });
     await expect(
-      asyncLocalContentRepository.getExperimentsByLesson('lesson', options),
+      asyncLocalContentRepository.getMasteryQuestionsByLesson('lesson', options)
     ).rejects.toMatchObject({ name: 'AbortError' });
     await expect(
-      asyncLocalContentRepository.getReviewQuestionsByLesson('lesson', options),
-    ).rejects.toMatchObject({ name: 'AbortError' });
-    await expect(
-      asyncLocalContentRepository.getMasteryQuestionsByLesson('lesson', options),
-    ).rejects.toMatchObject({ name: 'AbortError' });
-    await expect(
-      asyncLocalContentRepository.getGamesByLesson('lesson', options),
+      asyncLocalContentRepository.getGamesByLesson('lesson', options)
     ).rejects.toMatchObject({ name: 'AbortError' });
   });
 

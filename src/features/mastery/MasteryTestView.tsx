@@ -49,9 +49,7 @@ function ReviewItem({
         السؤال <bdi dir="ltr">{questionNumber}</bdi>
       </p>
 
-      <h4 style={{ margin: `0 0 ${spacing.sm}`, color: colors.textPrimary }}>
-        {question.prompt}
-      </h4>
+      <h4 style={{ margin: `0 0 ${spacing.sm}`, color: colors.textPrimary }}>{question.prompt}</h4>
 
       <p
         style={{

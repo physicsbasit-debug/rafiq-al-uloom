@@ -17,64 +17,43 @@ export interface RepositoryRequestOptions {
 export interface ContentRepository {
   getGrades(options?: RepositoryRequestOptions): Promise<Grade[]>;
 
-  getSemestersByGrade(
-    gradeId: string,
-    options?: RepositoryRequestOptions,
-  ): Promise<Semester[]>;
+  getSemestersByGrade(gradeId: string, options?: RepositoryRequestOptions): Promise<Semester[]>;
 
-  getSubjectsBySemester(
-    semesterId: string,
-    options?: RepositoryRequestOptions,
-  ): Promise<Subject[]>;
+  getSubjectsBySemester(semesterId: string, options?: RepositoryRequestOptions): Promise<Subject[]>;
 
   getUnitsBySubjectAndSemester(
     subjectId: string,
     semesterId: string,
-    options?: RepositoryRequestOptions,
+    options?: RepositoryRequestOptions
   ): Promise<Unit[]>;
 
-  getUnitsBySubject(
-    subjectId: string,
-    options?: RepositoryRequestOptions,
-  ): Promise<Unit[]>;
+  getUnitsBySubject(subjectId: string, options?: RepositoryRequestOptions): Promise<Unit[]>;
 
-  getLessonsByUnit(
-    unitId: string,
-    options?: RepositoryRequestOptions,
-  ): Promise<Lesson[]>;
+  getLessonsByUnit(unitId: string, options?: RepositoryRequestOptions): Promise<Lesson[]>;
 
-  getLessonById(
-    lessonId: string,
-    options?: RepositoryRequestOptions,
-  ): Promise<Lesson | undefined>;
+  getLessonById(lessonId: string, options?: RepositoryRequestOptions): Promise<Lesson | undefined>;
 
-  getObjectivesByLesson(
-    lessonId: string,
-    options?: RepositoryRequestOptions,
-  ): Promise<Objective[]>;
+  getObjectivesByLesson(lessonId: string, options?: RepositoryRequestOptions): Promise<Objective[]>;
 
   getObjectivesByIds(
     objectiveIds: string[],
-    options?: RepositoryRequestOptions,
+    options?: RepositoryRequestOptions
   ): Promise<Objective[]>;
 
   getExperimentsByLesson(
     lessonId: string,
-    options?: RepositoryRequestOptions,
+    options?: RepositoryRequestOptions
   ): Promise<Experiment[]>;
 
   getReviewQuestionsByLesson(
     lessonId: string,
-    options?: RepositoryRequestOptions,
+    options?: RepositoryRequestOptions
   ): Promise<Question[]>;
 
   getMasteryQuestionsByLesson(
     lessonId: string,
-    options?: RepositoryRequestOptions,
+    options?: RepositoryRequestOptions
   ): Promise<Question[]>;
 
-  getGamesByLesson(
-    lessonId: string,
-    options?: RepositoryRequestOptions,
-  ): Promise<Game[]>;
+  getGamesByLesson(lessonId: string, options?: RepositoryRequestOptions): Promise<Game[]>;
 }
