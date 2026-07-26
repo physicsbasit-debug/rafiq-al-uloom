@@ -41,29 +41,41 @@ export function useAsyncQuery<T>({
     const requestVersion = ++requestVersionRef.current;
     let isMounted = true;
 
-    setData(initialData);
-    setIsLoading(true);
-    setError(null);
+    queueMicrotask(() => {
+      if (!isMounted) return;
+      if (requestVersion !== requestVersionRef.current) return;
 
-    queryFn(controller.signal).then(
-      (nextData) => {
-        if (!isMounted) return;
-        if (requestVersion !== requestVersionRef.current) return;
+      setData(initialData);
+      setIsLoading(true);
+      setError(null);
+    });
 
-        setData(nextData);
-        setIsLoading(false);
-        setError(null);
-      },
-      (queryError: unknown) => {
-        if (controller.signal.aborted) return;
-        if (!isMounted) return;
-        if (requestVersion !== requestVersionRef.current) return;
+    // قد لا تُستدعى queryFn إطلاقًا إذا أُلغي الطلب قبل هذه النقطة،
+    // مثل unmount فوري. هذا مقصود وآمن لدوال القراءة الخالصة الحالية.
+    Promise.resolve()
+      .then(() => {
+        controller.signal.throwIfAborted();
+        return queryFn(controller.signal);
+      })
+      .then(
+        (nextData) => {
+          if (!isMounted) return;
+          if (requestVersion !== requestVersionRef.current) return;
 
-        setData(initialData);
-        setIsLoading(false);
-        setError(normalizeContentQueryError(queryError));
-      },
-    );
+          setData(nextData);
+          setIsLoading(false);
+          setError(null);
+        },
+        (queryError: unknown) => {
+          if (controller.signal.aborted) return;
+          if (!isMounted) return;
+          if (requestVersion !== requestVersionRef.current) return;
+
+          setData(initialData);
+          setIsLoading(false);
+          setError(normalizeContentQueryError(queryError));
+        },
+      );
 
     return () => {
       isMounted = false;
