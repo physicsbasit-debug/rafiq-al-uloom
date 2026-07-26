@@ -74,7 +74,7 @@ export function useAsyncQuery<T>({
           setData(initialData);
           setIsLoading(false);
           setError(normalizeContentQueryError(queryError));
-        },
+        }
       );
 
     return () => {

@@ -42,7 +42,7 @@ function renderAsyncQuery<T>(props: HookProps<T>) {
       }),
     {
       initialProps: props,
-    },
+    }
   );
 }
 
