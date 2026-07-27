@@ -179,9 +179,12 @@ export function useMasteryQuestions(lessonId: string) {
 }
 
 export function useObjectivesByIds(objectiveIds: string[]) {
-  const objectiveIdsKey = objectiveIds.join(',');
+  const objectiveIdsKey = JSON.stringify(objectiveIds);
 
-  const stableObjectiveIds = useMemo(() => [...objectiveIds], [objectiveIdsKey]);
+  const stableObjectiveIds = useMemo(
+    () => JSON.parse(objectiveIdsKey) as string[],
+    [objectiveIdsKey],
+  );
 
   const queryFn = useCallback(
     (signal: AbortSignal) =>

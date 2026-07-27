@@ -2,7 +2,7 @@
 
 import { renderHook, waitFor } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { asyncLocalContentRepository } from '@services/data/async-local-content.repository';
 import {
@@ -43,87 +43,141 @@ describe('content query hooks: repository mappings', () => {
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
-  it('يفوض hooks الفهرس إلى دوال Repository الصحيحة', async () => {
-    const semestersSpy = vi
+  it('يفوض useSemestersByGrade إلى الدالة الصحيحة', async () => {
+    const spy = vi
       .spyOn(asyncLocalContentRepository, 'getSemestersByGrade')
-      .mockResolvedValue([]);
-    const subjectsSpy = vi
-      .spyOn(asyncLocalContentRepository, 'getSubjectsBySemester')
-      .mockResolvedValue([]);
-    const unitsBySemesterSpy = vi
-      .spyOn(asyncLocalContentRepository, 'getUnitsBySubjectAndSemester')
-      .mockResolvedValue([]);
-    const unitsBySubjectSpy = vi
-      .spyOn(asyncLocalContentRepository, 'getUnitsBySubject')
       .mockResolvedValue([]);
 
     renderHook(() => useSemestersByGrade('grade-1'));
-    renderHook(() => useSubjectsBySemester('semester-1'));
-    renderHook(() => useUnitsBySubjectAndSemester('subject-1', 'semester-1'));
-    renderHook(() => useUnitsBySubject('subject-1'));
 
     await waitFor(() => {
-      expect(semestersSpy).toHaveBeenCalledWith('grade-1', {
-        signal: expect.any(AbortSignal),
-      });
-      expect(subjectsSpy).toHaveBeenCalledWith('semester-1', {
-        signal: expect.any(AbortSignal),
-      });
-      expect(unitsBySemesterSpy).toHaveBeenCalledWith('subject-1', 'semester-1', {
-        signal: expect.any(AbortSignal),
-      });
-      expect(unitsBySubjectSpy).toHaveBeenCalledWith('subject-1', {
+      expect(spy).toHaveBeenCalledWith('grade-1', {
         signal: expect.any(AbortSignal),
       });
     });
   });
 
-  it('يفوض hooks الدرس إلى دوال Repository الصحيحة', async () => {
-    const lessonSpy = vi.spyOn(asyncLocalContentRepository, 'getLessonById').mockResolvedValue(
-      undefined,
-    );
-    const objectivesSpy = vi
+  it('يفوض useSubjectsBySemester إلى الدالة الصحيحة', async () => {
+    const spy = vi
+      .spyOn(asyncLocalContentRepository, 'getSubjectsBySemester')
+      .mockResolvedValue([]);
+
+    renderHook(() => useSubjectsBySemester('semester-1'));
+
+    await waitFor(() => {
+      expect(spy).toHaveBeenCalledWith('semester-1', {
+        signal: expect.any(AbortSignal),
+      });
+    });
+  });
+
+  it('يفوض useUnitsBySubjectAndSemester إلى الدالة الصحيحة', async () => {
+    const spy = vi
+      .spyOn(asyncLocalContentRepository, 'getUnitsBySubjectAndSemester')
+      .mockResolvedValue([]);
+
+    renderHook(() => useUnitsBySubjectAndSemester('subject-1', 'semester-1'));
+
+    await waitFor(() => {
+      expect(spy).toHaveBeenCalledWith('subject-1', 'semester-1', {
+        signal: expect.any(AbortSignal),
+      });
+    });
+  });
+
+  it('يفوض useUnitsBySubject إلى الدالة الصحيحة', async () => {
+    const spy = vi
+      .spyOn(asyncLocalContentRepository, 'getUnitsBySubject')
+      .mockResolvedValue([]);
+
+    renderHook(() => useUnitsBySubject('subject-1'));
+
+    await waitFor(() => {
+      expect(spy).toHaveBeenCalledWith('subject-1', {
+        signal: expect.any(AbortSignal),
+      });
+    });
+  });
+
+  it('يفوض useLesson إلى getLessonById ويبدأ بـundefined', async () => {
+    const spy = vi.spyOn(asyncLocalContentRepository, 'getLessonById').mockResolvedValue(undefined);
+
+    const { result } = renderHook(() => useLesson('lesson-1'));
+
+    expect(result.current.data).toBeUndefined();
+
+    await waitFor(() => {
+      expect(spy).toHaveBeenCalledWith('lesson-1', {
+        signal: expect.any(AbortSignal),
+      });
+    });
+  });
+
+  it('يفوض useLessonObjectives إلى الدالة الصحيحة', async () => {
+    const spy = vi
       .spyOn(asyncLocalContentRepository, 'getObjectivesByLesson')
       .mockResolvedValue([]);
-    const experimentsSpy = vi
+
+    renderHook(() => useLessonObjectives('lesson-1'));
+
+    await waitFor(() => {
+      expect(spy).toHaveBeenCalledWith('lesson-1', {
+        signal: expect.any(AbortSignal),
+      });
+    });
+  });
+
+  it('يفوض useLessonExperiments إلى الدالة الصحيحة', async () => {
+    const spy = vi
       .spyOn(asyncLocalContentRepository, 'getExperimentsByLesson')
       .mockResolvedValue([]);
-    const reviewSpy = vi
+
+    renderHook(() => useLessonExperiments('lesson-1'));
+
+    await waitFor(() => {
+      expect(spy).toHaveBeenCalledWith('lesson-1', {
+        signal: expect.any(AbortSignal),
+      });
+    });
+  });
+
+  it('يفوض useReviewQuestions إلى الدالة الصحيحة', async () => {
+    const spy = vi
       .spyOn(asyncLocalContentRepository, 'getReviewQuestionsByLesson')
       .mockResolvedValue([]);
-    const masterySpy = vi
+
+    renderHook(() => useReviewQuestions('lesson-1'));
+
+    await waitFor(() => {
+      expect(spy).toHaveBeenCalledWith('lesson-1', {
+        signal: expect.any(AbortSignal),
+      });
+    });
+  });
+
+  it('يفوض useMasteryQuestions إلى الدالة الصحيحة', async () => {
+    const spy = vi
       .spyOn(asyncLocalContentRepository, 'getMasteryQuestionsByLesson')
       .mockResolvedValue([]);
-    const gamesSpy = vi
+
+    renderHook(() => useMasteryQuestions('lesson-1'));
+
+    await waitFor(() => {
+      expect(spy).toHaveBeenCalledWith('lesson-1', {
+        signal: expect.any(AbortSignal),
+      });
+    });
+  });
+
+  it('يفوض useGamesByLesson إلى الدالة الصحيحة', async () => {
+    const spy = vi
       .spyOn(asyncLocalContentRepository, 'getGamesByLesson')
       .mockResolvedValue([]);
 
-    const lessonHook = renderHook(() => useLesson('lesson-1'));
-    renderHook(() => useLessonObjectives('lesson-1'));
-    renderHook(() => useLessonExperiments('lesson-1'));
-    renderHook(() => useReviewQuestions('lesson-1'));
-    renderHook(() => useMasteryQuestions('lesson-1'));
     renderHook(() => useGamesByLesson('lesson-1'));
 
-    expect(lessonHook.result.current.data).toBeUndefined();
-
     await waitFor(() => {
-      expect(lessonSpy).toHaveBeenCalledWith('lesson-1', {
-        signal: expect.any(AbortSignal),
-      });
-      expect(objectivesSpy).toHaveBeenCalledWith('lesson-1', {
-        signal: expect.any(AbortSignal),
-      });
-      expect(experimentsSpy).toHaveBeenCalledWith('lesson-1', {
-        signal: expect.any(AbortSignal),
-      });
-      expect(reviewSpy).toHaveBeenCalledWith('lesson-1', {
-        signal: expect.any(AbortSignal),
-      });
-      expect(masterySpy).toHaveBeenCalledWith('lesson-1', {
-        signal: expect.any(AbortSignal),
-      });
-      expect(gamesSpy).toHaveBeenCalledWith('lesson-1', {
+      expect(spy).toHaveBeenCalledWith('lesson-1', {
         signal: expect.any(AbortSignal),
       });
     });
@@ -162,7 +216,7 @@ describe('content query hooks: reference stability', () => {
     });
   });
 
-  it('يثبت useObjectivesByIds بحسب المحتوى لا بحسب مرجع المصفوفة', async () => {
+  it('لا يعيد useObjectivesByIds الطلب عند تغير المرجع وبقاء المحتوى نفسه', async () => {
     const spy = vi
       .spyOn(asyncLocalContentRepository, 'getObjectivesByIds')
       .mockResolvedValue([]);
@@ -180,7 +234,25 @@ describe('content query hooks: reference stability', () => {
 
     rerender({ objectiveIds: ['o1', 'o2'] });
     await Promise.resolve();
+
     expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('يعيد useObjectivesByIds الطلب عند تغير المحتوى', async () => {
+    const spy = vi
+      .spyOn(asyncLocalContentRepository, 'getObjectivesByIds')
+      .mockResolvedValue([]);
+
+    const { rerender } = renderHook(
+      ({ objectiveIds }: { objectiveIds: string[] }) => useObjectivesByIds(objectiveIds),
+      {
+        initialProps: { objectiveIds: ['o1', 'o2'] },
+      },
+    );
+
+    await waitFor(() => {
+      expect(spy).toHaveBeenCalledTimes(1);
+    });
 
     rerender({ objectiveIds: ['o1', 'o3'] });
 
@@ -188,13 +260,34 @@ describe('content query hooks: reference stability', () => {
       expect(spy).toHaveBeenCalledTimes(2);
     });
 
-    rerender({ objectiveIds: ['o3', 'o1'] });
+    expect(spy).toHaveBeenLastCalledWith(['o1', 'o3'], {
+      signal: expect.any(AbortSignal),
+    });
+  });
+
+  it('يعيد useObjectivesByIds الطلب عند تغير ترتيب المحتوى', async () => {
+    const spy = vi
+      .spyOn(asyncLocalContentRepository, 'getObjectivesByIds')
+      .mockResolvedValue([]);
+
+    const { rerender } = renderHook(
+      ({ objectiveIds }: { objectiveIds: string[] }) => useObjectivesByIds(objectiveIds),
+      {
+        initialProps: { objectiveIds: ['o1', 'o2'] },
+      },
+    );
 
     await waitFor(() => {
-      expect(spy).toHaveBeenCalledTimes(3);
+      expect(spy).toHaveBeenCalledTimes(1);
     });
 
-    expect(spy).toHaveBeenLastCalledWith(['o3', 'o1'], {
+    rerender({ objectiveIds: ['o2', 'o1'] });
+
+    await waitFor(() => {
+      expect(spy).toHaveBeenCalledTimes(2);
+    });
+
+    expect(spy).toHaveBeenLastCalledWith(['o2', 'o1'], {
       signal: expect.any(AbortSignal),
     });
   });
@@ -218,8 +311,9 @@ describe('content query hooks: reference stability', () => {
 
 describe('content query hooks: structural regression guards', () => {
   it('يحافظ على أعداد hooks والاستدعاءات والقيم الابتدائية المعتمدة', () => {
-    const sourcePath = fileURLToPath(
-      new URL('../../src/services/queries/content-query.hooks.ts', import.meta.url),
+    const sourcePath = resolve(
+      process.cwd(),
+      'src/services/queries/content-query.hooks.ts',
     );
     const source = readFileSync(sourcePath, 'utf8');
 
@@ -234,8 +328,9 @@ describe('content query hooks: structural regression guards', () => {
   });
 
   it('لا يكرر منطق دورة الاستعلام داخل hooks المتخصصة', () => {
-    const sourcePath = fileURLToPath(
-      new URL('../../src/services/queries/content-query.hooks.ts', import.meta.url),
+    const sourcePath = resolve(
+      process.cwd(),
+      'src/services/queries/content-query.hooks.ts',
     );
     const source = readFileSync(sourcePath, 'utf8');
 
