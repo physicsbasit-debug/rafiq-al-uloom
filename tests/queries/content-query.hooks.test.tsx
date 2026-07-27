@@ -44,9 +44,7 @@ describe('content query hooks: repository mappings', () => {
   });
 
   it('يفوض useSemestersByGrade إلى الدالة الصحيحة', async () => {
-    const spy = vi
-      .spyOn(asyncLocalContentRepository, 'getSemestersByGrade')
-      .mockResolvedValue([]);
+    const spy = vi.spyOn(asyncLocalContentRepository, 'getSemestersByGrade').mockResolvedValue([]);
 
     renderHook(() => useSemestersByGrade('grade-1'));
 
@@ -86,9 +84,7 @@ describe('content query hooks: repository mappings', () => {
   });
 
   it('يفوض useUnitsBySubject إلى الدالة الصحيحة', async () => {
-    const spy = vi
-      .spyOn(asyncLocalContentRepository, 'getUnitsBySubject')
-      .mockResolvedValue([]);
+    const spy = vi.spyOn(asyncLocalContentRepository, 'getUnitsBySubject').mockResolvedValue([]);
 
     renderHook(() => useUnitsBySubject('subject-1'));
 
@@ -170,9 +166,7 @@ describe('content query hooks: repository mappings', () => {
   });
 
   it('يفوض useGamesByLesson إلى الدالة الصحيحة', async () => {
-    const spy = vi
-      .spyOn(asyncLocalContentRepository, 'getGamesByLesson')
-      .mockResolvedValue([]);
+    const spy = vi.spyOn(asyncLocalContentRepository, 'getGamesByLesson').mockResolvedValue([]);
 
     renderHook(() => useGamesByLesson('lesson-1'));
 
@@ -186,16 +180,11 @@ describe('content query hooks: repository mappings', () => {
 
 describe('content query hooks: reference stability', () => {
   it('لا يعيد useLessonsByUnit الطلب مع unitId نفسه ويعيده مرة عند تغيّره', async () => {
-    const spy = vi
-      .spyOn(asyncLocalContentRepository, 'getLessonsByUnit')
-      .mockResolvedValue([]);
+    const spy = vi.spyOn(asyncLocalContentRepository, 'getLessonsByUnit').mockResolvedValue([]);
 
-    const { rerender } = renderHook(
-      ({ unitId }: { unitId: string }) => useLessonsByUnit(unitId),
-      {
-        initialProps: { unitId: 'unit-1' },
-      },
-    );
+    const { rerender } = renderHook(({ unitId }: { unitId: string }) => useLessonsByUnit(unitId), {
+      initialProps: { unitId: 'unit-1' },
+    });
 
     await waitFor(() => {
       expect(spy).toHaveBeenCalledTimes(1);
@@ -217,15 +206,13 @@ describe('content query hooks: reference stability', () => {
   });
 
   it('لا يعيد useObjectivesByIds الطلب عند تغير المرجع وبقاء المحتوى نفسه', async () => {
-    const spy = vi
-      .spyOn(asyncLocalContentRepository, 'getObjectivesByIds')
-      .mockResolvedValue([]);
+    const spy = vi.spyOn(asyncLocalContentRepository, 'getObjectivesByIds').mockResolvedValue([]);
 
     const { rerender } = renderHook(
       ({ objectiveIds }: { objectiveIds: string[] }) => useObjectivesByIds(objectiveIds),
       {
         initialProps: { objectiveIds: ['o1', 'o2'] },
-      },
+      }
     );
 
     await waitFor(() => {
@@ -239,15 +226,13 @@ describe('content query hooks: reference stability', () => {
   });
 
   it('يعيد useObjectivesByIds الطلب عند تغير المحتوى', async () => {
-    const spy = vi
-      .spyOn(asyncLocalContentRepository, 'getObjectivesByIds')
-      .mockResolvedValue([]);
+    const spy = vi.spyOn(asyncLocalContentRepository, 'getObjectivesByIds').mockResolvedValue([]);
 
     const { rerender } = renderHook(
       ({ objectiveIds }: { objectiveIds: string[] }) => useObjectivesByIds(objectiveIds),
       {
         initialProps: { objectiveIds: ['o1', 'o2'] },
-      },
+      }
     );
 
     await waitFor(() => {
@@ -266,15 +251,13 @@ describe('content query hooks: reference stability', () => {
   });
 
   it('يعيد useObjectivesByIds الطلب عند تغير ترتيب المحتوى', async () => {
-    const spy = vi
-      .spyOn(asyncLocalContentRepository, 'getObjectivesByIds')
-      .mockResolvedValue([]);
+    const spy = vi.spyOn(asyncLocalContentRepository, 'getObjectivesByIds').mockResolvedValue([]);
 
     const { rerender } = renderHook(
       ({ objectiveIds }: { objectiveIds: string[] }) => useObjectivesByIds(objectiveIds),
       {
         initialProps: { objectiveIds: ['o1', 'o2'] },
-      },
+      }
     );
 
     await waitFor(() => {
@@ -293,9 +276,7 @@ describe('content query hooks: reference stability', () => {
   });
 
   it('ينهي useObjectivesByIds التحميل بلا حلقة إعادة طلب', async () => {
-    const spy = vi
-      .spyOn(asyncLocalContentRepository, 'getObjectivesByIds')
-      .mockResolvedValue([]);
+    const spy = vi.spyOn(asyncLocalContentRepository, 'getObjectivesByIds').mockResolvedValue([]);
 
     const { result } = renderHook(() => useObjectivesByIds(['o1']));
 
@@ -311,10 +292,7 @@ describe('content query hooks: reference stability', () => {
 
 describe('content query hooks: structural regression guards', () => {
   it('يحافظ على أعداد hooks والاستدعاءات والقيم الابتدائية المعتمدة', () => {
-    const sourcePath = resolve(
-      process.cwd(),
-      'src/services/queries/content-query.hooks.ts',
-    );
+    const sourcePath = resolve(process.cwd(), 'src/services/queries/content-query.hooks.ts');
     const source = readFileSync(sourcePath, 'utf8');
 
     expect(source.match(/export function use[A-Z]\w*\(/g)?.length ?? 0).toBe(13);
@@ -323,15 +301,12 @@ describe('content query hooks: structural regression guards', () => {
     expect(source.match(/initialData:\s*undefined/g)?.length ?? 0).toBe(1);
 
     expect(source).not.toMatch(
-      /initialData:\s*(?:\[\]|\{\}|new\s+(?:Array|Map|Set)\s*\(|Array\.from\s*\(|\[\.\.\.|\{\s*\.\.\.)/,
+      /initialData:\s*(?:\[\]|\{\}|new\s+(?:Array|Map|Set)\s*\(|Array\.from\s*\(|\[\.\.\.|\{\s*\.\.\.)/
     );
   });
 
   it('لا يكرر منطق دورة الاستعلام داخل hooks المتخصصة', () => {
-    const sourcePath = resolve(
-      process.cwd(),
-      'src/services/queries/content-query.hooks.ts',
-    );
+    const sourcePath = resolve(process.cwd(), 'src/services/queries/content-query.hooks.ts');
     const source = readFileSync(sourcePath, 'utf8');
 
     expect(source).not.toContain('useEffect');

@@ -26,7 +26,7 @@ const EMPTY_GAMES: Game[] = [];
 export function useGrades() {
   const queryFn = useCallback(
     (signal: AbortSignal) => asyncLocalContentRepository.getGrades({ signal }),
-    [],
+    []
   );
 
   return useAsyncQuery({
@@ -38,9 +38,8 @@ export function useGrades() {
 
 export function useSemestersByGrade(gradeId: string) {
   const queryFn = useCallback(
-    (signal: AbortSignal) =>
-      asyncLocalContentRepository.getSemestersByGrade(gradeId, { signal }),
-    [gradeId],
+    (signal: AbortSignal) => asyncLocalContentRepository.getSemestersByGrade(gradeId, { signal }),
+    [gradeId]
   );
 
   return useAsyncQuery({
@@ -54,7 +53,7 @@ export function useSubjectsBySemester(semesterId: string) {
   const queryFn = useCallback(
     (signal: AbortSignal) =>
       asyncLocalContentRepository.getSubjectsBySemester(semesterId, { signal }),
-    [semesterId],
+    [semesterId]
   );
 
   return useAsyncQuery({
@@ -70,7 +69,7 @@ export function useUnitsBySubjectAndSemester(subjectId: string, semesterId: stri
       asyncLocalContentRepository.getUnitsBySubjectAndSemester(subjectId, semesterId, {
         signal,
       }),
-    [semesterId, subjectId],
+    [semesterId, subjectId]
   );
 
   return useAsyncQuery({
@@ -82,9 +81,8 @@ export function useUnitsBySubjectAndSemester(subjectId: string, semesterId: stri
 
 export function useUnitsBySubject(subjectId: string) {
   const queryFn = useCallback(
-    (signal: AbortSignal) =>
-      asyncLocalContentRepository.getUnitsBySubject(subjectId, { signal }),
-    [subjectId],
+    (signal: AbortSignal) => asyncLocalContentRepository.getUnitsBySubject(subjectId, { signal }),
+    [subjectId]
   );
 
   return useAsyncQuery({
@@ -96,9 +94,8 @@ export function useUnitsBySubject(subjectId: string) {
 
 export function useLessonsByUnit(unitId: string) {
   const queryFn = useCallback(
-    (signal: AbortSignal) =>
-      asyncLocalContentRepository.getLessonsByUnit(unitId, { signal }),
-    [unitId],
+    (signal: AbortSignal) => asyncLocalContentRepository.getLessonsByUnit(unitId, { signal }),
+    [unitId]
   );
 
   return useAsyncQuery({
@@ -110,9 +107,8 @@ export function useLessonsByUnit(unitId: string) {
 
 export function useLesson(lessonId: string) {
   const queryFn = useCallback(
-    (signal: AbortSignal) =>
-      asyncLocalContentRepository.getLessonById(lessonId, { signal }),
-    [lessonId],
+    (signal: AbortSignal) => asyncLocalContentRepository.getLessonById(lessonId, { signal }),
+    [lessonId]
   );
 
   return useAsyncQuery({
@@ -126,7 +122,7 @@ export function useLessonObjectives(lessonId: string) {
   const queryFn = useCallback(
     (signal: AbortSignal) =>
       asyncLocalContentRepository.getObjectivesByLesson(lessonId, { signal }),
-    [lessonId],
+    [lessonId]
   );
 
   return useAsyncQuery({
@@ -140,7 +136,7 @@ export function useLessonExperiments(lessonId: string) {
   const queryFn = useCallback(
     (signal: AbortSignal) =>
       asyncLocalContentRepository.getExperimentsByLesson(lessonId, { signal }),
-    [lessonId],
+    [lessonId]
   );
 
   return useAsyncQuery({
@@ -154,7 +150,7 @@ export function useReviewQuestions(lessonId: string) {
   const queryFn = useCallback(
     (signal: AbortSignal) =>
       asyncLocalContentRepository.getReviewQuestionsByLesson(lessonId, { signal }),
-    [lessonId],
+    [lessonId]
   );
 
   return useAsyncQuery({
@@ -168,7 +164,7 @@ export function useMasteryQuestions(lessonId: string) {
   const queryFn = useCallback(
     (signal: AbortSignal) =>
       asyncLocalContentRepository.getMasteryQuestionsByLesson(lessonId, { signal }),
-    [lessonId],
+    [lessonId]
   );
 
   return useAsyncQuery({
@@ -183,13 +179,13 @@ export function useObjectivesByIds(objectiveIds: string[]) {
 
   const stableObjectiveIds = useMemo(
     () => JSON.parse(objectiveIdsKey) as string[],
-    [objectiveIdsKey],
+    [objectiveIdsKey]
   );
 
   const queryFn = useCallback(
     (signal: AbortSignal) =>
       asyncLocalContentRepository.getObjectivesByIds(stableObjectiveIds, { signal }),
-    [stableObjectiveIds],
+    [stableObjectiveIds]
   );
 
   return useAsyncQuery({
@@ -201,9 +197,8 @@ export function useObjectivesByIds(objectiveIds: string[]) {
 
 export function useGamesByLesson(lessonId: string) {
   const queryFn = useCallback(
-    (signal: AbortSignal) =>
-      asyncLocalContentRepository.getGamesByLesson(lessonId, { signal }),
-    [lessonId],
+    (signal: AbortSignal) => asyncLocalContentRepository.getGamesByLesson(lessonId, { signal }),
+    [lessonId]
   );
 
   return useAsyncQuery({
