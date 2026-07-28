@@ -29,9 +29,7 @@ describe('UnitSelection', () => {
       reload: vi.fn(),
     });
 
-    render(
-      <UnitSelection semesterId="semester-2" subjectId="physics" onSelectUnit={vi.fn()} />,
-    );
+    render(<UnitSelection semesterId="semester-2" subjectId="physics" onSelectUnit={vi.fn()} />);
 
     expect(mockedUseUnitsBySubjectAndSemester).toHaveBeenCalledWith('physics', 'semester-2');
   });
@@ -44,9 +42,7 @@ describe('UnitSelection', () => {
       reload: vi.fn(),
     });
 
-    render(
-      <UnitSelection semesterId="semester-2" subjectId="physics" onSelectUnit={vi.fn()} />,
-    );
+    render(<UnitSelection semesterId="semester-2" subjectId="physics" onSelectUnit={vi.fn()} />);
 
     expect(screen.getByRole('status')).toHaveTextContent('جارٍ تحميل البيانات...');
   });
@@ -59,9 +55,7 @@ describe('UnitSelection', () => {
       reload: vi.fn(),
     });
 
-    render(
-      <UnitSelection semesterId="semester-2" subjectId="physics" onSelectUnit={vi.fn()} />,
-    );
+    render(<UnitSelection semesterId="semester-2" subjectId="physics" onSelectUnit={vi.fn()} />);
 
     expect(screen.getByRole('alert')).toHaveTextContent('تعذر تحميل الوحدات.');
   });
@@ -76,9 +70,7 @@ describe('UnitSelection', () => {
       reload,
     });
 
-    render(
-      <UnitSelection semesterId="semester-2" subjectId="physics" onSelectUnit={vi.fn()} />,
-    );
+    render(<UnitSelection semesterId="semester-2" subjectId="physics" onSelectUnit={vi.fn()} />);
     fireEvent.click(screen.getByRole('button', { name: 'إعادة المحاولة' }));
 
     expect(reload).toHaveBeenCalledTimes(1);
@@ -92,9 +84,7 @@ describe('UnitSelection', () => {
       reload: vi.fn(),
     });
 
-    render(
-      <UnitSelection semesterId="semester-2" subjectId="physics" onSelectUnit={vi.fn()} />,
-    );
+    render(<UnitSelection semesterId="semester-2" subjectId="physics" onSelectUnit={vi.fn()} />);
 
     const cards = screen.getAllByRole('button');
     expect(cards).toHaveLength(2);
@@ -113,7 +103,7 @@ describe('UnitSelection', () => {
     });
 
     render(
-      <UnitSelection semesterId="semester-2" subjectId="physics" onSelectUnit={onSelectUnit} />,
+      <UnitSelection semesterId="semester-2" subjectId="physics" onSelectUnit={onSelectUnit} />
     );
     fireEvent.click(screen.getByRole('button', { name: 'الضوء' }));
 

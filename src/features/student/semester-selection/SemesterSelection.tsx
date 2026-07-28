@@ -14,9 +14,7 @@ export function SemesterSelection({ gradeId, onSelectSemester }: SemesterSelecti
   return (
     <QueryBoundary isLoading={isLoading} error={error} onRetry={reload}>
       <section>
-        <h2 style={{ margin: '0 0 0.9rem', color: colors.textPrimary }}>
-          اختر الفصل الدراسي
-        </h2>
+        <h2 style={{ margin: '0 0 0.9rem', color: colors.textPrimary }}>اختر الفصل الدراسي</h2>
         <div style={{ display: 'grid', gap: '0.8rem' }}>
           {semesters.map((semester) => (
             <AppCard

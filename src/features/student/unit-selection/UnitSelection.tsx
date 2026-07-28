@@ -10,10 +10,12 @@ interface UnitSelectionProps {
 }
 
 export function UnitSelection({ semesterId, subjectId, onSelectUnit }: UnitSelectionProps) {
-  const { data: units, isLoading, error, reload } = useUnitsBySubjectAndSemester(
-    subjectId,
-    semesterId,
-  );
+  const {
+    data: units,
+    isLoading,
+    error,
+    reload,
+  } = useUnitsBySubjectAndSemester(subjectId, semesterId);
 
   return (
     <QueryBoundary isLoading={isLoading} error={error} onRetry={reload}>
