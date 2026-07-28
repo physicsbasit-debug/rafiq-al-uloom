@@ -1,3 +1,5 @@
+/// <reference types="vitest/config" />
+
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { fileURLToPath } from 'node:url';
@@ -5,6 +7,9 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  test: {
+    setupFiles: ['./tests/setup.ts'],
+  },
   resolve: {
     alias: {
       '@shared-types': fileURLToPath(new URL('./src/types', import.meta.url)),
