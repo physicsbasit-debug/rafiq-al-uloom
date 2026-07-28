@@ -116,9 +116,11 @@ describe('SubjectSelection', () => {
 
     render(<SubjectSelection semesterId="semester-2" onSelectSubject={vi.fn()} />);
 
-    expect(screen.getByRole('button', { name: 'الفيزياء' })).toHaveStyle({
-      borderInlineStart: '5px solid #7C3AED',
-    });
+    const physicsCard = screen.getByRole('button', { name: 'الفيزياء' });
+
+expect(physicsCard.getAttribute('style')).toContain(
+  'border-inline-start: 5px solid #7C3AED',
+);
   });
 
   it('يمرر subject.id نفسه عند اختيار البطاقة', () => {
