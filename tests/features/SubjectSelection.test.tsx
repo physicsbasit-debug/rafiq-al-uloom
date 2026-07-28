@@ -12,8 +12,18 @@ vi.mock('@services/queries/content-query.hooks', () => ({
 const mockedUseSubjectsBySemester = vi.mocked(useSubjectsBySemester);
 
 const subjects = [
-  { id: 'physics', name: 'الفيزياء', gradeId: 'grade-10', themeColor: '#7C3AED' },
-  { id: 'chemistry', name: 'الكيمياء', gradeId: 'grade-10', themeColor: '#059669' },
+  {
+    id: 'physics',
+    name: 'الفيزياء',
+    gradeId: 'grade-10',
+    themeColor: '#7C3AED',
+  },
+  {
+    id: 'chemistry',
+    name: 'الكيمياء',
+    gradeId: 'grade-10',
+    themeColor: '#059669',
+  },
 ] as ReturnType<typeof useSubjectsBySemester>['data'];
 
 beforeEach(() => {
@@ -71,6 +81,7 @@ describe('SubjectSelection', () => {
     });
 
     render(<SubjectSelection semesterId="semester-2" onSelectSubject={vi.fn()} />);
+
     fireEvent.click(screen.getByRole('button', { name: 'إعادة المحاولة' }));
 
     expect(reload).toHaveBeenCalledTimes(1);
@@ -101,6 +112,7 @@ describe('SubjectSelection', () => {
     render(<SubjectSelection semesterId="semester-2" onSelectSubject={vi.fn()} />);
 
     const cards = screen.getAllByRole('button');
+
     expect(cards).toHaveLength(2);
     expect(cards[0]).toHaveTextContent('الفيزياء');
     expect(cards[1]).toHaveTextContent('الكيمياء');
@@ -118,9 +130,9 @@ describe('SubjectSelection', () => {
 
     const physicsCard = screen.getByRole('button', { name: 'الفيزياء' });
 
-expect(physicsCard.getAttribute('style')).toContain(
-  'border-inline-start: 5px solid #7C3AED',
-);
+    expect(physicsCard.getAttribute('style')).toContain(
+      'border-inline-start: 5px solid #7C3AED',
+    );
   });
 
   it('يمرر subject.id نفسه عند اختيار البطاقة', () => {
@@ -134,6 +146,7 @@ expect(physicsCard.getAttribute('style')).toContain(
     });
 
     render(<SubjectSelection semesterId="semester-2" onSelectSubject={onSelectSubject} />);
+
     fireEvent.click(screen.getByRole('button', { name: 'الكيمياء' }));
 
     expect(onSelectSubject).toHaveBeenCalledTimes(1);
