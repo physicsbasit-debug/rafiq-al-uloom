@@ -9,7 +9,7 @@ describe('QueryBoundary', () => {
     render(
       <QueryBoundary isLoading error={null} onRetry={vi.fn()}>
         <div>المحتوى</div>
-      </QueryBoundary>,
+      </QueryBoundary>
     );
 
     expect(screen.getByRole('status')).toHaveTextContent('جارٍ تحميل البيانات...');
@@ -18,13 +18,9 @@ describe('QueryBoundary', () => {
 
   it('يعطي التحميل أولوية على الخطأ عند اجتماعهما مؤقتًا', () => {
     render(
-      <QueryBoundary
-        isLoading
-        error={{ message: 'تعذر التحميل.' }}
-        onRetry={vi.fn()}
-      >
+      <QueryBoundary isLoading error={{ message: 'تعذر التحميل.' }} onRetry={vi.fn()}>
         <div>المحتوى</div>
-      </QueryBoundary>,
+      </QueryBoundary>
     );
 
     expect(screen.getByRole('status')).toHaveTextContent('جارٍ تحميل البيانات...');
@@ -33,13 +29,9 @@ describe('QueryBoundary', () => {
 
   it('يعرض رسالة الخطأ وزر إعادة المحاولة', () => {
     render(
-      <QueryBoundary
-        isLoading={false}
-        error={{ message: 'تعذر تحميل الصفوف.' }}
-        onRetry={vi.fn()}
-      >
+      <QueryBoundary isLoading={false} error={{ message: 'تعذر تحميل الصفوف.' }} onRetry={vi.fn()}>
         <div>المحتوى</div>
-      </QueryBoundary>,
+      </QueryBoundary>
     );
 
     expect(screen.getByRole('alert')).toHaveTextContent('تعذر تحميل الصفوف.');
@@ -51,13 +43,9 @@ describe('QueryBoundary', () => {
     const onRetry = vi.fn();
 
     render(
-      <QueryBoundary
-        isLoading={false}
-        error={{ message: 'تعذر تحميل الصفوف.' }}
-        onRetry={onRetry}
-      >
+      <QueryBoundary isLoading={false} error={{ message: 'تعذر تحميل الصفوف.' }} onRetry={onRetry}>
         <div>المحتوى</div>
-      </QueryBoundary>,
+      </QueryBoundary>
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'إعادة المحاولة' }));
@@ -69,7 +57,7 @@ describe('QueryBoundary', () => {
     render(
       <QueryBoundary isLoading={false} error={null} onRetry={vi.fn()}>
         <div>المحتوى الناجح</div>
-      </QueryBoundary>,
+      </QueryBoundary>
     );
 
     expect(screen.getByText('المحتوى الناجح')).toBeInTheDocument();
@@ -79,7 +67,7 @@ describe('QueryBoundary', () => {
     const { container } = render(
       <QueryBoundary isLoading={false} error={null} onRetry={vi.fn()}>
         {null}
-      </QueryBoundary>,
+      </QueryBoundary>
     );
 
     expect(screen.queryByRole('status')).not.toBeInTheDocument();

@@ -12,12 +12,7 @@ interface QueryBoundaryProps {
   children: ReactNode;
 }
 
-export function QueryBoundary({
-  isLoading,
-  error,
-  onRetry,
-  children,
-}: QueryBoundaryProps) {
+export function QueryBoundary({ isLoading, error, onRetry, children }: QueryBoundaryProps) {
   if (isLoading) {
     return (
       <div
