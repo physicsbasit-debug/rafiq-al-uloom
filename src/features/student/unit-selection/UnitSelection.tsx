@@ -1,6 +1,7 @@
 import { AppCard } from '@design-system/components/AppCard';
+import { QueryBoundary } from '@design-system/components/QueryBoundary';
 import { colors } from '@design-system/theme/colors';
-import { getUnitsBySubjectAndSemester } from '@services/data/local-content.repository';
+import { useUnitsBySubjectAndSemester } from '@services/queries/content-query.hooks';
 
 interface UnitSelectionProps {
   semesterId: string;
@@ -9,16 +10,21 @@ interface UnitSelectionProps {
 }
 
 export function UnitSelection({ semesterId, subjectId, onSelectUnit }: UnitSelectionProps) {
-  const units = getUnitsBySubjectAndSemester(subjectId, semesterId);
+  const { data: units, isLoading, error, reload } = useUnitsBySubjectAndSemester(
+    subjectId,
+    semesterId,
+  );
 
   return (
-    <section>
-      <h2 style={{ margin: '0 0 0.9rem', color: colors.textPrimary }}>اختر الوحدة</h2>
-      <div style={{ display: 'grid', gap: '0.8rem' }}>
-        {units.map((unit) => (
-          <AppCard key={unit.id} title={unit.title} onClick={() => onSelectUnit(unit.id)} />
-        ))}
-      </div>
-    </section>
+    <QueryBoundary isLoading={isLoading} error={error} onRetry={reload}>
+      <section>
+        <h2 style={{ margin: '0 0 0.9rem', color: colors.textPrimary }}>اختر الوحدة</h2>
+        <div style={{ display: 'grid', gap: '0.8rem' }}>
+          {units.map((unit) => (
+            <AppCard key={unit.id} title={unit.title} onClick={() => onSelectUnit(unit.id)} />
+          ))}
+        </div>
+      </section>
+    </QueryBoundary>
   );
 }
