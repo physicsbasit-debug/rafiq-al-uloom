@@ -114,12 +114,8 @@ describe('LessonList', () => {
 
     render(<LessonList unitId="unit-waves" onSelectLesson={vi.fn()} />);
 
-    expect(screen.getByRole('button', { name: /خصائص الموجات/ })).toHaveTextContent(
-      'الدرس 1',
-    );
-    expect(screen.getByRole('button', { name: /سرعة الموجة/ })).toHaveTextContent(
-      'الدرس 2',
-    );
+    expect(screen.getByRole('button', { name: /خصائص الموجات/ })).toHaveTextContent('الدرس 1');
+    expect(screen.getByRole('button', { name: /سرعة الموجة/ })).toHaveTextContent('الدرس 2');
   });
 
   it('يمرر lesson.id نفسه عند اختيار البطاقة', () => {

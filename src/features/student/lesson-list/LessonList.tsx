@@ -9,12 +9,7 @@ interface LessonListProps {
 }
 
 export function LessonList({ unitId, onSelectLesson }: LessonListProps) {
-  const {
-    data: lessons,
-    isLoading,
-    error,
-    reload,
-  } = useLessonsByUnit(unitId);
+  const { data: lessons, isLoading, error, reload } = useLessonsByUnit(unitId);
 
   return (
     <QueryBoundary isLoading={isLoading} error={error} onRetry={reload}>
