@@ -114,10 +114,10 @@ describe('LessonList', () => {
 
     render(<LessonList unitId="unit-waves" onSelectLesson={vi.fn()} />);
 
-    expect(screen.getByRole('button', { name: 'خصائص الموجات' })).toHaveTextContent(
+    expect(screen.getByRole('button', { name: /خصائص الموجات/ })).toHaveTextContent(
       'الدرس 1',
     );
-    expect(screen.getByRole('button', { name: 'سرعة الموجة' })).toHaveTextContent(
+    expect(screen.getByRole('button', { name: /سرعة الموجة/ })).toHaveTextContent(
       'الدرس 2',
     );
   });
@@ -134,7 +134,7 @@ describe('LessonList', () => {
 
     render(<LessonList unitId="unit-waves" onSelectLesson={onSelectLesson} />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'سرعة الموجة' }));
+    fireEvent.click(screen.getByRole('button', { name: /سرعة الموجة/ }));
 
     expect(onSelectLesson).toHaveBeenCalledTimes(1);
     expect(onSelectLesson).toHaveBeenCalledWith('lesson-wave-speed');
