@@ -139,8 +139,9 @@ describe('ReviewQuestionsView', () => {
 
     render(<ReviewQuestionsView lessonId="lesson-one" onBackToLesson={vi.fn()} />);
 
-    expect(screen.getByText('سؤال', { selector: 'p' })).toBeInTheDocument();
-    expect(screen.getAllByText('سؤال', { selector: 'p' })).toHaveLength(2);
+    expect(
+      screen.getAllByText(/^سؤال/, { selector: 'p' })
+    ).toHaveLength(2);
   });
 
   it('يعرض خيارات السؤال الأول بترتيبها', () => {
@@ -206,7 +207,15 @@ describe('ReviewQuestionsView', () => {
     fireEvent.click(screen.getByRole('button', { name: 'ثانية' }));
 
     expect(screen.getByText('✕ إجابة خاطئة')).toBeInTheDocument();
-    expect(screen.getByText(/الإجابة الصحيحة:/)).toHaveTextContent('الإجابة الصحيحة: هرتز');
+    const article = getQuestionArticle('ما وحدة قياس التردد؟');
+
+    expect(
+      within(article).getByText(/الإجابة الصحيحة:/)
+    ).toBeInTheDocument();
+
+    expect(
+      within(article).getByText('هرتز')
+    ).toBeInTheDocument();
   });
 
   it('يعطل خيارات السؤال بعد تسجيل الإجابة', () => {
