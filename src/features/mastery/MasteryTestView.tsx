@@ -11,11 +11,7 @@ import { getQuestionFeedback } from '@features/quiz/quiz-engine';
 import type { MasteryResult } from '@shared-types/mastery.types';
 import type { Question } from '@shared-types/quiz.types';
 import { useMasteryQuestions } from '@services/queries/content-query.hooks';
-import {
-  areAllQuestionsAnswered,
-  calculateScore,
-  type AnswersByQuestionId,
-} from '@utils/scoring';
+import { areAllQuestionsAnswered, calculateScore, type AnswersByQuestionId } from '@utils/scoring';
 import { classifyMasteryScore } from './mastery-classifier';
 import { getMasteryRecommendation } from './recommendations';
 
@@ -60,9 +56,7 @@ function ReviewItem({
         السؤال <bdi dir="ltr">{questionNumber}</bdi>
       </p>
 
-      <h4 style={{ margin: `0 0 ${spacing.sm}`, color: colors.textPrimary }}>
-        {question.prompt}
-      </h4>
+      <h4 style={{ margin: `0 0 ${spacing.sm}`, color: colors.textPrimary }}>{question.prompt}</h4>
 
       <p
         style={{
@@ -91,11 +85,7 @@ function ReviewItem({
   );
 }
 
-function MasteryTestContent({
-  questions,
-  lessonId,
-  onBackToLesson,
-}: MasteryTestContentProps) {
+function MasteryTestContent({ questions, lessonId, onBackToLesson }: MasteryTestContentProps) {
   const [answers, setAnswers] = useState<AnswersByQuestionId>({});
   const [result, setResult] = useState<MasteryResult | null>(null);
   const isComplete = areAllQuestionsAnswered(questions, answers);
