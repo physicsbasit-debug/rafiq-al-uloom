@@ -213,10 +213,14 @@ describe('MasteryTestView', () => {
     fireEvent.click(screen.getByRole('button', { name: 'إنهاء الاختبار' }));
 
     expect(
-      screen.getByRole('heading', { name: 'ما وحدة قياس التردد؟' }),
+      screen.getByRole('heading', {
+        level: 3,
+        name: 'ما وحدة قياس التردد؟',
+      }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('heading', {
+        level: 3,
         name: 'ما العلاقة بين التردد والزمن الدوري؟',
       }),
     ).toBeInTheDocument();
@@ -256,8 +260,12 @@ describe('MasteryTestView', () => {
     fireEvent.click(screen.getByRole('button', { name: 'إنهاء الاختبار' }));
 
     expect(screen.getByText('✕ إجابة خاطئة')).toBeInTheDocument();
-    expect(screen.getByText('قريب من الإتقان')).toBeInTheDocument();
-    expect(screen.getByText(/راجع النقاط التي أخطأت فيها/)).toBeInTheDocument();
+    expect(screen.getByText('يحتاج مراجعة')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /ارجع إلى شرح الدرس والأمثلة الأساسية، ثم حل أسئلة المراجعة/,
+      ),
+    ).toBeInTheDocument();
   });
 
   it('زر العودة يستدعي onBackToLesson', () => {
