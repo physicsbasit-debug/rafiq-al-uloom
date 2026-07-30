@@ -21,7 +21,9 @@ vi.mock('@services/queries/content-query.hooks', () => ({
 
 vi.mock('@features/lesson/objectives/LessonObjectives', () => ({
   LessonObjectives: ({ objectives }: { objectives: Objective[] }) => (
-    <section data-testid="lesson-objectives">{objectives.map((item) => item.text).join('|')}</section>
+    <section data-testid="lesson-objectives">
+      {objectives.map((item) => item.text).join('|')}
+    </section>
   ),
 }));
 
@@ -115,9 +117,10 @@ function mockQueriesSuccess(options?: {
   experimentsData?: Experiment[];
 }) {
   mockedUseLesson.mockReturnValue({
-    data: options?.lessonData === undefined && !('lessonData' in (options ?? {}))
-      ? lesson
-      : options?.lessonData,
+    data:
+      options?.lessonData === undefined && !('lessonData' in (options ?? {}))
+        ? lesson
+        : options?.lessonData,
     isLoading: false,
     error: null,
     reload: vi.fn(),
@@ -170,42 +173,72 @@ describe('LessonView', () => {
 
   it('يعرض حالة التحميل إذا كان استعلام الدرس قيد التحميل', () => {
     mockQueriesSuccess();
-    mockedUseLesson.mockReturnValue({ data: undefined, isLoading: true, error: null, reload: vi.fn() });
+    mockedUseLesson.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      error: null,
+      reload: vi.fn(),
+    });
     render(<LessonView {...defaultProps} />);
     expect(screen.getByRole('status')).toHaveTextContent('جارٍ تحميل البيانات...');
   });
 
   it('يعرض حالة التحميل إذا كان استعلام الأهداف قيد التحميل', () => {
     mockQueriesSuccess();
-    mockedUseLessonObjectives.mockReturnValue({ data: [], isLoading: true, error: null, reload: vi.fn() });
+    mockedUseLessonObjectives.mockReturnValue({
+      data: [],
+      isLoading: true,
+      error: null,
+      reload: vi.fn(),
+    });
     render(<LessonView {...defaultProps} />);
     expect(screen.getByRole('status')).toHaveTextContent('جارٍ تحميل البيانات...');
   });
 
   it('يعرض حالة التحميل إذا كان استعلام التجارب قيد التحميل', () => {
     mockQueriesSuccess();
-    mockedUseLessonExperiments.mockReturnValue({ data: [], isLoading: true, error: null, reload: vi.fn() });
+    mockedUseLessonExperiments.mockReturnValue({
+      data: [],
+      isLoading: true,
+      error: null,
+      reload: vi.fn(),
+    });
     render(<LessonView {...defaultProps} />);
     expect(screen.getByRole('status')).toHaveTextContent('جارٍ تحميل البيانات...');
   });
 
   it('يعرض خطأ استعلام الدرس', () => {
     mockQueriesSuccess();
-    mockedUseLesson.mockReturnValue({ data: undefined, isLoading: false, error: { message: 'تعذر تحميل الدرس.' }, reload: vi.fn() });
+    mockedUseLesson.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: { message: 'تعذر تحميل الدرس.' },
+      reload: vi.fn(),
+    });
     render(<LessonView {...defaultProps} />);
     expect(screen.getByRole('alert')).toHaveTextContent('تعذر تحميل الدرس.');
   });
 
   it('يعرض خطأ استعلام الأهداف', () => {
     mockQueriesSuccess();
-    mockedUseLessonObjectives.mockReturnValue({ data: [], isLoading: false, error: { message: 'تعذر تحميل الأهداف.' }, reload: vi.fn() });
+    mockedUseLessonObjectives.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: { message: 'تعذر تحميل الأهداف.' },
+      reload: vi.fn(),
+    });
     render(<LessonView {...defaultProps} />);
     expect(screen.getByRole('alert')).toHaveTextContent('تعذر تحميل الأهداف.');
   });
 
   it('يعرض خطأ استعلام التجارب', () => {
     mockQueriesSuccess();
-    mockedUseLessonExperiments.mockReturnValue({ data: [], isLoading: false, error: { message: 'تعذر تحميل التجارب.' }, reload: vi.fn() });
+    mockedUseLessonExperiments.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: { message: 'تعذر تحميل التجارب.' },
+      reload: vi.fn(),
+    });
     render(<LessonView {...defaultProps} />);
     expect(screen.getByRole('alert')).toHaveTextContent('تعذر تحميل التجارب.');
   });
@@ -214,9 +247,24 @@ describe('LessonView', () => {
     const lessonReload = vi.fn();
     const objectivesReload = vi.fn();
     const experimentsReload = vi.fn();
-    mockedUseLesson.mockReturnValue({ data: undefined, isLoading: false, error: { message: 'تعذر تحميل الدرس.' }, reload: lessonReload });
-    mockedUseLessonObjectives.mockReturnValue({ data: [], isLoading: false, error: null, reload: objectivesReload });
-    mockedUseLessonExperiments.mockReturnValue({ data: [], isLoading: false, error: null, reload: experimentsReload });
+    mockedUseLesson.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: { message: 'تعذر تحميل الدرس.' },
+      reload: lessonReload,
+    });
+    mockedUseLessonObjectives.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+      reload: objectivesReload,
+    });
+    mockedUseLessonExperiments.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+      reload: experimentsReload,
+    });
 
     render(<LessonView {...defaultProps} />);
     fireEvent.click(screen.getByRole('button', { name: 'إعادة المحاولة' }));
@@ -249,7 +297,9 @@ describe('LessonView', () => {
   it('يمرر بيانات الأهداف القادمة من hook إلى LessonObjectives', () => {
     mockQueriesSuccess();
     render(<LessonView {...defaultProps} />);
-    expect(screen.getByTestId('lesson-objectives')).toHaveTextContent('يعرّف التردد والطول الموجي.');
+    expect(screen.getByTestId('lesson-objectives')).toHaveTextContent(
+      'يعرّف التردد والطول الموجي.'
+    );
   });
 
   it('يعرض LessonSummary بملخص الدرس', () => {
@@ -273,7 +323,9 @@ describe('LessonView', () => {
   it('يعرض LessonMisconceptions بالتصورات الخاطئة', () => {
     mockQueriesSuccess();
     render(<LessonView {...defaultProps} />);
-    expect(screen.getByTestId('lesson-misconceptions')).toHaveTextContent('السرعة والتردد شيء واحد');
+    expect(screen.getByTestId('lesson-misconceptions')).toHaveTextContent(
+      'السرعة والتردد شيء واحد'
+    );
   });
 
   it('يمرر بيانات التجارب القادمة من hook إلى LessonExperiments', () => {
@@ -296,7 +348,9 @@ describe('LessonView', () => {
     ].map((testId) => screen.getByTestId(testId));
 
     order.slice(0, -1).forEach((element, index) => {
-      expect(element.compareDocumentPosition(order[index + 1]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      expect(
+        element.compareDocumentPosition(order[index + 1]) & Node.DOCUMENT_POSITION_FOLLOWING
+      ).toBeTruthy();
     });
   });
 
@@ -333,10 +387,7 @@ describe('LessonView', () => {
   });
 
   it('لا يستورد LessonView المستودع المحلي المتزامن مباشرة', () => {
-    const sourcePath = resolve(
-      process.cwd(),
-      'src/features/student/lesson-view/LessonView.tsx'
-    );
+    const sourcePath = resolve(process.cwd(), 'src/features/student/lesson-view/LessonView.tsx');
     const source = readFileSync(sourcePath, 'utf8');
     expect(source).not.toContain('local-content.repository');
   });
