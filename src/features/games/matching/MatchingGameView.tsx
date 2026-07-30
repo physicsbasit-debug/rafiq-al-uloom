@@ -44,7 +44,7 @@ function MatchingGameObjectivesLoader({
 }: MatchingGameObjectivesLoaderProps) {
   const objectiveIds = useMemo(
     () => [...new Set(games.flatMap((game) => game.objectiveIds))],
-    [games],
+    [games]
   );
   const objectivesQuery = useObjectivesByIds(objectiveIds);
 
@@ -63,18 +63,14 @@ function MatchingGameObjectivesLoader({
   );
 }
 
-function MatchingGameContent({
-  games,
-  objectives,
-  onBackToLesson,
-}: MatchingGameContentProps) {
+function MatchingGameContent({ games, objectives, onBackToLesson }: MatchingGameContentProps) {
   const rounds = useMemo(
     () => games.map((game) => ({ game, round: createMatchingRound(game) })),
-    [games],
+    [games]
   );
   const objectivesById = useMemo(
     () => new Map(objectives.map((objective) => [objective.id, objective])),
-    [objectives],
+    [objectives]
   );
   const [selectedLeftByGame, setSelectedLeftByGame] = useState<
     Record<string, MatchingLeftItem | undefined>
@@ -137,10 +133,10 @@ function MatchingGameContent({
           const selectedLeft = selectedLeftByGame[game.id];
           const completedCount = completedPairsByGame[game.id]?.length ?? 0;
           const availableLeftItems = round.leftItems.filter(
-            (item) => !isPairCompleted(game.id, item.pairId),
+            (item) => !isPairCompleted(game.id, item.pairId)
           );
           const availableRightItems = round.rightItems.filter(
-            (item) => !isPairCompleted(game.id, item.pairId),
+            (item) => !isPairCompleted(game.id, item.pairId)
           );
           const gameObjectives = game.objectiveIds
             .map((objectiveId) => objectivesById.get(objectiveId))
@@ -334,10 +330,7 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
       error={gamesQuery.error}
       onRetry={gamesQuery.reload}
     >
-      <MatchingGameObjectivesLoader
-        games={gamesQuery.data}
-        onBackToLesson={onBackToLesson}
-      />
+      <MatchingGameObjectivesLoader games={gamesQuery.data} onBackToLesson={onBackToLesson} />
     </QueryBoundary>
   );
 }

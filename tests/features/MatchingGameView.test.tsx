@@ -3,10 +3,7 @@
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MatchingGameView } from '@features/games/matching/MatchingGameView';
-import {
-  useGamesByLesson,
-  useObjectivesByIds,
-} from '@services/queries/content-query.hooks';
+import { useGamesByLesson, useObjectivesByIds } from '@services/queries/content-query.hooks';
 import type { Objective } from '@shared-types/content.types';
 import type { Game } from '@shared-types/game.types';
 
@@ -274,30 +271,20 @@ describe('MatchingGameView', () => {
     fireEvent.click(screen.getByRole('button', { name: 'الطول الموجي' }));
     fireEvent.click(screen.getByRole('button', { name: 'عدد الاهتزازات في الثانية' }));
 
-    expect(screen.getByRole('status')).toHaveTextContent(
-      'ليست المطابقة الصحيحة. جرّب مرة أخرى.',
-    );
+    expect(screen.getByRole('status')).toHaveTextContent('ليست المطابقة الصحيحة. جرّب مرة أخرى.');
     expect(screen.getByText('العنصر المختار')).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: 'المسافة بين قمتين متتاليتين' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'المسافة بين قمتين متتاليتين' })).toBeInTheDocument();
 
-    fireEvent.click(
-      screen.getByRole('button', { name: 'المسافة بين قمتين متتاليتين' }),
-    );
+    fireEvent.click(screen.getByRole('button', { name: 'المسافة بين قمتين متتاليتين' }));
 
-    expect(
-      screen.queryByRole('button', { name: 'الطول الموجي' }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'الطول الموجي' })).not.toBeInTheDocument();
     expect(
       screen.queryByRole('button', {
         name: 'المسافة بين قمتين متتاليتين',
-      }),
+      })
     ).not.toBeInTheDocument();
     expect(screen.queryByText('العنصر المختار')).not.toBeInTheDocument();
-    expect(
-      screen.queryByText('ليست المطابقة الصحيحة. جرّب مرة أخرى.'),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText('ليست المطابقة الصحيحة. جرّب مرة أخرى.')).not.toBeInTheDocument();
   });
 
   it('المطابقة الصحيحة تسجل الزوج وتزيله من القائمتين', () => {
@@ -307,15 +294,11 @@ describe('MatchingGameView', () => {
     render(<MatchingGameView lessonId="lesson-one" onBackToLesson={vi.fn()} />);
 
     fireEvent.click(screen.getByRole('button', { name: 'الطول الموجي' }));
-    fireEvent.click(
-      screen.getByRole('button', { name: 'المسافة بين قمتين متتاليتين' }),
-    );
+    fireEvent.click(screen.getByRole('button', { name: 'المسافة بين قمتين متتاليتين' }));
 
+    expect(screen.queryByRole('button', { name: 'الطول الموجي' })).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'الطول الموجي' }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: 'المسافة بين قمتين متتاليتين' }),
+      screen.queryByRole('button', { name: 'المسافة بين قمتين متتاليتين' })
     ).not.toBeInTheDocument();
   });
 
@@ -326,17 +309,11 @@ describe('MatchingGameView', () => {
     render(<MatchingGameView lessonId="lesson-one" onBackToLesson={vi.fn()} />);
 
     fireEvent.click(screen.getByRole('button', { name: 'الطول الموجي' }));
-    fireEvent.click(
-      screen.getByRole('button', { name: 'المسافة بين قمتين متتاليتين' }),
-    );
+    fireEvent.click(screen.getByRole('button', { name: 'المسافة بين قمتين متتاليتين' }));
     fireEvent.click(screen.getByRole('button', { name: 'التردد' }));
-    fireEvent.click(
-      screen.getByRole('button', { name: 'عدد الاهتزازات في الثانية' }),
-    );
+    fireEvent.click(screen.getByRole('button', { name: 'عدد الاهتزازات في الثانية' }));
 
-    expect(screen.getByRole('status')).toHaveTextContent(
-      'اكتملت جميع المطابقات بنجاح.',
-    );
+    expect(screen.getByRole('status')).toHaveTextContent('اكتملت جميع المطابقات بنجاح.');
   });
 
   it('زر تغيير الاختيار يمسح اختيار اللعبة الحالية فقط', () => {
@@ -350,9 +327,7 @@ describe('MatchingGameView', () => {
     fireEvent.click(within(articles[0]).getByRole('button', { name: 'الطول الموجي' }));
     fireEvent.click(within(articles[1]).getByRole('button', { name: 'التردد الثاني' }));
 
-    fireEvent.click(
-      within(articles[0]).getByRole('button', { name: 'تغيير الاختيار' }),
-    );
+    fireEvent.click(within(articles[0]).getByRole('button', { name: 'تغيير الاختيار' }));
 
     expect(within(articles[0]).queryByText('العنصر المختار')).not.toBeInTheDocument();
     expect(within(articles[1]).getByText('العنصر المختار')).toBeInTheDocument();
@@ -383,17 +358,13 @@ describe('MatchingGameView', () => {
     fireEvent.click(
       within(articles[0]).getByRole('button', {
         name: 'المسافة بين قمتين متتاليتين',
-      }),
+      })
     );
 
     expect(
-      within(articles[0]).queryByRole('button', { name: 'الطول الموجي' }),
+      within(articles[0]).queryByRole('button', { name: 'الطول الموجي' })
     ).not.toBeInTheDocument();
-    expect(
-      within(articles[1]).getByRole('button', { name: 'التردد الثاني' }),
-    ).toBeInTheDocument();
-    expect(
-      within(articles[1]).getByRole('button', { name: 'الزمن الدوري' }),
-    ).toBeInTheDocument();
+    expect(within(articles[1]).getByRole('button', { name: 'التردد الثاني' })).toBeInTheDocument();
+    expect(within(articles[1]).getByRole('button', { name: 'الزمن الدوري' })).toBeInTheDocument();
   });
 });
