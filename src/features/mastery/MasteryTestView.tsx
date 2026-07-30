@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { AppButton } from '@design-system/components/AppButton';
 import { ChoiceButton } from '@design-system/components/ChoiceButton';
 import { MasteryBadge } from '@design-system/components/MasteryBadge';
+import { QueryBoundary } from '@design-system/components/QueryBoundary';
 import { colors } from '@design-system/theme/colors';
 import { radius } from '@design-system/theme/radius';
 import { spacing } from '@design-system/theme/spacing';
@@ -9,12 +10,22 @@ import { typography } from '@design-system/theme/typography';
 import { getQuestionFeedback } from '@features/quiz/quiz-engine';
 import type { MasteryResult } from '@shared-types/mastery.types';
 import type { Question } from '@shared-types/quiz.types';
-import { getMasteryQuestionsByLesson } from '@services/data/local-content.repository';
-import { areAllQuestionsAnswered, calculateScore, type AnswersByQuestionId } from '@utils/scoring';
+import { useMasteryQuestions } from '@services/queries/content-query.hooks';
+import {
+  areAllQuestionsAnswered,
+  calculateScore,
+  type AnswersByQuestionId,
+} from '@utils/scoring';
 import { classifyMasteryScore } from './mastery-classifier';
 import { getMasteryRecommendation } from './recommendations';
 
 interface MasteryTestViewProps {
+  lessonId: string;
+  onBackToLesson: () => void;
+}
+
+interface MasteryTestContentProps {
+  questions: Question[];
   lessonId: string;
   onBackToLesson: () => void;
 }
@@ -49,7 +60,9 @@ function ReviewItem({
         السؤال <bdi dir="ltr">{questionNumber}</bdi>
       </p>
 
-      <h4 style={{ margin: `0 0 ${spacing.sm}`, color: colors.textPrimary }}>{question.prompt}</h4>
+      <h4 style={{ margin: `0 0 ${spacing.sm}`, color: colors.textPrimary }}>
+        {question.prompt}
+      </h4>
 
       <p
         style={{
@@ -78,8 +91,11 @@ function ReviewItem({
   );
 }
 
-export function MasteryTestView({ lessonId, onBackToLesson }: MasteryTestViewProps) {
-  const questions = getMasteryQuestionsByLesson(lessonId);
+function MasteryTestContent({
+  questions,
+  lessonId,
+  onBackToLesson,
+}: MasteryTestContentProps) {
   const [answers, setAnswers] = useState<AnswersByQuestionId>({});
   const [result, setResult] = useState<MasteryResult | null>(null);
   const isComplete = areAllQuestionsAnswered(questions, answers);
@@ -230,5 +246,23 @@ export function MasteryTestView({ lessonId, onBackToLesson }: MasteryTestViewPro
         <AppButton label="العودة إلى الدرس" variant="secondary" onClick={onBackToLesson} />
       </div>
     </section>
+  );
+}
+
+export function MasteryTestView({ lessonId, onBackToLesson }: MasteryTestViewProps) {
+  const questionsQuery = useMasteryQuestions(lessonId);
+
+  return (
+    <QueryBoundary
+      isLoading={questionsQuery.isLoading}
+      error={questionsQuery.error}
+      onRetry={questionsQuery.reload}
+    >
+      <MasteryTestContent
+        questions={questionsQuery.data}
+        lessonId={lessonId}
+        onBackToLesson={onBackToLesson}
+      />
+    </QueryBoundary>
   );
 }
