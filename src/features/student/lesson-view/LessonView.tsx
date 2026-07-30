@@ -1,4 +1,5 @@
 import { AppButton } from '@design-system/components/AppButton';
+import { QueryBoundary } from '@design-system/components/QueryBoundary';
 import { colors } from '@design-system/theme/colors';
 import { spacing } from '@design-system/theme/spacing';
 import { LessonConcepts } from '@features/lesson/concepts/LessonConcepts';
@@ -7,11 +8,13 @@ import { LessonExperiments } from '@features/lesson/experiments/LessonExperiment
 import { LessonMisconceptions } from '@features/lesson/misconceptions/LessonMisconceptions';
 import { LessonObjectives } from '@features/lesson/objectives/LessonObjectives';
 import { LessonSummary } from '@features/lesson/summary/LessonSummary';
+import type { Lesson, Objective } from '@shared-types/content.types';
+import type { Experiment } from '@shared-types/experiment.types';
 import {
-  getExperimentsByLesson,
-  getLessonById,
-  getObjectivesByLesson,
-} from '@services/data/local-content.repository';
+  useLesson,
+  useLessonExperiments,
+  useLessonObjectives,
+} from '@services/queries/content-query.hooks';
 
 interface LessonViewProps {
   lessonId: string;
@@ -21,15 +24,21 @@ interface LessonViewProps {
   onOpenMasteryTest: () => void;
 }
 
-export function LessonView({
-  lessonId,
+interface LessonViewContentProps extends Omit<LessonViewProps, 'lessonId'> {
+  lesson: Lesson | undefined;
+  objectives: Objective[];
+  experiments: Experiment[];
+}
+
+function LessonViewContent({
+  lesson,
+  objectives,
+  experiments,
   onBackToLessons,
   onOpenReviewQuestions,
   onOpenMatchingGame,
   onOpenMasteryTest,
-}: LessonViewProps) {
-  const lesson = getLessonById(lessonId);
-
+}: LessonViewContentProps) {
   if (!lesson) {
     return (
       <section>
@@ -54,12 +63,12 @@ export function LessonView({
         <h2 style={{ margin: 0, color: colors.textPrimary }}>{lesson.title}</h2>
       </header>
 
-      <LessonObjectives objectives={getObjectivesByLesson(lesson.id)} />
+      <LessonObjectives objectives={objectives} />
       <LessonSummary summary={lesson.summary} />
       <LessonConcepts concepts={lesson.keyConcepts} />
       <LessonExamples examples={lesson.examples} />
       <LessonMisconceptions misconceptions={lesson.misconceptions} />
-      <LessonExperiments experiments={getExperimentsByLesson(lesson.id)} />
+      <LessonExperiments experiments={experiments} />
 
       <div
         style={{
@@ -74,5 +83,41 @@ export function LessonView({
         <AppButton label="العودة إلى الدروس" variant="secondary" onClick={onBackToLessons} />
       </div>
     </article>
+  );
+}
+
+export function LessonView({
+  lessonId,
+  onBackToLessons,
+  onOpenReviewQuestions,
+  onOpenMatchingGame,
+  onOpenMasteryTest,
+}: LessonViewProps) {
+  const lessonQuery = useLesson(lessonId);
+  const objectivesQuery = useLessonObjectives(lessonId);
+  const experimentsQuery = useLessonExperiments(lessonId);
+
+  const isLoading =
+    lessonQuery.isLoading || objectivesQuery.isLoading || experimentsQuery.isLoading;
+  const error = lessonQuery.error || objectivesQuery.error || experimentsQuery.error;
+
+  function handleRetry() {
+    lessonQuery.reload();
+    objectivesQuery.reload();
+    experimentsQuery.reload();
+  }
+
+  return (
+    <QueryBoundary isLoading={isLoading} error={error} onRetry={handleRetry}>
+      <LessonViewContent
+        lesson={lessonQuery.data}
+        objectives={objectivesQuery.data}
+        experiments={experimentsQuery.data}
+        onBackToLessons={onBackToLessons}
+        onOpenReviewQuestions={onOpenReviewQuestions}
+        onOpenMatchingGame={onOpenMatchingGame}
+        onOpenMasteryTest={onOpenMasteryTest}
+      />
+    </QueryBoundary>
   );
 }
