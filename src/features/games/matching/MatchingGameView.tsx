@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { AppButton } from '@design-system/components/AppButton';
+import { QueryBoundary } from '@design-system/components/QueryBoundary';
 import { colors } from '@design-system/theme/colors';
 import { radius } from '@design-system/theme/radius';
 import { spacing } from '@design-system/theme/spacing';
@@ -11,7 +12,9 @@ import {
   type MatchingLeftItem,
   type MatchingRightItem,
 } from '@features/games/game-engine';
-import { getGamesByLesson, getObjectivesByIds } from '@services/data/local-content.repository';
+import { useGamesByLesson, useObjectivesByIds } from '@services/queries/content-query.hooks';
+import type { Objective } from '@shared-types/content.types';
+import type { Game } from '@shared-types/game.types';
 import { MatchingFeedback } from './MatchingFeedback';
 
 interface MatchingGameViewProps {
@@ -24,11 +27,54 @@ interface FeedbackState {
   result: MatchingAttemptResult;
 }
 
-export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewProps) {
-  const games = getGamesByLesson(lessonId);
+interface MatchingGameObjectivesLoaderProps {
+  games: Game[];
+  onBackToLesson: () => void;
+}
+
+interface MatchingGameContentProps {
+  games: Game[];
+  objectives: Objective[];
+  onBackToLesson: () => void;
+}
+
+function MatchingGameObjectivesLoader({
+  games,
+  onBackToLesson,
+}: MatchingGameObjectivesLoaderProps) {
+  const objectiveIds = useMemo(
+    () => [...new Set(games.flatMap((game) => game.objectiveIds))],
+    [games],
+  );
+  const objectivesQuery = useObjectivesByIds(objectiveIds);
+
+  return (
+    <QueryBoundary
+      isLoading={objectivesQuery.isLoading}
+      error={objectivesQuery.error}
+      onRetry={objectivesQuery.reload}
+    >
+      <MatchingGameContent
+        games={games}
+        objectives={objectivesQuery.data}
+        onBackToLesson={onBackToLesson}
+      />
+    </QueryBoundary>
+  );
+}
+
+function MatchingGameContent({
+  games,
+  objectives,
+  onBackToLesson,
+}: MatchingGameContentProps) {
   const rounds = useMemo(
     () => games.map((game) => ({ game, round: createMatchingRound(game) })),
-    [games]
+    [games],
+  );
+  const objectivesById = useMemo(
+    () => new Map(objectives.map((objective) => [objective.id, objective])),
+    [objectives],
   );
   const [selectedLeftByGame, setSelectedLeftByGame] = useState<
     Record<string, MatchingLeftItem | undefined>
@@ -91,12 +137,14 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
           const selectedLeft = selectedLeftByGame[game.id];
           const completedCount = completedPairsByGame[game.id]?.length ?? 0;
           const availableLeftItems = round.leftItems.filter(
-            (item) => !isPairCompleted(game.id, item.pairId)
+            (item) => !isPairCompleted(game.id, item.pairId),
           );
           const availableRightItems = round.rightItems.filter(
-            (item) => !isPairCompleted(game.id, item.pairId)
+            (item) => !isPairCompleted(game.id, item.pairId),
           );
-          const gameObjectives = getObjectivesByIds(game.objectiveIds);
+          const gameObjectives = game.objectiveIds
+            .map((objectiveId) => objectivesById.get(objectiveId))
+            .filter((objective): objective is Objective => objective !== undefined);
           const complete = completedCount === round.leftItems.length;
 
           return (
@@ -274,5 +322,22 @@ export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewP
         <AppButton label="العودة إلى الدرس" variant="secondary" onClick={onBackToLesson} />
       </div>
     </section>
+  );
+}
+
+export function MatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewProps) {
+  const gamesQuery = useGamesByLesson(lessonId);
+
+  return (
+    <QueryBoundary
+      isLoading={gamesQuery.isLoading}
+      error={gamesQuery.error}
+      onRetry={gamesQuery.reload}
+    >
+      <MatchingGameObjectivesLoader
+        games={gamesQuery.data}
+        onBackToLesson={onBackToLesson}
+      />
+    </QueryBoundary>
   );
 }
