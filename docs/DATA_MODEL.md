@@ -24,6 +24,7 @@
 ### Semester
 
 - id
+- gradeId
 - name
 - order
 
