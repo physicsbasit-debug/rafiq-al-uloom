@@ -7,10 +7,7 @@ export interface SupabaseEnvironment {
 
 let cachedClient: SupabaseClient | undefined;
 
-function readRequiredValue(
-  env: SupabaseEnvironment,
-  key: keyof SupabaseEnvironment
-): string {
+function readRequiredValue(env: SupabaseEnvironment, key: keyof SupabaseEnvironment): string {
   const value = env[key]?.trim();
 
   if (!value) {
