@@ -21,10 +21,17 @@
 - name
 - themeColor
 
+### Semester
+
+- id
+- name
+- order
+
 ### Unit
 
 - id
 - subjectId
+- semesterId
 - title
 - order
 
