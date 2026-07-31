@@ -17,10 +17,7 @@ interface ReviewQuestionsContentProps {
   onBackToLesson: () => void;
 }
 
-export function ReviewQuestionsView({
-  lessonId,
-  onBackToLesson,
-}: ReviewQuestionsViewProps) {
+export function ReviewQuestionsView({ lessonId, onBackToLesson }: ReviewQuestionsViewProps) {
   const questionsQuery = useReviewQuestions(lessonId);
 
   return (
@@ -29,25 +26,17 @@ export function ReviewQuestionsView({
       error={questionsQuery.error}
       onRetry={questionsQuery.reload}
     >
-      <ReviewQuestionsContent
-        questions={questionsQuery.data}
-        onBackToLesson={onBackToLesson}
-      />
+      <ReviewQuestionsContent questions={questionsQuery.data} onBackToLesson={onBackToLesson} />
     </QueryBoundary>
   );
 }
 
-function ReviewQuestionsContent({
-  questions,
-  onBackToLesson,
-}: ReviewQuestionsContentProps) {
+function ReviewQuestionsContent({ questions, onBackToLesson }: ReviewQuestionsContentProps) {
   const [answers, setAnswers] = useState<Record<string, number>>({});
 
   function handleSelectChoice(questionId: string, choiceIndex: number) {
     setAnswers((current) =>
-      current[questionId] !== undefined
-        ? current
-        : { ...current, [questionId]: choiceIndex }
+      current[questionId] !== undefined ? current : { ...current, [questionId]: choiceIndex }
     );
   }
 
@@ -79,11 +68,7 @@ function ReviewQuestionsContent({
       </div>
 
       <div style={{ maxWidth: '220px', marginTop: spacing.lg }}>
-        <AppButton
-          label="العودة إلى الدرس"
-          variant="secondary"
-          onClick={onBackToLesson}
-        />
+        <AppButton label="العودة إلى الدرس" variant="secondary" onClick={onBackToLesson} />
       </div>
     </section>
   );

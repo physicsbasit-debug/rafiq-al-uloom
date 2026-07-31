@@ -139,9 +139,11 @@ describe('ReviewQuestionsView', () => {
 
     render(<ReviewQuestionsView lessonId="lesson-one" onBackToLesson={vi.fn()} />);
 
-    expect(
-      screen.getAllByText(/^سؤال/, { selector: 'p' })
-    ).toHaveLength(2);
+    const questionLabels = screen.getAllByText(/^سؤال/, { selector: 'p' });
+
+    expect(questionLabels).toHaveLength(2);
+    expect(questionLabels[0]).toHaveTextContent('سؤال 1');
+    expect(questionLabels[1]).toHaveTextContent('سؤال 2');
   });
 
   it('يعرض خيارات السؤال الأول بترتيبها', () => {
@@ -169,9 +171,7 @@ describe('ReviewQuestionsView', () => {
     const onBackToLesson = vi.fn();
     mockQuestionsSuccess();
 
-    render(
-      <ReviewQuestionsView lessonId="lesson-one" onBackToLesson={onBackToLesson} />
-    );
+    render(<ReviewQuestionsView lessonId="lesson-one" onBackToLesson={onBackToLesson} />);
     fireEvent.click(screen.getByRole('button', { name: 'العودة إلى الدرس' }));
 
     expect(onBackToLesson).toHaveBeenCalledTimes(1);
@@ -206,16 +206,14 @@ describe('ReviewQuestionsView', () => {
     render(<ReviewQuestionsView lessonId="lesson-one" onBackToLesson={vi.fn()} />);
     fireEvent.click(screen.getByRole('button', { name: 'ثانية' }));
 
-    expect(screen.getByText('✕ إجابة خاطئة')).toBeInTheDocument();
     const article = getQuestionArticle('ما وحدة قياس التردد؟');
 
+    expect(within(article).getByText('✕ إجابة خاطئة')).toBeInTheDocument();
     expect(
-      within(article).getByText(/الإجابة الصحيحة:/)
-    ).toBeInTheDocument();
-
-    expect(
-      within(article).getByText('هرتز')
-    ).toBeInTheDocument();
+      within(article)
+        .getByText(/الإجابة الصحيحة:/)
+        .closest('p')
+    ).toHaveTextContent('الإجابة الصحيحة: هرتز');
   });
 
   it('يعطل خيارات السؤال بعد تسجيل الإجابة', () => {
@@ -348,9 +346,7 @@ describe('ReviewQuestionsView', () => {
 
     expect(contentStart).toBeGreaterThan(-1);
     expect(stateStart).toBeGreaterThan(contentStart);
-    expect(source.slice(0, contentStart)).not.toContain(
-      'useState<Record<string, number>>({})'
-    );
+    expect(source.slice(0, contentStart)).not.toContain('useState<Record<string, number>>({})');
   });
 
   it('يحافظ على منطق قفل الإجابة المعتمد داخل تحديث الحالة الوظيفي', () => {
