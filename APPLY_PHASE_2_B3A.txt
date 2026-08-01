@@ -1,0 +1,15 @@
+Phase 2-B3a — apply instructions
+
+1. Upload/extract this package at the repository root, preserving paths.
+2. Confirm these files exist:
+   src/services/data/supabase-content.rows.ts
+   src/services/data/supabase-content.mappers.ts
+   tests/data/supabase-content.mappers.test.ts
+   README_PHASE_2_B3A.md
+3. Run:
+   npm run build
+   npm run lint
+   npm run test
+   npx prettier --check .
+   git status
+4. Do not commit until all checks pass and Cloud review is complete.
