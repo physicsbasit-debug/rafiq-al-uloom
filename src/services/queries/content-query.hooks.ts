@@ -51,8 +51,7 @@ export function useSemestersByGrade(gradeId: string) {
 
 export function useSubjectsBySemester(semesterId: string) {
   const queryFn = useCallback(
-    (signal: AbortSignal) =>
-      getContentRepository().getSubjectsBySemester(semesterId, { signal }),
+    (signal: AbortSignal) => getContentRepository().getSubjectsBySemester(semesterId, { signal }),
     [semesterId]
   );
 
@@ -120,8 +119,7 @@ export function useLesson(lessonId: string) {
 
 export function useLessonObjectives(lessonId: string) {
   const queryFn = useCallback(
-    (signal: AbortSignal) =>
-      getContentRepository().getObjectivesByLesson(lessonId, { signal }),
+    (signal: AbortSignal) => getContentRepository().getObjectivesByLesson(lessonId, { signal }),
     [lessonId]
   );
 
@@ -134,8 +132,7 @@ export function useLessonObjectives(lessonId: string) {
 
 export function useLessonExperiments(lessonId: string) {
   const queryFn = useCallback(
-    (signal: AbortSignal) =>
-      getContentRepository().getExperimentsByLesson(lessonId, { signal }),
+    (signal: AbortSignal) => getContentRepository().getExperimentsByLesson(lessonId, { signal }),
     [lessonId]
   );
 

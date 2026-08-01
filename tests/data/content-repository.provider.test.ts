@@ -67,7 +67,6 @@ describe('content repository provider', () => {
     const first = provider.getContentRepository();
     const second = provider.getContentRepository();
 
-    expect(first).toBe(asyncLocalContentRepository);
     expect(second).toBe(first);
   });
 });

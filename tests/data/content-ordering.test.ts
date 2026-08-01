@@ -18,10 +18,7 @@ describe('content ordering', () => {
   it('يحافظ على ترتيب المعرّفات المطلوبة عند جلب الأهداف', () => {
     const objectives = [{ id: 'o1' }, { id: 'o2' }, { id: 'o3' }];
 
-    expect(orderEntitiesByIds(objectives, ['o3', 'o1'])).toEqual([
-      objectives[2],
-      objectives[0],
-    ]);
+    expect(orderEntitiesByIds(objectives, ['o3', 'o1'])).toEqual([objectives[2], objectives[0]]);
   });
 
   it('يحذف تكرار المعرّفات مع إبقاء أول ظهور لها', () => {

@@ -310,5 +310,4 @@ describe('supabase content repository', () => {
       args: ['id', ['chemistry', 'physics']],
     });
   });
-
 });

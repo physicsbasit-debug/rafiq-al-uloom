@@ -21,14 +21,10 @@ export function readContentProvider(env: ContentProviderEnvironment): ContentPro
     return value;
   }
 
-  throw new Error(
-    `Unsupported VITE_CONTENT_PROVIDER: "${value}". Expected "local" or "supabase".`
-  );
+  throw new Error(`Unsupported VITE_CONTENT_PROVIDER: "${value}". Expected "local" or "supabase".`);
 }
 
-export function createContentRepositoryFromEnv(
-  env: ContentProviderEnvironment
-): ContentRepository {
+export function createContentRepositoryFromEnv(env: ContentProviderEnvironment): ContentRepository {
   return readContentProvider(env) === 'supabase'
     ? supabaseContentRepository
     : asyncLocalContentRepository;
