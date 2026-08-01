@@ -1,0 +1,16 @@
+Phase 2-B3b files:
+- src/services/data/supabase-content.repository.ts
+- tests/data/supabase-content.repository.test.ts
+- README_PHASE_2_B3B.md
+
+After uploading to GitHub, synchronize Codespaces first:
+  git pull origin main
+
+Then run:
+  npm run build
+  npm run lint
+  npm run test
+  npx prettier --check .
+  git status
+
+Do not change features, hooks, provider selection, Auth, or mastery persistence in this phase.
