@@ -90,12 +90,7 @@ function requireNonNegativeInteger(
   return value;
 }
 
-function requireStringArray(
-  value: unknown,
-  field: string,
-  entity: string,
-  id: string
-): string[] {
+function requireStringArray(value: unknown, field: string, entity: string, id: string): string[] {
   if (!Array.isArray(value) || value.some((item) => typeof item !== 'string')) {
     invalid(entity, id, `${field} must be an array of strings`);
   }
@@ -126,9 +121,7 @@ function mapMatchingItems(value: unknown, gameId: string): MatchingItem[] {
 
   return value.map((item, index) => {
     if (typeof item !== 'object' || item === null || Array.isArray(item)) {
-      throw new Error(
-        `Invalid games.items for game "${gameId}": item ${index} must be an object`
-      );
+      throw new Error(`Invalid games.items for game "${gameId}": item ${index} must be an object`);
     }
 
     const record = item as Record<string, unknown>;
@@ -216,20 +209,8 @@ export function mapLessonRow(input: unknown, objectiveIds: readonly string[]): L
     keyConcepts: requireStringArray(row.key_concepts, 'key_concepts', 'lesson', id),
     examples: requireStringArray(row.examples, 'examples', 'lesson', id),
     misconceptions: requireStringArray(row.misconceptions, 'misconceptions', 'lesson', id),
-    status: requireEnum(
-      row.status,
-      CONTENT_STATUSES,
-      'status',
-      'lesson',
-      id
-    ) as ContentStatus,
-    source: requireEnum(
-      row.source,
-      CONTENT_SOURCES,
-      'source',
-      'lesson',
-      id
-    ) as ContentSource,
+    status: requireEnum(row.status, CONTENT_STATUSES, 'status', 'lesson', id) as ContentStatus,
+    source: requireEnum(row.source, CONTENT_SOURCES, 'source', 'lesson', id) as ContentSource,
   };
 }
 
@@ -237,12 +218,7 @@ export function mapQuestionRow(input: unknown): Question {
   const row = asRecord(input, 'question');
   const id = rowId(row);
   const choices = requireStringArray(row.choices, 'choices', 'question', id);
-  const correctAnswerIndex = requireNonNegativeInteger(
-    row,
-    'correct_answer_index',
-    'question',
-    id
-  );
+  const correctAnswerIndex = requireNonNegativeInteger(row, 'correct_answer_index', 'question', id);
 
   requireEnum(row.purpose, QUESTION_PURPOSES, 'purpose', 'question', id);
 
@@ -266,20 +242,8 @@ export function mapQuestionRow(input: unknown): Question {
       'question',
       id
     ) as Difficulty,
-    status: requireEnum(
-      row.status,
-      CONTENT_STATUSES,
-      'status',
-      'question',
-      id
-    ) as ContentStatus,
-    source: requireEnum(
-      row.source,
-      CONTENT_SOURCES,
-      'source',
-      'question',
-      id
-    ) as ContentSource,
+    status: requireEnum(row.status, CONTENT_STATUSES, 'status', 'question', id) as ContentStatus,
+    source: requireEnum(row.source, CONTENT_SOURCES, 'source', 'question', id) as ContentSource,
   };
 }
 
@@ -317,28 +281,11 @@ export function mapExperimentRow(input: unknown): Experiment {
       'experiment',
       id
     ) as SafetyLevel,
-    observationPrompt: requireString(
-      row,
-      'observation_prompt',
-      'experiment',
-      id
-    ),
+    observationPrompt: requireString(row, 'observation_prompt', 'experiment', id),
     conclusionPrompt: requireString(row, 'conclusion_prompt', 'experiment', id),
     homeAlternative: requireNullableString(row, 'home_alternative', 'experiment', id),
-    status: requireEnum(
-      row.status,
-      CONTENT_STATUSES,
-      'status',
-      'experiment',
-      id
-    ) as ContentStatus,
-    source: requireEnum(
-      row.source,
-      CONTENT_SOURCES,
-      'source',
-      'experiment',
-      id
-    ) as ContentSource,
+    status: requireEnum(row.status, CONTENT_STATUSES, 'status', 'experiment', id) as ContentStatus,
+    source: requireEnum(row.source, CONTENT_SOURCES, 'source', 'experiment', id) as ContentSource,
   };
 }
 

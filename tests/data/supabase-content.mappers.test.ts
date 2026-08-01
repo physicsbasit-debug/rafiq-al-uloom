@@ -208,8 +208,8 @@ describe('supabase content mappers', () => {
       position: 0,
     });
 
-    expect(() =>
-      mapGameObjectiveRow({ game_id: 'g1', objective_id: 'o1', position: -1 })
-    ).toThrow('position must be non-negative');
+    expect(() => mapGameObjectiveRow({ game_id: 'g1', objective_id: 'o1', position: -1 })).toThrow(
+      'position must be non-negative'
+    );
   });
 });
