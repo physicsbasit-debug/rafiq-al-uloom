@@ -56,10 +56,7 @@ const COLUMNS = {
 
 function isAbortError(error: unknown): boolean {
   return (
-    typeof error === 'object' &&
-    error !== null &&
-    'name' in error &&
-    error.name === 'AbortError'
+    typeof error === 'object' && error !== null && 'name' in error && error.name === 'AbortError'
   );
 }
 
@@ -85,7 +82,9 @@ async function executeQuery<T>(operation: string, query: QueryResponse<T>): Prom
         throw error;
       }
 
-      throw new Error(`${operation}: ${formatSupabaseError(error)}`);
+      throw new Error(`${operation}: ${formatSupabaseError(error)}`, {
+        cause: error,
+      });
     }
 
     if (data === null) {
@@ -102,7 +101,9 @@ async function executeQuery<T>(operation: string, query: QueryResponse<T>): Prom
       throw error;
     }
 
-    throw new Error(`${operation}: ${formatSupabaseError(error)}`);
+    throw new Error(`${operation}: ${formatSupabaseError(error)}`, {
+      cause: error,
+    });
   }
 }
 
@@ -157,7 +158,10 @@ export function createSupabaseContentRepository(
         queryFrom(client, 'grades').select(COLUMNS.grades).order('display_order'),
         options
       );
-      const rows = await executeQuery<GradeRow[]>('getGrades', query as QueryResponse<GradeRow[]>);
+      const rows = await executeQuery<GradeRow[]>(
+        'getGrades',
+        query as unknown as QueryResponse<GradeRow[]>
+      );
       return rows.map(mapGradeRow);
     },
 
@@ -171,7 +175,7 @@ export function createSupabaseContentRepository(
       );
       const rows = await executeQuery<SemesterRow[]>(
         'getSemestersByGrade',
-        query as QueryResponse<SemesterRow[]>
+        query as unknown as QueryResponse<SemesterRow[]>
       );
       return rows.map(mapSemesterRow);
     },
@@ -186,7 +190,7 @@ export function createSupabaseContentRepository(
       );
       const unitRows = await executeQuery<Array<Pick<UnitRow, 'subject_id'>>>(
         'getSubjectsBySemester:units',
-        unitQuery as QueryResponse<Array<Pick<UnitRow, 'subject_id'>>>
+        unitQuery as unknown as QueryResponse<Array<Pick<UnitRow, 'subject_id'>>>
       );
       const subjectIds = [...new Set(unitRows.map((row) => row.subject_id))];
 
@@ -200,7 +204,7 @@ export function createSupabaseContentRepository(
       );
       const rows = await executeQuery<SubjectRow[]>(
         'getSubjectsBySemester:subjects',
-        subjectQuery as QueryResponse<SubjectRow[]>
+        subjectQuery as unknown as QueryResponse<SubjectRow[]>
       );
       return reorderByIds(rows.map(mapSubjectRow), subjectIds);
     },
@@ -216,7 +220,7 @@ export function createSupabaseContentRepository(
       );
       const rows = await executeQuery<UnitRow[]>(
         'getUnitsBySubjectAndSemester',
-        query as QueryResponse<UnitRow[]>
+        query as unknown as QueryResponse<UnitRow[]>
       );
       return rows.map(mapUnitRow);
     },
@@ -231,7 +235,7 @@ export function createSupabaseContentRepository(
       );
       const rows = await executeQuery<UnitRow[]>(
         'getUnitsBySubject',
-        query as QueryResponse<UnitRow[]>
+        query as unknown as QueryResponse<UnitRow[]>
       );
       return rows.map(mapUnitRow);
     },
@@ -246,7 +250,7 @@ export function createSupabaseContentRepository(
       );
       const lessons = await executeQuery<LessonRow[]>(
         'getLessonsByUnit:lessons',
-        lessonQuery as QueryResponse<LessonRow[]>
+        lessonQuery as unknown as QueryResponse<LessonRow[]>
       );
 
       if (lessons.length === 0) {
@@ -264,7 +268,7 @@ export function createSupabaseContentRepository(
       );
       const objectives = await executeQuery<ObjectiveRow[]>(
         'getLessonsByUnit:objectives',
-        objectiveQuery as QueryResponse<ObjectiveRow[]>
+        objectiveQuery as unknown as QueryResponse<ObjectiveRow[]>
       );
       const objectiveIdsByLesson = groupObjectiveIdsByLesson(objectives);
 
@@ -280,7 +284,7 @@ export function createSupabaseContentRepository(
       );
       const lessons = await executeQuery<LessonRow[]>(
         'getLessonById:lesson',
-        lessonQuery as QueryResponse<LessonRow[]>
+        lessonQuery as unknown as QueryResponse<LessonRow[]>
       );
       const lesson = lessons[0];
 
@@ -297,7 +301,7 @@ export function createSupabaseContentRepository(
       );
       const objectives = await executeQuery<ObjectiveRow[]>(
         'getLessonById:objectives',
-        objectiveQuery as QueryResponse<ObjectiveRow[]>
+        objectiveQuery as unknown as QueryResponse<ObjectiveRow[]>
       );
       return mapLessonRow(
         lesson,
@@ -315,7 +319,7 @@ export function createSupabaseContentRepository(
       );
       const rows = await executeQuery<ObjectiveRow[]>(
         'getObjectivesByLesson',
-        query as QueryResponse<ObjectiveRow[]>
+        query as unknown as QueryResponse<ObjectiveRow[]>
       );
       return rows.map(mapObjectiveRow);
     },
@@ -333,7 +337,7 @@ export function createSupabaseContentRepository(
       );
       const rows = await executeQuery<ObjectiveRow[]>(
         'getObjectivesByIds',
-        query as QueryResponse<ObjectiveRow[]>
+        query as unknown as QueryResponse<ObjectiveRow[]>
       );
       return reorderByIds(rows.map(mapObjectiveRow), objectiveIds);
     },
@@ -348,7 +352,7 @@ export function createSupabaseContentRepository(
       );
       const rows = await executeQuery<ExperimentRow[]>(
         'getExperimentsByLesson',
-        query as QueryResponse<ExperimentRow[]>
+        query as unknown as QueryResponse<ExperimentRow[]>
       );
       return rows.map(mapExperimentRow);
     },
@@ -364,7 +368,7 @@ export function createSupabaseContentRepository(
       );
       const rows = await executeQuery<QuestionRow[]>(
         'getReviewQuestionsByLesson',
-        query as QueryResponse<QuestionRow[]>
+        query as unknown as QueryResponse<QuestionRow[]>
       );
       return rows.map(mapQuestionRow);
     },
@@ -380,22 +384,19 @@ export function createSupabaseContentRepository(
       );
       const rows = await executeQuery<QuestionRow[]>(
         'getMasteryQuestionsByLesson',
-        query as QueryResponse<QuestionRow[]>
+        query as unknown as QueryResponse<QuestionRow[]>
       );
       return rows.map(mapQuestionRow);
     },
 
     async getGamesByLesson(lessonId, options) {
       const gameQuery = withAbortSignal(
-        queryFrom(client, 'games')
-          .select(COLUMNS.games)
-          .eq('lesson_id', lessonId)
-          .order('id'),
+        queryFrom(client, 'games').select(COLUMNS.games).eq('lesson_id', lessonId).order('id'),
         options
       );
       const games = await executeQuery<GameRow[]>(
         'getGamesByLesson:games',
-        gameQuery as QueryResponse<GameRow[]>
+        gameQuery as unknown as QueryResponse<GameRow[]>
       );
 
       if (games.length === 0) {
@@ -413,7 +414,7 @@ export function createSupabaseContentRepository(
       );
       const objectiveRows = await executeQuery<GameObjectiveRow[]>(
         'getGamesByLesson:objectives',
-        objectiveQuery as QueryResponse<GameObjectiveRow[]>
+        objectiveQuery as unknown as QueryResponse<GameObjectiveRow[]>
       );
       const objectiveIdsByGame = groupObjectiveIdsByGame(objectiveRows);
 

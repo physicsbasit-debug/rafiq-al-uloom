@@ -46,7 +46,8 @@ class FakeQueryBuilder implements PromiseLike<{ data: unknown; error: unknown }>
   }
 
   then<TResult1 = { data: unknown; error: unknown }, TResult2 = never>(
-    onfulfilled?: ((value: { data: unknown; error: unknown }) => TResult1 | PromiseLike<TResult1>) | null,
+    onfulfilled?:
+      ((value: { data: unknown; error: unknown }) => TResult1 | PromiseLike<TResult1>) | null,
     onrejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | null
   ): PromiseLike<TResult1 | TResult2> {
     if ('rejection' in this.plan) {
@@ -193,7 +194,9 @@ describe('supabase content repository', () => {
     const { client, calls } = createFakeClient([]);
     const repository = createSupabaseContentRepository(client);
 
-    await expect(repository.getObjectivesByIds([], { signal: controller.signal })).rejects.toMatchObject({
+    await expect(
+      repository.getObjectivesByIds([], { signal: controller.signal })
+    ).rejects.toMatchObject({
       name: 'AbortError',
     });
     expect(calls).toEqual([]);
