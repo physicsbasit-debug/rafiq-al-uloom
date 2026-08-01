@@ -1,0 +1,13 @@
+Phase 2-B3d
+
+1. ارفع ملفات الحزمة إلى GitHub.
+2. في Codespaces نفذ: git pull origin main
+3. شغّل:
+   npm run build
+   npm run lint
+   npm run test
+   npx prettier --check .
+   npx supabase db reset
+   npm run test:supabase
+   git status
+4. لا تعمل commit قبل مراجعة النتائج.

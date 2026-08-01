@@ -4,7 +4,8 @@ import { join, relative, resolve } from 'node:path';
 import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 
-const FORBIDDEN_MODULE = '@services/data/local-content.repository';
+const SYNC_LOCAL_REPOSITORY = '@services/data/local-content.repository';
+const ASYNC_LOCAL_REPOSITORY = '@services/data/async-local-content.repository';
 
 function collectSourceFiles(dir: string): string[] {
   const entries = readdirSync(dir, { withFileTypes: true });
@@ -30,12 +31,7 @@ function collectSourceFiles(dir: string): string[] {
   return files.sort();
 }
 
-/**
- * Uses the TypeScript AST deliberately instead of regular expressions.
- * Regex-based scanning can misread commented-out imports or comment-like
- * text inside strings and template literals.
- */
-function findForbiddenImports(source: string, filePath: string): boolean {
+function findForbiddenImports(source: string, filePath: string, modules: Set<string>): boolean {
   const sourceFile = ts.createSourceFile(
     filePath,
     source,
@@ -49,7 +45,7 @@ function findForbiddenImports(source: string, filePath: string): boolean {
       (ts.isImportDeclaration(statement) || ts.isExportDeclaration(statement)) &&
       statement.moduleSpecifier &&
       ts.isStringLiteral(statement.moduleSpecifier) &&
-      statement.moduleSpecifier.text === FORBIDDEN_MODULE
+      modules.has(statement.moduleSpecifier.text)
     ) {
       return true;
     }
@@ -59,7 +55,7 @@ function findForbiddenImports(source: string, filePath: string): boolean {
       ts.isExternalModuleReference(statement.moduleReference) &&
       statement.moduleReference.expression &&
       ts.isStringLiteral(statement.moduleReference.expression) &&
-      statement.moduleReference.expression.text === FORBIDDEN_MODULE
+      modules.has(statement.moduleReference.expression.text)
     ) {
       return true;
     }
@@ -68,20 +64,35 @@ function findForbiddenImports(source: string, filePath: string): boolean {
   return false;
 }
 
+function findViolations(projectRoot: string, directories: string[], modules: string[]): string[] {
+  const forbiddenModules = new Set(modules);
+
+  return directories
+    .flatMap((directory) => collectSourceFiles(resolve(projectRoot, directory)))
+    .filter((filePath) => {
+      const source = readFileSync(filePath, 'utf8');
+      return findForbiddenImports(source, filePath, forbiddenModules);
+    })
+    .map((filePath) => relative(projectRoot, filePath))
+    .sort();
+}
+
 describe('architecture: no direct repository import', () => {
   it('لا يستورد أي ملف داخل src/features مباشرة من local-content.repository', () => {
     const projectRoot = process.cwd();
-    const featuresDir = resolve(projectRoot, 'src/features');
-    const files = collectSourceFiles(featuresDir);
 
-    const violations = files
-      .filter((filePath) => {
-        const source = readFileSync(filePath, 'utf8');
-        return findForbiddenImports(source, filePath);
-      })
-      .map((filePath) => relative(projectRoot, filePath))
-      .sort();
+    expect(findViolations(projectRoot, ['src/features'], [SYNC_LOCAL_REPOSITORY])).toEqual([]);
+  });
 
-    expect(violations).toEqual([]);
+  it('تستخدم features وqueries المزود المركزي بدل asyncLocalContentRepository مباشرة', () => {
+    const projectRoot = process.cwd();
+
+    expect(
+      findViolations(
+        projectRoot,
+        ['src/features', 'src/services/queries'],
+        [ASYNC_LOCAL_REPOSITORY]
+      )
+    ).toEqual([]);
   });
 });

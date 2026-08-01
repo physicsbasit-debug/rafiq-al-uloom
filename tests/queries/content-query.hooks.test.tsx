@@ -305,6 +305,16 @@ describe('content query hooks: structural regression guards', () => {
     );
   });
 
+  it('يستخدم المزود المركزي بدل الاستيراد المباشر للمستودع المحلي', () => {
+    const sourcePath = resolve(process.cwd(), 'src/services/queries/content-query.hooks.ts');
+    const source = readFileSync(sourcePath, 'utf8');
+
+    expect(source).toContain("@services/data/content-repository.provider");
+    expect(source).toContain('getContentRepository');
+    expect(source).not.toContain('asyncLocalContentRepository');
+    expect(source).not.toContain('@services/data/async-local-content.repository');
+  });
+
   it('لا يكرر منطق دورة الاستعلام داخل hooks المتخصصة', () => {
     const sourcePath = resolve(process.cwd(), 'src/services/queries/content-query.hooks.ts');
     const source = readFileSync(sourcePath, 'utf8');
