@@ -36,7 +36,7 @@ describe('generate-supabase-seed', () => {
     expect(sqlText("قانون نيوتن's law")).toBe("'قانون نيوتن''s law'");
     expect(sqlNullableText(null)).toBe('NULL');
     expect(sqlTextArray(['أ', "ب'ج"])).toBe("ARRAY['أ', 'ب''ج']::text[]");
-    expect(sqlJson({ text: "قيمة'" })).toBe("'{\"text\":\"قيمة''\"}'::jsonb");
+    expect(sqlJson({ text: "قيمة'" })).toBe('\'{"text":"قيمة\'\'"}\'::jsonb');
   });
 
   it('ينتج SQL حتمية متطابقة حرفيًا', () => {

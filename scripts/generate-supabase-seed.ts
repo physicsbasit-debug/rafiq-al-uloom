@@ -151,10 +151,7 @@ export function validateSeedGraph(seedData: SeedData): void {
       );
     }
 
-    if (
-      question.correctAnswerIndex < 0 ||
-      question.correctAnswerIndex >= question.choices.length
-    ) {
+    if (question.correctAnswerIndex < 0 || question.correctAnswerIndex >= question.choices.length) {
       throw new Error(`Invalid correctAnswerIndex for question ${question.id}`);
     }
   }
