@@ -1,0 +1,21 @@
+Phase 2-Freeze — خطوات التطبيق
+
+1) ارفع الملفات إلى GitHub.
+2) في Codespaces:
+   git pull origin main
+3) افحص المحتوى الحقيقي:
+   sed -n '1,260p' docs/PHASES.md
+   sed -n '1,360p' docs/ARCHITECTURE.md
+   sed -n '1,320p' docs/PROJECT_CHARTER.md
+4) شغّل:
+   npm run build
+   npm run lint
+   npm run test
+   npx prettier --check .
+   npm run test:supabase
+5) التزم بالتغييرات وادفعها.
+6) بعد أن تصبح الشجرة نظيفة، أنشئ الوسم على commit التجميد الجديد:
+   git tag -a v0.3-data-layer-complete -m "Data layer complete"
+   git push origin v0.3-data-layer-complete
+7) تحقق:
+   git show --no-patch --oneline v0.3-data-layer-complete
