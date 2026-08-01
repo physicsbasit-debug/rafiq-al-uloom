@@ -278,4 +278,37 @@ describe('supabase content repository', () => {
     await expect(import('@services/data/supabase-content.repository')).resolves.toBeDefined();
     vi.unstubAllEnvs();
   });
+
+  it('يرتب مادتين حسب أول ظهورهما في الوحدات لا حسب ترتيب استجابة المواد', async () => {
+    const physics = {
+      id: 'physics',
+      grade_id: 'g10',
+      name: 'الفيزياء',
+      theme_color: '#111111',
+    };
+    const chemistry = {
+      id: 'chemistry',
+      grade_id: 'g10',
+      name: 'الكيمياء',
+      theme_color: '#222222',
+    };
+    const { client, calls } = createFakeClient([
+      {
+        table: 'units',
+        data: [{ subject_id: 'chemistry' }, { subject_id: 'physics' }],
+      },
+      { table: 'subjects', data: [physics, chemistry] },
+    ]);
+    const repository = createSupabaseContentRepository(client);
+
+    const result = await repository.getSubjectsBySemester('semester-1');
+
+    expect(result.map(({ id }) => id)).toEqual(['chemistry', 'physics']);
+    expect(calls).toHaveLength(2);
+    expect(calls[1]?.operations).toContainEqual({
+      name: 'in',
+      args: ['id', ['chemistry', 'physics']],
+    });
+  });
+
 });

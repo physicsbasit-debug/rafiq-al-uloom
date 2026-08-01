@@ -1,0 +1,13 @@
+Phase 2-B3c
+
+1. ارفع الملفات فوق المستودع الحالي.
+2. في Codespaces نفّذ: git pull origin main
+3. شغّل:
+   npm run build
+   npm run lint
+   npm run test
+   npx prettier --check .
+4. شغّل التكامل المحلي:
+   npx supabase db reset
+   npm run test:supabase
+5. لا تعمل commit قبل مراجعة النتائج.

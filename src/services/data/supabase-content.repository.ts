@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import type { ContentRepository, RepositoryRequestOptions } from './content.repository';
+import { orderEntitiesByIds, uniqueIdsInOrder } from './content-ordering';
 import { getSupabaseClient } from './supabase-client';
 import {
   mapExperimentRow,
@@ -141,14 +142,6 @@ function groupObjectiveIdsByGame(rows: readonly GameObjectiveRow[]): Map<string,
   return grouped;
 }
 
-function reorderByIds<T extends { id: string }>(rows: readonly T[], ids: readonly string[]): T[] {
-  const byId = new Map(rows.map((row) => [row.id, row]));
-  return ids.flatMap((id) => {
-    const row = byId.get(id);
-    return row ? [row] : [];
-  });
-}
-
 export function createSupabaseContentRepository(
   client: SupabaseClient = getSupabaseClient()
 ): ContentRepository {
@@ -192,7 +185,7 @@ export function createSupabaseContentRepository(
         'getSubjectsBySemester:units',
         unitQuery as unknown as QueryResponse<Array<Pick<UnitRow, 'subject_id'>>>
       );
-      const subjectIds = [...new Set(unitRows.map((row) => row.subject_id))];
+      const subjectIds = uniqueIdsInOrder(unitRows.map((row) => row.subject_id));
 
       if (subjectIds.length === 0) {
         return [];
@@ -206,7 +199,7 @@ export function createSupabaseContentRepository(
         'getSubjectsBySemester:subjects',
         subjectQuery as unknown as QueryResponse<SubjectRow[]>
       );
-      return reorderByIds(rows.map(mapSubjectRow), subjectIds);
+      return orderEntitiesByIds(rows.map(mapSubjectRow), subjectIds);
     },
 
     async getUnitsBySubjectAndSemester(subjectId, semesterId, options) {
@@ -339,7 +332,7 @@ export function createSupabaseContentRepository(
         'getObjectivesByIds',
         query as unknown as QueryResponse<ObjectiveRow[]>
       );
-      return reorderByIds(rows.map(mapObjectiveRow), objectiveIds);
+      return orderEntitiesByIds(rows.map(mapObjectiveRow), objectiveIds);
     },
 
     async getExperimentsByLesson(lessonId, options) {

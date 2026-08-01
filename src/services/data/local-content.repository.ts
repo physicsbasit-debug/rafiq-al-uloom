@@ -23,6 +23,7 @@ import {
   grade10PhysicsWavesObjectives,
   grade10PhysicsWavesReviewQuestions,
 } from '@content/seed/grade10-physics-waves';
+import { orderEntitiesByIds, uniqueIdsInOrder } from './content-ordering';
 
 /**
  * local-content.repository
@@ -49,13 +50,14 @@ export function getSemestersByGrade(gradeId: string): Semester[] {
 }
 
 export function getSubjectsBySemester(semesterId: string): Subject[] {
-  const subjectIdsInSemester = new Set(
+  const subjectIdsInSemester = uniqueIdsInOrder(
     learningCatalogUnits
       .filter((unit) => unit.semesterId === semesterId)
+      .sort((a, b) => a.order - b.order)
       .map((unit) => unit.subjectId)
   );
 
-  return learningCatalogSubjects.filter((subject) => subjectIdsInSemester.has(subject.id));
+  return orderEntitiesByIds(learningCatalogSubjects, subjectIdsInSemester);
 }
 
 export function getUnitsBySubjectAndSemester(subjectId: string, semesterId: string): Unit[] {
@@ -85,9 +87,7 @@ export function getObjectivesByLesson(lessonId: string): Objective[] {
 }
 
 export function getObjectivesByIds(objectiveIds: string[]): Objective[] {
-  const requestedIds = new Set(objectiveIds);
-
-  return grade10PhysicsWavesObjectives.filter((objective) => requestedIds.has(objective.id));
+  return orderEntitiesByIds(grade10PhysicsWavesObjectives, objectiveIds);
 }
 
 export function getExperimentsByLesson(lessonId: string): Experiment[] {
