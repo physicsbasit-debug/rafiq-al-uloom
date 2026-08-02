@@ -1,0 +1,12 @@
+Phase 2-C0/C1 Documentation Baseline
+
+1) ارفع محتويات الحزمة فوق جذر المستودع مع الحفاظ على المسارات.
+2) في Codespaces نفّذ:
+   git pull origin main
+3) اعرض الملفات للمراجعة الحرفية:
+   sed -n '1,320p' docs/PHASE_2_C0_AUTH_ARCHITECTURE.md
+   sed -n '1,360p' docs/PHASE_2_C1_AUTH_CLIENT_SESSION.md
+   sed -n '1,260p' docs/PHASES.md
+4) لا تبدأ كود C1 قبل اعتماد الملفات الثلاثة.
+5) بعد الاعتماد شغّل الفحوص الحالية، ثم التزم الملفات برسالة:
+   docs: define authentication architecture and session contract
