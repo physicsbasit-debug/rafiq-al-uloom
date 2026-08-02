@@ -1,0 +1,19 @@
+Phase 2-C1 — Auth Client & Session
+
+1) ارفع محتويات الحزمة فوق المستودع الحالي.
+2) في Codespaces نفّذ: git pull origin main
+3) شغّل:
+   npm run build
+   npm run lint
+   npm run test
+   npx prettier --check .
+   git status
+4) لا تعمل commit قبل مراجعة الحزمة ونجاح جميع الفحوص.
+
+الملفات:
+- src/services/auth/auth.types.ts
+- src/services/auth/auth.errors.ts
+- src/services/auth/auth.service.ts
+- tests/auth/auth.service.test.ts
+- README_PHASE_2_C1.md
+- APPLY_PHASE_2_C1.txt
