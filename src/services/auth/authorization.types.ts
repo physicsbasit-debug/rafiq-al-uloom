@@ -12,11 +12,7 @@ export interface UserProfile {
 }
 
 export type PublicAuthorizationErrorCode =
-  | 'missing_profile'
-  | 'invalid_profile'
-  | 'network_error'
-  | 'service_unavailable'
-  | 'unknown';
+  'missing_profile' | 'invalid_profile' | 'network_error' | 'service_unavailable' | 'unknown';
 
 export interface PublicAuthorizationError {
   readonly code: PublicAuthorizationErrorCode;
@@ -55,6 +51,4 @@ export type AuthorizationState =
       readonly error: PublicAuthorizationError;
     };
 
-export type AuthorizationStateListener = (
-  state: AuthorizationState | null
-) => void;
+export type AuthorizationStateListener = (state: AuthorizationState | null) => void;

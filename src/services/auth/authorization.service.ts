@@ -211,17 +211,13 @@ export function createAuthorizationService(
 let defaultAuthorizationService: AuthorizationService | undefined;
 
 function getDefaultAuthorizationService(): AuthorizationService {
-  defaultAuthorizationService ??= createAuthorizationService(
-    authService,
-    profileService
-  );
+  defaultAuthorizationService ??= createAuthorizationService(authService, profileService);
   return defaultAuthorizationService;
 }
 
 export const authorizationService: AuthorizationService = {
   getCurrentState: () => getDefaultAuthorizationService().getCurrentState(),
-  refreshAuthorization: () =>
-    getDefaultAuthorizationService().refreshAuthorization(),
+  refreshAuthorization: () => getDefaultAuthorizationService().refreshAuthorization(),
   onAuthorizationStateChange: (listener) =>
     getDefaultAuthorizationService().onAuthorizationStateChange(listener),
 };

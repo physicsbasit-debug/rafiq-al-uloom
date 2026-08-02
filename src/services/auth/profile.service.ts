@@ -83,10 +83,7 @@ function requireEnum<const T extends readonly string[]>(
   allowedValues: T,
   field: string
 ): T[number] {
-  if (
-    typeof value !== 'string' ||
-    !allowedValues.includes(value as T[number])
-  ) {
+  if (typeof value !== 'string' || !allowedValues.includes(value as T[number])) {
     throw new Error(`Invalid ${field}`);
   }
 
@@ -144,11 +141,7 @@ function toPublicAuthorizationError(error: unknown): PublicAuthorizationError {
 
   let code: PublicAuthorizationErrorCode = 'unknown';
 
-  if (
-    error instanceof TypeError ||
-    message.includes('fetch') ||
-    message.includes('network')
-  ) {
+  if (error instanceof TypeError || message.includes('fetch') || message.includes('network')) {
     code = 'network_error';
   } else if (status !== undefined && status >= 500) {
     code = 'service_unavailable';
@@ -171,11 +164,7 @@ export function createProfileService(
 ): ProfileService {
   const reportDiagnostic = options.reportDiagnostic ?? (() => undefined);
 
-  function report(
-    operation: string,
-    publicError: PublicAuthorizationError,
-    cause: unknown
-  ): void {
+  function report(operation: string, publicError: PublicAuthorizationError, cause: unknown): void {
     reportDiagnostic(diagnosticError(operation, publicError, cause));
   }
 
@@ -248,6 +237,5 @@ function getDefaultProfileService(): ProfileService {
 }
 
 export const profileService: ProfileService = {
-  getUserProfile: (userId, options) =>
-    getDefaultProfileService().getUserProfile(userId, options),
+  getUserProfile: (userId, options) => getDefaultProfileService().getUserProfile(userId, options),
 };

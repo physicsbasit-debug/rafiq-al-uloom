@@ -18,16 +18,8 @@ describeIntegration('Phase 2-C2-B profile client read layer', () => {
 
   beforeAll(async () => {
     fixtures = new SupabaseAuthFixtures(readLocalSupabaseEnvironment());
-    activeStudent = await fixtures.createIdentity(
-      'profile-read-student',
-      'student',
-      'active'
-    );
-    activeTeacher = await fixtures.createIdentity(
-      'profile-read-teacher',
-      'teacher',
-      'active'
-    );
+    activeStudent = await fixtures.createIdentity('profile-read-student', 'student', 'active');
+    activeTeacher = await fixtures.createIdentity('profile-read-teacher', 'teacher', 'active');
   });
 
   afterAll(async () => {

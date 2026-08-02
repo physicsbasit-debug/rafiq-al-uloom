@@ -2,14 +2,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { AuthService } from '@services/auth/auth.service';
 import { createAuthorizationService } from '@services/auth/authorization.service';
-import type {
-  AuthStateChange,
-  AuthStateChangeListener,
-} from '@services/auth/auth.types';
-import type {
-  ProfileReadResult,
-  UserProfile,
-} from '@services/auth/authorization.types';
+import type { AuthStateChange, AuthStateChangeListener } from '@services/auth/auth.types';
+import type { ProfileReadResult, UserProfile } from '@services/auth/authorization.types';
 import type { ProfileService } from '@services/auth/profile.service';
 
 function profile(
@@ -27,10 +21,7 @@ function profile(
   };
 }
 
-function authenticatedChange(
-  event: AuthStateChange['event'],
-  userId = 'user-1'
-): AuthStateChange {
+function authenticatedChange(event: AuthStateChange['event'], userId = 'user-1'): AuthStateChange {
   return {
     event,
     state: {
@@ -75,8 +66,7 @@ function success(resultProfile: UserProfile): ProfileReadResult {
 }
 
 function createProfileMock(
-  implementation: ProfileService['getUserProfile'] = async () =>
-    success(profile())
+  implementation: ProfileService['getUserProfile'] = async () => success(profile())
 ) {
   const getUserProfile = vi.fn(implementation);
   return {
@@ -241,9 +231,7 @@ describe('Authorization service', () => {
     const signals: AbortSignal[] = [];
     const profiles = createProfileMock(async (userId, options) => {
       if (options?.signal) signals.push(options.signal);
-      return userId === 'user-1'
-        ? first.promise
-        : success(profile('active', { id: 'user-2' }));
+      return userId === 'user-1' ? first.promise : success(profile('active', { id: 'user-2' }));
     });
     const service = createAuthorizationService(auth.auth, profiles.profiles);
     service.onAuthorizationStateChange(vi.fn());
