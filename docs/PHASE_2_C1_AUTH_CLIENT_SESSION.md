@@ -113,12 +113,12 @@ C2 تجيب: هل الحساب مسموح له، وما دوره؟
 التصور الأولي لدوال الخدمة:
 
 ```ts
-getCurrentSession()
-getCurrentUser()
-signInWithPassword()
-signUp()
-signOut()
-onAuthStateChange()
+getCurrentSession();
+getCurrentUser();
+signInWithPassword();
+signUp();
+signOut();
+onAuthStateChange();
 ```
 
 يجب أن تكون الأنواع التطبيقية مستقلة عن أشكال Supabase الخام قدر الإمكان، مع الاحتفاظ بالحد الأدنى اللازم من معرف المستخدم والجلسة.

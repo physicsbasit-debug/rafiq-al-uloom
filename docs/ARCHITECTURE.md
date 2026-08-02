@@ -6,23 +6,23 @@
 
 ## القرارات المعمارية المعتمدة
 
-| القرار | الاعتماد الحالي |
-| --- | --- |
-| Frontend | React + Vite + TypeScript strict |
-| Styling | Tailwind v4 + design-system داخلي |
-| التنقل الحالي | آلة حالات بسيطة داخل `App.tsx` باستخدام `useState` و`Step` discriminated union |
-| React Router | غير مستخدم في النسخة الحالية، ولا يُضاف قبل وجود حاجة فعلية للروابط العميقة أو سجل المتصفح |
-| عقد البيانات | `ContentRepository` غير متزامن |
-| المزوّد المحلي | `asyncLocalContentRepository` |
-| المزوّد السحابي | `createSupabaseContentRepository(client?)` + كائن جاهز كسول |
-| اختيار المزوّد | `getContentRepository()` مركزي وكسول |
-| الافتراضي | `VITE_CONTENT_PROVIDER` غائب أو `local` ⇒ المزوّد المحلي |
-| Supabase | Schema + RLS + Seed + عميل + Repository + تكافؤ محلي مكتملة |
-| Auth والصلاحيات | Phase 2-C، غير منفذة بعد |
-| Cloud Persistence | Phase 2-D، وتشمل `mastery_results` في الحد الأدنى |
-| لوحة المعلم | Phase 3 |
-| AI | Phase 4 |
-| الاختبارات | Vitest + React Testing Library + اختبار تكامل Supabase منفصل |
+| القرار            | الاعتماد الحالي                                                                            |
+| ----------------- | ------------------------------------------------------------------------------------------ |
+| Frontend          | React + Vite + TypeScript strict                                                           |
+| Styling           | Tailwind v4 + design-system داخلي                                                          |
+| التنقل الحالي     | آلة حالات بسيطة داخل `App.tsx` باستخدام `useState` و`Step` discriminated union             |
+| React Router      | غير مستخدم في النسخة الحالية، ولا يُضاف قبل وجود حاجة فعلية للروابط العميقة أو سجل المتصفح |
+| عقد البيانات      | `ContentRepository` غير متزامن                                                             |
+| المزوّد المحلي    | `asyncLocalContentRepository`                                                              |
+| المزوّد السحابي   | `createSupabaseContentRepository(client?)` + كائن جاهز كسول                                |
+| اختيار المزوّد    | `getContentRepository()` مركزي وكسول                                                       |
+| الافتراضي         | `VITE_CONTENT_PROVIDER` غائب أو `local` ⇒ المزوّد المحلي                                   |
+| Supabase          | Schema + RLS + Seed + عميل + Repository + تكافؤ محلي مكتملة                                |
+| Auth والصلاحيات   | Phase 2-C، غير منفذة بعد                                                                   |
+| Cloud Persistence | Phase 2-D، وتشمل `mastery_results` في الحد الأدنى                                          |
+| لوحة المعلم       | Phase 3                                                                                    |
+| AI                | Phase 4                                                                                    |
+| الاختبارات        | Vitest + React Testing Library + اختبار تكامل Supabase منفصل                               |
 
 ## مسار البيانات
 
@@ -126,12 +126,12 @@ npm run test:supabase
 
 ## حدود حجم الملفات
 
-| النوع | الحد الإرشادي |
-| --- | --- |
-| مكوّن واجهة | 250 سطرًا |
-| ملف منطق | 300 سطر |
-| ملف Seed أو Migration | قد يكون أطول بشرط التنظيم |
-| أي تجاوز | يحتاج مبررًا مكتوبًا وخطة تقسيم إذا استمر النمو |
+| النوع                 | الحد الإرشادي                                   |
+| --------------------- | ----------------------------------------------- |
+| مكوّن واجهة           | 250 سطرًا                                       |
+| ملف منطق              | 300 سطر                                         |
+| ملف Seed أو Migration | قد يكون أطول بشرط التنظيم                       |
+| أي تجاوز              | يحتاج مبررًا مكتوبًا وخطة تقسيم إذا استمر النمو |
 
 `supabase-content.repository.ts` استثناء توثيقي حالي لأنه يطبق عقدًا من ثلاث عشرة دالة ويجمع منطق الاستعلامات المشتركة. لا يُستخدم هذا الاستثناء لتوسيع الملف بوظائف الكتابة أو Auth؛ أي نمو من هذا النوع يُفصل إلى وحدات مستقلة.
 
