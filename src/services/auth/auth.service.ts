@@ -1,9 +1,4 @@
-import type {
-  AuthChangeEvent,
-  Session,
-  SupabaseClient,
-  User,
-} from '@supabase/supabase-js';
+import type { AuthChangeEvent, Session, SupabaseClient, User } from '@supabase/supabase-js';
 
 import { getSupabaseClient } from '@services/data/supabase-client';
 
@@ -93,7 +88,9 @@ function mapAuthEvent(event: AuthChangeEvent): AuthEvent {
   }
 }
 
-function validateCredentials(credentials: SignInCredentials | SignUpCredentials): PublicAuthError | null {
+function validateCredentials(
+  credentials: SignInCredentials | SignUpCredentials
+): PublicAuthError | null {
   const email = credentials.email.trim();
 
   if (!EMAIL_PATTERN.test(email) || !credentials.password) {
@@ -309,8 +306,7 @@ function getDefaultAuthService(): AuthService {
 export const authService: AuthService = {
   getCurrentSession: () => getDefaultAuthService().getCurrentSession(),
   getCurrentUser: () => getDefaultAuthService().getCurrentUser(),
-  signInWithPassword: (credentials) =>
-    getDefaultAuthService().signInWithPassword(credentials),
+  signInWithPassword: (credentials) => getDefaultAuthService().signInWithPassword(credentials),
   signUp: (credentials) => getDefaultAuthService().signUp(credentials),
   signOut: () => getDefaultAuthService().signOut(),
   onAuthStateChange: (listener) => getDefaultAuthService().onAuthStateChange(listener),
