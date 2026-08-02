@@ -10,9 +10,7 @@ import {
 const runIntegration = process.env.RUN_SUPABASE_INTEGRATION_TESTS === 'true';
 const describeIntegration = runIntegration ? describe : describe.skip;
 
-function expectPermissionDenied(
-  error: { code?: string; message?: string } | null
-): void {
+function expectPermissionDenied(error: { code?: string; message?: string } | null): void {
   expect(error).not.toBeNull();
   expect(error?.code).toBe('42501');
   expect(error?.message?.toLowerCase()).toContain('permission denied');
@@ -29,26 +27,10 @@ describeIntegration('Phase 2-C2-A profiles and authorization RLS', () => {
   beforeAll(async () => {
     fixtures = new SupabaseAuthFixtures(readLocalSupabaseEnvironment());
     pendingStudent = await fixtures.createIdentity('pending-student');
-    activeStudent = await fixtures.createIdentity(
-      'active-student',
-      'student',
-      'active'
-    );
-    activeTeacher = await fixtures.createIdentity(
-      'active-teacher',
-      'teacher',
-      'active'
-    );
-    activeReviewer = await fixtures.createIdentity(
-      'active-reviewer',
-      'reviewer',
-      'active'
-    );
-    suspendedStudent = await fixtures.createIdentity(
-      'suspended-student',
-      'student',
-      'suspended'
-    );
+    activeStudent = await fixtures.createIdentity('active-student', 'student', 'active');
+    activeTeacher = await fixtures.createIdentity('active-teacher', 'teacher', 'active');
+    activeReviewer = await fixtures.createIdentity('active-reviewer', 'reviewer', 'active');
+    suspendedStudent = await fixtures.createIdentity('suspended-student', 'student', 'suspended');
   });
 
   afterAll(async () => {
@@ -145,9 +127,7 @@ describeIntegration('Phase 2-C2-A profiles and authorization RLS', () => {
       .eq('id', pendingStudent.user.id);
 
     expectPermissionDenied(error);
-    expect((await fixtures.readProfile(pendingStudent.user.id)).id).toBe(
-      pendingStudent.user.id
-    );
+    expect((await fixtures.readProfile(pendingStudent.user.id)).id).toBe(pendingStudent.user.id);
   });
 
   it('allows service_role to update role and status and restores the fixture in finally', async () => {
@@ -187,9 +167,7 @@ describeIntegration('Phase 2-C2-A profiles and authorization RLS', () => {
 
     expectPermissionDenied(insertResult.error);
     expectPermissionDenied(deleteResult.error);
-    expect((await fixtures.readProfile(pendingStudent.user.id)).id).toBe(
-      pendingStudent.user.id
-    );
+    expect((await fixtures.readProfile(pendingStudent.user.id)).id).toBe(pendingStudent.user.id);
   });
 
   it('rejects invalid role and status values through named CHECK constraints', async () => {
@@ -269,9 +247,7 @@ describeIntegration('Phase 2-C2-A profiles and authorization RLS', () => {
       expect(error).not.toBeNull();
       expect(data.user).toBeNull();
       expect(
-        Number(
-          psqlAdmin(`SELECT count(*) FROM auth.users WHERE email = '${sentinelEmail}';`)
-        )
+        Number(psqlAdmin(`SELECT count(*) FROM auth.users WHERE email = '${sentinelEmail}';`))
       ).toBe(0);
       expect(
         Number(
@@ -340,10 +316,7 @@ describeIntegration('Phase 2-C2-A profiles and authorization RLS', () => {
     `);
 
     try {
-      const lesson = await activeStudent.client
-        .from('lessons')
-        .select('id')
-        .eq('id', lessonId);
+      const lesson = await activeStudent.client.from('lessons').select('id').eq('id', lessonId);
       const objectives = await activeStudent.client
         .from('objectives')
         .select('id')
@@ -352,10 +325,7 @@ describeIntegration('Phase 2-C2-A profiles and authorization RLS', () => {
         .from('questions')
         .select('id')
         .eq('lesson_id', lessonId);
-      const games = await activeStudent.client
-        .from('games')
-        .select('id')
-        .eq('lesson_id', lessonId);
+      const games = await activeStudent.client.from('games').select('id').eq('lesson_id', lessonId);
       const experiments = await activeStudent.client
         .from('experiments')
         .select('id')

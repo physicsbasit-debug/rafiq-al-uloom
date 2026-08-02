@@ -1,10 +1,6 @@
 import { execFileSync } from 'node:child_process';
 
-import {
-  createClient,
-  type SupabaseClient,
-  type User,
-} from '@supabase/supabase-js';
+import { createClient, type SupabaseClient, type User } from '@supabase/supabase-js';
 
 export type AppRole = 'student' | 'teacher' | 'reviewer';
 export type AccountStatus = 'pending' | 'active' | 'suspended';
@@ -76,10 +72,7 @@ export function readLocalSupabaseEnvironment(): LocalSupabaseEnvironment {
   return { apiUrl, restUrl, publishableKey, serviceRoleKey };
 }
 
-export function createIsolatedSupabaseClient(
-  apiUrl: string,
-  key: string
-): SupabaseClient {
+export function createIsolatedSupabaseClient(apiUrl: string, key: string): SupabaseClient {
   return createClient(apiUrl, key, {
     auth: {
       persistSession: false,
@@ -138,20 +131,12 @@ export class SupabaseAuthFixtures {
   readonly anonymousClient: SupabaseClient;
 
   private readonly createdUserIds = new Set<string>();
-  private readonly runId = `${Date.now()}-${Math.random()
-    .toString(36)
-    .slice(2, 10)}`;
+  private readonly runId = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 
   constructor(readonly env: LocalSupabaseEnvironment) {
     // This service-role client is administrative only. It must never call signInWithPassword.
-    this.adminClient = createIsolatedSupabaseClient(
-      env.apiUrl,
-      env.serviceRoleKey
-    );
-    this.anonymousClient = createIsolatedSupabaseClient(
-      env.apiUrl,
-      env.publishableKey
-    );
+    this.adminClient = createIsolatedSupabaseClient(env.apiUrl, env.serviceRoleKey);
+    this.anonymousClient = createIsolatedSupabaseClient(env.apiUrl, env.publishableKey);
   }
 
   async createIdentity(
@@ -168,9 +153,7 @@ export class SupabaseAuthFixtures {
     });
 
     if (error || !data.user) {
-      throw new Error(
-        `Failed to create ${label} fixture: ${error?.message ?? 'missing user'}`
-      );
+      throw new Error(`Failed to create ${label} fixture: ${error?.message ?? 'missing user'}`);
     }
 
     this.createdUserIds.add(data.user.id);
@@ -182,17 +165,12 @@ export class SupabaseAuthFixtures {
         .eq('id', data.user.id);
 
       if (updateError) {
-        throw new Error(
-          `Failed to configure ${label} profile: ${updateError.message}`
-        );
+        throw new Error(`Failed to configure ${label} profile: ${updateError.message}`);
       }
     }
 
     // Every identity gets its own publishable-key client and a real user session.
-    const client = createIsolatedSupabaseClient(
-      this.env.apiUrl,
-      this.env.publishableKey
-    );
+    const client = createIsolatedSupabaseClient(this.env.apiUrl, this.env.publishableKey);
     const { data: signInData, error: signInError } = await client.auth.signInWithPassword({
       email,
       password,
@@ -200,9 +178,7 @@ export class SupabaseAuthFixtures {
 
     if (signInError || !signInData.session) {
       throw new Error(
-        `Failed to sign in ${label} fixture: ${
-          signInError?.message ?? 'missing session'
-        }`
+        `Failed to sign in ${label} fixture: ${signInError?.message ?? 'missing session'}`
       );
     }
 
