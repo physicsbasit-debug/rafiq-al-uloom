@@ -1,0 +1,57 @@
+Phase 2-C2-A — طريقة التطبيق المعتمدة
+
+1) ارفع محتويات الحزمة إلى GitHub فوق المستودع الحالي.
+
+2) في Codespaces اسحب التحديث:
+
+git pull origin main
+
+3) تحقق من وصول الملفات:
+
+ls supabase/migrations/20260803014500_add_profiles_and_authorization_rls.sql
+ls tests/integration/supabase-profiles-authorization.integration.ts
+ls tests/integration/helpers/supabase-auth-fixtures.ts
+ls scripts/verify-supabase-local.sh
+ls README_PHASE_2_C2_SQL.md
+ls APPLY_PHASE_2_C2_SQL.txt
+
+4) اعرض الملفات الفعلية لكلاود قبل تشغيل Supabase أو أي Migration:
+
+sed -n '1,420p' supabase/migrations/20260803014500_add_profiles_and_authorization_rls.sql
+sed -n '1,520p' tests/integration/supabase-profiles-authorization.integration.ts
+sed -n '1,420p' tests/integration/helpers/supabase-auth-fixtures.ts
+sed -n '1,420p' scripts/verify-supabase-local.sh
+sed -n '1,260p' README_PHASE_2_C2_SQL.md
+
+5) بعد اعتماد كلاود فقط، تأكد أن البيئة المحلية لا تحتوي مستخدمين مطلوب الحفاظ عليهم. Migration ستتوقف عمدًا إذا لم تكن auth.users فارغة.
+
+6) شغّل Supabase وأعد بناء القاعدة محليًا:
+
+npx supabase start
+npx supabase db reset
+
+7) شغّل التحقق البنيوي واختبارات التكامل:
+
+bash scripts/verify-supabase-local.sh
+npm run test:supabase
+
+يجب أن يبقى اختبار B3c القديم ناجحًا 13/13 ضمن نفس الأمر.
+
+8) شغّل فحوص المشروع:
+
+npm run build
+npm run lint
+npm run test
+npx prettier --check .
+git status
+
+9) لا تشغّل أي Migration على مشروع بعيد أو إنتاجي في هذه الدفعة. لا تشغّل npm audit fix.
+
+10) إذا عدّل Prettier ملفات الحزمة، نسّق الملفات المحددة فقط، أعد جميع الفحوص، ثم ثبّت تعديل التنسيق في Commit مستقل عند الحاجة.
+
+11) بعد نجاح كل الفحوص واعتماد كلاود للنتائج، ثبّت أي تعديلات محلية وادفعها إلى GitHub، ثم تحقق:
+
+git status
+git log --oneline -5
+
+المطلوب: nothing to commit, working tree clean
