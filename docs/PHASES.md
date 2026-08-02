@@ -8,7 +8,7 @@
 v0.3-data-layer-complete
 ```
 
-اكتملت وثيقة Phase 2-C0، وأصبحت Phase 2-C1 هي الدفعة البرمجية التالية بعد اعتماد عقدها التوثيقي.
+اكتملت Phase 2-C1 برمجيًا واختباريًا، وأصبحت Phase 2-C2 قيد التوثيق قبل أي Migration أو تعديل لقاعدة البيانات.
 
 ## خارطة الطريق المحدّثة
 
@@ -21,8 +21,8 @@ v0.3-data-layer-complete
 | 2-B      | Supabase Content Data Layer               | Schema + RLS + Seed + Repository + Provider Selection                  | تكافؤ كامل بين local وSupabase                     | مكتملة         |
 | 2-Freeze | Data Layer Freeze                         | توثيق المعمارية والخارطة + الوسم `v0.3-data-layer-complete`            | الوسم يشير إلى commit التجميد المعتمد              | مكتملة         |
 | 2-C0     | Auth & Authorization Architecture         | قرارات Supabase Auth + Profiles + Roles + Account Status + حدود RLS    | اعتماد الوثيقة المعمارية دون كود                   | مكتملة         |
-| 2-C1     | Auth Client & Session Contract            | Auth types + service + session + sign-in/sign-up/sign-out + unit tests | عقد Auth واختباراته ناجحة بلا Profiles أو UI       | قادمة          |
-| 2-C2     | Profiles + Roles + Authorization RLS      | جدول Profiles + Trigger + سياسات RLS + اختبارات SQL                    | لا تصعيد ذاتي للصلاحيات ولا مستخدم يتيم            | مخططة بعد 2-C1 |
+| 2-C1     | Auth Client & Session Contract            | Auth types + service + session + sign-in/sign-up/sign-out + unit tests | عقد Auth واختباراته ناجحة بلا Profiles أو UI       | مكتملة         |
+| 2-C2     | Profiles + Roles + Authorization RLS      | Profiles + Trigger + AuthorizationState + RLS + اختبارات SQL وتكامل   | لا تصعيد ذاتي للصلاحيات ولا مستخدم يتيم            | قيد التوثيق    |
 | 2-C3     | Login / Logout / Session UI               | واجهات Auth ورسائل الجلسة والتأكيد                                     | تجربة RTL واضحة بلا وميض واجهة محمية               | مخططة          |
 | 2-C4     | Protected Operations + Access Guards      | حراس الواجهات والعمليات                                                | لا عملية محمية تعتمد على إخفاء الواجهة فقط         | مخططة          |
 | 2-C5     | Auth Integration Tests & Security Closure | اختبارات Auth/RLS/UX وتوثيق التشغيل                                    | إغلاق أمني وتشغيلي كامل لـ2-C                      | مخططة          |

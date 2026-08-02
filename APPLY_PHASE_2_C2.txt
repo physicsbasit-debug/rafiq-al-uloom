@@ -1,0 +1,70 @@
+Phase 2-C2 — Documentation Only
+
+مهم:
+- لا تشغّل SQL.
+- لا تنشئ Migration.
+- لا تعدّل Supabase Dashboard.
+- لا تبدأ تنفيذ Profile أو RLS قبل اعتماد الوثيقة.
+
+1) ارفع محتويات الحزمة إلى GitHub فوق المستودع الحالي.
+
+الملفات:
+- docs/PHASE_2_C2_PROFILES_ROLES_RLS.md
+- docs/PHASES.md
+- README_PHASE_2_C2.md
+- APPLY_PHASE_2_C2.txt
+
+2) في Codespaces اسحب التحديث:
+
+git pull origin main
+
+3) تحقق من وصول الملفات:
+
+ls docs/PHASE_2_C2_PROFILES_ROLES_RLS.md
+ls docs/PHASES.md
+ls README_PHASE_2_C2.md
+ls APPLY_PHASE_2_C2.txt
+
+4) اعرض الملفات الفعلية لكلاود:
+
+sed -n '1,760p' docs/PHASE_2_C2_PROFILES_ROLES_RLS.md
+sed -n '1,300p' docs/PHASES.md
+sed -n '1,220p' README_PHASE_2_C2.md
+
+أرسل المخرجات الفعلية، لا ملخص المحادثة.
+
+5) بعد اعتماد كلاود فقط شغّل فحوص المشروع:
+
+npm run build
+npm run lint
+npm run test
+npx prettier --check .
+git status
+
+6) لا تعمل أي تعديل SQL أو كود Auth ضمن هذه الدفعة.
+
+7) إذا نتج عن Prettier تعديل توثيقي، راجعه وثبّته فقط بعد نجاح الفحوص:
+
+git diff --check
+git diff --stat
+git diff
+
+ثم عند الحاجة:
+
+git add \
+  docs/PHASE_2_C2_PROFILES_ROLES_RLS.md \
+  docs/PHASES.md \
+  README_PHASE_2_C2.md \
+  APPLY_PHASE_2_C2.txt
+
+git commit -m "docs: define profiles roles and authorization rls"
+git push origin main
+
+8) التحقق النهائي:
+
+git status
+git log --oneline -4
+
+المطلوب:
+
+nothing to commit, working tree clean
