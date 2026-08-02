@@ -1,0 +1,43 @@
+Phase 2-C2-B: UserProfile + AuthorizationState Client Read Layer
+
+الترتيب المعتمد:
+
+1) ارفع محتويات الحزمة إلى GitHub فوق المستودع الحالي مع الحفاظ على المسارات.
+
+2) في Codespaces اسحب التحديث:
+
+git pull origin main
+
+3) تحقق من وصول الملفات:
+
+ls src/services/auth/authorization.types.ts
+ls src/services/auth/profile.service.ts
+ls src/services/auth/authorization.service.ts
+ls tests/auth/profile.service.test.ts
+ls tests/auth/authorization.service.test.ts
+ls tests/integration/supabase-profile-read.integration.ts
+ls README_PHASE_2_C2_B.md
+ls APPLY_PHASE_2_C2_B.txt
+
+4) اعرض الملفات الفعلية لكلاود قبل تشغيل الفحوص:
+
+sed -n '1,260p' src/services/auth/authorization.types.ts
+sed -n '1,420p' src/services/auth/profile.service.ts
+sed -n '1,440p' src/services/auth/authorization.service.ts
+sed -n '1,520p' tests/auth/profile.service.test.ts
+sed -n '1,620p' tests/auth/authorization.service.test.ts
+sed -n '1,260p' tests/integration/supabase-profile-read.integration.ts
+
+5) بعد اعتماد كلاود فقط شغّل:
+
+npm ci
+npm run build
+npm run lint
+npm run test
+npx prettier --check .
+npm run test:supabase
+git status
+
+6) لا تشغّل npm audit fix، ولا تعدّل SQL أو ملفات C1 ضمن هذه الدفعة.
+
+7) إذا أظهر Prettier ملفات هذه الحزمة فقط، نسّق الملفات المذكورة ثم أعد الفحوص كاملة قبل commit جديد.
