@@ -145,14 +145,14 @@ public.profiles
 
 البنية المعتمدة:
 
-| العمود         | النوع         | Null | القيمة الافتراضية | القاعدة                                                                 |
-| -------------- | ------------- | ---- | ------------------ | ----------------------------------------------------------------------- |
-| `id`           | `uuid`        | لا   | لا توجد            | مفتاح أساسي ومفتاح خارجي إلى `auth.users.id` مع `ON DELETE CASCADE`     |
-| `display_name` | `text`        | نعم  | `NULL`             | حقل شخصي غير أمني، ولا يُملأ من Metadata في C2                          |
-| `role`         | `text`        | لا   | `student`          | قيد مسمى يحصر القيمة في `student/teacher/reviewer`                      |
-| `status`       | `text`        | لا   | `pending`          | قيد مسمى يحصر القيمة في `pending/active/suspended`                      |
-| `created_at`   | `timestamptz` | لا   | وقت قاعدة البيانات | لا يرسله العميل                                                         |
-| `updated_at`   | `timestamptz` | لا   | وقت قاعدة البيانات | يُحدّث من قاعدة البيانات عند أي تعديل موثوق                             |
+| العمود         | النوع         | Null | القيمة الافتراضية  | القاعدة                                                             |
+| -------------- | ------------- | ---- | ------------------ | ------------------------------------------------------------------- |
+| `id`           | `uuid`        | لا   | لا توجد            | مفتاح أساسي ومفتاح خارجي إلى `auth.users.id` مع `ON DELETE CASCADE` |
+| `display_name` | `text`        | نعم  | `NULL`             | حقل شخصي غير أمني، ولا يُملأ من Metadata في C2                      |
+| `role`         | `text`        | لا   | `student`          | قيد مسمى يحصر القيمة في `student/teacher/reviewer`                  |
+| `status`       | `text`        | لا   | `pending`          | قيد مسمى يحصر القيمة في `pending/active/suspended`                  |
+| `created_at`   | `timestamptz` | لا   | وقت قاعدة البيانات | لا يرسله العميل                                                     |
+| `updated_at`   | `timestamptz` | لا   | وقت قاعدة البيانات | يُحدّث من قاعدة البيانات عند أي تعديل موثوق                         |
 
 ### 5.1 سبب استخدام text مع CHECK
 
@@ -606,37 +606,37 @@ infinite recursion detected in policy
 
 ## 16. مصفوفة اختبارات profiles
 
-| الاختبار                                      | النتيجة المطلوبة                                             | طبقة الحماية المتوقعة        |
-| --------------------------------------------- | ------------------------------------------------------------- | ---------------------------- |
-| إنشاء مستخدم جديد                             | Profile واحد بدور `student` وحالة `pending`                   | Trigger + defaults           |
-| حذف مستخدم Auth                               | حذف Profile تلقائيًا                                          | FK `ON DELETE CASCADE`       |
-| مستخدم يقرأ Profile الخاص به                  | نجاح                                                          | GRANT SELECT + RLS           |
-| مستخدم يقرأ Profile مستخدم آخر                | لا صف ظاهر                                                    | RLS                          |
-| anon يقرأ profiles                            | رفض                                                          | GRANT                        |
-| مستخدم ينشئ Profile                           | `42501 permission denied`                                     | غياب INSERT GRANT            |
-| مستخدم يغير display_name                      | `42501 permission denied` وعدم تغير القيمة                    | غياب UPDATE GRANT            |
-| مستخدم يغير role                              | `42501 permission denied` وعدم تغير القيمة                    | غياب UPDATE GRANT            |
-| مستخدم يغير status                            | `42501 permission denied` وعدم تغير القيمة                    | غياب UPDATE GRANT            |
-| مستخدم يحذف Profile                           | `42501 permission denied`                                     | غياب DELETE GRANT            |
-| service_role تقرأ Profile                     | نجاح                                                          | GRANT SELECT + bypass RLS     |
-| service_role تغير role/status                 | نجاح ثم استعادة Fixture                                       | GRANT UPDATE + bypass RLS     |
-| service_role تنشئ أو تحذف Profile في C2        | رفض                                                          | غياب INSERT/DELETE GRANT      |
-| قيمة role غير معتمدة عبر مسار إداري           | فشل قيد CHECK                                                 | constraint                   |
-| قيمة status غير معتمدة عبر مسار إداري         | فشل قيد CHECK                                                 | constraint                   |
-| Trigger يفشل عمدًا                            | فشل التسجيل وعدم وجود مستخدم أو Profile يتيم                 | transaction atomicity        |
-| استعلام المستخدمين اليتامى                    | صفر صفوف                                                      | integration invariant        |
+| الاختبار                                | النتيجة المطلوبة                             | طبقة الحماية المتوقعة     |
+| --------------------------------------- | -------------------------------------------- | ------------------------- |
+| إنشاء مستخدم جديد                       | Profile واحد بدور `student` وحالة `pending`  | Trigger + defaults        |
+| حذف مستخدم Auth                         | حذف Profile تلقائيًا                         | FK `ON DELETE CASCADE`    |
+| مستخدم يقرأ Profile الخاص به            | نجاح                                         | GRANT SELECT + RLS        |
+| مستخدم يقرأ Profile مستخدم آخر          | لا صف ظاهر                                   | RLS                       |
+| anon يقرأ profiles                      | رفض                                          | GRANT                     |
+| مستخدم ينشئ Profile                     | `42501 permission denied`                    | غياب INSERT GRANT         |
+| مستخدم يغير display_name                | `42501 permission denied` وعدم تغير القيمة   | غياب UPDATE GRANT         |
+| مستخدم يغير role                        | `42501 permission denied` وعدم تغير القيمة   | غياب UPDATE GRANT         |
+| مستخدم يغير status                      | `42501 permission denied` وعدم تغير القيمة   | غياب UPDATE GRANT         |
+| مستخدم يحذف Profile                     | `42501 permission denied`                    | غياب DELETE GRANT         |
+| service_role تقرأ Profile               | نجاح                                         | GRANT SELECT + bypass RLS |
+| service_role تغير role/status           | نجاح ثم استعادة Fixture                      | GRANT UPDATE + bypass RLS |
+| service_role تنشئ أو تحذف Profile في C2 | رفض                                          | غياب INSERT/DELETE GRANT  |
+| قيمة role غير معتمدة عبر مسار إداري     | فشل قيد CHECK                                | constraint                |
+| قيمة status غير معتمدة عبر مسار إداري   | فشل قيد CHECK                                | constraint                |
+| Trigger يفشل عمدًا                      | فشل التسجيل وعدم وجود مستخدم أو Profile يتيم | transaction atomicity     |
+| استعلام المستخدمين اليتامى              | صفر صفوف                                     | integration invariant     |
 
 ## 17. مصفوفة اختبارات RLS المحتوى
 
-| الهوية والحالة      | Catalog | Approved details | Draft / pending review | Profile الشخصي |
-| ------------------- | ------- | ---------------- | ---------------------- | -------------- |
-| anon                | مرفوض   | مرفوض            | مرفوض                  | مرفوض          |
-| student pending     | مرفوض   | مرفوض            | مرفوض                  | مسموح          |
-| student active      | مسموح   | مسموح            | مرفوض                  | مسموح          |
-| teacher active      | مسموح   | مسموح            | مرفوض في C2            | مسموح          |
-| reviewer active     | مسموح   | مسموح            | مرفوض في C2            | مسموح          |
-| أي دور suspended    | مرفوض   | مرفوض            | مرفوض                  | مسموح          |
-| service_role        | مسموح   | مسموح            | مسموح وفق صلاحياتها    | مسموح          |
+| الهوية والحالة   | Catalog | Approved details | Draft / pending review | Profile الشخصي |
+| ---------------- | ------- | ---------------- | ---------------------- | -------------- |
+| anon             | مرفوض   | مرفوض            | مرفوض                  | مرفوض          |
+| student pending  | مرفوض   | مرفوض            | مرفوض                  | مسموح          |
+| student active   | مسموح   | مسموح            | مرفوض                  | مسموح          |
+| teacher active   | مسموح   | مسموح            | مرفوض في C2            | مسموح          |
+| reviewer active  | مسموح   | مسموح            | مرفوض في C2            | مسموح          |
+| أي دور suspended | مرفوض   | مرفوض            | مرفوض                  | مسموح          |
+| service_role     | مسموح   | مسموح            | مسموح وفق صلاحياتها    | مسموح          |
 
 ## 18. الاختبارات البرمجية
 
