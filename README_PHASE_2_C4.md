@@ -1,4 +1,4 @@
-# Phase 2-C4-0: Operation Authorization Contract
+# Phase 2-C4-0 Fix 1: Operation Authorization Contract
 
 ## الغرض
 
@@ -30,6 +30,16 @@ APPLY_PHASE_2_C4.txt
 allowed: false
 reason: guest
 ```
+
+- حالة التهيئة الفعلية هي `AuthState.status = loading`، وهو الاسم الوحيد المستخدم في عقد C4.
+- حالة `AuthState.status = error` ترفض دفاعيًا بسبب مستقل:
+
+```text
+allowed: false
+reason: session_error
+```
+
+- إضافة `session_error` توسع عقد C4 وحده، ولا تتطلب تعديل `AuthState` أو `AuthSessionProvider` أو شاشات C1-C3 القائمة.
 
 - C4-A تستبدل فحص `authorized` القديم في `App.tsx` ولا تضيف طبقة مكررة فوقه.
 - `authorization.policy.ts` هو المصدر المركزي لقرار العمليات.

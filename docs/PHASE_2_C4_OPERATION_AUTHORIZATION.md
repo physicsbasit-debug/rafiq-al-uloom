@@ -15,6 +15,7 @@ commit: 0c2cf40
 - لا تفتح أي صلاحية كتابة جديدة.
 - لا تضيف واجهة معلم أو مراجع فعلية.
 - لا تعدل عقود C0 أو C1 أو C2 أو C3.
+- يتضمن Fix 1 تصحيح اسم حالة التهيئة إلى `loading` وإضافة سبب الرفض `session_error` داخل عقد C4 فقط.
 
 ## 1. الهدف
 
@@ -219,6 +220,7 @@ interface AuthorizationDecision {
     | 'allowed'
     | 'guest'
     | 'profile_loading'
+    | 'session_error'
     | 'profile_error'
     | 'account_pending'
     | 'account_suspended'
@@ -252,7 +254,11 @@ allowed: false
 إذا استدعيت الدالة خطأ بحالة زائر:
 
 ```ts
-authorizeOperation(guestAuthState, null, 'access_student_experience');
+authorizeOperation(
+  guestAuthState,
+  null,
+  'access_student_experience'
+)
 ```
 
 فالنتيجة الملزمة:
@@ -263,6 +269,43 @@ reason: guest
 ```
 
 لا تعيد الدالة سماحًا محليًا للزائر، لأن مسار الزائر ليس صلاحية حساب.
+
+### 6.3 reason: session_error
+
+إذا كانت حالة Auth الفعلية:
+
+```text
+authState.status = error
+```
+
+فالنتيجة الملزمة:
+
+```text
+allowed: false
+reason: session_error
+```
+
+يمثل `session_error` فشل تحديد الجلسة أو حالة Auth نفسها، ويختلف دلاليًا عن:
+
+```text
+profile_loading
+→ التهيئة أو قراءة Profile ما زالت جارية
+
+profile_error
+→ الجلسة صحيحة لكن قراءة Profile أو التحقق منها فشل
+```
+
+إضافة `session_error` توسع عقد C4 فقط. لا تتطلب أي تعديل على:
+
+```text
+AuthState
+auth.types.ts
+AuthSessionProvider
+AccountStatusView
+أو أي عقد أو شاشة مكتملة في C1 أو C2 أو C3
+```
+
+تظل شاشة `session_error` القائمة في C3 هي شاشة العرض الأساسية لهذه الحالة، بينما يضيف محرك C4 رفضًا دفاعيًا إذا وصلت الحالة إليه بالخطأ.
 
 ## 7. المسار المحلي للزائر
 
@@ -316,6 +359,7 @@ RequireCapability
 booting
 guest
 confirmation_required
+session_error
 pending
 suspended
 profile_error
@@ -359,7 +403,8 @@ authorization.policy.ts
 
 ```ts
 const authorized =
-  authState.status === 'authenticated' && authorizationState?.status === 'authorized';
+  authState.status === 'authenticated' &&
+  authorizationState?.status === 'authorized';
 ```
 
 يجوز لـApp فحص الحالة لاختيار شاشة `pending` أو `suspended`، لكنه لا يكرر مصفوفة الدور أو قرار العملية.
@@ -382,15 +427,16 @@ suspended
 
 ## 9. مصفوفة العمليات
 
-| الحالة            | تجربة الطالب          | مساحة المعلم | مساحة المراجع | التأليف       | المراجعة      |
-| ----------------- | --------------------- | ------------ | ------------- | ------------- | ------------- |
-| Guest             | مسار محلي خارج المحرك | مرفوض        | مرفوض         | مرفوض         | مرفوض         |
-| Pending student   | مرفوض                 | مرفوض        | مرفوض         | مرفوض         | مرفوض         |
-| Suspended student | مرفوض                 | مرفوض        | مرفوض         | مرفوض         | مرفوض         |
-| Active student    | مسموح                 | مرفوض        | مرفوض         | مرفوض         | مرفوض         |
-| Active teacher    | مسموح                 | مسموح        | مرفوض         | غير متاحة بعد | مرفوض         |
-| Active reviewer   | مسموح                 | مرفوض        | مسموح         | مرفوض         | غير متاحة بعد |
-| Profile error     | مرفوض                 | مرفوض        | مرفوض         | مرفوض         | مرفوض         |
+| الحالة | تجربة الطالب | مساحة المعلم | مساحة المراجع | التأليف | المراجعة |
+| --- | --- | --- | --- | --- | --- |
+| Guest | مسار محلي خارج المحرك | مرفوض | مرفوض | مرفوض | مرفوض |
+| Pending student | مرفوض | مرفوض | مرفوض | مرفوض | مرفوض |
+| Suspended student | مرفوض | مرفوض | مرفوض | مرفوض | مرفوض |
+| Active student | مسموح | مرفوض | مرفوض | مرفوض | مرفوض |
+| Active teacher | مسموح | مسموح | مرفوض | غير متاحة بعد | مرفوض |
+| Active reviewer | مسموح | مرفوض | مسموح | مرفوض | غير متاحة بعد |
+| Session error | مرفوض | مرفوض | مرفوض | مرفوض | مرفوض |
+| Profile error | مرفوض | مرفوض | مرفوض | مرفوض | مرفوض |
 
 ### 9.1 أولوية حالة الحساب
 
@@ -433,16 +479,41 @@ authorizeOperation(
 ): AuthorizationDecision
 ```
 
-### 10.1 Auth غير مكتملة
+### 10.1 Auth قيد التهيئة
 
-إذا كانت تهيئة الجلسة لم تكتمل:
+إذا كانت الحالة الفعلية المطابقة لعقد C1:
+
+```text
+authState.status = loading
+```
+
+فالنتيجة:
 
 ```text
 allowed: false
 reason: profile_loading
 ```
 
-### 10.2 Guest
+مصدر الحقيقة الوحيد هو اتحاد `AuthState` الفعلي في C1، والحالة غير المهيأة اسمها `loading`.
+
+### 10.2 Auth error
+
+إذا كانت:
+
+```text
+authState.status = error
+```
+
+فالنتيجة:
+
+```text
+allowed: false
+reason: session_error
+```
+
+لا تحول هذه الحالة إلى `profile_loading` أو `profile_error`.
+
+### 10.3 Guest
 
 ```text
 allowed: false
@@ -451,35 +522,49 @@ reason: guest
 
 هذا مسار دفاعي، لا المسار الطبيعي للزائر داخل App.
 
-### 10.3 مستخدم مصادق وProfile قيد التحميل
+### 10.4 مستخدم مصادق وProfile غير جاهزة
+
+إذا كان المستخدم مصادقًا وكانت:
+
+```text
+authorizationState = null
+```
+
+أو كانت الحالة:
+
+```text
+loading_profile
+```
+
+فالنتيجة:
 
 ```text
 allowed: false
 reason: profile_loading
 ```
 
-### 10.4 Profile error
+### 10.5 Profile error
 
 ```text
 allowed: false
 reason: profile_error
 ```
 
-### 10.5 Pending
+### 10.6 Pending
 
 ```text
 allowed: false
 reason: account_pending
 ```
 
-### 10.6 Suspended
+### 10.7 Suspended
 
 ```text
 allowed: false
 reason: account_suspended
 ```
 
-### 10.7 Authorized
+### 10.8 Authorized
 
 إذا كانت الحالة `authorized`:
 
@@ -487,21 +572,37 @@ reason: account_suspended
 2. يفحص الدور المسموح.
 3. يعيد `allowed` أو سبب الرفض.
 
-### 10.8 ترتيب القرار
+### 10.9 ترتيب القرار
 
-الترتيب الملزم يمنع الرسائل المضللة:
+الترتيب الملزم يتكون من ثمانية فروع صريحة، ويمنع الرسائل المضللة:
 
 ```text
-1. اكتمال Auth
-2. Guest
-3. وجود AuthorizationState
-4. loading/profile_error/pending/suspended
-5. توفر العملية
-6. أهلية الدور
-7. allowed
+1. authState.status = loading
+   → profile_loading
+
+2. authState.status = error
+   → session_error
+
+3. authState.status = guest
+   → guest
+
+4. authenticated + AuthorizationState فارغة أو loading_profile
+   → profile_loading
+
+5. profile_error
+   → profile_error
+
+6. pending
+   → account_pending
+
+7. suspended
+   → account_suspended
+
+8. authorized
+   → توفر العملية ثم أهلية الدور ثم allowed
 ```
 
-مثلًا لا يعاد `role_not_allowed` لمستخدم `suspended`، لأن السبب الحقيقي السابق هو تعليق الحساب.
+مثلًا لا يعاد `role_not_allowed` لمستخدم `suspended`، ولا يعاد `profile_loading` عند فشل الجلسة؛ لأن السبب الحقيقي السابق يجب أن يظل ظاهرًا ودقيقًا.
 
 ## 11. تفاصيل العمليات الخمس
 
@@ -519,6 +620,7 @@ active reviewer
 
 ```text
 guest
+session_error
 pending
 suspended
 profile_error
@@ -692,7 +794,10 @@ ContentRepository
 الواجهة المتوقعة:
 
 ```tsx
-<RequireCapability operation="access_student_experience" fallback={<AccessDeniedView />}>
+<RequireCapability
+  operation="access_student_experience"
+  fallback={<AccessDeniedView />}
+>
   <StudentApplication />
 </RequireCapability>
 ```
@@ -731,8 +836,8 @@ authorization.policy.ts
 يجب ألا تظهر داخل مكونات القرار شروط مثل:
 
 ```ts
-profile.role === 'teacher';
-profile.role === 'reviewer';
+profile.role === 'teacher'
+profile.role === 'reviewer'
 ```
 
 لاتخاذ قرار عرض عملية محمية.
@@ -746,26 +851,32 @@ profile.role === 'reviewer';
 
 ## 19. اختبارات authorization.policy
 
-يجب أن تغطي كل خلية في المصفوفة، ومنها:
+يجب أن تغطي كل خلية في المصفوفة وترتيب القرار الثماني، ومنها:
 
-1. Guest يرفض دفاعيًا بسبب `guest`.
-2. Active student يدخل تجربة الطالب.
-3. Active teacher يدخل تجربة الطالب.
-4. Active reviewer يدخل تجربة الطالب.
-5. Student لا يدخل مساحة المعلم.
-6. Teacher يدخل مساحة المعلم.
-7. Reviewer لا يدخل مساحة المعلم.
-8. Reviewer يدخل مساحة المراجع.
-9. Teacher لا يدخل مساحة المراجع.
-10. Pending يمنع كل العمليات المحمية.
-11. Suspended يمنع كل العمليات المحمية.
-12. Profile error يمنع كل العمليات.
-13. Loading يمنع كل العمليات.
-14. Active teacher لا يؤلف في C4 بسبب `operation_not_available`.
-15. Active reviewer لا يراجع في C4 بسبب `operation_not_available`.
-16. الدور لا يتجاوز حالة الحساب.
-17. عملية غير معروفة تفشل مغلقة إذا وصلت من JavaScript غير منضبط وقت التشغيل.
-18. لا تنتج حالة `allowed: true` مع سبب غير `allowed`.
+1. `authState.status = loading` يرفض بسبب `profile_loading`.
+2. `authState.status = error` يرفض بسبب `session_error`.
+3. `session_error` لا يتحول إلى `profile_loading`.
+4. `session_error` لا يتحول إلى `profile_error`.
+5. Guest يرفض دفاعيًا بسبب `guest`.
+6. مستخدم مصادق وAuthorization فارغة يرفض بسبب `profile_loading`.
+7. `loading_profile` يرفض بسبب `profile_loading`.
+8. Active student يدخل تجربة الطالب.
+9. Active teacher يدخل تجربة الطالب.
+10. Active reviewer يدخل تجربة الطالب.
+11. Student لا يدخل مساحة المعلم.
+12. Teacher يدخل مساحة المعلم.
+13. Reviewer لا يدخل مساحة المعلم.
+14. Reviewer يدخل مساحة المراجع.
+15. Teacher لا يدخل مساحة المراجع.
+16. Pending يمنع كل العمليات المحمية.
+17. Suspended يمنع كل العمليات المحمية.
+18. Profile error يمنع كل العمليات.
+19. Active teacher لا يؤلف في C4 بسبب `operation_not_available`.
+20. Active reviewer لا يراجع في C4 بسبب `operation_not_available`.
+21. الدور لا يتجاوز حالة الحساب.
+22. عملية غير معروفة تفشل مغلقة إذا وصلت من JavaScript غير منضبط وقت التشغيل.
+23. لا تنتج حالة `allowed: true` مع سبب غير `allowed`.
+24. يستخدم التنفيذ الاسم الفعلي `loading` المطابق لعقد C1 دون أي تسمية بديلة.
 
 ## 20. اختبارات RequireCapability
 
@@ -775,6 +886,7 @@ profile.role === 'reviewer';
 - عرض Fallback عند المنع.
 - عدم تنفيذ Child Component عند المنع.
 - تغيير AuthorizationState يعيد التقييم.
+- Session error لا يعرض المحتوى.
 - Pending لا يعرض المحتوى.
 - Suspended لا يعرض المحتوى.
 - Profile error لا يعرض المحتوى.
@@ -790,11 +902,12 @@ profile.role === 'reviewer';
 2. مسار الزائر لا يستدعي `authorizeOperation` في الاستخدام الطبيعي.
 3. المستخدم النشط يمر عبر `RequireCapability`.
 4. فحص `authorized` القديم لا يبقى مصدر قرار مكرر.
-5. Pending وSuspended يستمران في شاشات C3 الصحيحة.
-6. Profile error يستمر في شاشة C3 الصحيحة.
-7. إزالة السماح من Policy تخفي تجربة الطالب دون تعديل Step.
-8. اتحاد Step يبقى مطابقًا لحالة C3.
-9. موضع الطالب لا يمسح عند إعادة تقييم الحارس.
+5. Session error يستمر في شاشة C3 الصحيحة قبل الوصول إلى الحارس.
+6. Pending وSuspended يستمران في شاشات C3 الصحيحة.
+7. Profile error يستمر في شاشة C3 الصحيحة.
+8. إزالة السماح من Policy تخفي تجربة الطالب دون تعديل Step.
+9. اتحاد Step يبقى مطابقًا لحالة C3.
+10. موضع الطالب لا يمسح عند إعادة تقييم الحارس.
 
 ## 22. C4-B: إثبات تجاوز الواجهة
 
@@ -840,15 +953,15 @@ DELETE
 
 يجب أن تبقى النتائج:
 
-| الهوية          | المحتوى المعتمد            | المسودات                   |
-| --------------- | -------------------------- | -------------------------- |
-| anon            | مرفوض                      | مرفوض                      |
-| pending         | مرفوض                      | مرفوض                      |
-| suspended       | مرفوض                      | مرفوض                      |
-| active student  | مسموح                      | مرفوض                      |
-| active teacher  | مسموح                      | مرفوض                      |
-| active reviewer | مسموح                      | مرفوض                      |
-| service_role    | وفق المسار الإداري الموثوق | وفق المسار الإداري الموثوق |
+| الهوية | المحتوى المعتمد | المسودات |
+| --- | --- | --- |
+| anon | مرفوض | مرفوض |
+| pending | مرفوض | مرفوض |
+| suspended | مرفوض | مرفوض |
+| active student | مسموح | مرفوض |
+| active teacher | مسموح | مرفوض |
+| active reviewer | مسموح | مرفوض |
+| service_role | وفق المسار الإداري الموثوق | وفق المسار الإداري الموثوق |
 
 ### 22.4 سلامة البيانات
 
@@ -890,6 +1003,8 @@ VITE_* public environment
 - شروط Role متناثرة لاتخاذ القرار.
 - إضافة حالات Auth إلى `Step`.
 - بقاء فحص `authorized` القديم مصدرًا موازيًا للعملية.
+- استخدام أي تسمية بديلة بدل `AuthState.status = loading`.
+- غياب الفرع الدفاعي `session_error` لحالة `AuthState.status = error`.
 - استخدام `service_role` في كود الإنتاج.
 
 ## 25. الرسائل وتجربة المستخدم
@@ -909,6 +1024,9 @@ VITE_* public environment
 profile_loading
 → جارٍ التحقق من صلاحية الحساب.
 
+session_error
+→ تعذر التحقق من الجلسة. حاول مرة أخرى.
+
 account_pending
 → الحساب بانتظار التفعيل.
 
@@ -922,7 +1040,7 @@ operation_not_available
 → هذه الوظيفة غير متاحة في الإصدار الحالي.
 ```
 
-شاشات C3 الحالية تظل المصدر الأساسي لحالات Pending وSuspended وProfile Error.
+شاشات C3 الحالية تظل المصدر الأساسي لحالات Session Error وPending وSuspended وProfile Error، ولا تستبدلها إضافة السبب الجديد داخل عقد C4.
 
 ## 26. حدود C4 مقابل Phase 3
 
@@ -1081,6 +1199,8 @@ Git working tree clean
 - قائمة العمليات.
 - مصفوفة الأدوار.
 - ترتيب أسباب الرفض.
+- أسماء حالات `AuthState` المستخدمة في المحرك.
+- أسباب الرفض `session_error` و`profile_error` و`profile_loading`.
 - مسار الزائر.
 - توفر عمليات التأليف أو المراجعة.
 - حدود C4 مقابل Phase 3.

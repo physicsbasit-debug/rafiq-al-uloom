@@ -1,0 +1,45 @@
+Phase 2-C4-0 Fix 1 Documentation
+================================
+
+هذه حزمة changed-files-only لتصحيح عقد C4-0 قبل تنفيذ C4-A.
+
+التعديلات المحصورة:
+
+- اعتماد `AuthState.status = loading` بالاسم الفعلي المطابق لعقد C1.
+- إضافة `session_error` لحالة `AuthState.status = error`.
+- توثيق ترتيب القرار الثماني واختباراته.
+- تأكيد أن التغيير يوسع عقد C4 فقط ولا يعدل C1 أو C2 أو C3.
+
+الملفات:
+
+- docs/PHASE_2_C4_OPERATION_AUTHORIZATION.md
+- README_PHASE_2_C4.md
+- APPLY_PHASE_2_C4_FIX1.txt
+
+الترتيب المعتمد:
+
+1) ارفع محتويات ZIP إلى جذر مستودع GitHub مع الحفاظ على المسارات.
+
+2) في Codespaces اسحب التحديث:
+
+   git pull origin main
+
+3) تحقق من وصول الملفات:
+
+   ls docs/PHASE_2_C4_OPERATION_AUTHORIZATION.md
+   ls README_PHASE_2_C4.md
+   ls APPLY_PHASE_2_C4_FIX1.txt
+
+4) اعرض الملفات الفعلية لكلاود:
+
+   sed -n '1,1400p' docs/PHASE_2_C4_OPERATION_AUTHORIZATION.md
+   sed -n '1,180p' README_PHASE_2_C4.md
+
+5) تحقق من العقد المصحح:
+
+   grep -n "authState.status = loading" docs/PHASE_2_C4_OPERATION_AUTHORIZATION.md
+   grep -n "session_error" docs/PHASE_2_C4_OPERATION_AUTHORIZATION.md
+
+6) لا تنفذ كود C4-A ولا تعدل App.tsx قبل اعتماد Fix 1 توثيقيًا.
+
+7) بعد اعتماد كلاود شغّل فحوص المشروع المعتادة، ثم نسّق ملفات التوثيق التي يذكرها Prettier فقط.
