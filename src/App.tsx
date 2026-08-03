@@ -138,9 +138,7 @@ export function AppContent() {
             ) : null}
 
             {step.name === 'grade' ? (
-              <GradeSelection
-                onSelectGrade={(gradeId) => setStep({ name: 'semester', gradeId })}
-              />
+              <GradeSelection onSelectGrade={(gradeId) => setStep({ name: 'semester', gradeId })} />
             ) : null}
 
             {step.name === 'semester' ? (

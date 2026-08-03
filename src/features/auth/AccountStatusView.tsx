@@ -7,10 +7,7 @@ import { typography } from '@design-system/theme/typography';
 import type { SignOutResult } from '@services/auth/auth.types';
 import type { AuthorizationState } from '@services/auth/authorization.types';
 
-type BlockingAuthorizationState = Exclude<
-  AuthorizationState,
-  { readonly status: 'authorized' }
->;
+type BlockingAuthorizationState = Exclude<AuthorizationState, { readonly status: 'authorized' }>;
 
 type AccountStatusState =
   | BlockingAuthorizationState

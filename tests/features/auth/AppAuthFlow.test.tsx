@@ -12,25 +12,39 @@ import { useAuthSession } from '@features/auth/useAuthSession';
 vi.mock('@features/auth/useAuthSession', () => ({ useAuthSession: vi.fn() }));
 
 vi.mock('@features/student/grade-selection/GradeSelection', () => ({
-  GradeSelection: ({ onSelectGrade }: { onSelectGrade: (id: string) => void }) => <button onClick={() => onSelectGrade('grade-10')}>الصف التجريبي</button>,
+  GradeSelection: ({ onSelectGrade }: { onSelectGrade: (id: string) => void }) => (
+    <button onClick={() => onSelectGrade('grade-10')}>الصف التجريبي</button>
+  ),
 }));
 vi.mock('@features/student/semester-selection/SemesterSelection', () => ({
-  SemesterSelection: ({ onSelectSemester }: { onSelectSemester: (id: string) => void }) => <button onClick={() => onSelectSemester('semester-1')}>الفصل التجريبي</button>,
+  SemesterSelection: ({ onSelectSemester }: { onSelectSemester: (id: string) => void }) => (
+    <button onClick={() => onSelectSemester('semester-1')}>الفصل التجريبي</button>
+  ),
 }));
 vi.mock('@features/student/subject-selection/SubjectSelection', () => ({
-  SubjectSelection: ({ onSelectSubject }: { onSelectSubject: (id: string) => void }) => <button onClick={() => onSelectSubject('physics')}>المادة التجريبية</button>,
+  SubjectSelection: ({ onSelectSubject }: { onSelectSubject: (id: string) => void }) => (
+    <button onClick={() => onSelectSubject('physics')}>المادة التجريبية</button>
+  ),
 }));
 vi.mock('@features/student/unit-selection/UnitSelection', () => ({
-  UnitSelection: ({ onSelectUnit }: { onSelectUnit: (id: string) => void }) => <button onClick={() => onSelectUnit('waves')}>الوحدة التجريبية</button>,
+  UnitSelection: ({ onSelectUnit }: { onSelectUnit: (id: string) => void }) => (
+    <button onClick={() => onSelectUnit('waves')}>الوحدة التجريبية</button>
+  ),
 }));
 vi.mock('@features/student/lesson-list/LessonList', () => ({
-  LessonList: ({ onSelectLesson }: { onSelectLesson: (id: string) => void }) => <button onClick={() => onSelectLesson('lesson-3')}>الدرس الثالث</button>,
+  LessonList: ({ onSelectLesson }: { onSelectLesson: (id: string) => void }) => (
+    <button onClick={() => onSelectLesson('lesson-3')}>الدرس الثالث</button>
+  ),
 }));
 vi.mock('@features/student/lesson-view/LessonView', () => ({
   LessonView: ({ lessonId }: { lessonId: string }) => <div>صفحة الدرس {lessonId}</div>,
 }));
-vi.mock('@features/student/review-questions/ReviewQuestionsView', () => ({ ReviewQuestionsView: () => <div>مراجعة</div> }));
-vi.mock('@features/games/matching/MatchingGameView', () => ({ MatchingGameView: () => <div>لعبة</div> }));
+vi.mock('@features/student/review-questions/ReviewQuestionsView', () => ({
+  ReviewQuestionsView: () => <div>مراجعة</div>,
+}));
+vi.mock('@features/games/matching/MatchingGameView', () => ({
+  MatchingGameView: () => <div>لعبة</div>,
+}));
 vi.mock('@features/mastery/MasteryTestView', () => ({ MasteryTestView: () => <div>اختبار</div> }));
 
 const mockedUseAuthSession = vi.mocked(useAuthSession);
@@ -80,10 +94,16 @@ describe('App auth flow', () => {
   });
 
   it('لا يعرض تجربة الطالب أثناء loading_profile', () => {
-    mockedUseAuthSession.mockReturnValue(baseSession({
-      authState: { status: 'authenticated', user: { id: 'u', email: null, emailConfirmedAt: null }, session: { expiresAt: null, user: { id: 'u', email: null, emailConfirmedAt: null } } },
-      authorizationState: { status: 'loading_profile', userId: 'u' },
-    }));
+    mockedUseAuthSession.mockReturnValue(
+      baseSession({
+        authState: {
+          status: 'authenticated',
+          user: { id: 'u', email: null, emailConfirmedAt: null },
+          session: { expiresAt: null, user: { id: 'u', email: null, emailConfirmedAt: null } },
+        },
+        authorizationState: { status: 'loading_profile', userId: 'u' },
+      })
+    );
     render(<AppContent />);
     expect(screen.queryByText('الصف التجريبي')).not.toBeInTheDocument();
   });
@@ -130,8 +150,25 @@ describe('App auth flow', () => {
     session = baseSession({ entryMode: 'sign_in' });
     view.rerender(<AppContent />);
     session = baseSession({
-      authState: { status: 'authenticated', user: { id: 'u', email: 'u@example.com', emailConfirmedAt: null }, session: { expiresAt: null, user: { id: 'u', email: 'u@example.com', emailConfirmedAt: null } } },
-      authorizationState: { status: 'authorized', profile: { id: 'u', displayName: null, role: 'student', status: 'active', createdAt: 'x', updatedAt: 'x' } },
+      authState: {
+        status: 'authenticated',
+        user: { id: 'u', email: 'u@example.com', emailConfirmedAt: null },
+        session: {
+          expiresAt: null,
+          user: { id: 'u', email: 'u@example.com', emailConfirmedAt: null },
+        },
+      },
+      authorizationState: {
+        status: 'authorized',
+        profile: {
+          id: 'u',
+          displayName: null,
+          role: 'student',
+          status: 'active',
+          createdAt: 'x',
+          updatedAt: 'x',
+        },
+      },
     });
     view.rerender(<AppContent />);
     expect(screen.getByText('صفحة الدرس lesson-3')).toBeInTheDocument();
@@ -144,8 +181,25 @@ describe('App auth flow', () => {
     reachLesson();
 
     session = baseSession({
-      authState: { status: 'authenticated', user: { id: 'u', email: 'u@example.com', emailConfirmedAt: null }, session: { expiresAt: null, user: { id: 'u', email: 'u@example.com', emailConfirmedAt: null } } },
-      authorizationState: { status: 'authorized', profile: { id: 'u', displayName: null, role: 'student', status: 'active', createdAt: 'x', updatedAt: 'x' } },
+      authState: {
+        status: 'authenticated',
+        user: { id: 'u', email: 'u@example.com', emailConfirmedAt: null },
+        session: {
+          expiresAt: null,
+          user: { id: 'u', email: 'u@example.com', emailConfirmedAt: null },
+        },
+      },
+      authorizationState: {
+        status: 'authorized',
+        profile: {
+          id: 'u',
+          displayName: null,
+          role: 'student',
+          status: 'active',
+          createdAt: 'x',
+          updatedAt: 'x',
+        },
+      },
     });
     view.rerender(<AppContent />);
     expect(screen.getByText('صفحة الدرس lesson-3')).toBeInTheDocument();
@@ -162,8 +216,22 @@ describe('App auth flow', () => {
     reachLesson();
 
     session = baseSession({
-      authState: { status: 'authenticated', user: { id: 'u', email: null, emailConfirmedAt: null }, session: { expiresAt: null, user: { id: 'u', email: null, emailConfirmedAt: null } } },
-      authorizationState: { status: 'pending', profile: { id: 'u', displayName: null, role: 'student', status: 'pending', createdAt: 'x', updatedAt: 'x' } },
+      authState: {
+        status: 'authenticated',
+        user: { id: 'u', email: null, emailConfirmedAt: null },
+        session: { expiresAt: null, user: { id: 'u', email: null, emailConfirmedAt: null } },
+      },
+      authorizationState: {
+        status: 'pending',
+        profile: {
+          id: 'u',
+          displayName: null,
+          role: 'student',
+          status: 'pending',
+          createdAt: 'x',
+          updatedAt: 'x',
+        },
+      },
     });
     view.rerender(<AppContent />);
     expect(screen.getByText('الحساب في انتظار التفعيل')).toBeInTheDocument();
@@ -174,10 +242,12 @@ describe('App auth flow', () => {
   });
 
   it('يعرض شاشة تأكيد البريد دون إظهار تجربة الطالب', () => {
-    mockedUseAuthSession.mockReturnValue(baseSession({
-      entryMode: 'confirmation_required',
-      confirmationEmail: 'new@example.com',
-    }));
+    mockedUseAuthSession.mockReturnValue(
+      baseSession({
+        entryMode: 'confirmation_required',
+        confirmationEmail: 'new@example.com',
+      })
+    );
     render(<AppContent />);
 
     expect(screen.getByText('راجع بريدك الإلكتروني')).toBeInTheDocument();

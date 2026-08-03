@@ -51,12 +51,19 @@ describe('SignUpForm', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'إنشاء الحساب' }));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('كلمة المرور لا تحقق متطلبات الأمان.');
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'كلمة المرور لا تحقق متطلبات الأمان.'
+    );
   });
 
   it('يعطل الأزرار أثناء الإرسال', async () => {
     let resolve!: (result: SignUpResult) => void;
-    const onSubmit = vi.fn(() => new Promise<SignUpResult>((done) => { resolve = done; }));
+    const onSubmit = vi.fn(
+      () =>
+        new Promise<SignUpResult>((done) => {
+          resolve = done;
+        })
+    );
     render(<SignUpForm onSubmit={onSubmit} onSignIn={vi.fn()} onCancel={vi.fn()} />);
     fill();
 
@@ -72,7 +79,10 @@ describe('SignUpForm', () => {
     render(<SignUpForm onSubmit={vi.fn()} onSignIn={vi.fn()} onCancel={vi.fn()} />);
 
     expect(screen.getByLabelText('كلمة المرور')).toHaveAttribute('autocomplete', 'new-password');
-    expect(screen.getByLabelText('تأكيد كلمة المرور')).toHaveAttribute('autocomplete', 'new-password');
+    expect(screen.getByLabelText('تأكيد كلمة المرور')).toHaveAttribute(
+      'autocomplete',
+      'new-password'
+    );
   });
 
   it('يربط العودة إلى الدخول والإلغاء', () => {

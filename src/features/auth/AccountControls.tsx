@@ -53,9 +53,7 @@ export function AccountControls(props: AccountControlsProps) {
 
   return (
     <div style={{ marginTop: spacing.md }}>
-      <div
-        style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: spacing.sm }}
-      >
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: spacing.sm }}>
         {email ? <span dir="ltr">{email}</span> : null}
         <button
           type="button"
@@ -66,9 +64,7 @@ export function AccountControls(props: AccountControlsProps) {
           {isSigningOut ? 'جارٍ تسجيل الخروج...' : 'تسجيل الخروج'}
         </button>
       </div>
-      <div aria-live="polite">
-        {errorMessage ? <span role="alert">{errorMessage}</span> : null}
-      </div>
+      <div aria-live="polite">{errorMessage ? <span role="alert">{errorMessage}</span> : null}</div>
     </div>
   );
 }

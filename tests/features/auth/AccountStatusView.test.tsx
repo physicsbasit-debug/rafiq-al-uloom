@@ -26,25 +26,45 @@ beforeEach(() => {
 
 describe('AccountStatusView', () => {
   it('يعرض حالة التحميل دون تجربة الطالب أو أزرار تشغيلية', () => {
-    render(<AccountStatusView state={{ status: 'session_loading' }} onRetry={retry} onSignOut={signOut} />);
+    render(
+      <AccountStatusView
+        state={{ status: 'session_loading' }}
+        onRetry={retry}
+        onSignOut={signOut}
+      />
+    );
 
     expect(screen.getByRole('status')).toHaveTextContent('جارٍ تجهيز حسابك');
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
   it('يعرض pending مع إعادة المحاولة وتسجيل الخروج', async () => {
-    render(<AccountStatusView state={{ status: 'pending', profile: profile('pending') }} onRetry={retry} onSignOut={signOut} />);
+    render(
+      <AccountStatusView
+        state={{ status: 'pending', profile: profile('pending') }}
+        onRetry={retry}
+        onSignOut={signOut}
+      />
+    );
 
     fireEvent.click(screen.getByRole('button', { name: 'إعادة المحاولة' }));
 
     await waitFor(() => expect(retry).toHaveBeenCalledTimes(1));
-    await waitFor(() => expect(screen.getByRole('button', { name: 'إعادة المحاولة' })).toBeEnabled());
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'إعادة المحاولة' })).toBeEnabled()
+    );
     fireEvent.click(screen.getByRole('button', { name: 'تسجيل الخروج' }));
     await waitFor(() => expect(signOut).toHaveBeenCalledTimes(1));
   });
 
   it('لا يعرض إعادة المحاولة للحساب الموقوف', () => {
-    render(<AccountStatusView state={{ status: 'suspended', profile: profile('suspended') }} onRetry={retry} onSignOut={signOut} />);
+    render(
+      <AccountStatusView
+        state={{ status: 'suspended', profile: profile('suspended') }}
+        onRetry={retry}
+        onSignOut={signOut}
+      />
+    );
 
     expect(screen.getByText('الحساب موقوف')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'إعادة المحاولة' })).not.toBeInTheDocument();
@@ -52,7 +72,16 @@ describe('AccountStatusView', () => {
   });
 
   it('يعرض رسالة profile_error العامة ويعيد المحاولة مرة واحدة', async () => {
-    render(<AccountStatusView state={{ status: 'profile_error', error: { code: 'network_error', message: 'تعذر الاتصال بخدمة بيانات الحساب حاليًا.' } }} onRetry={retry} onSignOut={signOut} />);
+    render(
+      <AccountStatusView
+        state={{
+          status: 'profile_error',
+          error: { code: 'network_error', message: 'تعذر الاتصال بخدمة بيانات الحساب حاليًا.' },
+        }}
+        onRetry={retry}
+        onSignOut={signOut}
+      />
+    );
 
     expect(screen.getByRole('alert')).toHaveTextContent('تعذر الاتصال بخدمة بيانات الحساب حاليًا.');
     fireEvent.click(screen.getByRole('button', { name: 'إعادة المحاولة' }));

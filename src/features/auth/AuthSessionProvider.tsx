@@ -1,11 +1,4 @@
-import {
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { authService } from '@services/auth/auth.service';
 import type {
@@ -19,11 +12,7 @@ import type {
 import { authorizationService } from '@services/auth/authorization.service';
 import type { AuthorizationState } from '@services/auth/authorization.types';
 
-import {
-  AuthSessionContext,
-  type AuthEntryMode,
-  type AuthSessionServices,
-} from './useAuthSession';
+import { AuthSessionContext, type AuthEntryMode, type AuthSessionServices } from './useAuthSession';
 
 interface AuthSessionProviderProps {
   readonly children: ReactNode;
@@ -78,10 +67,7 @@ export function AuthSessionProvider({
     });
 
     void services.auth.getCurrentSession().then((state) => {
-      if (
-        !active ||
-        authEventVersionRef.current !== initialEventVersion
-      ) {
+      if (!active || authEventVersionRef.current !== initialEventVersion) {
         return;
       }
 

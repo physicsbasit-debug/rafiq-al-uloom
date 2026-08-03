@@ -60,8 +60,7 @@ export function AuthEntryView({ session }: AuthEntryViewProps) {
               lineHeight: typography.lineHeight.lg,
             }}
           >
-            أرسلنا تعليمات تأكيد الحساب إلى البريد المدخل. أكمل التأكيد ثم عد إلى تسجيل
-            الدخول.
+            أرسلنا تعليمات تأكيد الحساب إلى البريد المدخل. أكمل التأكيد ثم عد إلى تسجيل الدخول.
           </p>
           {session.confirmationEmail ? (
             <p dir="ltr" style={{ textAlign: 'left', fontWeight: typography.fontWeight.bold }}>

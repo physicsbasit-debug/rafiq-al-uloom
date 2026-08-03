@@ -18,7 +18,9 @@ function deferred<T>() {
   return { promise, resolve };
 }
 
-function createServices(sessionPromise: AuthService['getCurrentSession'] = async () => ({ status: 'guest' })) {
+function createServices(
+  sessionPromise: AuthService['getCurrentSession'] = async () => ({ status: 'guest' })
+) {
   let authListener: AuthStateChangeListener | undefined;
   let authorizationListener: AuthorizationStateListener | undefined;
   const removeAuth = vi.fn();
@@ -74,12 +76,30 @@ function Consumer() {
       <span data-testid="authorization">{session.authorizationState?.status ?? 'none'}</span>
       <span data-testid="entry">{session.entryMode}</span>
       <span data-testid="confirmation">{session.confirmationEmail ?? 'none'}</span>
-      <button type="button" onClick={session.openSignIn}>open-sign-in</button>
-      <button type="button" onClick={session.openSignUp}>open-sign-up</button>
-      <button type="button" onClick={session.closeAuthEntry}>close-entry</button>
-      <button type="button" onClick={() => void session.signIn({ email: 'a@example.com', password: 'pw' })}>sign-in</button>
-      <button type="button" onClick={() => void session.signUp({ email: 'a@example.com', password: 'pw' })}>sign-up</button>
-      <button type="button" onClick={() => void session.signOut()}>sign-out</button>
+      <button type="button" onClick={session.openSignIn}>
+        open-sign-in
+      </button>
+      <button type="button" onClick={session.openSignUp}>
+        open-sign-up
+      </button>
+      <button type="button" onClick={session.closeAuthEntry}>
+        close-entry
+      </button>
+      <button
+        type="button"
+        onClick={() => void session.signIn({ email: 'a@example.com', password: 'pw' })}
+      >
+        sign-in
+      </button>
+      <button
+        type="button"
+        onClick={() => void session.signUp({ email: 'a@example.com', password: 'pw' })}
+      >
+        sign-up
+      </button>
+      <button type="button" onClick={() => void session.signOut()}>
+        sign-out
+      </button>
     </div>
   );
 }
@@ -101,14 +121,22 @@ describe('AuthSessionProvider', () => {
     const currentSession = deferred<Awaited<ReturnType<AuthService['getCurrentSession']>>>();
     const mock = createServices(() => currentSession.promise);
 
-    render(<AuthSessionProvider services={mock.services}><Consumer /></AuthSessionProvider>);
+    render(
+      <AuthSessionProvider services={mock.services}>
+        <Consumer />
+      </AuthSessionProvider>
+    );
 
     expect(screen.getByTestId('auth')).toHaveTextContent('loading');
   });
 
   it('ينتقل إلى guest عند عدم وجود جلسة', async () => {
     const mock = createServices();
-    render(<AuthSessionProvider services={mock.services}><Consumer /></AuthSessionProvider>);
+    render(
+      <AuthSessionProvider services={mock.services}>
+        <Consumer />
+      </AuthSessionProvider>
+    );
 
     await waitFor(() => expect(screen.getByTestId('auth')).toHaveTextContent('guest'));
   });
@@ -116,7 +144,11 @@ describe('AuthSessionProvider', () => {
   it('يربط initial_session بحالة Authorization دون وميض guest', async () => {
     const currentSession = deferred<Awaited<ReturnType<AuthService['getCurrentSession']>>>();
     const mock = createServices(() => currentSession.promise);
-    render(<AuthSessionProvider services={mock.services}><Consumer /></AuthSessionProvider>);
+    render(
+      <AuthSessionProvider services={mock.services}>
+        <Consumer />
+      </AuthSessionProvider>
+    );
 
     act(() => {
       mock.emitAuthorization({ status: 'loading_profile', userId: 'user-1' });
@@ -130,7 +162,11 @@ describe('AuthSessionProvider', () => {
 
   it('يفتح ويغلق واجهة المصادقة بمعزل عن حالة الجلسة', async () => {
     const mock = createServices();
-    render(<AuthSessionProvider services={mock.services}><Consumer /></AuthSessionProvider>);
+    render(
+      <AuthSessionProvider services={mock.services}>
+        <Consumer />
+      </AuthSessionProvider>
+    );
     await waitFor(() => expect(screen.getByTestId('auth')).toHaveTextContent('guest'));
 
     fireEvent.click(screen.getByRole('button', { name: 'open-sign-in' }));
@@ -147,11 +183,17 @@ describe('AuthSessionProvider', () => {
       status: 'confirmation_required',
       email: 'a@example.com',
     });
-    render(<AuthSessionProvider services={mock.services}><Consumer /></AuthSessionProvider>);
+    render(
+      <AuthSessionProvider services={mock.services}>
+        <Consumer />
+      </AuthSessionProvider>
+    );
 
     fireEvent.click(screen.getByRole('button', { name: 'sign-up' }));
 
-    await waitFor(() => expect(screen.getByTestId('entry')).toHaveTextContent('confirmation_required'));
+    await waitFor(() =>
+      expect(screen.getByTestId('entry')).toHaveTextContent('confirmation_required')
+    );
     expect(screen.getByTestId('confirmation')).toHaveTextContent('a@example.com');
   });
 
@@ -162,7 +204,11 @@ describe('AuthSessionProvider', () => {
       user: authenticatedChange.state.user,
       session: authenticatedChange.state.session,
     });
-    render(<AuthSessionProvider services={mock.services}><Consumer /></AuthSessionProvider>);
+    render(
+      <AuthSessionProvider services={mock.services}>
+        <Consumer />
+      </AuthSessionProvider>
+    );
     fireEvent.click(screen.getByRole('button', { name: 'open-sign-in' }));
 
     fireEvent.click(screen.getByRole('button', { name: 'sign-in' }));
@@ -180,7 +226,11 @@ describe('AuthSessionProvider', () => {
       user: authenticatedChange.state.user,
       session: authenticatedChange.state.session,
     });
-    render(<AuthSessionProvider services={mock.services}><Consumer /></AuthSessionProvider>);
+    render(
+      <AuthSessionProvider services={mock.services}>
+        <Consumer />
+      </AuthSessionProvider>
+    );
 
     fireEvent.click(screen.getByRole('button', { name: 'sign-in' }));
     await waitFor(() => expect(screen.getByTestId('auth')).toHaveTextContent('authenticated'));
@@ -193,13 +243,21 @@ describe('AuthSessionProvider', () => {
 
   it('يمسح التفويض وواجهة Auth عند نجاح تسجيل الخروج', async () => {
     const mock = createServices();
-    render(<AuthSessionProvider services={mock.services}><Consumer /></AuthSessionProvider>);
+    render(
+      <AuthSessionProvider services={mock.services}>
+        <Consumer />
+      </AuthSessionProvider>
+    );
     act(() => {
       mock.emitAuthorization({
         status: 'authorized',
         profile: {
-          id: 'user-1', displayName: null, role: 'student', status: 'active',
-          createdAt: '2026-08-03T00:00:00.000Z', updatedAt: '2026-08-03T00:00:00.000Z',
+          id: 'user-1',
+          displayName: null,
+          role: 'student',
+          status: 'active',
+          createdAt: '2026-08-03T00:00:00.000Z',
+          updatedAt: '2026-08-03T00:00:00.000Z',
         },
       });
       mock.emitAuth(authenticatedChange);
@@ -215,7 +273,11 @@ describe('AuthSessionProvider', () => {
   it('يلغي الاشتراكين عند إزالة Provider', () => {
     const currentSession = deferred<Awaited<ReturnType<AuthService['getCurrentSession']>>>();
     const mock = createServices(() => currentSession.promise);
-    const view = render(<AuthSessionProvider services={mock.services}><Consumer /></AuthSessionProvider>);
+    const view = render(
+      <AuthSessionProvider services={mock.services}>
+        <Consumer />
+      </AuthSessionProvider>
+    );
 
     view.unmount();
 

@@ -160,7 +160,11 @@ export function SignUpForm({ onSubmit, onSignIn, onCancel }: SignUpFormProps) {
           lineHeight: typography.lineHeight.lg,
         }}
       >
-        {errorMessage ? <p role="alert" style={{ margin: 0 }}>{errorMessage}</p> : null}
+        {errorMessage ? (
+          <p role="alert" style={{ margin: 0 }}>
+            {errorMessage}
+          </p>
+        ) : null}
       </div>
 
       <div style={{ display: 'grid', gap: spacing.md }}>
@@ -182,7 +186,12 @@ export function SignUpForm({ onSubmit, onSignIn, onCancel }: SignUpFormProps) {
           {isSubmitting ? 'جارٍ إنشاء الحساب...' : 'إنشاء الحساب'}
         </button>
 
-        <button type="button" onClick={onSignIn} disabled={isSubmitting} style={secondaryButtonStyle}>
+        <button
+          type="button"
+          onClick={onSignIn}
+          disabled={isSubmitting}
+          style={secondaryButtonStyle}
+        >
           لدي حساب بالفعل
         </button>
 

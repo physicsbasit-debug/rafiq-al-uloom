@@ -27,10 +27,13 @@ describe('SignInForm', () => {
   });
 
   it('يرسل البريد وكلمة المرور فقط', async () => {
-    const onSubmit = vi.fn(async () => ({
-      status: 'error',
-      error: { code: 'network_error', message: 'تعذر الاتصال بالخدمة حاليًا.' },
-    } satisfies SignInResult));
+    const onSubmit = vi.fn(
+      async () =>
+        ({
+          status: 'error',
+          error: { code: 'network_error', message: 'تعذر الاتصال بالخدمة حاليًا.' },
+        }) satisfies SignInResult
+    );
     render(<SignInForm onSubmit={onSubmit} onCreateAccount={vi.fn()} onCancel={vi.fn()} />);
     fillForm();
 
@@ -61,7 +64,12 @@ describe('SignInForm', () => {
 
   it('يعطل الإرسال أثناء الطلب ويمنع التكرار', async () => {
     let resolve!: (result: SignInResult) => void;
-    const onSubmit = vi.fn(() => new Promise<SignInResult>((done) => { resolve = done; }));
+    const onSubmit = vi.fn(
+      () =>
+        new Promise<SignInResult>((done) => {
+          resolve = done;
+        })
+    );
     render(<SignInForm onSubmit={onSubmit} onCreateAccount={vi.fn()} onCancel={vi.fn()} />);
     fillForm();
 
@@ -79,7 +87,10 @@ describe('SignInForm', () => {
     render(<SignInForm onSubmit={vi.fn()} onCreateAccount={vi.fn()} onCancel={vi.fn()} />);
 
     expect(screen.getByLabelText('البريد الإلكتروني')).toHaveAttribute('autocomplete', 'email');
-    expect(screen.getByLabelText('كلمة المرور')).toHaveAttribute('autocomplete', 'current-password');
+    expect(screen.getByLabelText('كلمة المرور')).toHaveAttribute(
+      'autocomplete',
+      'current-password'
+    );
     expect(screen.getByLabelText('البريد الإلكتروني')).toHaveAttribute('type', 'email');
   });
 
