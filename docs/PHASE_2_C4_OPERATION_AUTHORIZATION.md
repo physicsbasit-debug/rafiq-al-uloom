@@ -254,11 +254,7 @@ allowed: false
 إذا استدعيت الدالة خطأ بحالة زائر:
 
 ```ts
-authorizeOperation(
-  guestAuthState,
-  null,
-  'access_student_experience'
-)
+authorizeOperation(guestAuthState, null, 'access_student_experience');
 ```
 
 فالنتيجة الملزمة:
@@ -403,8 +399,7 @@ authorization.policy.ts
 
 ```ts
 const authorized =
-  authState.status === 'authenticated' &&
-  authorizationState?.status === 'authorized';
+  authState.status === 'authenticated' && authorizationState?.status === 'authorized';
 ```
 
 يجوز لـApp فحص الحالة لاختيار شاشة `pending` أو `suspended`، لكنه لا يكرر مصفوفة الدور أو قرار العملية.
@@ -427,16 +422,16 @@ suspended
 
 ## 9. مصفوفة العمليات
 
-| الحالة | تجربة الطالب | مساحة المعلم | مساحة المراجع | التأليف | المراجعة |
-| --- | --- | --- | --- | --- | --- |
-| Guest | مسار محلي خارج المحرك | مرفوض | مرفوض | مرفوض | مرفوض |
-| Pending student | مرفوض | مرفوض | مرفوض | مرفوض | مرفوض |
-| Suspended student | مرفوض | مرفوض | مرفوض | مرفوض | مرفوض |
-| Active student | مسموح | مرفوض | مرفوض | مرفوض | مرفوض |
-| Active teacher | مسموح | مسموح | مرفوض | غير متاحة بعد | مرفوض |
-| Active reviewer | مسموح | مرفوض | مسموح | مرفوض | غير متاحة بعد |
-| Session error | مرفوض | مرفوض | مرفوض | مرفوض | مرفوض |
-| Profile error | مرفوض | مرفوض | مرفوض | مرفوض | مرفوض |
+| الحالة            | تجربة الطالب          | مساحة المعلم | مساحة المراجع | التأليف       | المراجعة      |
+| ----------------- | --------------------- | ------------ | ------------- | ------------- | ------------- |
+| Guest             | مسار محلي خارج المحرك | مرفوض        | مرفوض         | مرفوض         | مرفوض         |
+| Pending student   | مرفوض                 | مرفوض        | مرفوض         | مرفوض         | مرفوض         |
+| Suspended student | مرفوض                 | مرفوض        | مرفوض         | مرفوض         | مرفوض         |
+| Active student    | مسموح                 | مرفوض        | مرفوض         | مرفوض         | مرفوض         |
+| Active teacher    | مسموح                 | مسموح        | مرفوض         | غير متاحة بعد | مرفوض         |
+| Active reviewer   | مسموح                 | مرفوض        | مسموح         | مرفوض         | غير متاحة بعد |
+| Session error     | مرفوض                 | مرفوض        | مرفوض         | مرفوض         | مرفوض         |
+| Profile error     | مرفوض                 | مرفوض        | مرفوض         | مرفوض         | مرفوض         |
 
 ### 9.1 أولوية حالة الحساب
 
@@ -794,10 +789,7 @@ ContentRepository
 الواجهة المتوقعة:
 
 ```tsx
-<RequireCapability
-  operation="access_student_experience"
-  fallback={<AccessDeniedView />}
->
+<RequireCapability operation="access_student_experience" fallback={<AccessDeniedView />}>
   <StudentApplication />
 </RequireCapability>
 ```
@@ -836,8 +828,8 @@ authorization.policy.ts
 يجب ألا تظهر داخل مكونات القرار شروط مثل:
 
 ```ts
-profile.role === 'teacher'
-profile.role === 'reviewer'
+profile.role === 'teacher';
+profile.role === 'reviewer';
 ```
 
 لاتخاذ قرار عرض عملية محمية.
@@ -953,15 +945,15 @@ DELETE
 
 يجب أن تبقى النتائج:
 
-| الهوية | المحتوى المعتمد | المسودات |
-| --- | --- | --- |
-| anon | مرفوض | مرفوض |
-| pending | مرفوض | مرفوض |
-| suspended | مرفوض | مرفوض |
-| active student | مسموح | مرفوض |
-| active teacher | مسموح | مرفوض |
-| active reviewer | مسموح | مرفوض |
-| service_role | وفق المسار الإداري الموثوق | وفق المسار الإداري الموثوق |
+| الهوية          | المحتوى المعتمد            | المسودات                   |
+| --------------- | -------------------------- | -------------------------- |
+| anon            | مرفوض                      | مرفوض                      |
+| pending         | مرفوض                      | مرفوض                      |
+| suspended       | مرفوض                      | مرفوض                      |
+| active student  | مسموح                      | مرفوض                      |
+| active teacher  | مسموح                      | مرفوض                      |
+| active reviewer | مسموح                      | مرفوض                      |
+| service_role    | وفق المسار الإداري الموثوق | وفق المسار الإداري الموثوق |
 
 ### 22.4 سلامة البيانات
 
