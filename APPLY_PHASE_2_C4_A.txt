@@ -1,0 +1,60 @@
+Phase 2-C4-A: Central Authorization Policy + React Guards
+
+1) ارفع محتويات الحزمة إلى GitHub فوق المستودع الحالي مع الحفاظ على المسارات.
+
+2) في Codespaces اسحب التحديث:
+
+git pull origin main
+
+3) تحقق من وصول الملفات:
+
+ls src/services/auth/authorization.operations.ts
+ls src/services/auth/authorization.policy.ts
+ls src/features/auth/RequireCapability.tsx
+ls src/features/auth/useAuthorizationDecision.ts
+ls src/App.tsx
+ls tests/auth/authorization.policy.test.ts
+ls tests/features/auth/RequireCapability.test.tsx
+ls tests/features/auth/AppAuthorizationGuard.test.tsx
+ls tests/architecture/no-inline-authorization-logic.test.ts
+ls README_PHASE_2_C4_A.md
+ls APPLY_PHASE_2_C4_A.txt
+
+4) اعرض الملفات الفعلية لكلاود قبل تشغيل الفحوص:
+
+sed -n '1,180p' src/services/auth/authorization.operations.ts
+sed -n '1,320p' src/services/auth/authorization.policy.ts
+sed -n '1,320p' src/features/auth/RequireCapability.tsx
+sed -n '1,180p' src/features/auth/useAuthorizationDecision.ts
+sed -n '1,520p' src/App.tsx
+sed -n '1,520p' tests/auth/authorization.policy.test.ts
+sed -n '1,360p' tests/features/auth/RequireCapability.test.tsx
+sed -n '1,420p' tests/features/auth/AppAuthorizationGuard.test.tsx
+sed -n '1,360p' tests/architecture/no-inline-authorization-logic.test.ts
+
+5) اطلب من كلاود التحقق خصوصًا من:
+
+- ترتيب القرار الثماني داخل authorizeOperation.
+- وجود session_error كسبب مستقل.
+- حذف const authorized وshowStudentExperience من App.tsx.
+- وجود RequireCapability مرة واحدة لمسار المستخدم النشط.
+- بقاء اتحاد Step مطابقًا لنسخة C3.
+- بقاء Guest خارج الحارس في الاستخدام الفعلي.
+- عدم وجود شروط role متناثرة أو Supabase مباشر في الحراس.
+
+6) لا تشغّل الفحوص قبل اعتماد كلاود.
+
+7) بعد الاعتماد شغّل:
+
+npm run build
+npm run lint
+npm run test
+npx prettier --check .
+npm run test:supabase
+git status
+
+8) لا حاجة إلى supabase db reset لأن هذه الدفعة لا تعدّل SQL. إذا كانت قاعدة Supabase المحلية غير عاملة أصلًا، شغّلها وفق المسار المعتاد قبل test:supabase فقط.
+
+9) إذا ذكر Prettier ملفات، نسّق الملفات المذكورة فقط ثم أعد السلسلة كاملة.
+
+10) لا تنفذ commit أو push جديدًا قبل نجاح الفحوص ومراجعة أي فرق ناتج عن التنسيق.

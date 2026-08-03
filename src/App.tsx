@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { type Dispatch, type SetStateAction, useState } from 'react';
 
 import { AppButton } from '@design-system/components/AppButton';
 import { colors } from '@design-system/theme/colors';
@@ -6,6 +6,7 @@ import { AccountControls } from '@features/auth/AccountControls';
 import { AccountStatusView } from '@features/auth/AccountStatusView';
 import { AuthEntryView } from '@features/auth/AuthEntryView';
 import { AuthSessionProvider } from '@features/auth/AuthSessionProvider';
+import { RequireCapability } from '@features/auth/RequireCapability';
 import { useAuthSession } from '@features/auth/useAuthSession';
 import { MatchingGameView } from '@features/games/matching/MatchingGameView';
 import { MasteryTestView } from '@features/mastery/MasteryTestView';
@@ -28,15 +29,116 @@ type Step =
   | { name: 'game'; lessonId: string; unitId: string }
   | { name: 'mastery'; lessonId: string; unitId: string };
 
+interface StudentExperienceProps {
+  readonly step: Step;
+  readonly setStep: Dispatch<SetStateAction<Step>>;
+}
+
+function StudentExperience({ step, setStep }: StudentExperienceProps) {
+  return (
+    <>
+      {step.name !== 'grade' ? (
+        <div style={{ maxWidth: '210px', marginBottom: '1rem' }}>
+          <AppButton
+            label="رجوع للبداية"
+            variant="secondary"
+            onClick={() => setStep({ name: 'grade' })}
+          />
+        </div>
+      ) : null}
+
+      {step.name === 'grade' ? (
+        <GradeSelection
+          onSelectGrade={(gradeId) => setStep({ name: 'semester', gradeId })}
+        />
+      ) : null}
+
+      {step.name === 'semester' ? (
+        <SemesterSelection
+          gradeId={step.gradeId}
+          onSelectSemester={(semesterId) => setStep({ name: 'subject', semesterId })}
+        />
+      ) : null}
+
+      {step.name === 'subject' ? (
+        <SubjectSelection
+          semesterId={step.semesterId}
+          onSelectSubject={(subjectId) =>
+            setStep({ name: 'unit', semesterId: step.semesterId, subjectId })
+          }
+        />
+      ) : null}
+
+      {step.name === 'unit' ? (
+        <UnitSelection
+          semesterId={step.semesterId}
+          subjectId={step.subjectId}
+          onSelectUnit={(unitId) => setStep({ name: 'lessons', unitId })}
+        />
+      ) : null}
+
+      {step.name === 'lessons' ? (
+        <LessonList
+          unitId={step.unitId}
+          onSelectLesson={(lessonId) =>
+            setStep({ name: 'lesson', lessonId, unitId: step.unitId })
+          }
+        />
+      ) : null}
+
+      {step.name === 'lesson' ? (
+        <LessonView
+          lessonId={step.lessonId}
+          onBackToLessons={() => setStep({ name: 'lessons', unitId: step.unitId })}
+          onOpenReviewQuestions={() =>
+            setStep({ name: 'review', lessonId: step.lessonId, unitId: step.unitId })
+          }
+          onOpenMatchingGame={() =>
+            setStep({ name: 'game', lessonId: step.lessonId, unitId: step.unitId })
+          }
+          onOpenMasteryTest={() =>
+            setStep({ name: 'mastery', lessonId: step.lessonId, unitId: step.unitId })
+          }
+        />
+      ) : null}
+
+      {step.name === 'review' ? (
+        <ReviewQuestionsView
+          lessonId={step.lessonId}
+          onBackToLesson={() =>
+            setStep({ name: 'lesson', lessonId: step.lessonId, unitId: step.unitId })
+          }
+        />
+      ) : null}
+
+      {step.name === 'game' ? (
+        <MatchingGameView
+          lessonId={step.lessonId}
+          onBackToLesson={() =>
+            setStep({ name: 'lesson', lessonId: step.lessonId, unitId: step.unitId })
+          }
+        />
+      ) : null}
+
+      {step.name === 'mastery' ? (
+        <MasteryTestView
+          lessonId={step.lessonId}
+          onBackToLesson={() =>
+            setStep({ name: 'lesson', lessonId: step.lessonId, unitId: step.unitId })
+          }
+        />
+      ) : null}
+    </>
+  );
+}
+
 export function AppContent() {
   const [step, setStep] = useState<Step>({ name: 'grade' });
   const session = useAuthSession();
 
   const authenticated = session.authState.status === 'authenticated';
-  const authorized = session.authorizationState?.status === 'authorized';
-  const showStudentExperience =
-    (session.authState.status === 'guest' && session.entryMode === 'closed') ||
-    (authenticated && authorized);
+  const showGuestExperience =
+    session.authState.status === 'guest' && session.entryMode === 'closed';
 
   return (
     <div dir="rtl" style={{ minHeight: '100vh', backgroundColor: colors.background }}>
@@ -52,7 +154,7 @@ export function AppContent() {
           <h1 style={{ margin: 0, fontSize: '1.55rem' }}>رفيق العلوم</h1>
           <p style={{ margin: '0.25rem 0 0', lineHeight: 1.6 }}>اكتشف • تعلّم • أتقن</p>
 
-          {session.authState.status === 'guest' && session.entryMode === 'closed' ? (
+          {showGuestExperience ? (
             <AccountControls
               mode="guest"
               onSignIn={session.openSignIn}
@@ -60,7 +162,7 @@ export function AppContent() {
             />
           ) : null}
 
-          {session.authState.status === 'authenticated' && authorized ? (
+          {authenticated && session.authorizationState?.status === 'authorized' ? (
             <AccountControls
               mode="authenticated"
               email={session.authState.user.email}
@@ -125,98 +227,12 @@ export function AppContent() {
           />
         ) : null}
 
-        {showStudentExperience ? (
-          <>
-            {step.name !== 'grade' ? (
-              <div style={{ maxWidth: '210px', marginBottom: '1rem' }}>
-                <AppButton
-                  label="رجوع للبداية"
-                  variant="secondary"
-                  onClick={() => setStep({ name: 'grade' })}
-                />
-              </div>
-            ) : null}
+        {showGuestExperience ? <StudentExperience step={step} setStep={setStep} /> : null}
 
-            {step.name === 'grade' ? (
-              <GradeSelection onSelectGrade={(gradeId) => setStep({ name: 'semester', gradeId })} />
-            ) : null}
-
-            {step.name === 'semester' ? (
-              <SemesterSelection
-                gradeId={step.gradeId}
-                onSelectSemester={(semesterId) => setStep({ name: 'subject', semesterId })}
-              />
-            ) : null}
-
-            {step.name === 'subject' ? (
-              <SubjectSelection
-                semesterId={step.semesterId}
-                onSelectSubject={(subjectId) =>
-                  setStep({ name: 'unit', semesterId: step.semesterId, subjectId })
-                }
-              />
-            ) : null}
-
-            {step.name === 'unit' ? (
-              <UnitSelection
-                semesterId={step.semesterId}
-                subjectId={step.subjectId}
-                onSelectUnit={(unitId) => setStep({ name: 'lessons', unitId })}
-              />
-            ) : null}
-
-            {step.name === 'lessons' ? (
-              <LessonList
-                unitId={step.unitId}
-                onSelectLesson={(lessonId) =>
-                  setStep({ name: 'lesson', lessonId, unitId: step.unitId })
-                }
-              />
-            ) : null}
-
-            {step.name === 'lesson' ? (
-              <LessonView
-                lessonId={step.lessonId}
-                onBackToLessons={() => setStep({ name: 'lessons', unitId: step.unitId })}
-                onOpenReviewQuestions={() =>
-                  setStep({ name: 'review', lessonId: step.lessonId, unitId: step.unitId })
-                }
-                onOpenMatchingGame={() =>
-                  setStep({ name: 'game', lessonId: step.lessonId, unitId: step.unitId })
-                }
-                onOpenMasteryTest={() =>
-                  setStep({ name: 'mastery', lessonId: step.lessonId, unitId: step.unitId })
-                }
-              />
-            ) : null}
-
-            {step.name === 'review' ? (
-              <ReviewQuestionsView
-                lessonId={step.lessonId}
-                onBackToLesson={() =>
-                  setStep({ name: 'lesson', lessonId: step.lessonId, unitId: step.unitId })
-                }
-              />
-            ) : null}
-
-            {step.name === 'game' ? (
-              <MatchingGameView
-                lessonId={step.lessonId}
-                onBackToLesson={() =>
-                  setStep({ name: 'lesson', lessonId: step.lessonId, unitId: step.unitId })
-                }
-              />
-            ) : null}
-
-            {step.name === 'mastery' ? (
-              <MasteryTestView
-                lessonId={step.lessonId}
-                onBackToLesson={() =>
-                  setStep({ name: 'lesson', lessonId: step.lessonId, unitId: step.unitId })
-                }
-              />
-            ) : null}
-          </>
+        {authenticated && session.authorizationState?.status === 'authorized' ? (
+          <RequireCapability operation="access_student_experience">
+            <StudentExperience step={step} setStep={setStep} />
+          </RequireCapability>
         ) : null}
       </main>
     </div>
