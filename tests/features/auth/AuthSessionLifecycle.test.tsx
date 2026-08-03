@@ -46,10 +46,7 @@ function authenticatedState(
   };
 }
 
-function profile(
-  userId = 'user-1',
-  overrides: Partial<UserProfile> = {}
-): UserProfile {
+function profile(userId = 'user-1', overrides: Partial<UserProfile> = {}): UserProfile {
   return {
     id: userId,
     displayName: null,
@@ -101,10 +98,12 @@ function createAuthController(
   };
 }
 
-function createHarness(options: {
-  readonly getCurrentSession?: AuthService['getCurrentSession'];
-  readonly getUserProfile?: ProfileService['getUserProfile'];
-} = {}) {
+function createHarness(
+  options: {
+    readonly getCurrentSession?: AuthService['getCurrentSession'];
+    readonly getUserProfile?: ProfileService['getUserProfile'];
+  } = {}
+) {
   const authController = createAuthController(options.getCurrentSession);
   const getUserProfile = vi.fn<ProfileService['getUserProfile']>(
     options.getUserProfile ?? (async (userId: string) => success(profile(userId)))
@@ -139,9 +138,7 @@ function Consumer() {
       <span data-testid="auth-status">{session.authState.status}</span>
       <span data-testid="auth-user">{authenticatedUserId}</span>
       <span data-testid="expires-at">{expiresAt}</span>
-      <span data-testid="authorization-status">
-        {session.authorizationState?.status ?? 'none'}
-      </span>
+      <span data-testid="authorization-status">{session.authorizationState?.status ?? 'none'}</span>
       <span data-testid="profile-user">{profileId}</span>
       <button type="button" onClick={() => void session.retrySession()}>
         retry-session
@@ -181,9 +178,7 @@ describe('Auth session lifecycle integration', () => {
     const harness = createHarness({ getCurrentSession });
     renderHarness(harness);
 
-    await waitFor(() =>
-      expect(screen.getByTestId('auth-status')).toHaveTextContent('error')
-    );
+    await waitFor(() => expect(screen.getByTestId('auth-status')).toHaveTextContent('error'));
     fireEvent.click(screen.getByRole('button', { name: 'retry-session' }));
 
     await waitFor(() =>
@@ -205,14 +200,10 @@ describe('Auth session lifecycle integration', () => {
     const harness = createHarness({ getCurrentSession });
     renderHarness(harness);
 
-    await waitFor(() =>
-      expect(screen.getByTestId('auth-status')).toHaveTextContent('error')
-    );
+    await waitFor(() => expect(screen.getByTestId('auth-status')).toHaveTextContent('error'));
     fireEvent.click(screen.getByRole('button', { name: 'retry-session' }));
 
-    await waitFor(() =>
-      expect(screen.getByTestId('auth-status')).toHaveTextContent('guest')
-    );
+    await waitFor(() => expect(screen.getByTestId('auth-status')).toHaveTextContent('guest'));
     expect(screen.getByTestId('authorization-status')).toHaveTextContent('none');
     expect(harness.getUserProfile).not.toHaveBeenCalled();
   });
@@ -226,17 +217,13 @@ describe('Auth session lifecycle integration', () => {
     const harness = createHarness({ getCurrentSession });
     renderHarness(harness);
 
-    await waitFor(() =>
-      expect(screen.getByTestId('auth-status')).toHaveTextContent('error')
-    );
+    await waitFor(() => expect(screen.getByTestId('auth-status')).toHaveTextContent('error'));
     fireEvent.click(screen.getByRole('button', { name: 'retry-session' }));
 
     act(() => {
       harness.emit({ event: 'signed_in', state: authenticatedState('newer-user') });
     });
-    await waitFor(() =>
-      expect(screen.getByTestId('profile-user')).toHaveTextContent('newer-user')
-    );
+    await waitFor(() => expect(screen.getByTestId('profile-user')).toHaveTextContent('newer-user'));
 
     await act(async () => {
       retryResult.resolve(authenticatedState('stale-user'));
@@ -253,47 +240,44 @@ describe('Auth session lifecycle integration', () => {
     'password_recovery',
     'mfa_challenge_verified',
     'unknown',
-  ] as const)(
-    'يحدث Auth عند %s بلا إعادة قراءة Profile',
-    async (event) => {
-      const initialSession = deferred<AuthState>();
-      const harness = createHarness({ getCurrentSession: () => initialSession.promise });
-      renderHarness(harness);
+  ] as const)('يحدث Auth عند %s بلا إعادة قراءة Profile', async (event) => {
+    const initialSession = deferred<AuthState>();
+    const harness = createHarness({ getCurrentSession: () => initialSession.promise });
+    renderHarness(harness);
 
-      act(() => {
-        harness.emit({ event: 'initial_session', state: authenticatedState('user-1') });
-      });
-      await waitFor(() =>
-        expect(screen.getByTestId('authorization-status')).toHaveTextContent('authorized')
-      );
-      harness.getUserProfile.mockClear();
+    act(() => {
+      harness.emit({ event: 'initial_session', state: authenticatedState('user-1') });
+    });
+    await waitFor(() =>
+      expect(screen.getByTestId('authorization-status')).toHaveTextContent('authorized')
+    );
+    harness.getUserProfile.mockClear();
 
-      act(() => {
-        harness.emit({
-          event,
-          state: authenticatedState('user-1', {
-            session: {
-              expiresAt: 1785722400,
-              user: {
-                id: 'user-1',
-                email: 'updated@example.com',
-                emailConfirmedAt: '2026-08-03T00:00:00.000Z',
-              },
-            },
+    act(() => {
+      harness.emit({
+        event,
+        state: authenticatedState('user-1', {
+          session: {
+            expiresAt: 1785722400,
             user: {
               id: 'user-1',
               email: 'updated@example.com',
               emailConfirmedAt: '2026-08-03T00:00:00.000Z',
             },
-          }),
-        });
+          },
+          user: {
+            id: 'user-1',
+            email: 'updated@example.com',
+            emailConfirmedAt: '2026-08-03T00:00:00.000Z',
+          },
+        }),
       });
+    });
 
-      expect(screen.getByTestId('expires-at')).toHaveTextContent('1785722400');
-      expect(screen.getByTestId('authorization-status')).toHaveTextContent('authorized');
-      expect(harness.getUserProfile).not.toHaveBeenCalled();
-    }
-  );
+    expect(screen.getByTestId('expires-at')).toHaveTextContent('1785722400');
+    expect(screen.getByTestId('authorization-status')).toHaveTextContent('authorized');
+    expect(harness.getUserProfile).not.toHaveBeenCalled();
+  });
 
   it('يعكس refreshAuthorization الصريح تغير الحالة الإدارية إلى suspended', async () => {
     const initialSession = deferred<AuthState>();
@@ -410,9 +394,7 @@ describe('Auth session lifecycle integration', () => {
       harness.emit({ event: 'signed_in', state: authenticatedState('user-a') });
       harness.emit({ event: 'signed_in', state: authenticatedState('user-b') });
     });
-    await waitFor(() =>
-      expect(screen.getByTestId('profile-user')).toHaveTextContent('user-b')
-    );
+    await waitFor(() => expect(screen.getByTestId('profile-user')).toHaveTextContent('user-b'));
 
     await act(async () => {
       firstProfile.resolve(success(profile('user-a')));
