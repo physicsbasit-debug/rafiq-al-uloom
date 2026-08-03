@@ -1,0 +1,56 @@
+Phase 2-C3: Login / Logout / Session UI
+
+1) ارفع محتويات الحزمة إلى GitHub فوق المستودع الحالي مع الحفاظ على المسارات.
+
+2) في Codespaces اسحب التحديث:
+
+git pull origin main
+
+3) تحقق من وصول الملفات:
+
+ls src/features/auth/AuthSessionProvider.tsx
+ls src/features/auth/useAuthSession.ts
+ls src/features/auth/AuthEntryView.tsx
+ls src/features/auth/SignInForm.tsx
+ls src/features/auth/SignUpForm.tsx
+ls src/features/auth/AccountStatusView.tsx
+ls src/features/auth/AccountControls.tsx
+ls src/App.tsx
+ls tests/features/auth/AuthSessionProvider.test.tsx
+ls tests/features/auth/SignInForm.test.tsx
+ls tests/features/auth/SignUpForm.test.tsx
+ls tests/features/auth/AccountStatusView.test.tsx
+ls tests/features/auth/AppAuthFlow.test.tsx
+ls README_PHASE_2_C3.md
+ls APPLY_PHASE_2_C3.txt
+
+4) اعرض الملفات الفعلية لكلاود قبل تشغيل الفحوص:
+
+sed -n '1,360p' src/features/auth/AuthSessionProvider.tsx
+sed -n '1,220p' src/features/auth/useAuthSession.ts
+sed -n '1,300p' src/features/auth/AuthEntryView.tsx
+sed -n '1,360p' src/features/auth/SignInForm.tsx
+sed -n '1,400p' src/features/auth/SignUpForm.tsx
+sed -n '1,340p' src/features/auth/AccountStatusView.tsx
+sed -n '1,280p' src/features/auth/AccountControls.tsx
+sed -n '1,420p' src/App.tsx
+sed -n '1,520p' tests/features/auth/AuthSessionProvider.test.tsx
+sed -n '1,360p' tests/features/auth/SignInForm.test.tsx
+sed -n '1,380p' tests/features/auth/SignUpForm.test.tsx
+sed -n '1,360p' tests/features/auth/AccountStatusView.test.tsx
+sed -n '1,520p' tests/features/auth/AppAuthFlow.test.tsx
+
+5) لا تشغّل الفحوص قبل اعتماد كلاود.
+
+6) بعد الاعتماد شغّل:
+
+npm run build
+npm run lint
+npm run test
+npx prettier --check .
+npm run test:supabase
+git status
+
+7) إذا ذكر Prettier ملفات، نسّق الملفات المذكورة فقط، ثم أعد السلسلة كاملة.
+
+8) لا تنفذ commit أو push جديدًا قبل نجاح الفحوص ومراجعة أي فرق ناتج عن التنسيق.
