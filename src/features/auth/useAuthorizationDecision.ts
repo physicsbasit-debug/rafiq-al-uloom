@@ -6,9 +6,7 @@ import {
 
 import { useAuthSession } from './useAuthSession';
 
-export function useAuthorizationDecision(
-  operation: AuthorizationOperation
-): AuthorizationDecision {
+export function useAuthorizationDecision(operation: AuthorizationOperation): AuthorizationDecision {
   const { authState, authorizationState } = useAuthSession();
 
   return authorizeOperation(authState, authorizationState, operation);

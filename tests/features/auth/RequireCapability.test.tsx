@@ -52,10 +52,7 @@ describe('RequireCapability', () => {
     });
 
     render(
-      <RequireCapability
-        operation="access_student_experience"
-        fallback={<div>واجهة بديلة</div>}
-      >
+      <RequireCapability operation="access_student_experience" fallback={<div>واجهة بديلة</div>}>
         <div>المحتوى</div>
       </RequireCapability>
     );
@@ -158,9 +155,7 @@ describe('RequireCapability', () => {
       </RequireCapability>
     );
 
-    expect(mockedUseAuthorizationDecision).toHaveBeenCalledWith(
-      'access_reviewer_workspace'
-    );
+    expect(mockedUseAuthorizationDecision).toHaveBeenCalledWith('access_reviewer_workspace');
   });
 
   it('يرفض Guest دفاعيًا إذا وصل إلى الحارس', () => {

@@ -71,7 +71,6 @@ function baseSession(overrides: Partial<AuthSessionContextValue> = {}): AuthSess
   };
 }
 
-
 function userProfile(role: UserRole, status: 'active' | 'pending' | 'suspended' = 'active') {
   return {
     id: `user-${role}`,
@@ -227,7 +226,9 @@ describe('App authorization guard', () => {
 
     expect(source).not.toMatch(/const\s+authorized\s*=/);
     expect(source).not.toMatch(/showStudentExperience/);
-    expect(source.match(/<RequireCapability\s+operation="access_student_experience">/g)).toHaveLength(1);
+    expect(
+      source.match(/<RequireCapability\s+operation="access_student_experience">/g)
+    ).toHaveLength(1);
   });
 
   it('يبقي مسار Guest خارج RequireCapability في المصدر الفعلي', () => {

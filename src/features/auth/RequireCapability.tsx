@@ -15,10 +15,7 @@ interface RequireCapabilityProps {
   readonly fallback?: ReactNode;
 }
 
-const REJECTION_MESSAGES: Record<
-  Exclude<AuthorizationDecisionReason, 'allowed'>,
-  string
-> = {
+const REJECTION_MESSAGES: Record<Exclude<AuthorizationDecisionReason, 'allowed'>, string> = {
   guest: 'هذه العملية تتطلب حسابًا نشطًا.',
   profile_loading: 'جارٍ التحقق من صلاحيات الحساب.',
   session_error: 'تعذر التحقق من جلسة الحساب.',
@@ -47,18 +44,12 @@ function DefaultAuthorizationFallback({
       }}
     >
       <h2 style={{ margin: '0 0 0.5rem', fontSize: '1.1rem' }}>تعذر فتح هذه المساحة</h2>
-      <p style={{ margin: 0, lineHeight: 1.7 }}>
-        {REJECTION_MESSAGES[decision.reason]}
-      </p>
+      <p style={{ margin: 0, lineHeight: 1.7 }}>{REJECTION_MESSAGES[decision.reason]}</p>
     </section>
   );
 }
 
-export function RequireCapability({
-  operation,
-  children,
-  fallback,
-}: RequireCapabilityProps) {
+export function RequireCapability({ operation, children, fallback }: RequireCapabilityProps) {
   const decision = useAuthorizationDecision(operation);
 
   if (!decision.allowed) {

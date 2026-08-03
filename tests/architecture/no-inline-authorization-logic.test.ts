@@ -29,9 +29,7 @@ function collectTypeScriptFiles(directory: string): string[] {
 }
 
 function stringLiteralValue(node: ts.Expression): string | null {
-  return ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)
-    ? node.text
-    : null;
+  return ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node) ? node.text : null;
 }
 
 function isRoleAccess(node: ts.Expression): boolean {
@@ -93,9 +91,7 @@ describe('architecture: centralized authorization decisions', () => {
     ];
 
     const violations = files.flatMap((filePath) =>
-      findInlineRoleDecisions(filePath).map(
-        (line) => `${relative(root, filePath)}:${line}`
-      )
+      findInlineRoleDecisions(filePath).map((line) => `${relative(root, filePath)}:${line}`)
     );
 
     expect(violations).toEqual([]);

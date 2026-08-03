@@ -58,9 +58,10 @@ function decide(
 
 describe('authorizeOperation', () => {
   it('يرفض Auth loading بسبب profile_loading', () => {
-    expect(
-      authorizeOperation({ status: 'loading' }, null, 'access_student_experience')
-    ).toEqual({ allowed: false, reason: 'profile_loading' });
+    expect(authorizeOperation({ status: 'loading' }, null, 'access_student_experience')).toEqual({
+      allowed: false,
+      reason: 'profile_loading',
+    });
   });
 
   it('يرفض Auth error بسبب session_error', () => {
@@ -90,9 +91,10 @@ describe('authorizeOperation', () => {
   });
 
   it('يرفض Guest دفاعيًا', () => {
-    expect(
-      authorizeOperation({ status: 'guest' }, null, 'access_student_experience')
-    ).toEqual({ allowed: false, reason: 'guest' });
+    expect(authorizeOperation({ status: 'guest' }, null, 'access_student_experience')).toEqual({
+      allowed: false,
+      reason: 'guest',
+    });
   });
 
   it('يرفض المستخدم المصادق عند غياب AuthorizationState', () => {

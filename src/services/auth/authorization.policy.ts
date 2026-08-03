@@ -28,9 +28,7 @@ const ALLOWED: AuthorizationDecision = {
   reason: 'allowed',
 };
 
-function denied(
-  reason: Exclude<AuthorizationDecisionReason, 'allowed'>
-): AuthorizationDecision {
+function denied(reason: Exclude<AuthorizationDecisionReason, 'allowed'>): AuthorizationDecision {
   return {
     allowed: false,
     reason,
