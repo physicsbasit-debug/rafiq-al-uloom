@@ -1,0 +1,74 @@
+Phase 2-C4-B: Direct PostgREST Authorization Bypass Tests
+
+1) ارفع محتويات الحزمة إلى GitHub فوق المستودع الحالي مع الحفاظ على المسارات.
+
+2) في Codespaces اسحب التحديث:
+
+git pull origin main
+
+3) تحقق من وصول الملفات:
+
+ls tests/integration/supabase-authorization-bypass.integration.ts
+ls tests/integration/supabase-profiles-authorization.integration.ts
+ls README_PHASE_2_C4_B.md
+ls APPLY_PHASE_2_C4_B.txt
+
+4) اعرض الملفات الفعلية لكلاود قبل تشغيل الفحوص:
+
+sed -n '1,420p' tests/integration/supabase-authorization-bypass.integration.ts
+sed -n '280,390p' tests/integration/supabase-profiles-authorization.integration.ts
+sed -n '1,320p' README_PHASE_2_C4_B.md
+
+5) اطلب من كلاود التحقق خصوصًا من:
+
+- أن الاختبارات تتجاوز React وauthorizeOperation بالكامل.
+- استخدام جلسة مستقلة حقيقية لكل هوية.
+- الفصل بين 42501 الناتج عن غياب GRANT وبين الصفوف الفارغة الناتجة عن RLS.
+- أن حمولة INSERT كاملة وصحيحة وبلا .select() أو RETURNING.
+- التحقق الإداري من عدم تغير البيانات بعد كل كتابة مرفوضة.
+- رفض student وteacher وreviewer لعمليات INSERT وUPDATE وDELETE.
+- رفض reviewer لتغيير status إلى approved.
+- رفض تعديل display_name وrole وstatus لكل دور نشط.
+- توسيع اختبار approved القائم إلى student وteacher وreviewer دون إنشاء اختبار حالة موازٍ.
+- عدم تعديل أي Migration أو ملف داخل src/.
+
+6) لا تشغّل الفحوص قبل اعتماد كلاود للملفات الفعلية.
+
+7) بعد الاعتماد، أعد قاعدة Supabase إلى خط أساس نظيف:
+
+npx supabase db reset
+
+8) شغّل اختبارات التكامل أولًا:
+
+npm run test:supabase
+
+المتوقع:
+
+50 passed
+0 failed
+
+9) شغّل بقية الفحوص:
+
+npm run build
+npm run lint
+npm run test
+npx prettier --check .
+git status
+
+المتوقع:
+
+431 basic tests passed
+50 integration tests passed
+All matched files use Prettier code style!
+
+10) إذا ذكر Prettier ملفات، نسّق الملفات المذكورة فقط ثم أعد السلسلة كاملة.
+
+11) بعد نجاح الفحوص، ثبّت أي تعديلات تنسيق محلية برسالة واضحة، ثم نفذ:
+
+git push origin main
+git status
+git log --oneline -5
+
+المطلوب:
+
+nothing to commit, working tree clean

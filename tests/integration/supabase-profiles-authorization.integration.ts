@@ -305,7 +305,7 @@ describeIntegration('Phase 2-C2-A profiles and authorization RLS', () => {
     }
   });
 
-  it('allows active users to read approved lesson content and restores seed state', async () => {
+  it('allows every active role to read approved lesson content and restores seed state', async () => {
     const lessonId = 'g10-phy-waves-l1';
 
     psqlAdmin(`
@@ -316,35 +316,40 @@ describeIntegration('Phase 2-C2-A profiles and authorization RLS', () => {
     `);
 
     try {
-      const lesson = await activeStudent.client.from('lessons').select('id').eq('id', lessonId);
-      const objectives = await activeStudent.client
-        .from('objectives')
-        .select('id')
-        .eq('lesson_id', lessonId);
-      const questions = await activeStudent.client
-        .from('questions')
-        .select('id')
-        .eq('lesson_id', lessonId);
-      const games = await activeStudent.client.from('games').select('id').eq('lesson_id', lessonId);
-      const experiments = await activeStudent.client
-        .from('experiments')
-        .select('id')
-        .eq('lesson_id', lessonId);
-      const gameObjectives = await activeStudent.client
-        .from('game_objectives')
-        .select('game_id, objective_id')
-        .eq('game_id', 'l1-game');
-      const pendingLesson = await pendingStudent.client
-        .from('lessons')
-        .select('id')
-        .eq('id', lessonId);
+      for (const identity of [activeStudent, activeTeacher, activeReviewer]) {
+        const lesson = await identity.client.from('lessons').select('id').eq('id', lessonId);
+        const objectives = await identity.client
+          .from('objectives')
+          .select('id')
+          .eq('lesson_id', lessonId);
+        const questions = await identity.client
+          .from('questions')
+          .select('id')
+          .eq('lesson_id', lessonId);
+        const games = await identity.client
+          .from('games')
+          .select('id')
+          .eq('lesson_id', lessonId);
+        const experiments = await identity.client
+          .from('experiments')
+          .select('id')
+          .eq('lesson_id', lessonId);
+        const gameObjectives = await identity.client
+          .from('game_objectives')
+          .select('game_id, objective_id')
+          .eq('game_id', 'l1-game');
 
-      for (const result of [lesson, objectives, questions, games, experiments, gameObjectives]) {
-        expect(result.error).toBeNull();
-        expect(result.data?.length).toBeGreaterThan(0);
+        for (const result of [lesson, objectives, questions, games, experiments, gameObjectives]) {
+          expect(result.error).toBeNull();
+          expect(result.data?.length).toBeGreaterThan(0);
+        }
       }
-      expect(pendingLesson.error).toBeNull();
-      expect(pendingLesson.data).toEqual([]);
+
+      for (const identity of [pendingStudent, suspendedStudent]) {
+        const lesson = await identity.client.from('lessons').select('id').eq('id', lessonId);
+        expect(lesson.error).toBeNull();
+        expect(lesson.data).toEqual([]);
+      }
     } finally {
       psqlAdmin(`
         UPDATE public.lessons SET status = 'draft' WHERE id = '${lessonId}';
