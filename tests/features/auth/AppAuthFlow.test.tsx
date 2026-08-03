@@ -2,6 +2,7 @@
 
 import { fireEvent, render, screen } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AppContent } from '../../../src/App';
@@ -185,7 +186,7 @@ describe('App auth flow', () => {
   });
 
   it('لا يضيف حالات Auth إلى آلة Step التعليمية', async () => {
-    const source = readFileSync(new URL('../../../src/App.tsx', import.meta.url), 'utf8');
+    const source = readFileSync(resolve(process.cwd(), 'src/App.tsx'), 'utf8');
     expect(source).not.toMatch(/name:\s*['"]sign_in['"]/);
     expect(source).not.toMatch(/name:\s*['"]pending['"]/);
     expect(source).not.toMatch(/name:\s*['"]suspended['"]/);
