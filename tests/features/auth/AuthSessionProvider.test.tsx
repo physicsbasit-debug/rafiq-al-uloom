@@ -46,6 +46,7 @@ function createServices(
 
   const authorization: AuthorizationService = {
     getCurrentState: vi.fn(() => null),
+    ensureAuthorizationForUser: vi.fn(async () => undefined),
     refreshAuthorization: vi.fn(async () => undefined),
     onAuthorizationStateChange: vi.fn((listener: AuthorizationStateListener) => {
       authorizationListener = listener;

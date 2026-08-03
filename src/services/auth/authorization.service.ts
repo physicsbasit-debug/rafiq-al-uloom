@@ -11,6 +11,7 @@ import { profileService, type ProfileService } from './profile.service';
 
 export interface AuthorizationService {
   getCurrentState(): AuthorizationState | null;
+  ensureAuthorizationForUser(userId: string): Promise<void>;
   refreshAuthorization(): Promise<void>;
   onAuthorizationStateChange(listener: AuthorizationStateListener): () => void;
 }
@@ -51,6 +52,7 @@ export function createAuthorizationService(
   let currentUserId: string | null = null;
   let removeAuthListener: (() => void) | undefined;
   let activeController: AbortController | undefined;
+  let activeLoad: { readonly userId: string; readonly promise: Promise<void> } | undefined;
   let requestGeneration = 0;
 
   function notify(state: AuthorizationState | null): void {
@@ -64,6 +66,7 @@ export function createAuthorizationService(
     requestGeneration += 1;
     activeController?.abort();
     activeController = undefined;
+    activeLoad = undefined;
   }
 
   function clearAuthorization(): void {
@@ -130,7 +133,27 @@ export function createAuthorizationService(
       }
     })();
 
+    activeLoad = { userId, promise: load };
     await load;
+
+    if (activeLoad?.promise === load) {
+      activeLoad = undefined;
+    }
+  }
+
+  async function ensureAuthorizationForUser(userId: string): Promise<void> {
+    if (currentUserId === userId) {
+      if (currentState?.status === 'loading_profile' && activeLoad?.userId === userId) {
+        await activeLoad.promise;
+        return;
+      }
+
+      if (hasLoadedProfileFor(userId)) {
+        return;
+      }
+    }
+
+    await loadProfile(userId);
   }
 
   function handleAuthStateChange(change: AuthStateChange): void {
@@ -148,19 +171,8 @@ export function createAuthorizationService(
 
     const userId = change.state.user.id;
 
-    if (change.event === 'initial_session') {
-      void loadProfile(userId);
-      return;
-    }
-
-    if (change.event === 'signed_in') {
-      if (currentState?.status === 'loading_profile' && currentUserId === userId) {
-        return;
-      }
-
-      if (!hasLoadedProfileFor(userId) || currentState?.status === 'profile_error') {
-        void loadProfile(userId);
-      }
+    if (change.event === 'initial_session' || change.event === 'signed_in') {
+      void ensureAuthorizationForUser(userId);
     }
   }
 
@@ -176,6 +188,8 @@ export function createAuthorizationService(
     getCurrentState(): AuthorizationState | null {
       return currentState;
     },
+
+    ensureAuthorizationForUser,
 
     async refreshAuthorization(): Promise<void> {
       if (!currentUserId) {
@@ -217,6 +231,8 @@ function getDefaultAuthorizationService(): AuthorizationService {
 
 export const authorizationService: AuthorizationService = {
   getCurrentState: () => getDefaultAuthorizationService().getCurrentState(),
+  ensureAuthorizationForUser: (userId) =>
+    getDefaultAuthorizationService().ensureAuthorizationForUser(userId),
   refreshAuthorization: () => getDefaultAuthorizationService().refreshAuthorization(),
   onAuthorizationStateChange: (listener) =>
     getDefaultAuthorizationService().onAuthorizationStateChange(listener),

@@ -1,0 +1,52 @@
+Phase 2-C5-A: Auth Lifecycle Integration Hardening
+
+1. ارفع محتويات ZIP إلى جذر المستودع مع الحفاظ على المسارات.
+
+2. في Codespaces:
+
+git pull origin main
+
+3. تحقق من الملفات:
+
+ls src/services/auth/authorization.service.ts
+ls src/features/auth/AuthSessionProvider.tsx
+ls tests/auth/authorization.service.test.ts
+ls tests/features/auth/AuthSessionProvider.test.tsx
+ls tests/features/auth/AuthSessionLifecycle.test.tsx
+ls README_PHASE_2_C5_A.md
+ls APPLY_PHASE_2_C5_A.txt
+
+4. اعرض الكود الفعلي لكلاود قبل التشغيل:
+
+sed -n '1,320p' src/services/auth/authorization.service.ts
+sed -n '140,220p' src/features/auth/AuthSessionProvider.tsx
+sed -n '280,380p' tests/auth/authorization.service.test.ts
+sed -n '1,520p' tests/features/auth/AuthSessionLifecycle.test.tsx
+sed -n '1,260p' README_PHASE_2_C5_A.md
+
+5. نقاط المراجعة الحرجة:
+
+- ensureAuthorizationForUser تستقبل userId صراحة.
+- retrySession تستخدم ensureAuthorizationForUser(state.user.id).
+- initial_session وsigned_in يستخدمان المزامنة الموحدة.
+- token_refreshed/user_updated/password_recovery/mfa/unknown لا تعيد Profile.
+- refreshAuthorization تبقى إعادة قراءة صريحة وقسرية.
+- لا تعديل على App.tsx أو authorization.policy.ts أو Supabase.
+
+6. بعد اعتماد كلاود شغّل:
+
+npm run build
+npm run lint
+npm run test
+npx prettier --check .
+npm run test:supabase
+git status
+
+المتوقع:
+
+39 test files passed
+447 basic tests passed
+50 Supabase integration tests passed
+All matched files use Prettier code style!
+
+لا حاجة إلى db reset لأن C5-A لا تحتوي SQL جديدة، لكن تشغيل test:supabase يبقى مطلوبًا لمنع الانحدار.

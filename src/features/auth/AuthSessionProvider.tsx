@@ -182,7 +182,7 @@ export function AuthSessionProvider({
     }
 
     setAuthState(state);
-    await services.authorization.refreshAuthorization();
+    await services.authorization.ensureAuthorizationForUser(state.user.id);
   }, [services]);
 
   const value = useMemo(

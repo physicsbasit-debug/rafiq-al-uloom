@@ -299,6 +299,45 @@ describe('Authorization service', () => {
     expect(profiles.getUserProfile).toHaveBeenCalledTimes(2);
   });
 
+  it('يحمّل Profile صراحة لهوية مستعادة قبل وصول أي Auth event', async () => {
+    const auth = createAuthMock();
+    const profiles = createProfileMock(async (userId) =>
+      success(profile('active', { id: userId }))
+    );
+    const service = createAuthorizationService(auth.auth, profiles.profiles);
+    service.onAuthorizationStateChange(vi.fn());
+
+    await service.ensureAuthorizationForUser('recovered-user');
+
+    expect(profiles.getUserProfile).toHaveBeenCalledWith(
+      'recovered-user',
+      expect.objectContaining({ signal: expect.any(AbortSignal) })
+    );
+    expect(service.getCurrentState()).toMatchObject({
+      status: 'authorized',
+      profile: { id: 'recovered-user' },
+    });
+  });
+
+  it('لا يكرر طلب Profile إذا وصل signed_in أثناء مزامنة الهوية نفسها', async () => {
+    const auth = createAuthMock();
+    const pending = deferred<ProfileReadResult>();
+    const profiles = createProfileMock(async () => pending.promise);
+    const service = createAuthorizationService(auth.auth, profiles.profiles);
+    service.onAuthorizationStateChange(vi.fn());
+
+    const synchronization = service.ensureAuthorizationForUser('user-1');
+    auth.emit(authenticatedChange('signed_in', 'user-1'));
+
+    expect(profiles.getUserProfile).toHaveBeenCalledTimes(1);
+
+    pending.resolve(success(profile()));
+    await synchronization;
+    await waitForState(service, 'authorized');
+
+    expect(profiles.getUserProfile).toHaveBeenCalledTimes(1);
+  });
+
   it('لا ينفذ refreshAuthorization قبل معرفة مستخدم مصادق عليه', async () => {
     const auth = createAuthMock();
     const profiles = createProfileMock();
