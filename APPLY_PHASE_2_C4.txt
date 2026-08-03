@@ -1,0 +1,47 @@
+Phase 2-C4-0 Documentation
+==========================
+
+هذه حزمة changed-files-only للتوثيق فقط.
+
+الترتيب المعتمد:
+
+1) ارفع محتويات ZIP إلى جذر مستودع GitHub مع الحفاظ على المسارات.
+
+2) في Codespaces اسحب التحديث:
+
+   git pull origin main
+
+3) تحقق من وصول الملفات:
+
+   ls docs/PHASE_2_C4_OPERATION_AUTHORIZATION.md
+   ls docs/PHASES.md
+   ls README_PHASE_2_C4.md
+   ls APPLY_PHASE_2_C4.txt
+
+4) اعرض الملفات الفعلية لكلاود:
+
+   sed -n '1,900p' docs/PHASE_2_C4_OPERATION_AUTHORIZATION.md
+   sed -n '1,320p' docs/PHASES.md
+   sed -n '1,240p' README_PHASE_2_C4.md
+
+5) لا تنفذ كود C4-A ولا تعدل App.tsx ولا تضف Migration قبل اعتماد الوثيقة.
+
+6) بعد اعتماد كلاود شغّل:
+
+   npm run build
+   npm run lint
+   npm run test
+   npx prettier --check .
+   npm run test:supabase
+   git status
+
+7) إذا طلب Prettier تنسيق ملفات الوثيقة، استخدم --write فقط على الملفات التي ذكرها، ثم أعد الفحوص.
+
+8) ثبّت أي تعديل تنسيقي محلي فقط بعد نجاح جميع الفحوص.
+
+النتيجة المطلوبة قبل بدء C4-A:
+
+- وثيقة C4-0 معتمدة.
+- Phase 2-C2 وC3 مسجلتان كمكتملتين في PHASES.md.
+- C4 مسجلة كقيد التوثيق.
+- Git working tree clean.
