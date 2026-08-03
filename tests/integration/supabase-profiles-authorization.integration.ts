@@ -326,10 +326,7 @@ describeIntegration('Phase 2-C2-A profiles and authorization RLS', () => {
           .from('questions')
           .select('id')
           .eq('lesson_id', lessonId);
-        const games = await identity.client
-          .from('games')
-          .select('id')
-          .eq('lesson_id', lessonId);
+        const games = await identity.client.from('games').select('id').eq('lesson_id', lessonId);
         const experiments = await identity.client
           .from('experiments')
           .select('id')

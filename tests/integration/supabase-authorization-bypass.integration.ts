@@ -158,10 +158,7 @@ describeIntegration('Phase 2-C4-B direct PostgREST authorization bypass', () => 
 
         expectTablePermissionDenied(error, 'lessons');
 
-        const after = await fixtures.adminClient
-          .from('lessons')
-          .select('id')
-          .eq('id', insertedId);
+        const after = await fixtures.adminClient.from('lessons').select('id').eq('id', insertedId);
         expect(after.error).toBeNull();
         expect(after.data).toEqual([]);
       } finally {
