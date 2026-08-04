@@ -18,7 +18,7 @@
 | اختيار المزوّد    | `getContentRepository()` مركزي وكسول                                                       |
 | الافتراضي         | `VITE_CONTENT_PROVIDER` غائب أو `local` ⇒ المزوّد المحلي                                   |
 | Supabase          | Schema + RLS + Seed + عميل + Repository + تكافؤ محلي مكتملة                                |
-| Auth والصلاحيات   | Phase 2-C، غير منفذة بعد                                                                   |
+| Auth والصلاحيات   | Supabase Auth + Profiles + Authorization Policy + React Guards + RLS، مكتملة حتى C5-B      |
 | Cloud Persistence | Phase 2-D، وتشمل `mastery_results` في الحد الأدنى                                          |
 | لوحة المعلم       | Phase 3                                                                                    |
 | AI                | Phase 4                                                                                    |
@@ -79,6 +79,47 @@ Supabase Data API / PostgreSQL
 - `scripts/generate-supabase-seed.ts` يولد `supabase/seed.sql` حتميًا.
 - `npx supabase db reset` هو مسار إعادة البناء المعتمد.
 - `scripts/verify-supabase-local.sh` يتحقق من GRANT + RLS + Data API + أعداد البيانات.
+
+## المصادقة والتفويض
+
+المسار التشغيلي المعتمد:
+
+```text
+Supabase Auth
+→ auth.service
+→ AuthSessionProvider
+→ authorization.service
+→ profile.service
+→ authorization.policy
+→ RequireCapability
+→ App.tsx
+→ GRANT / REVOKE + RLS
+```
+
+### الحدود والمسؤوليات
+
+- Supabase Auth يثبت الهوية والجلسة فقط، ولا يقرر الدور التطبيقي.
+- `public.profiles` هو مصدر `role` و`status`.
+- `authorization.service` يقرأ Profile ويحوّلها إلى `AuthorizationState`.
+- `authorization.policy.ts` هو مصدر قرار العمليات المحمية في الواجهة.
+- `RequireCapability` طبقة UX دفاعية، وليس حاجز الأمان النهائي.
+- GRANT وRLS هما الحماية الفعلية عند تجاوز React وPostgREST مباشرة.
+- وضع الزائر المحلي يبقى خارج محرك الصلاحيات.
+- `retrySession()` يستعيد الجلسة ثم يستدعي `ensureAuthorizationForUser(userId)` صراحةً.
+- `token_refreshed` و`user_updated` وبقية أحداث الجلسة المهيأة لا تعيد قراءة Profile تلقائيًا.
+- تحديث الواجهة بعد تغيير إداري يتم عبر `refreshAuthorization()`، بينما RLS تطبق التغيير فورًا.
+- استدعاءات Supabase Auth المباشرة محصورة في `src/services/auth/auth.service.ts`.
+- لا يدخل Service Role أو Database Password أو JWT signing secret إلى تطبيق العميل.
+
+### الأدلة الحالية
+
+```text
+447 basic tests
+61 Supabase integration tests
+508 total tests
+```
+
+اختبارات C4-B تثبت تجاوز الواجهة، واختبارات C5-B تثبت تركيب Auth وProfile وAuthorization الحقيقي، بما في ذلك انتقال `active → suspended` أثناء التشغيل.
 
 ## Mappers وحدود البيانات
 

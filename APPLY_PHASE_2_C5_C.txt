@@ -1,0 +1,25 @@
+Phase 2-C5-C1 — Operational Closure Verification
+
+1. ارفع محتويات الحزمة إلى GitHub مع الحفاظ على المسارات.
+2. في Codespaces نفذ:
+   git pull origin main
+3. اعرض الملفات الفعلية لكلاود، خصوصًا:
+   scripts/verify-auth-security.sh
+   scripts/check-auth-client-boundaries.mjs
+   docs/AUTH_OPERATIONS.md
+   docs/ARCHITECTURE.md
+   docs/PHASES.md
+   package.json
+4. لا تعدل src أو tests أو supabase ضمن هذه الدفعة.
+5. تأكد أن Supabase المحلية مشغلة:
+   npx supabase status
+6. بعد اعتماد كلاود نفذ:
+   npm run verify:auth-closure
+7. لا تتجاوز أي فشل ولا تستخدم || true.
+8. بعد نجاح الفحص نفذ:
+   git diff --check
+   git status --short
+9. ثبّت ملفات C5-C1 فقط برسالة مثل:
+   chore: add auth security closure verification
+10. ادفع إلى main وتأكد أن working tree نظيفة.
+11. لا تنشئ الوسم v0.4-auth-security-complete بعد؛ يأتي ذلك في C5-C2 بعد تحديث الإغلاق النهائي وإعادة التحقق.
