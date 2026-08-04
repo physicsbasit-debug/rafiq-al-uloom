@@ -26,12 +26,15 @@ commit 4c69442
 ```text
 scripts/verify-auth-security.sh
 scripts/check-auth-client-boundaries.mjs
+tests/integration/helpers/supabase-auth-fixtures.ts
 docs/AUTH_OPERATIONS.md
 docs/ARCHITECTURE.md
 docs/PHASES.md
 package.json
 README_PHASE_2_C5_C.md
 APPLY_PHASE_2_C5_C.txt
+APPLY_PHASE_2_C5_C_FIX3.txt
+APPLY_PHASE_2_C5_C_FIX4.txt
 ```
 
 ## أمر التحقق
@@ -50,6 +53,8 @@ Prettier
 client boundary and dist secret scan
 Supabase status
 Supabase db reset
+Supabase readiness check
+controlled local-stack recovery when API services remain stopped
 Supabase integration tests
 git diff --check
 ```
@@ -60,7 +65,7 @@ git diff --check
 set -euo pipefail
 ```
 
-ويتوقف عند أول فشل. لا يبدأ Supabase تلقائيًا.
+ويتوقف عند أول فشل. لا يبدأ بيئة Supabase المتوقفة من البداية تلقائيًا. إذا كان `db reset` الذي نفذه الأمر نفسه قد ترك قاعدة البيانات عاملة بينما أوقف Kong/PostgREST، ينفذ استعادة محكومة عبر `supabase stop --no-backup` ثم `supabase start`، مع حجب مخرجات المفاتيح المحلية.
 
 ## اكتشاف استدعاءات Supabase Auth
 
@@ -146,6 +151,22 @@ API_URL
 SERVICE_ROLE_KEY
 PUBLISHABLE_KEY أو ANON_KEY
 ```
+
+## الاستعادة بعد `db reset`
+
+أثبت الاختبار التشغيلي في Codespaces أن `supabase db reset` قد ينتهي بنجاح بينما تبقى خدمات API، وبالأخص Kong، متوقفة. في هذه الحالة تعرض `supabase status -o env` مفاتيح العميل وقاعدة البيانات لكنها لا تعرض `API_URL` أو `REST_URL`.
+
+بعد `db reset` يقوم الأمر بالآتي:
+
+```text
+1. ينتظر ظهور API_URL ومفتاح العميل وSERVICE_ROLE_KEY لخمس محاولات قصيرة.
+2. إذا بقيت API غير متاحة، يوقف بيئة الاختبار المحلية عبر supabase stop --no-backup.
+3. يعيد تشغيلها عبر supabase start.
+4. يحجب خرج إعادة التشغيل حتى لا تظهر المفاتيح المحلية في سجل التحقق.
+5. ينتظر الجاهزية الكاملة قبل تشغيل اختبارات التكامل.
+```
+
+هذه الاستعادة لا تُستخدم لبدء Stack كانت متوقفة قبل تشغيل أمر الإغلاق؛ فالفحص الأولي يبقى حاجبًا ويطلب تشغيل `npx supabase start` يدويًا. الاستعادة محصورة في علاج الحالة الجزئية التي تسبب بها `db reset` داخل الأمر نفسه.
 
 ## المتطلبات
 

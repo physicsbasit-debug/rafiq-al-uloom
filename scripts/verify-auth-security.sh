@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
-required_commands=(git grep node npm npx sleep)
+required_commands=(git grep node npm npx rm sleep)
 for command_name in "${required_commands[@]}"; do
   if ! command -v "$command_name" >/dev/null 2>&1; then
     echo "Missing required command: $command_name" >&2
@@ -42,8 +42,8 @@ supabase_test_environment_ready() {
 }
 
 wait_for_supabase_test_environment() {
-  local max_attempts=30
-  local delay_seconds=2
+  local max_attempts="${1:-30}"
+  local delay_seconds="${2:-2}"
   local attempt
 
   for ((attempt = 1; attempt <= max_attempts; attempt++)); do
@@ -62,13 +62,31 @@ wait_for_supabase_test_environment() {
     fi
   done
 
-  cat >&2 <<'MESSAGE'
-Supabase local stack did not expose the required test environment after database reset.
-Required keys: API_URL, SERVICE_ROLE_KEY, and either PUBLISHABLE_KEY or ANON_KEY.
-Run: npx supabase status -o env
-Then inspect the local stack before rerunning: npm run verify:auth-closure
-MESSAGE
   return 1
+}
+
+restart_supabase_local_stack_after_reset() {
+  local log_file="${TMPDIR:-/tmp}/rafiq-supabase-recovery.log"
+  rm -f "$log_file"
+
+  # db reset can leave the database healthy while Kong/PostgREST remain stopped.
+  # Restart the already-running local test stack without printing local keys.
+  if ! npx --no-install supabase stop --no-backup >"$log_file" 2>&1; then
+    rm -f "$log_file"
+    echo "Failed to stop the partial Supabase local stack after database reset." >&2
+    echo "Run manually: npx supabase stop --no-backup" >&2
+    return 1
+  fi
+
+  if ! npx --no-install supabase start >"$log_file" 2>&1; then
+    rm -f "$log_file"
+    echo "Failed to restart the Supabase local stack after database reset." >&2
+    echo "Run manually: npx supabase start" >&2
+    return 1
+  fi
+
+  rm -f "$log_file"
+  echo "Supabase local stack restarted after database reset."
 }
 
 run_step "Build" npm run build
@@ -88,7 +106,25 @@ MESSAGE
 fi
 
 run_step "Supabase database reset" npx --no-install supabase db reset
-run_step "Supabase test environment readiness" wait_for_supabase_test_environment
+
+printf '\n==> Supabase test environment readiness\n'
+if ! wait_for_supabase_test_environment 5 2; then
+  printf '%s\n' \
+    'Supabase API was unavailable after database reset; restarting the local test stack.'
+  run_step "Supabase local stack recovery" restart_supabase_local_stack_after_reset
+
+  printf '\n==> Supabase test environment readiness after recovery\n'
+  if ! wait_for_supabase_test_environment 30 2; then
+    cat >&2 <<'MESSAGE'
+Supabase local stack did not expose the required test environment after recovery.
+Required keys: API_URL, SERVICE_ROLE_KEY, and either PUBLISHABLE_KEY or ANON_KEY.
+Run: npx supabase status -o env
+Then inspect the local stack before rerunning: npm run verify:auth-closure
+MESSAGE
+    exit 1
+  fi
+fi
+
 run_step "Supabase integration tests" npm run test:supabase
 run_step "Git diff check" git diff --check
 

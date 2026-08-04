@@ -1,0 +1,32 @@
+Phase 2-C5-C1 Fix 4 — deterministic Supabase API recovery after db reset
+
+Files:
+- scripts/verify-auth-security.sh
+- docs/AUTH_OPERATIONS.md
+- README_PHASE_2_C5_C.md
+- APPLY_PHASE_2_C5_C_FIX4.txt
+
+Evidence behind the fix:
+- A clean `npx supabase start` exposed API_URL and REST_URL.
+- The same local stack passed all 61 Supabase integration tests.
+- `supabase db reset` could leave PostgreSQL healthy while Kong/API services remained stopped.
+
+Apply:
+1. Upload the files while preserving paths.
+2. Run: git pull origin main
+3. Verify shell syntax:
+   bash -n scripts/verify-auth-security.sh
+4. Verify formatting:
+   npx prettier --check .
+5. Run the complete closure command:
+   npm run verify:auth-closure
+
+Expected recovery path when needed:
+- Supabase database reset
+- Short readiness probe
+- Supabase local stack recovery
+- Supabase test environment readiness after recovery
+- 61 Supabase integration tests passed
+- Auth closure verification passed
+
+The recovery does not bootstrap a stack that was stopped before verification. It only repairs the partial local-stack state caused by db reset inside the command itself.

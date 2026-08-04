@@ -36,13 +36,13 @@ npm run test:supabase
 npm run verify:auth-closure
 ```
 
-أمر `verify:auth-closure` لا يبدأ Supabase تلقائيًا. يجب تشغيل البيئة المحلية قبل الأمر.
+أمر `verify:auth-closure` لا يبدأ بيئة Supabase المتوقفة من البداية تلقائيًا؛ يجب تشغيل البيئة المحلية قبل الأمر. إذا ترك `supabase db reset` الذي ينفذه الأمر قاعدة البيانات عاملة بينما أوقف خدمات API المحلية مثل Kong، ينفذ الأمر استعادة محكومة للـStack عبر `supabase stop --no-backup` ثم `supabase start`، ويحجب مخرجات إعادة التشغيل حتى لا تظهر المفاتيح المحلية في السجل.
 
 ## 4. حالات Auth
 
 ```text
 loading
- guest
+guest
 authenticated
 error
 ```
