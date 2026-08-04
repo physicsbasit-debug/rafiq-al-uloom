@@ -1,8 +1,12 @@
 # رفيق العلوم — المعمارية
 
-## الحالة المعمارية عند نقطة التجميد
+## الحالة المعمارية عند مرشح تجميد Auth
 
 رفيق العلوم تطبيق React + Vite + TypeScript strict. طبقة الطالب الحالية تعمل خلف عقد بيانات غير متزامن واحد، ويمكن تشغيلها بمزوّد محلي أو Supabase دون تغيير واجهات الطالب.
+
+اكتملت منظومة Auth والصلاحيات تشغيليًا حتى C5-C1 بنتيجة 508 اختبارات. يصبح
+التجميد رسميًا عندما يشير الوسم `v0.4-auth-security-complete` إلى التزام C5-C2
+النهائي الذي اجتاز `npm run verify:auth-closure`.
 
 ## القرارات المعمارية المعتمدة
 
@@ -18,7 +22,7 @@
 | اختيار المزوّد    | `getContentRepository()` مركزي وكسول                                                       |
 | الافتراضي         | `VITE_CONTENT_PROVIDER` غائب أو `local` ⇒ المزوّد المحلي                                   |
 | Supabase          | Schema + RLS + Seed + عميل + Repository + تكافؤ محلي مكتملة                                |
-| Auth والصلاحيات   | Supabase Auth + Profiles + Authorization Policy + React Guards + RLS، مكتملة حتى C5-B      |
+| Auth والصلاحيات   | مكتملة تشغيليًا؛ تتجمد بالوسم `v0.4-auth-security-complete`                                |
 | Cloud Persistence | Phase 2-D، وتشمل `mastery_results` في الحد الأدنى                                          |
 | لوحة المعلم       | Phase 3                                                                                    |
 | AI                | Phase 4                                                                                    |
@@ -117,6 +121,7 @@ Supabase Auth
 447 basic tests
 61 Supabase integration tests
 508 total tests
+npm run verify:auth-closure passed at f0ddb3b
 ```
 
 اختبارات C4-B تثبت تجاوز الواجهة، واختبارات C5-B تثبت تركيب Auth وProfile وAuthorization الحقيقي، بما في ذلك انتقال `active → suspended` أثناء التشغيل.

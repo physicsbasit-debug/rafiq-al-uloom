@@ -194,3 +194,28 @@ Auth closure verification passed
 - لا تُعدل نسخة `package.json`.
 
 بعد نجاح التحقق وتثبيت C5-C1، تأتي C5-C2 لتحديث وثائق الإغلاق، ثم يعاد التحقق وتُنشأ العلامة يدويًا فوق الالتزام النهائي.
+
+## نتيجة C5-C1 الفعلية
+
+أُغلقت C5-C1 عند الالتزام `f0ddb3b` بعد نجاح:
+
+```text
+447/447 basic tests
+61/61 Supabase integration tests
+508 total tests
+Build + Lint + Prettier
+Auth client boundary and dist secret scan
+Supabase db reset and API readiness
+Git diff check
+Auth closure verification passed
+```
+
+## C5-C2: Final Freeze Candidate
+
+لا تضيف C5-C2 كود إنتاج أو اختبارات أو SQL. نطاقها تحديث وثائق الحالة بالأدلة
+الفعلية، وإعادة تشغيل `npm run verify:auth-closure` على الالتزام النهائي، ثم إنشاء
+الوسم `v0.4-auth-security-complete` يدويًا والتحقق أنه يشير محليًا وعن بعد إلى
+الالتزام نفسه.
+
+لا تعالج هذه الدفعة تحذير حجم Chunk، ولا تحدث Supabase CLI، ولا تبدأ Phase 2-D
+قبل اكتمال الوسم.

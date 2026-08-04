@@ -1,0 +1,76 @@
+Phase 2-C5-C2 — Final Auth Freeze
+==================================
+
+1) ارفع محتويات الحزمة إلى جذر المستودع مع الحفاظ على المسارات.
+
+2) داخل Codespaces:
+
+git pull origin main
+
+3) تحقق من أن التغيير وثائقي فقط:
+
+git show --stat --oneline -1
+git show -- docs/PHASES.md docs/PHASE_2_C5_AUTH_SECURITY_CLOSURE.md docs/ARCHITECTURE.md README_PHASE_2_C5.md README_PHASE_2_C5_C.md README_PHASE_2_C5_C2.md APPLY_PHASE_2_C5_C2.txt
+
+4) شغّل التحقق النهائي كاملًا:
+
+npm run verify:auth-closure
+
+يجب أن ينتهي بالسطر:
+
+Auth closure verification passed.
+
+5) تحقق من النظافة والتزامن واحفظ الالتزام النهائي:
+
+git status --short
+FINAL_COMMIT="$(git rev-parse HEAD)"
+REMOTE_COMMIT="$(git rev-parse origin/main)"
+printf 'HEAD=%s\norigin/main=%s\n' "$FINAL_COMMIT" "$REMOTE_COMMIT"
+test "$FINAL_COMMIT" = "$REMOTE_COMMIT"
+
+يجب ألا يطبع git status --short أي ملف.
+
+6) تأكد أن الوسم غير موجود محليًا أو عن بعد:
+
+git tag -l v0.4-auth-security-complete
+git ls-remote --tags origin refs/tags/v0.4-auth-security-complete
+
+يجب ألا يظهر أي تطابق.
+
+7) أنشئ الوسم على الالتزام النهائي وادفعه:
+
+git tag -a v0.4-auth-security-complete \
+  -m "Phase 2-C auth security complete: 508 tests verified"
+
+git push origin v0.4-auth-security-complete
+
+8) تحقق أن الوسم المحلي يشير إلى HEAD:
+
+test "$(git rev-list -n 1 v0.4-auth-security-complete)" = "$FINAL_COMMIT"
+
+9) تحقق من الوسم البعيد، مع فك annotated tag إلى commit:
+
+REMOTE_TAG_COMMIT="$(
+  git ls-remote --tags origin \
+    'refs/tags/v0.4-auth-security-complete^{}' \
+  | awk '{print $1}'
+)"
+
+if [ -z "$REMOTE_TAG_COMMIT" ]; then
+  REMOTE_TAG_COMMIT="$(
+    git ls-remote --tags origin \
+      refs/tags/v0.4-auth-security-complete \
+    | awk '{print $1}'
+  )"
+fi
+
+test "$REMOTE_TAG_COMMIT" = "$FINAL_COMMIT"
+
+10) تحقق نهائيًا:
+
+git status
+git show --no-patch --decorate v0.4-auth-security-complete
+git log --oneline -5
+
+لا تُحدّث Supabase CLI ولا تعالج تحذير Chunk داخل هذه الدفعة.
+لا تبدأ Phase 2-D قبل نجاح جميع الخطوات أعلاه.
