@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import console from 'node:console';
+import process from 'node:process';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, extname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
