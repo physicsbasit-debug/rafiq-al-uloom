@@ -121,16 +121,16 @@ profile_error
 
 تحافظ C5 على عقد Phase 2-C2-B ولا تعكسه.
 
-| الحدث | تحديث AuthState | قراءة Profile تلقائيًا | القرار |
-| --- | --- | --- | --- |
-| `initial_session` | Guest أو Authenticated | نعم للحساب المصادق | تهيئة أولى |
-| `signed_in` | Authenticated | نعم عند مستخدم جديد أو Profile غير محملة أو خطأ سابق | مزامنة دخول |
-| `signed_out` | Guest | لا | إلغاء الطلب ومسح Authorization |
-| `token_refreshed` | تحديث Session للمستخدم نفسه | لا | لا يدل على تغير Profile |
-| `user_updated` | تحديث بيانات AuthUser | لا | لا يدل على تغير `public.profiles` |
-| `password_recovery` | تحديث حالة Auth حسب الجلسة | لا | لا يمنح صلاحية إضافية |
-| `mfa_challenge_verified` | تحديث حالة Auth حسب الجلسة | لا | لا يمنح صلاحية إضافية |
-| `unknown` | Fail Closed حسب حالة Auth | لا | لا تحميل تلقائي مبني على حدث مجهول |
+| الحدث                    | تحديث AuthState             | قراءة Profile تلقائيًا                               | القرار                             |
+| ------------------------ | --------------------------- | ---------------------------------------------------- | ---------------------------------- |
+| `initial_session`        | Guest أو Authenticated      | نعم للحساب المصادق                                   | تهيئة أولى                         |
+| `signed_in`              | Authenticated               | نعم عند مستخدم جديد أو Profile غير محملة أو خطأ سابق | مزامنة دخول                        |
+| `signed_out`             | Guest                       | لا                                                   | إلغاء الطلب ومسح Authorization     |
+| `token_refreshed`        | تحديث Session للمستخدم نفسه | لا                                                   | لا يدل على تغير Profile            |
+| `user_updated`           | تحديث بيانات AuthUser       | لا                                                   | لا يدل على تغير `public.profiles`  |
+| `password_recovery`      | تحديث حالة Auth حسب الجلسة  | لا                                                   | لا يمنح صلاحية إضافية              |
+| `mfa_challenge_verified` | تحديث حالة Auth حسب الجلسة  | لا                                                   | لا يمنح صلاحية إضافية              |
+| `unknown`                | Fail Closed حسب حالة Auth   | لا                                                   | لا تحميل تلقائي مبني على حدث مجهول |
 
 ### 4.1 قرار عدم إعادة القراءة الدورية
 
