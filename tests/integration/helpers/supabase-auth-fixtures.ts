@@ -59,13 +59,14 @@ export function readLocalSupabaseEnvironment(): LocalSupabaseEnvironment {
   const env = parseSupabaseEnvironment(output);
 
   const apiUrl = env.API_URL;
-  const restUrl = env.REST_URL;
-  const publishableKey = env.PUBLISHABLE_KEY;
+  const restUrl =
+    env.REST_URL ?? (apiUrl ? `${apiUrl.replace(/\/$/, '')}/rest/v1` : undefined);
+  const publishableKey = env.PUBLISHABLE_KEY ?? env.ANON_KEY;
   const serviceRoleKey = env.SERVICE_ROLE_KEY;
 
   if (!apiUrl || !restUrl || !publishableKey || !serviceRoleKey) {
     throw new Error(
-      'Supabase local API_URL/REST_URL/PUBLISHABLE_KEY/SERVICE_ROLE_KEY are unavailable. Run npx supabase start first.'
+      'Supabase local API_URL, PUBLISHABLE_KEY or ANON_KEY, and SERVICE_ROLE_KEY are unavailable. Run npx supabase start first.'
     );
   }
 

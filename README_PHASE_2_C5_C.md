@@ -128,6 +128,26 @@ VITE_SUPABASE_URL
 VITE_SUPABASE_ANON_KEY
 ```
 
+
+## توافق مخرجات Supabase CLI المحلية
+
+تقبل اختبارات التكامل صيغتي مفاتيح العميل العام:
+
+```text
+PUBLISHABLE_KEY
+ANON_KEY
+```
+
+يستخدم `PUBLISHABLE_KEY` عند وجوده، ويعود إلى `ANON_KEY` في إصدارات CLI التي تعرض المفتاح القديم. كما يُشتق عنوان REST من `API_URL` عند غياب `REST_URL`. لا يُعد غياب `REST_URL` أو `PUBLISHABLE_KEY` وحده دليلًا على أن Supabase غير جاهزة.
+
+فحص الجاهزية بعد `db reset` ينتظر فقط القيم اللازمة فعليًا:
+
+```text
+API_URL
+SERVICE_ROLE_KEY
+PUBLISHABLE_KEY أو ANON_KEY
+```
+
 ## المتطلبات
 
 - Node وnpm وGit.

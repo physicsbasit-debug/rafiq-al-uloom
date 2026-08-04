@@ -21,17 +21,22 @@ run_step() {
 
 supabase_test_environment_ready() {
   local status_output
-  local required_key
 
   if ! status_output="$(npx --no-install supabase status -o env 2>/dev/null)"; then
     return 1
   fi
 
-  for required_key in API_URL REST_URL PUBLISHABLE_KEY SERVICE_ROLE_KEY; do
-    if ! grep -Eq "^${required_key}=\"?.+\"?$" <<<"$status_output"; then
-      return 1
-    fi
-  done
+  if ! grep -Eq '^API_URL="?.+"?$' <<<"$status_output"; then
+    return 1
+  fi
+
+  if ! grep -Eq '^(PUBLISHABLE_KEY|ANON_KEY)="?.+"?$' <<<"$status_output"; then
+    return 1
+  fi
+
+  if ! grep -Eq '^SERVICE_ROLE_KEY="?.+"?$' <<<"$status_output"; then
+    return 1
+  fi
 
   return 0
 }
@@ -59,7 +64,7 @@ wait_for_supabase_test_environment() {
 
   cat >&2 <<'MESSAGE'
 Supabase local stack did not expose the required test environment after database reset.
-Required keys: API_URL, REST_URL, PUBLISHABLE_KEY, SERVICE_ROLE_KEY.
+Required keys: API_URL, SERVICE_ROLE_KEY, and either PUBLISHABLE_KEY or ANON_KEY.
 Run: npx supabase status -o env
 Then inspect the local stack before rerunning: npm run verify:auth-closure
 MESSAGE
