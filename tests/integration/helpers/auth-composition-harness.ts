@@ -18,11 +18,7 @@ interface PendingWaiter<T> {
 
 interface StateChannel<T> {
   publish(value: T): void;
-  waitFor(
-    predicate: (value: T) => boolean,
-    label: string,
-    timeoutMs?: number
-  ): Promise<T>;
+  waitFor(predicate: (value: T) => boolean, label: string, timeoutMs?: number): Promise<T>;
   dispose(): void;
 }
 
@@ -123,8 +119,7 @@ export function createAuthCompositionHarness(client: SupabaseClient): AuthCompos
     getAuthorizationState: () => authorizationStates.getCurrent(),
 
     waitForAuthState: (predicate, label) => authStates.waitFor(predicate, label),
-    waitForAuthorizationState: (predicate, label) =>
-      authorizationStates.waitFor(predicate, label),
+    waitForAuthorizationState: (predicate, label) => authorizationStates.waitFor(predicate, label),
 
     dispose(): void {
       if (!active) {
