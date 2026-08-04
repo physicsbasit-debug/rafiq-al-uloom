@@ -128,7 +128,6 @@ VITE_SUPABASE_URL
 VITE_SUPABASE_ANON_KEY
 ```
 
-
 ## توافق مخرجات Supabase CLI المحلية
 
 تقبل اختبارات التكامل صيغتي مفاتيح العميل العام:

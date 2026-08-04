@@ -59,8 +59,7 @@ export function readLocalSupabaseEnvironment(): LocalSupabaseEnvironment {
   const env = parseSupabaseEnvironment(output);
 
   const apiUrl = env.API_URL;
-  const restUrl =
-    env.REST_URL ?? (apiUrl ? `${apiUrl.replace(/\/$/, '')}/rest/v1` : undefined);
+  const restUrl = env.REST_URL ?? (apiUrl ? `${apiUrl.replace(/\/$/, '')}/rest/v1` : undefined);
   const publishableKey = env.PUBLISHABLE_KEY ?? env.ANON_KEY;
   const serviceRoleKey = env.SERVICE_ROLE_KEY;
 

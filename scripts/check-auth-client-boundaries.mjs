@@ -142,7 +142,8 @@ function scanSupabaseAuthBoundary(absolutePath, relativePath, text) {
     );
   });
 
-  const destructuredAuth = /\b(?:const|let|var)\s*\{[^}\n]*\bauth\b[^}\n]*\}\s*=|\b(?:const|let|var)\s+[A-Za-z_$][\w$]*\s*=\s*[^;\n]+(?:\.|\?\.)\s*auth\b/g;
+  const destructuredAuth =
+    /\b(?:const|let|var)\s*\{[^}\n]*\bauth\b[^}\n]*\}\s*=|\b(?:const|let|var)\s+[A-Za-z_$][\w$]*\s*=\s*[^;\n]+(?:\.|\?\.)\s*auth\b/g;
   findPatternMatches(destructuredAuth, scanText, (match) => {
     addViolation(
       'supabase-auth-namespace-alias',
@@ -176,7 +177,8 @@ function scanMetadataAuthorization(absolutePath, text) {
 }
 
 function scanProfileWrites(absolutePath, text) {
-  const profileWritePattern = /\.from\(\s*['"]profiles['"]\s*\)[\s\S]{0,500}?\.(?:insert|update|delete|upsert)\s*\(/g;
+  const profileWritePattern =
+    /\.from\(\s*['"]profiles['"]\s*\)[\s\S]{0,500}?\.(?:insert|update|delete|upsert)\s*\(/g;
   findPatternMatches(profileWritePattern, text, (match) => {
     addViolation(
       'client-profile-write',
