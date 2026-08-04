@@ -1,0 +1,21 @@
+Phase 2-C5-B — Real Supabase Auth Composition Tests
+
+1. ارفع الملفات الأربعة مع الحفاظ على المسارات.
+2. في Codespaces:
+   git pull origin main
+3. اعرض الملفات الفعلية لكلاود قبل التشغيل:
+   sed -n '1,320p' tests/integration/helpers/auth-composition-harness.ts
+   sed -n '1,760p' tests/integration/supabase-auth-composition.integration.ts
+   sed -n '1,260p' README_PHASE_2_C5_B.md
+4. بعد الاعتماد:
+   npx supabase db reset
+   npm run test:supabase
+5. المتوقع:
+   61 passed
+6. ثم:
+   npm run build
+   npm run lint
+   npm run test
+   npx prettier --check .
+   git status
+7. لا تعدل src أو migrations أو RLS ضمن هذه الدفعة.
