@@ -16,27 +16,26 @@ Supabase، بإجمالي 508 اختبارات. أصبحت Phase 2-C5-C2 مرش�
 
 ## خارطة الطريق المحدّثة
 
-| المرحلة  | الهدف                                     | المخرجات                                                               | معيار القبول                                       | الحالة        |
-| -------- | ----------------------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------- | ------------- |
-| 0-A      | قرارات تأسيسية                            | وثيقة معتمدة                                                           | اعتماد كتابي                                       | مكتملة        |
-| 0-B      | Project Skeleton                          | مشروع + مجلدات + أنواع + Theme + Docs                                  | build/lint/prettier ناجحة                          | مكتملة        |
-| 1        | Local Prototype                           | تجربة طالب كاملة بمحتوى TypeScript محلي                                | تصفح كامل من الصف إلى النتيجة                      | مكتملة        |
-| 2-A      | Async Data Contract                       | ContentRepository غير متزامن + hooks مشتركة + ترحيل واجهات الطالب      | الاختبارات المحلية مستقلة عن الشبكة                | مكتملة        |
-| 2-B      | Supabase Content Data Layer               | Schema + RLS + Seed + Repository + Provider Selection                  | تكافؤ كامل بين local وSupabase                     | مكتملة        |
-| 2-Freeze | Data Layer Freeze                         | توثيق المعمارية والخارطة + الوسم `v0.3-data-layer-complete`            | الوسم يشير إلى commit التجميد المعتمد              | مكتملة        |
-| 2-C0     | Auth & Authorization Architecture         | قرارات Supabase Auth + Profiles + Roles + Account Status + حدود RLS    | اعتماد الوثيقة المعمارية دون كود                   | مكتملة        |
-| 2-C1     | Auth Client & Session Contract            | Auth types + service + session + sign-in/sign-up/sign-out + unit tests | عقد Auth واختباراته ناجحة بلا Profiles أو UI       | مكتملة        |
-| 2-C2     | Profiles + Roles + Authorization RLS      | Profiles + Trigger + AuthorizationState + RLS + اختبارات SQL وتكامل    | لا تصعيد ذاتي للصلاحيات ولا مستخدم يتيم            | مكتملة        |
-| 2-C3     | Login / Logout / Session UI               | واجهات Auth ورسائل الجلسة والتأكيد                                     | تجربة RTL واضحة بلا وميض واجهة محمية               | مكتملة        |
-| 2-C4     | Protected Operations + Access Guards      | عقد عمليات + محرك قرار + حراس React + اختبارات تجاوز الواجهة           | لا عملية محمية تعتمد على إخفاء الواجهة فقط         | مكتملة        |
-| 2-C5     | Auth Integration Tests & Security Closure | دورة حياة Auth + تركيب حقيقي + فحص أسرار + توثيق تشغيل وتجميد          | الالتزام النهائي متحقق وموسوم                      | مكتملة        |
+| المرحلة  | الهدف                                     | المخرجات                                                               | معيار القبول                                       | الحالة            |
+| -------- | ----------------------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------- | ----------------- |
+| 0-A      | قرارات تأسيسية                            | وثيقة معتمدة                                                           | اعتماد كتابي                                       | مكتملة            |
+| 0-B      | Project Skeleton                          | مشروع + مجلدات + أنواع + Theme + Docs                                  | build/lint/prettier ناجحة                          | مكتملة            |
+| 1        | Local Prototype                           | تجربة طالب كاملة بمحتوى TypeScript محلي                                | تصفح كامل من الصف إلى النتيجة                      | مكتملة            |
+| 2-A      | Async Data Contract                       | ContentRepository غير متزامن + hooks مشتركة + ترحيل واجهات الطالب      | الاختبارات المحلية مستقلة عن الشبكة                | مكتملة            |
+| 2-B      | Supabase Content Data Layer               | Schema + RLS + Seed + Repository + Provider Selection                  | تكافؤ كامل بين local وSupabase                     | مكتملة            |
+| 2-Freeze | Data Layer Freeze                         | توثيق المعمارية والخارطة + الوسم `v0.3-data-layer-complete`            | الوسم يشير إلى commit التجميد المعتمد              | مكتملة            |
+| 2-C0     | Auth & Authorization Architecture         | قرارات Supabase Auth + Profiles + Roles + Account Status + حدود RLS    | اعتماد الوثيقة المعمارية دون كود                   | مكتملة            |
+| 2-C1     | Auth Client & Session Contract            | Auth types + service + session + sign-in/sign-up/sign-out + unit tests | عقد Auth واختباراته ناجحة بلا Profiles أو UI       | مكتملة            |
+| 2-C2     | Profiles + Roles + Authorization RLS      | Profiles + Trigger + AuthorizationState + RLS + اختبارات SQL وتكامل    | لا تصعيد ذاتي للصلاحيات ولا مستخدم يتيم            | مكتملة            |
+| 2-C3     | Login / Logout / Session UI               | واجهات Auth ورسائل الجلسة والتأكيد                                     | تجربة RTL واضحة بلا وميض واجهة محمية               | مكتملة            |
+| 2-C4     | Protected Operations + Access Guards      | عقد عمليات + محرك قرار + حراس React + اختبارات تجاوز الواجهة           | لا عملية محمية تعتمد على إخفاء الواجهة فقط         | مكتملة            |
+| 2-C5     | Auth Integration Tests & Security Closure | دورة حياة Auth + تركيب حقيقي + فحص أسرار + توثيق تشغيل وتجميد          | الالتزام النهائي متحقق وموسوم                      | مكتملة            |
 | 2-D      | Cloud Persistence                         | حفظ `mastery_results` والبيانات التشغيلية المستمرة                     | النتيجة تبقى متاحة بعد تغيير الجهاز أو الجلسة      | مخططة بعد وسم 2-C |
-| 3        | Teacher Dashboard                         | إضافة ومراجعة واعتماد المحتوى                                          | المعلم أو المراجع يعتمد درسًا كاملًا وفق الصلاحيات | مخططة         |
-| 4        | AI-assisted Authoring                     | توليد محتوى بمراجعة بشرية                                              | لا يصل أي محتوى مولّد إلى `approved` تلقائيًا      | مخططة         |
-| 5        | Advanced Science Activities               | توسيع الألعاب والتجارب والمحاكاة والأنشطة العلمية                      | كل نشاط مرتبط بهدف تعلم وقابل للاختبار             | مخططة         |
-| 6        | Production Readiness                      | أمن، أداء، مراقبة أخطاء، نسخ احتياطي، نشر وتوثيق تشغيل                 | قائمة جاهزية إنتاج ناجحة                           | مخططة         |
-| 1.0      | الإطلاق الرسمي                            | نسخة مستقرة قابلة للاستخدام والتوسع                                    | قبول وظيفي وتشغيلي كامل                            | الهدف النهائي |
-
+| 3        | Teacher Dashboard                         | إضافة ومراجعة واعتماد المحتوى                                          | المعلم أو المراجع يعتمد درسًا كاملًا وفق الصلاحيات | مخططة             |
+| 4        | AI-assisted Authoring                     | توليد محتوى بمراجعة بشرية                                              | لا يصل أي محتوى مولّد إلى `approved` تلقائيًا      | مخططة             |
+| 5        | Advanced Science Activities               | توسيع الألعاب والتجارب والمحاكاة والأنشطة العلمية                      | كل نشاط مرتبط بهدف تعلم وقابل للاختبار             | مخططة             |
+| 6        | Production Readiness                      | أمن، أداء، مراقبة أخطاء، نسخ احتياطي، نشر وتوثيق تشغيل                 | قائمة جاهزية إنتاج ناجحة                           | مخططة             |
+| 1.0      | الإطلاق الرسمي                            | نسخة مستقرة قابلة للاستخدام والتوسع                                    | قبول وظيفي وتشغيلي كامل                            | الهدف النهائي     |
 
 ## تقسيم Phase 2-C5
 
