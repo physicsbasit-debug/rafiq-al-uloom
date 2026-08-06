@@ -1,0 +1,108 @@
+PHASE 2-D2 FIX 1 — APPLY AND VERIFY
+===================================
+
+BASELINE
+--------
+Expected current HEAD before upload:
+
+  b068b4e
+
+The working tree should be clean and main should match origin/main.
+
+PACKAGE SCOPE
+-------------
+
+  src/services/mastery-results/mastery-results.fingerprint.ts
+  README_PHASE_2_D2_FIX1.md
+  APPLY_PHASE_2_D2_FIX1.txt
+
+No other files should be uploaded.
+
+AFTER UPLOADING TO GITHUB
+-------------------------
+
+Run:
+
+  git pull origin main
+  git show --stat --oneline -1
+  git status --short
+
+Expected:
+
+  - Three Phase 2-D2 Fix 1 files only.
+  - No output from git status --short.
+
+PRIMARY BUILD GATE
+------------------
+
+Run first:
+
+  npm run build
+
+Expected:
+
+  - tsc -b passes.
+  - vite build passes.
+  - No BufferSource / ArrayBufferLike error in mastery-results.fingerprint.ts.
+
+FUNCTIONAL AND REGRESSION TESTS
+-------------------------------
+
+Run:
+
+  npm test
+  npm run test:supabase
+
+Expected:
+
+  - 44 test files passed.
+  - 490 basic tests passed.
+  - 6 Supabase integration files passed.
+  - 77 Supabase integration tests passed.
+  - mastery-results.fingerprint.test.ts remains 4/4.
+
+QUALITY GATES
+-------------
+
+Run:
+
+  npm run lint
+  npx prettier --check .
+  git diff --check
+
+If Prettier reports only the three Fix 1 files, run:
+
+  npx prettier --write \
+    src/services/mastery-results/mastery-results.fingerprint.ts \
+    README_PHASE_2_D2_FIX1.md
+
+  git add \
+    src/services/mastery-results/mastery-results.fingerprint.ts \
+    README_PHASE_2_D2_FIX1.md
+
+  git commit -m "style: format phase 2 d2 fix 1 files"
+  git push origin main
+
+Then rerun all gates:
+
+  npm run build
+  npm test
+  npm run test:supabase
+  npm run lint
+  npx prettier --check .
+  git diff --check
+
+FINAL CHECK
+-----------
+
+Run:
+
+  git status
+  git log -1 --oneline
+
+Expected:
+
+  Your branch is up to date with 'origin/main'.
+  nothing to commit, working tree clean
+
+Do not create a Git tag. v0.5 waits for D3-D5 closure.
