@@ -1,0 +1,115 @@
+PHASE 2-D4 FINAL APPLICATION PACKAGE
+====================================
+
+BASELINE
+--------
+e66983a
+
+SCOPE
+-----
+This package adds only:
+- Two real Supabase composition tests.
+- Ten permanent scoring parity tests.
+- Shared D4 database fixtures.
+- TSX support in vitest.supabase.config.ts.
+- Two npm scripts in package.json.
+- D4 documentation.
+
+No src/ file, SQL migration, RPC, RLS, or production behavior is changed.
+
+FILES
+-----
+tests/integration/helpers/mastery-results-fixtures.ts
+tests/integration/supabase-mastery-composition.integration.tsx
+tests/integration/supabase-mastery-scoring-parity.integration.ts
+vitest.supabase.config.ts
+package.json
+docs/PHASE_2_D4_COMPOSITION_AND_PARITY.md
+README_PHASE_2_D4.md
+APPLY_PHASE_2_D4.txt
+
+AFTER UPLOAD
+------------
+Run:
+
+git pull origin main
+git show --stat --oneline -1
+git status --short
+
+START CLEAN LOCAL SUPABASE
+--------------------------
+Run:
+
+npx supabase status || npx supabase start
+npx supabase db reset
+
+RUN D4 GATES FIRST
+------------------
+Run:
+
+npm run test:mastery-results-composition
+npm run test:mastery-results-parity
+
+Expected:
+- Composition: 2 passed.
+- Parity: 10 passed.
+
+RUN FULL ACCEPTANCE
+-------------------
+Run:
+
+npm run build
+npm test
+npm run test:supabase
+npm run lint
+npx prettier --check .
+git diff --check
+
+Expected:
+- Build: PASS.
+- Basic tests: 508/508.
+- Supabase integration files: 8/8.
+- Supabase integration tests: 89/89.
+- Lint: PASS.
+- Prettier: PASS.
+- git diff --check: no output.
+
+IF PRETTIER ONLY FAILS
+----------------------
+Run:
+
+npx prettier --write \
+  tests/integration/helpers/mastery-results-fixtures.ts \
+  tests/integration/supabase-mastery-composition.integration.tsx \
+  tests/integration/supabase-mastery-scoring-parity.integration.ts \
+  vitest.supabase.config.ts \
+  package.json \
+  docs/PHASE_2_D4_COMPOSITION_AND_PARITY.md \
+  README_PHASE_2_D4.md
+
+git add \
+  tests/integration/helpers/mastery-results-fixtures.ts \
+  tests/integration/supabase-mastery-composition.integration.tsx \
+  tests/integration/supabase-mastery-scoring-parity.integration.ts \
+  vitest.supabase.config.ts \
+  package.json \
+  docs/PHASE_2_D4_COMPOSITION_AND_PARITY.md \
+  README_PHASE_2_D4.md
+
+git commit -m "style: format phase 2 d4 composition parity files"
+git push origin main
+
+Then repeat every acceptance command.
+
+FINAL CHECK
+-----------
+Run:
+
+git status
+git log -1 --oneline
+
+Required:
+- main is up to date with origin/main.
+- nothing to commit, working tree clean.
+
+Do not create v0.5 yet. D5 remains required.

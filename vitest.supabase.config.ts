@@ -1,10 +1,14 @@
 import { fileURLToPath } from 'node:url';
+
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
     environment: 'node',
-    include: ['tests/integration/**/*.integration.ts'],
+    include: [
+      'tests/integration/**/*.integration.ts',
+      'tests/integration/**/*.integration.tsx',
+    ],
   },
   resolve: {
     alias: {
