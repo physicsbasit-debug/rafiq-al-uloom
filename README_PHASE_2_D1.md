@@ -58,10 +58,7 @@ selectedIndex === correctAnswerIndex
 أضيف اختبار فعلي يطلق طلبين متزامنين:
 
 ```ts
-Promise.all([
-  submit(...sameSubmissionId),
-  submit(...sameSubmissionId),
-])
+Promise.all([submit(...sameSubmissionId), submit(...sameSubmissionId)]);
 ```
 
 المطلوب:

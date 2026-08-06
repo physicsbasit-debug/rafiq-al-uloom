@@ -158,7 +158,11 @@ describeIntegration('Phase 2-D1 mastery result persistence', { concurrent: false
     activeTeacher = await fixtures.createIdentity('d1-active-teacher', 'teacher', 'active');
     activeReviewer = await fixtures.createIdentity('d1-active-reviewer', 'reviewer', 'active');
     pendingStudent = await fixtures.createIdentity('d1-pending-student');
-    suspendedStudent = await fixtures.createIdentity('d1-suspended-student', 'student', 'suspended');
+    suspendedStudent = await fixtures.createIdentity(
+      'd1-suspended-student',
+      'student',
+      'suspended'
+    );
   });
 
   afterAll(async () => {
@@ -174,22 +178,27 @@ describeIntegration('Phase 2-D1 mastery result persistence', { concurrent: false
     ['student', () => activeStudent],
     ['teacher', () => activeTeacher],
     ['reviewer', () => activeReviewer],
-  ] as const)('allows active %s to save only a server-scored own attempt', async (_role, getIdentity) => {
-    const response = await submit(getIdentity(), lessonId, questions, {
-      answers: answersFor(questions, [0, 0, 2]),
-    });
+  ] as const)(
+    'allows active %s to save only a server-scored own attempt',
+    async (_role, getIdentity) => {
+      const response = await submit(getIdentity(), lessonId, questions, {
+        answers: answersFor(questions, [0, 0, 2]),
+      });
 
-    expect(response.error).toBeNull();
-    expect(response.data?.status).toBe('saved');
-    if (response.data?.status !== 'saved') throw new Error('Expected saved mastery result.');
+      expect(response.error).toBeNull();
+      expect(response.data?.status).toBe('saved');
+      if (response.data?.status !== 'saved') throw new Error('Expected saved mastery result.');
 
-    expect(response.data.result.lessonId).toBe(lessonId);
-    expect(response.data.result.questionCount).toBe(3);
-    expect(response.data.result.correctCount).toBe(2);
-    expect(response.data.result.percentage).toBeCloseTo((2 / 3) * 100, 12);
-    expect(response.data.result.scoringPolicyVersion).toBe(scoringPolicyVersion);
-    expect(response.data.result.scoringFingerprint).toBe(buildScoringFingerprint(lessonId, questions));
-  });
+      expect(response.data.result.lessonId).toBe(lessonId);
+      expect(response.data.result.questionCount).toBe(3);
+      expect(response.data.result.correctCount).toBe(2);
+      expect(response.data.result.percentage).toBeCloseTo((2 / 3) * 100, 12);
+      expect(response.data.result.scoringPolicyVersion).toBe(scoringPolicyVersion);
+      expect(response.data.result.scoringFingerprint).toBe(
+        buildScoringFingerprint(lessonId, questions)
+      );
+    }
+  );
 
   it('returns the same attempt for an identical idempotent retry', async () => {
     const submissionId = randomUUID();
@@ -215,10 +224,7 @@ describeIntegration('Phase 2-D1 mastery result persistence', { concurrent: false
 
     expect(first.error).toBeNull();
     expect(second.error).toBeNull();
-    expect([first.data?.status, second.data?.status].sort()).toEqual([
-      'already_saved',
-      'saved',
-    ]);
+    expect([first.data?.status, second.data?.status].sort()).toEqual(['already_saved', 'saved']);
 
     if (!first.data || !second.data || !('result' in first.data) || !('result' in second.data)) {
       throw new Error('Expected two successful concurrent idempotent results.');

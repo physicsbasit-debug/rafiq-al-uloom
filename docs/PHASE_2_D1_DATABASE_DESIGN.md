@@ -29,13 +29,10 @@ src/features/quiz/quiz-engine.ts
 
 ```ts
 isChoiceIndexValid =
-  Number.isInteger(selectedIndex) &&
-  selectedIndex >= 0 &&
-  selectedIndex < question.choices.length;
+  Number.isInteger(selectedIndex) && selectedIndex >= 0 && selectedIndex < question.choices.length;
 
 isCorrectAnswer =
-  isChoiceIndexValid(question, selectedIndex) &&
-  selectedIndex === question.correctAnswerIndex;
+  isChoiceIndexValid(question, selectedIndex) && selectedIndex === question.correctAnswerIndex;
 ```
 
 ترجمة D1 إلى SQL مطابقة حرفيًا:
@@ -357,7 +354,7 @@ objective خاص
 Promise.all([
   submit(activeStudent, lessonId, questions, { submissionId }),
   submit(activeStudent, lessonId, questions, { submissionId }),
-])
+]);
 ```
 
 ويثبت:
