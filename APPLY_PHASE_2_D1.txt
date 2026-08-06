@@ -1,0 +1,83 @@
+Phase 2-D1 — Database Schema, RPC & RLS
+==============================================
+
+هذه حزمة تطبيق نهائية مرشحة للرفع والاختبار في Codespaces.
+
+الملفات المتوقعة:
+- supabase/migrations/20260806070000_add_mastery_result_persistence.sql
+- tests/integration/supabase-mastery-results.integration.ts
+- docs/PHASE_2_D1_DATABASE_DESIGN.md
+- README_PHASE_2_D1.md
+- APPLY_PHASE_2_D1.txt
+
+لا تحتوي الحزمة أي تعديل على quiz-engine.ts أو scoring.ts أو Auth.
+
+بعد رفع محتويات ZIP إلى GitHub:
+
+1. اسحب آخر نسخة:
+
+   git pull origin main
+
+2. تحقق من نطاق الالتزام:
+
+   git show --stat --oneline -1
+
+3. افحص التنسيق:
+
+   npx prettier --check \
+     tests/integration/supabase-mastery-results.integration.ts \
+     docs/PHASE_2_D1_DATABASE_DESIGN.md \
+     README_PHASE_2_D1.md
+
+4. إذا ظهر تحذير Prettier:
+
+   npx prettier --write \
+     tests/integration/supabase-mastery-results.integration.ts \
+     docs/PHASE_2_D1_DATABASE_DESIGN.md \
+     README_PHASE_2_D1.md
+
+   git add \
+     tests/integration/supabase-mastery-results.integration.ts \
+     docs/PHASE_2_D1_DATABASE_DESIGN.md \
+     README_PHASE_2_D1.md
+
+   git commit -m "style: format phase 2 d1 persistence files"
+   git push origin main
+
+5. تأكد أن Supabase تعمل:
+
+   npx supabase status
+
+6. أعد بناء قاعدة البيانات:
+
+   npx supabase db reset
+
+7. شغّل اختبارات Supabase كلها:
+
+   npm run test:supabase
+
+8. شغّل الاختبارات الأساسية وفحوص المشروع:
+
+   npm test
+   npm run build
+   npm run lint
+   npx prettier --check .
+   git diff --check
+
+9. افحص الحالة:
+
+   git status
+   git log -1 --oneline
+
+معيار القبول:
+- db reset ناجح.
+- 447 اختبارًا أساسيًا تبقى ناجحة.
+- baseline 61 اختبار Supabase تبقى ناجحة.
+- اختبارات mastery-results الجديدة ناجحة.
+- اختبار Promise.all المتزامن ينجح.
+- Build/Lint/Prettier ناجحة.
+- working tree clean.
+
+لا تنشئ Tag في D1.
+لا تعلن Phase 2-D كاملة.
+D1 تغلق فقط بعد وصول مخرجات التنفيذ الحي ومراجعتها.

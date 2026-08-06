@@ -1,34 +1,35 @@
-# Phase 2-D1 — Database Schema, RPC & RLS Review
+# Phase 2-D1 — Database Schema, RPC & RLS
 
 ## الحالة
 
 ```text
-REVIEW ONLY
-لا ترفع إلى GitHub بعد
+IMPLEMENTATION CANDIDATE
+جاهزة للرفع والاختبار الفعلي في Codespaces
+لا تُغلق D1 قبل نجاح db reset واختبارات Supabase الحقيقية
 ```
 
-تغلق الحزمة أولًا فجوة `quiz-engine.ts`، ثم تقترح مخطط الحفظ وRPC وRLS واختبارات Supabase الحقيقية.
+اعتمد كلاود تصميم D1 بعد مراجعة `quiz-engine.ts` وMigration والاختبارات مباشرة. أضيف قبل النسخة النهائية اختبار تزامن حقيقي لطلبين يحملان `submission_id` نفسه عبر `Promise.all`.
 
 ## نقطة الأساس
 
 ```text
-Commit: 2fbefca
+Baseline commit: 2fbefca
 Phase 2-D0: CLOSED
-Baseline: 508 tests
+Auth freeze tag: v0.4-auth-security-complete
+Verified baseline: 447 basic + 61 Supabase integration = 508 tests
 ```
 
 ## الملفات
 
 ```text
-src/features/quiz/quiz-engine.ts
 supabase/migrations/20260806070000_add_mastery_result_persistence.sql
 tests/integration/supabase-mastery-results.integration.ts
 docs/PHASE_2_D1_DATABASE_DESIGN.md
 README_PHASE_2_D1.md
-APPLY_PHASE_2_D1_REVIEW.txt
+APPLY_PHASE_2_D1.txt
 ```
 
-`quiz-engine.ts` نسخة تحقق غير معدلة من المصدر الحقيقي. وجودها داخل حزمة المراجعة لا يعني تعديلها في Git.
+لا تتضمن الحزمة `quiz-engine.ts` لأنها لم تتغير؛ استُخدمت في المراجعة فقط لإثبات منطق `isCorrectAnswer`.
 
 ## القرار المركزي
 
@@ -44,26 +45,50 @@ RPC تحسب النتيجة
 ## منطق الإجابة المؤكد
 
 ```text
-integer
->= 0
-< choices.length
-=== correctAnswerIndex
+Number.isInteger(selectedIndex)
+selectedIndex >= 0
+selectedIndex < choices.length
+selectedIndex === correctAnswerIndex
 ```
 
-لا يوجد منطق نصي أو متعدد أو جزئي مخفي في `quiz-engine.ts`.
+لا يوجد منطق نصي أو متعدد أو جزئي مخفي.
 
-## الاختبارات المقترحة
+## الاختبار الإضافي بعد مراجعة كلاود
 
-الحزمة تضيف 17 سيناريو تكامل، تشمل الأدوار الثلاثة، RLS، منع DML، Idempotency، تعارض المفتاح، البصمة القديمة، الذرية، وحذف المستخدم.
+أضيف اختبار فعلي يطلق طلبين متزامنين:
 
-## ما تم فحصه في بيئة التجهيز
+```ts
+Promise.all([
+  submit(...sameSubmissionId),
+  submit(...sameSubmissionId),
+])
+```
+
+المطلوب:
 
 ```text
-TypeScript parse                          PASS
-quiz-engine source match                  PASS
-SQL security-contract static checks       PASS
-ZIP path/integrity checks                 PASS
-UTF-8 / CRLF / trailing whitespace        PASS
+طلب واحد saved
+طلب واحد already_saved
+نفس attemptId
+لا استثناء غير معالج
+لا محاولة ثانية
 ```
 
-لم يتوفر Docker/Supabase محلي لتشغيل Migration، ولذلك لا تُعد الحزمة جاهزة للرفع قبل مراجعة كلاود.
+هذا الاختبار يمارس مسار `unique_violation` الدفاعي داخل RPC، لا مسار Retry التسلسلي فقط.
+
+## معايير القبول الحي
+
+لا تُعد D1 مغلقة إلا بعد:
+
+```text
+supabase db reset                          PASS
+447 اختبارًا أساسيًا                       PASS
+61 اختبار Supabase أساسيًا                 PASS
+اختبارات mastery-results الجديدة          PASS
+اختبار التزامن الحقيقي                    PASS
+Build / Lint / Prettier                    PASS
+git diff --check                           PASS
+working tree clean                         PASS
+```
+
+لم يتوفر Docker/Supabase في بيئة تجهيز الحزمة، لذلك يظل التنفيذ الحي في Codespaces هو دليل القبول النهائي.

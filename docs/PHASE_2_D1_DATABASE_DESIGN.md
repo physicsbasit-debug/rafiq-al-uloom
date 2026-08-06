@@ -1,8 +1,8 @@
-# Phase 2-D1 — Database Schema, RPC & RLS Review
+# Phase 2-D1 — Database Schema, RPC & RLS
 
 ## الحالة
 
-حزمة مراجعة قبل الرفع إلى GitHub وقبل تنفيذ `supabase db reset` على مستودع المستخدم.
+تصميم معتمد من كلاود ومرشح تطبيق نهائي للرفع والاختبار الحي في Codespaces. لا تُغلق D1 قبل نجاح `supabase db reset` واختبارات Supabase الفعلية.
 
 لا تتضمن هذه الحزمة خدمة العميل أو دمج React. نطاقها قاعدة البيانات واختبارات التكامل الحقيقية فقط.
 
@@ -17,11 +17,13 @@ Verified baseline: 447 basic + 61 Supabase integration = 508 tests
 
 ## 1. إغلاق فجوة `quiz-engine.ts`
 
-المصدر الفعلي داخل الحزمة:
+المصدر الفعلي الذي تمت مراجعته مباشرة قبل بناء SQL:
 
 ```text
 src/features/quiz/quiz-engine.ts
 ```
+
+الملف غير معدّل وغير موجود داخل حزمة التطبيق النهائية.
 
 منطق الصحة الفعلي:
 
@@ -43,18 +45,17 @@ isCorrectAnswer =
 3. الإجابة صحيحة فقط عند مساواة الفهرس المختار للفهرس الرسمي.
 4. لا مقارنة نصية، ولا تعدد إجابات، ولا حساسية أحرف، ولا درجات جزئية.
 
-## 2. الملفات المقترحة
+## 2. الملفات النهائية
 
 ```text
 supabase/migrations/20260806070000_add_mastery_result_persistence.sql
 tests/integration/supabase-mastery-results.integration.ts
-src/features/quiz/quiz-engine.ts  # نسخة غير معدلة للتحقق داخل حزمة المراجعة فقط
 docs/PHASE_2_D1_DATABASE_DESIGN.md
 README_PHASE_2_D1.md
-APPLY_PHASE_2_D1_REVIEW.txt
+APPLY_PHASE_2_D1.txt
 ```
 
-`quiz-engine.ts` غير معدلة ولا يفترض أن تنتج فرقًا عند تطبيق الحزمة النهائية.
+`quiz-engine.ts` ليست داخل الحزمة النهائية لأنها غير معدلة. تمت مراجعتها مباشرة لإثبات مطابقة منطق SQL قبل اعتماد D1.
 
 ## 3. نموذج البيانات
 
@@ -315,19 +316,20 @@ answer count = 0
 2. Active teacher يحفظ محاولته الشخصية.
 3. Active reviewer يحفظ محاولته الشخصية.
 4. النتيجة الرسمية 2/3 تطابق النسبة المحلية.
-5. Retry مطابق يعيد `already_saved` ونفس `attemptId`.
-6. إعادة استخدام المفتاح مع إجابات مختلفة تعطي `submission_conflict`.
-7. بصمة قديمة تعطي `scoring_contract_stale` بلا سجل.
-8. درس غير متاح يعطي `lesson_not_available`.
-9. سؤال ناقص أو إضافي أو مكرر يعطي `question_set_mismatch`.
-10. فهرس سالب أو كسري أو خارج النطاق يعطي `invalid_response_set`.
-11. Pending وSuspended يعطيان `not_authorized` بلا سجل.
-12. Anonymous لا ينفذ RPC عند طبقة الامتياز.
-13. المستخدم يقرأ محاولته وإجاباتها فقط.
-14. مستخدم آخر يرى مصفوفة فارغة عبر RLS.
-15. INSERT/UPDATE/DELETE المباشر ممنوع.
-16. فشل answers يلغي attempt ذريًا.
-17. حذف auth user يحذف attempt وanswers عبر Cascade.
+5. Retry مطابق تسلسلي يعيد `already_saved` ونفس `attemptId`.
+6. طلبان متزامنان فعليًا لنفس `submission_id` يعيدان `saved` و`already_saved` مع `attemptId` واحد.
+7. إعادة استخدام المفتاح مع إجابات مختلفة تعطي `submission_conflict`.
+8. بصمة قديمة تعطي `scoring_contract_stale` بلا سجل.
+9. درس غير متاح يعطي `lesson_not_available`.
+10. سؤال ناقص أو إضافي أو مكرر يعطي `question_set_mismatch`.
+11. فهرس سالب أو كسري أو خارج النطاق يعطي `invalid_response_set`.
+12. Pending وSuspended يعطيان `not_authorized` بلا سجل.
+13. Anonymous لا ينفذ RPC عند طبقة الامتياز.
+14. المستخدم يقرأ محاولته وإجاباتها فقط.
+15. مستخدم آخر يرى مصفوفة فارغة عبر RLS.
+16. INSERT/UPDATE/DELETE المباشر ممنوع.
+17. فشل answers يلغي attempt ذريًا.
+18. حذف auth user يحذف attempt وanswers عبر Cascade.
 
 ## 13. عدم لمس المحتوى المشترك في الاختبارات
 
@@ -345,7 +347,31 @@ objective خاص
 
 هذا يمنع سباقات بين ملفات Vitest المتوازية.
 
-## 14. ما لم يُختبر في بيئة التجهيز
+## 14. مراجعة كلاود والاختبار الإضافي
+
+اعتمد كلاود ترجمة `quiz-engine.ts`، وعقد RPC، وRLS، وGRANT، والذرية، والبصمات، وحالات الرفض. الملاحظة الوحيدة كانت أن اختبار Retry الأصلي تسلسلي ولا يمارس سباق الإدخال الحقيقي.
+
+أضيف لذلك اختبار:
+
+```ts
+Promise.all([
+  submit(activeStudent, lessonId, questions, { submissionId }),
+  submit(activeStudent, lessonId, questions, { submissionId }),
+])
+```
+
+ويثبت:
+
+```text
+saved + already_saved
+نفس attemptId
+لا خطأ غير معالج
+لا سجل ثانٍ
+```
+
+بهذا أصبح مسار `EXCEPTION WHEN unique_violation` خاضعًا لدليل تنفيذي مباشر عند تشغيل الاختبارات الحية.
+
+## 15. ما لم يُختبر في بيئة التجهيز
 
 بيئة إعداد الحزمة لا تحتوي Supabase/Docker/PostgreSQL عاملة، لذلك لم يُنفذ:
 
@@ -367,21 +393,27 @@ TypeScript parse للملفات
 
 التنفيذ الحي يجب أن يحدث في Codespaces بعد اعتماد كلاود للحزمة، لا قبل المراجعة.
 
-## 15. أسئلة المراجعة المطلوبة من كلاود
+## 16. بوابة الإغلاق
 
-1. هل ترجمة `isCorrectAnswer` إلى SQL حرفية؟
-2. هل نوع `submission_id uuid` مناسب للعقد؟
-3. هل ترتيب التحقق قبل الإدخال يمنع أي محاولة جزئية؟
-4. هل `request_fingerprint` كافٍ لاكتشاف تعارض Retry؟
-5. هل حالات الرفض متميزة بلا خلط؟
-6. هل سياسة SELECT المقيدة بالحساب active هي السلوك المرغوب؟
-7. هل ترتيب `REVOKE → GRANT` صحيح؟
-8. هل `SECURITY DEFINER + search_path=''` محكم؟
-9. هل اختبار Trigger المؤقت يثبت الذرية دون تلويث الاختبارات الأخرى؟
-10. هل توجد ثغرة Race أو Privilege أو RLS لم تغطها الاختبارات؟
+بعد رفع الحزمة يجب تنفيذ:
 
-## 16. قرار الانتقال
+```text
+supabase db reset
+npm run test:supabase
+npm test
+npm run build
+npm run lint
+npx prettier --check .
+git diff --check
+```
 
-هذه حزمة مراجعة، وليست حزمة رفع.
+لا تُعلن D1 مكتملة إلا إذا:
 
-لا تُطبّق Migration ولا تُرفع ملفاتها إلى `main` قبل اعتماد كلاود أو تسجيل ملاحظاته وإصلاحها.
+```text
+Migration تطبق بنجاح
+جميع اختبارات Supabase القديمة والجديدة تنجح
+447 اختبارًا أساسيًا تبقى ناجحة
+اختبار التزامن الحقيقي ينجح
+لا Regression في baseline 508
+شجرة Git نظيفة
+```

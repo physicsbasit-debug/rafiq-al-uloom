@@ -206,6 +206,27 @@ describeIntegration('Phase 2-D1 mastery result persistence', { concurrent: false
     expect(second.data.result.attemptId).toBe(first.data.result.attemptId);
   });
 
+  it('handles two genuinely concurrent submissions with the same submission id', async () => {
+    const submissionId = randomUUID();
+    const [first, second] = await Promise.all([
+      submit(activeStudent, lessonId, questions, { submissionId }),
+      submit(activeStudent, lessonId, questions, { submissionId }),
+    ]);
+
+    expect(first.error).toBeNull();
+    expect(second.error).toBeNull();
+    expect([first.data?.status, second.data?.status].sort()).toEqual([
+      'already_saved',
+      'saved',
+    ]);
+
+    if (!first.data || !second.data || !('result' in first.data) || !('result' in second.data)) {
+      throw new Error('Expected two successful concurrent idempotent results.');
+    }
+
+    expect(second.data.result.attemptId).toBe(first.data.result.attemptId);
+  });
+
   it('rejects reusing one submission id with different answers', async () => {
     const submissionId = randomUUID();
     const first = await submit(activeStudent, lessonId, questions, { submissionId });
