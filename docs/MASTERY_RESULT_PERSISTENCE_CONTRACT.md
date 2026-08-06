@@ -201,9 +201,7 @@ type RejectedMasteryAttempt = {
 النتيجة الناجحة تحتوي:
 
 ```ts
-type MasteryResultReconciliation =
-  | 'matched_local_result'
-  | 'display_reconciled_to_server';
+type MasteryResultReconciliation = 'matched_local_result' | 'display_reconciled_to_server';
 ```
 
 والنتيجة الرسمية:
