@@ -1,0 +1,11 @@
+Phase 2-D0 source verification bundle
+Pinned repository commit: 990471d
+Repository: physicsbasit-debug/rafiq-al-uloom
+
+Files are unmodified source copies from that commit:
+- src/features/mastery/MasteryTestView.tsx
+- src/utils/scoring.ts
+- src/features/mastery/mastery-classifier.ts
+- src/types/quiz.types.ts
+
+Purpose: allow independent verification of Phase 2-D0 claims before approving the persistence contract.

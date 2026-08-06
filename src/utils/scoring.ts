@@ -9,7 +9,6 @@ export interface ScoreResult {
 }
 
 export type AnswersByQuestionId = Record<string, number | undefined>;
-
 export function calculateScore(
   questions: Question[],
   answersByQuestionId: AnswersByQuestionId
@@ -24,7 +23,6 @@ export function calculateScore(
 
     return selectedIndex !== undefined && isCorrectAnswer(question, selectedIndex);
   }).length;
-
   return {
     totalQuestions,
     answeredQuestions,
