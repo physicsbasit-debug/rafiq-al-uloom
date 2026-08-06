@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AppButton } from '@design-system/components/AppButton';
 import { ChoiceButton } from '@design-system/components/ChoiceButton';
 import { MasteryBadge } from '@design-system/components/MasteryBadge';
@@ -13,6 +13,8 @@ import type { Question } from '@shared-types/quiz.types';
 import { useMasteryQuestions } from '@services/queries/content-query.hooks';
 import { areAllQuestionsAnswered, calculateScore, type AnswersByQuestionId } from '@utils/scoring';
 import { classifyMasteryScore } from './mastery-classifier';
+import { MasteryResultSaveStatus } from './MasteryResultSaveStatus';
+import { useMasteryResultPersistence } from './useMasteryResultPersistence';
 import { getMasteryRecommendation } from './recommendations';
 interface MasteryTestViewProps {
   lessonId: string;
@@ -83,7 +85,29 @@ function ReviewItem({
 function MasteryTestContent({ questions, lessonId, onBackToLesson }: MasteryTestContentProps) {
   const [answers, setAnswers] = useState<AnswersByQuestionId>({});
   const [result, setResult] = useState<MasteryResult | null>(null);
+  const persistence = useMasteryResultPersistence(lessonId);
   const isComplete = areAllQuestionsAnswered(questions, answers);
+
+  useEffect(() => {
+    if (persistence.state.status !== 'saved') {
+      return;
+    }
+
+    const officialScore = persistence.state.result.percentage;
+    setResult((current) => {
+      if (!current || current.score === officialScore) {
+        return current;
+      }
+
+      const classification = classifyMasteryScore(officialScore);
+      return {
+        ...current,
+        score: officialScore,
+        classification,
+        recommendation: getMasteryRecommendation(classification),
+      };
+    });
+  }, [persistence.state]);
   function handleSelectChoice(questionId: string, choiceIndex: number) {
     if (!result && answers[questionId] === undefined) {
       setAnswers((current) => ({ ...current, [questionId]: choiceIndex }));
@@ -102,6 +126,10 @@ function MasteryTestContent({ questions, lessonId, onBackToLesson }: MasteryTest
       classification,
       recommendation: getMasteryRecommendation(classification),
       createdAt: 'local-session',
+    });
+    persistence.submitAttempt({
+      questions,
+      answersByQuestionId: answers,
     });
   }
   return (
@@ -202,6 +230,7 @@ function MasteryTestContent({ questions, lessonId, onBackToLesson }: MasteryTest
             <strong>التوصية: </strong>
             {result.recommendation}
           </p>
+          <MasteryResultSaveStatus state={persistence.state} onRetry={persistence.retry} />
           <div style={{ display: 'grid', gap: spacing.md }}>
             {questions.map((question, index) => (
               <ReviewItem
@@ -230,6 +259,7 @@ export function MasteryTestView({ lessonId, onBackToLesson }: MasteryTestViewPro
       onRetry={questionsQuery.reload}
     >
       <MasteryTestContent
+        key={lessonId}
         questions={questionsQuery.data}
         lessonId={lessonId}
         onBackToLesson={onBackToLesson}

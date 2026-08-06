@@ -1,0 +1,91 @@
+PHASE 2-D3 — FINAL APPLICATION PACKAGE
+
+Baseline:
+c098927
+
+1) Upload the ZIP contents to the repository while preserving paths.
+
+2) Pull and inspect the uploaded commit:
+
+git pull origin main
+git show --stat --oneline -1
+git status --short
+
+Expected changed scope:
+- src/features/mastery/MasteryTestView.tsx
+- src/features/mastery/MasteryResultSaveStatus.tsx
+- src/features/mastery/mastery-result-save.types.ts
+- src/features/mastery/useMasteryResultPersistence.ts
+- tests/features/MasteryTestView.persistence.test.tsx
+- tests/features/useMasteryResultPersistence.test.tsx
+- docs/PHASE_2_D3_MASTERY_TEST_INTEGRATION_DESIGN.md
+- README_PHASE_2_D3.md
+- APPLY_PHASE_2_D3.txt
+
+3) Run the build first:
+
+npm run build
+
+4) Run basic tests:
+
+npm test
+
+Expected:
+- 46 test files
+- 508 tests passed
+
+5) Run Supabase regression tests:
+
+npm run test:supabase
+
+Expected:
+- 6 test files
+- 77 tests passed
+
+6) Run quality gates:
+
+npm run lint
+npx prettier --check .
+git diff --check
+
+7) If Prettier reports only D3 files, format them:
+
+npx prettier --write \
+  src/features/mastery/MasteryTestView.tsx \
+  src/features/mastery/MasteryResultSaveStatus.tsx \
+  src/features/mastery/mastery-result-save.types.ts \
+  src/features/mastery/useMasteryResultPersistence.ts \
+  tests/features/MasteryTestView.persistence.test.tsx \
+  tests/features/useMasteryResultPersistence.test.tsx \
+  docs/PHASE_2_D3_MASTERY_TEST_INTEGRATION_DESIGN.md \
+  README_PHASE_2_D3.md
+
+git add \
+  src/features/mastery/MasteryTestView.tsx \
+  src/features/mastery/MasteryResultSaveStatus.tsx \
+  src/features/mastery/mastery-result-save.types.ts \
+  src/features/mastery/useMasteryResultPersistence.ts \
+  tests/features/MasteryTestView.persistence.test.tsx \
+  tests/features/useMasteryResultPersistence.test.tsx \
+  docs/PHASE_2_D3_MASTERY_TEST_INTEGRATION_DESIGN.md \
+  README_PHASE_2_D3.md
+
+git commit -m "style: format phase 2 d3 mastery integration files"
+git push origin main
+
+Then rerun all gates.
+
+8) Final verification:
+
+git status
+git log -1 --oneline
+
+Required final state:
+- main is up to date with origin/main
+- working tree clean
+- build passes
+- 508/508 basic tests pass
+- 77/77 Supabase tests pass
+- lint and Prettier pass
+
+Do not create a tag. Phase 2-D3 closes only after the live Codespaces gates pass.
