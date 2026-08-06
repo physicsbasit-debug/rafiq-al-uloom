@@ -88,8 +88,7 @@ export function useMasteryResultPersistence(
   const authSession = useContext(AuthSessionContext);
   const authorization = dependencies.authorization ?? authSession ?? GUEST_AUTHORIZATION;
   const service = dependencies.service ?? masteryResultsService;
-  const contentProvider =
-    dependencies.contentProvider ?? readContentProvider(import.meta.env);
+  const contentProvider = dependencies.contentProvider ?? readContentProvider(import.meta.env);
   const makeSubmissionId = dependencies.createSubmissionId ?? createSubmissionId;
   const now = dependencies.now ?? nowIso;
 

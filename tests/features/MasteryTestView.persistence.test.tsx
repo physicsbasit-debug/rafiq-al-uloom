@@ -5,7 +5,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AuthSessionContext, type AuthSessionContextValue } from '@features/auth/useAuthSession';
 import { MasteryTestView } from '@features/mastery/MasteryTestView';
-import { masteryResultsService, type MasteryAttemptSubmissionResult } from '@services/mastery-results';
+import {
+  masteryResultsService,
+  type MasteryAttemptSubmissionResult,
+} from '@services/mastery-results';
 import { useMasteryQuestions } from '@services/queries/content-query.hooks';
 import type { Question } from '@shared-types/quiz.types';
 
@@ -160,9 +163,7 @@ describe('MasteryTestView result persistence integration', () => {
         reconciliation: 'matched_local_result',
       });
     });
-    await waitFor(() =>
-      expect(screen.getByText('تم حفظ النتيجة في حسابك.')).toBeInTheDocument()
-    );
+    await waitFor(() => expect(screen.getByText('تم حفظ النتيجة في حسابك.')).toBeInTheDocument());
   });
 
   it('يعتمد الدرجة الرسمية بعد display_reconciled_to_server', async () => {
@@ -182,9 +183,7 @@ describe('MasteryTestView result persistence integration', () => {
         reconciliation: 'display_reconciled_to_server',
       });
     });
-    await waitFor(() =>
-      expect(screen.getByText(/الدرجة:/)).toHaveTextContent('الدرجة: 50 من 100')
-    );
+    await waitFor(() => expect(screen.getByText(/الدرجة:/)).toHaveTextContent('الدرجة: 50 من 100'));
     expect(screen.getByText('تم حفظ النتيجة واعتماد الدرجة الرسمية.')).toBeInTheDocument();
     expect(screen.getByText('يحتاج مراجعة')).toBeInTheDocument();
   });
@@ -207,9 +206,7 @@ describe('MasteryTestView result persistence integration', () => {
     const firstSubmission = vi.mocked(masteryResultsService.submitAttempt).mock.calls[0][0];
 
     fireEvent.click(screen.getByRole('button', { name: 'إعادة محاولة الحفظ' }));
-    await waitFor(() =>
-      expect(screen.getByText('تم حفظ النتيجة في حسابك.')).toBeInTheDocument()
-    );
+    await waitFor(() => expect(screen.getByText('تم حفظ النتيجة في حسابك.')).toBeInTheDocument());
     const secondSubmission = vi.mocked(masteryResultsService.submitAttempt).mock.calls[1][0];
     expect(secondSubmission.submissionId).toBe(firstSubmission.submissionId);
     expect(secondSubmission.startedAt).toBe(firstSubmission.startedAt);

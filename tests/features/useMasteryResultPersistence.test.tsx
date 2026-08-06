@@ -110,14 +110,17 @@ afterEach(() => {
 
 describe('useMasteryResultPersistence', () => {
   it('يبدأ بحالة idle', () => {
-    const service = createService(async () => ({ status: 'saved', result: officialResult(), reconciliation: 'matched_local_result' }));
+    const service = createService(async () => ({
+      status: 'saved',
+      result: officialResult(),
+      reconciliation: 'matched_local_result',
+    }));
     const { result } = renderHook(() =>
       useMasteryResultPersistence('lesson-1', activeDependencies(service))
     );
 
     expect(result.current.state).toEqual({ status: 'idle' });
   });
-
 
   it('يثبت startedAt عند بدء جلسة الاختبار قبل الإنهاء', async () => {
     const now = vi.fn(() => STARTED_AT);
@@ -142,7 +145,11 @@ describe('useMasteryResultPersistence', () => {
 
   it('يعيد not_applicable للمزوّد المحلي دون إنشاء submissionId أو استدعاء الخدمة', async () => {
     const createSubmissionId = vi.fn(() => SUBMISSION_ID);
-    const service = createService(async () => ({ status: 'saved', result: officialResult(), reconciliation: 'matched_local_result' }));
+    const service = createService(async () => ({
+      status: 'saved',
+      result: officialResult(),
+      reconciliation: 'matched_local_result',
+    }));
     const { result } = renderHook(() =>
       useMasteryResultPersistence('lesson-1', {
         ...activeDependencies(service),
@@ -161,7 +168,11 @@ describe('useMasteryResultPersistence', () => {
 
   it('يعيد not_applicable للزائر دون إنشاء submissionId أو استدعاء الخدمة', async () => {
     const createSubmissionId = vi.fn(() => SUBMISSION_ID);
-    const service = createService(async () => ({ status: 'saved', result: officialResult(), reconciliation: 'matched_local_result' }));
+    const service = createService(async () => ({
+      status: 'saved',
+      result: officialResult(),
+      reconciliation: 'matched_local_result',
+    }));
     const { result } = renderHook(() =>
       useMasteryResultPersistence('lesson-1', {
         ...activeDependencies(service),
@@ -182,7 +193,11 @@ describe('useMasteryResultPersistence', () => {
   });
 
   it('لا يستدعي الخدمة قبل سماح authorizeOperation', async () => {
-    const service = createService(async () => ({ status: 'saved', result: officialResult(), reconciliation: 'matched_local_result' }));
+    const service = createService(async () => ({
+      status: 'saved',
+      result: officialResult(),
+      reconciliation: 'matched_local_result',
+    }));
     const pendingAuthorization: AuthorizationState = {
       status: 'pending',
       profile: { ...activeAuthorization.profile, status: 'pending' },

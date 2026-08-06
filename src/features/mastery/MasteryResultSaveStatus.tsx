@@ -9,10 +9,7 @@ interface MasteryResultSaveStatusProps {
   readonly onRetry: () => void;
 }
 
-export function MasteryResultSaveStatus({
-  state,
-  onRetry,
-}: MasteryResultSaveStatusProps) {
+export function MasteryResultSaveStatus({ state, onRetry }: MasteryResultSaveStatusProps) {
   if (state.status === 'idle' || state.status === 'not_applicable') {
     return null;
   }
@@ -27,7 +24,11 @@ export function MasteryResultSaveStatus({
 
   if (state.status === 'saved') {
     return (
-      <p role="status" data-save-status="saved" style={{ color: colors.successDark, fontWeight: 800 }}>
+      <p
+        role="status"
+        data-save-status="saved"
+        style={{ color: colors.successDark, fontWeight: 800 }}
+      >
         {state.reconciliation === 'display_reconciled_to_server'
           ? 'تم حفظ النتيجة واعتماد الدرجة الرسمية.'
           : 'تم حفظ النتيجة في حسابك.'}
