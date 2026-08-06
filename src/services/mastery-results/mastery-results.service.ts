@@ -107,7 +107,7 @@ function resultsMatch(
   return (
     local.totalQuestions === official.questionCount &&
     local.correctAnswers === official.correctCount &&
-    Math.abs(local.score - official.percentage) <= Number.EPSILON * 100
+    Math.abs(local.score - official.percentage) <= 1e-9
   );
 }
 
