@@ -1,0 +1,59 @@
+Phase 2-D2 — Client Persistence Service
+=======================================
+
+Baseline:
+  commit 0367959
+  Phase 2-D0 CLOSED
+  Phase 2-D1 CLOSED
+
+Scope:
+  - Client types, repository, service, fingerprint helper
+  - submit_own_mastery_result authorization operation
+  - Unit and architecture tests
+  - No React integration
+  - No SQL or migration
+  - No dependency or package changes
+  - No Git tag
+
+After uploading this package to GitHub:
+
+1. Pull and inspect:
+   git pull origin main
+   git show --stat --oneline -1
+   git status --short
+
+2. Run the TypeScript build first, especially to verify Web Crypto typings:
+   npm run build
+
+3. Run all basic tests:
+   npm test
+
+   Expected baseline after D2:
+     Test Files: 44 passed
+     Tests: 490 passed
+
+4. Run quality checks:
+   npm run lint
+   npx prettier --check .
+   git diff --check
+
+5. Run Supabase regression tests while local Supabase is available:
+   npm run test:supabase
+
+   Expected:
+     Test Files: 6 passed
+     Tests: 77 passed
+
+6. Final state:
+   git status
+   git log -1 --oneline
+
+Expected:
+  main is synchronized with origin/main
+  working tree clean
+
+Important:
+  - Do not modify MasteryTestView in D2.
+  - Do not create a Git tag.
+  - If npm run build reports BufferSource/SubtleCrypto typing only in
+    mastery-results.fingerprint.ts, stop and apply a dedicated minimal Fix 1.

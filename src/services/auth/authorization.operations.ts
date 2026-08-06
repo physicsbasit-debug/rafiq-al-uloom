@@ -1,5 +1,6 @@
 export const AUTHORIZATION_OPERATIONS = [
   'access_student_experience',
+  'submit_own_mastery_result',
   'access_teacher_workspace',
   'access_reviewer_workspace',
   'author_content',

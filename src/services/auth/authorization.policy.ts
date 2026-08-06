@@ -45,6 +45,7 @@ function authorizeActiveRole(
 
   switch (operation) {
     case 'access_student_experience':
+    case 'submit_own_mastery_result':
       return ALLOWED;
     case 'access_teacher_workspace':
       return role === 'teacher' ? ALLOWED : denied('role_not_allowed');
