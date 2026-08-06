@@ -1,0 +1,61 @@
+PHASE 2-D3 FIX 1 — FINAL APPLICATION
+
+Baseline:
+  c0ae0b8
+
+Purpose:
+  Remove synchronous setResult from useEffect in MasteryTestView.
+  Derive the official displayed result during render instead.
+
+Files in this package:
+  src/features/mastery/MasteryTestView.tsx
+  README_PHASE_2_D3_FIX1.md
+  APPLY_PHASE_2_D3_FIX1.txt
+
+Expected source change:
+  - React import no longer includes useEffect.
+  - Add pure helper withOfficialScore(...).
+  - Remove the reconciliation useEffect.
+  - Derive displayedResult from result + saved official percentage.
+  - Render score/classification/recommendation from displayedResult.
+  - Keep answer locking based on raw local result.
+  - Do not change persistence hook, retry, submissionId, startedAt, answers, or ReviewItem.
+
+After uploading the package to GitHub, run:
+
+  git pull origin main
+  git show --stat --oneline -1
+  git status --short
+
+Run the previously failing gate first:
+
+  npm run lint
+
+Then run the full acceptance gates:
+
+  npm run build
+  npm test
+  npm run test:supabase
+  npx prettier --check .
+  git diff --check
+
+Expected:
+
+  lint: PASS
+  build: PASS
+  basic tests: 508/508
+  Supabase integration tests: 77/77
+  Prettier: PASS
+  git diff --check: PASS
+
+Final verification:
+
+  git status
+  git log -1 --oneline
+
+Expected:
+
+  Your branch is up to date with 'origin/main'.
+  nothing to commit, working tree clean
+
+Do not create a tag yet. Phase 2-D4 and Phase 2-D5 remain before v0.5.

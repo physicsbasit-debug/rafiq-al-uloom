@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { AppButton } from '@design-system/components/AppButton';
 import { ChoiceButton } from '@design-system/components/ChoiceButton';
 import { MasteryBadge } from '@design-system/components/MasteryBadge';
@@ -25,6 +25,23 @@ interface MasteryTestContentProps {
   questions: Question[];
   lessonId: string;
   onBackToLesson: () => void;
+}
+
+function withOfficialScore(
+  result: MasteryResult | null,
+  officialScore: number
+): MasteryResult | null {
+  if (!result || result.score === officialScore) {
+    return result;
+  }
+
+  const classification = classifyMasteryScore(officialScore);
+  return {
+    ...result,
+    score: officialScore,
+    classification,
+    recommendation: getMasteryRecommendation(classification),
+  };
 }
 
 function ReviewItem({
@@ -87,27 +104,11 @@ function MasteryTestContent({ questions, lessonId, onBackToLesson }: MasteryTest
   const [result, setResult] = useState<MasteryResult | null>(null);
   const persistence = useMasteryResultPersistence(lessonId);
   const isComplete = areAllQuestionsAnswered(questions, answers);
+  const displayedResult =
+    persistence.state.status === 'saved'
+      ? withOfficialScore(result, persistence.state.result.percentage)
+      : result;
 
-  useEffect(() => {
-    if (persistence.state.status !== 'saved') {
-      return;
-    }
-
-    const officialScore = persistence.state.result.percentage;
-    setResult((current) => {
-      if (!current || current.score === officialScore) {
-        return current;
-      }
-
-      const classification = classifyMasteryScore(officialScore);
-      return {
-        ...current,
-        score: officialScore,
-        classification,
-        recommendation: getMasteryRecommendation(classification),
-      };
-    });
-  }, [persistence.state]);
   function handleSelectChoice(questionId: string, choiceIndex: number) {
     if (!result && answers[questionId] === undefined) {
       setAnswers((current) => ({ ...current, [questionId]: choiceIndex }));
@@ -196,7 +197,7 @@ function MasteryTestContent({ questions, lessonId, onBackToLesson }: MasteryTest
           );
         })}
       </div>
-      {!result ? (
+      {!displayedResult ? (
         <div style={{ marginTop: spacing.lg }}>
           <p style={{ color: colors.textSecondary, lineHeight: typography.lineHeight.lg }}>
             تمت الإجابة عن <bdi dir="ltr">{Object.keys(answers).length}</bdi> من{' '}
@@ -221,14 +222,14 @@ function MasteryTestContent({ questions, lessonId, onBackToLesson }: MasteryTest
         >
           <h3 style={{ marginTop: 0, color: colors.textPrimary }}>نتيجة اختبار الإتقان</h3>
           <p style={{ color: colors.textPrimary, fontWeight: 900 }}>
-            الدرجة: <bdi dir="ltr">{result.score}</bdi> من <bdi dir="ltr">100</bdi>
+            الدرجة: <bdi dir="ltr">{displayedResult.score}</bdi> من <bdi dir="ltr">100</bdi>
           </p>
 
-          <MasteryBadge classification={result.classification} />
+          <MasteryBadge classification={displayedResult.classification} />
 
           <p style={{ color: colors.textPrimary, lineHeight: typography.lineHeight.lg }}>
             <strong>التوصية: </strong>
-            {result.recommendation}
+            {displayedResult.recommendation}
           </p>
           <MasteryResultSaveStatus state={persistence.state} onRetry={persistence.retry} />
           <div style={{ display: 'grid', gap: spacing.md }}>
