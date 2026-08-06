@@ -1,0 +1,53 @@
+Phase 2-D0 — Final Documentation Package
+=========================================
+
+الحالة: معتمدة من كلاود وجاهزة للرفع إلى GitHub.
+
+الملفات:
+1. docs/MASTERY_RESULT_CURRENT_STATE_AUDIT.md
+2. docs/MASTERY_RESULT_PERSISTENCE_CONTRACT.md
+3. README_PHASE_2_D0.md
+4. APPLY_PHASE_2_D0.txt
+
+خطوات التطبيق:
+
+1. ارفع محتويات الحزمة مع الحفاظ على المسارات.
+2. داخل Codespaces شغّل:
+
+   git pull origin main
+
+3. تحقق أن التغيير يقتصر على ملفات D0 الوثائقية:
+
+   git show --stat --oneline -1
+
+4. شغّل:
+
+   npx prettier --check \
+     docs/MASTERY_RESULT_CURRENT_STATE_AUDIT.md \
+     docs/MASTERY_RESULT_PERSISTENCE_CONTRACT.md \
+     README_PHASE_2_D0.md
+
+5. إذا طلب Prettier تنسيقًا:
+
+   npx prettier --write \
+     docs/MASTERY_RESULT_CURRENT_STATE_AUDIT.md \
+     docs/MASTERY_RESULT_PERSISTENCE_CONTRACT.md \
+     README_PHASE_2_D0.md
+
+   git add \
+     docs/MASTERY_RESULT_CURRENT_STATE_AUDIT.md \
+     docs/MASTERY_RESULT_PERSISTENCE_CONTRACT.md \
+     README_PHASE_2_D0.md
+
+   git commit -m "style: format phase 2 d0 persistence contract"
+   git push origin main
+
+6. تحقق من نظافة المستودع:
+
+   git status
+
+ملاحظة مهمة:
+حزمة source verification ليست جزءًا من D0 النهائية. إذا أضاف رفعها ملف SOURCE_VERIFICATION.txt إلى جذر المستودع، احذفه في التزام توثيقي صغير. لا تحذف ملفات src الأصلية ولا تعدلها.
+
+بوابة D1 الإلزامية:
+قبل كتابة SQL/RPC يجب تضمين src/features/quiz/quiz-engine.ts في حزمة D1 والتحقق من isCorrectAnswer وgetQuestionFeedback مباشرة.
