@@ -53,10 +53,9 @@ export function toUnavailableReason(error: unknown): MasteryAttemptUnavailableRe
   return 'unknown';
 }
 
-export function unavailableResult(error: unknown): Extract<
-  MasteryAttemptRepositoryResult,
-  { readonly status: 'unavailable' }
-> {
+export function unavailableResult(
+  error: unknown
+): Extract<MasteryAttemptRepositoryResult, { readonly status: 'unavailable' }> {
   return {
     status: 'unavailable',
     reason: toUnavailableReason(error),

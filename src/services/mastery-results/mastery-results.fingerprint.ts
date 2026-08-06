@@ -31,9 +31,7 @@ export async function digestSha256Hex(bytes: Uint8Array): Promise<string> {
   }
 
   const digest = await subtle.digest('SHA-256', bytes);
-  return [...new Uint8Array(digest)]
-    .map((value) => value.toString(16).padStart(2, '0'))
-    .join('');
+  return [...new Uint8Array(digest)].map((value) => value.toString(16).padStart(2, '0')).join('');
 }
 
 export async function createMasteryScoringFingerprint(
@@ -41,7 +39,9 @@ export async function createMasteryScoringFingerprint(
   questions: readonly Question[],
   digest: Sha256HexDigest = digestSha256Hex
 ): Promise<string> {
-  const fingerprint = (await digest(textEncoder.encode(buildMasteryScoringMaterial(lessonId, questions))))
+  const fingerprint = (
+    await digest(textEncoder.encode(buildMasteryScoringMaterial(lessonId, questions)))
+  )
     .trim()
     .toLowerCase();
 

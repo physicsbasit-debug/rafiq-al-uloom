@@ -172,7 +172,10 @@ export function createSupabaseMasteryResultsRepository(
 ): MasteryResultsRepository {
   const reportDiagnostic = options.reportDiagnostic ?? (() => undefined);
 
-  function report(reason: 'network_error' | 'service_unavailable' | 'unknown', cause: unknown): void {
+  function report(
+    reason: 'network_error' | 'service_unavailable' | 'unknown',
+    cause: unknown
+  ): void {
     reportDiagnostic(createMasteryResultsDiagnosticError('submitMasteryAttempt', reason, cause));
   }
 
@@ -234,6 +237,5 @@ function getDefaultRepository(): MasteryResultsRepository {
 }
 
 export const supabaseMasteryResultsRepository: MasteryResultsRepository = {
-  submitAttempt: (submission, options) =>
-    getDefaultRepository().submitAttempt(submission, options),
+  submitAttempt: (submission, options) => getDefaultRepository().submitAttempt(submission, options),
 };

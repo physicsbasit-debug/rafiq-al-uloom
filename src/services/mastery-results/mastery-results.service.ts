@@ -132,10 +132,7 @@ export function createMasteryResultsService(
         return rejected(questionSetError);
       }
 
-      const answers = toAnswerSubmissions(
-        submission.questions,
-        submission.answersByQuestionId
-      );
+      const answers = toAnswerSubmissions(submission.questions, submission.answersByQuestionId);
       if (!answers) {
         return rejected('invalid_response_set');
       }

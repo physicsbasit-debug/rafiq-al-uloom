@@ -12,14 +12,9 @@ export type MasteryAttemptRejectionReason =
   | 'question_set_mismatch'
   | 'submission_conflict';
 
-export type MasteryAttemptUnavailableReason =
-  | 'network_error'
-  | 'service_unavailable'
-  | 'unknown';
+export type MasteryAttemptUnavailableReason = 'network_error' | 'service_unavailable' | 'unknown';
 
-export type MasteryResultReconciliation =
-  | 'matched_local_result'
-  | 'display_reconciled_to_server';
+export type MasteryResultReconciliation = 'matched_local_result' | 'display_reconciled_to_server';
 
 export interface MasteryAnswerSubmission {
   readonly questionId: string;

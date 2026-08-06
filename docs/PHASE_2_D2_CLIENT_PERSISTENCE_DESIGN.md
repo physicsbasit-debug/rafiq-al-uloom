@@ -132,7 +132,7 @@ submission_conflict
     scoringPolicyVersion: 'mastery-equal-weight-v1';
     scoringFingerprint: string;
     completedAt: string;
-  };
+  }
 }
 ```
 
@@ -205,17 +205,17 @@ submit_own_mastery_result
 
 القرار:
 
-| الحالة | النتيجة |
-|---|---|
-| Guest | رفض `guest` |
-| Auth loading | رفض `profile_loading` |
-| Session error | رفض `session_error` |
-| Profile loading/error | رفض مطابق للحالة |
-| Pending | رفض `account_pending` |
-| Suspended | رفض `account_suspended` |
-| Active student | سماح |
-| Active teacher | سماح |
-| Active reviewer | سماح |
+| الحالة                | النتيجة                 |
+| --------------------- | ----------------------- |
+| Guest                 | رفض `guest`             |
+| Auth loading          | رفض `profile_loading`   |
+| Session error         | رفض `session_error`     |
+| Profile loading/error | رفض مطابق للحالة        |
+| Pending               | رفض `account_pending`   |
+| Suspended             | رفض `account_suspended` |
+| Active student        | سماح                    |
+| Active teacher        | سماح                    |
+| Active reviewer       | سماح                    |
 
 هذا القرار يسمح بحفظ نتيجة المستخدم نفسه فقط. RLS وRPC تبقيان الحماية الفعلية.
 
