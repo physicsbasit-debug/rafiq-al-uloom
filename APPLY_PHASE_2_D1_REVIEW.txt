@@ -1,0 +1,36 @@
+Phase 2-D1 — Review Instructions
+================================
+
+هذه حزمة مراجعة لكلاود فقط.
+
+لا ترفعها إلى GitHub.
+لا تنفذ supabase db reset الآن.
+لا تنشئ Commit أو Tag.
+
+أرسل إلى كلاود:
+
+1. ZIP كاملة.
+2. SHA-256.
+3. اطلب منه البدء بقراءة:
+   src/features/quiz/quiz-engine.ts
+4. ثم مطابقة المنطق مع:
+   supabase/migrations/20260806070000_add_mastery_result_persistence.sql
+5. ثم مراجعة:
+   tests/integration/supabase-mastery-results.integration.ts
+6. ثم الوثيقة:
+   docs/PHASE_2_D1_DATABASE_DESIGN.md
+
+نقاط الحكم المطلوبة:
+
+- صحة ترجمة isChoiceIndexValid/isCorrectAnswer.
+- RPC لا تقبل user_id أو score.
+- auth.uid() + profiles هما مصدر الهوية والأهلية.
+- SECURITY DEFINER مع search_path فارغ.
+- REVOKE قبل GRANT.
+- لا DML مباشر للمستخدم.
+- RLS تمنع القراءة المتقاطعة.
+- Idempotency تعالج التكرار والسباق.
+- Transaction تلغي attempt عند فشل answers.
+- الاختبارات لا تعدّل Seed مشتركة.
+
+بعد اعتماد كلاود ستُنشأ حزمة D1 النهائية القابلة للرفع والاختبار في Codespaces.

@@ -14,13 +14,11 @@ export function isChoiceIndexValid(question: Question, selectedIndex: number): b
     Number.isInteger(selectedIndex) && selectedIndex >= 0 && selectedIndex < question.choices.length
   );
 }
-
 export function isCorrectAnswer(question: Question, selectedIndex: number): boolean {
   return (
     isChoiceIndexValid(question, selectedIndex) && selectedIndex === question.correctAnswerIndex
   );
 }
-
 export function getQuestionFeedback(
   question: Question,
   selectedIndex: number
@@ -29,7 +27,6 @@ export function getQuestionFeedback(
   const isCorrect = isCorrectAnswer(question, selectedIndex);
   const selectedChoice = isValidChoice ? question.choices[selectedIndex] : null;
   const correctChoice = question.choices[question.correctAnswerIndex] ?? '';
-
   return {
     isCorrect,
     isValidChoice,
