@@ -1,0 +1,88 @@
+# APPLY — Phase 2-D5-C2 Final Documentation & Freeze
+
+هذه حزمة الرفع النهائية لـ Phase 2-D5-C2 بعد اعتماد المراجعة.
+
+## التطبيق
+
+1. ارفع محتويات الحزمة إلى جذر المستودع.
+2. في Codespaces نفّذ:
+
+```bash
+git pull origin main
+git show --stat --oneline -1
+git status --short
+```
+
+3. تحقق نصيًا من صف Phase 2-D:
+
+```bash
+grep -n "| 2-D " docs/PHASES.md
+```
+
+يجب أن يحتوي الصف على:
+
+```text
+مكتملة / CLOSED
+```
+
+4. راجع أن التغيير توثيقي فقط:
+
+```bash
+git show --name-only --format= HEAD
+```
+
+5. شغّل أمر الإغلاق كاملًا على التزام C2:
+
+```bash
+npm run verify:mastery-results-closure
+```
+
+لا تنشئ الوسم إذا فشل أي جزء.
+
+## بعد نجاح أمر الإغلاق فقط
+
+```bash
+TAG="v0.5-mastery-results-cloud-complete"
+FINAL_COMMIT="$(git rev-parse HEAD)"
+REMOTE_MAIN="$(git ls-remote origin refs/heads/main | awk '{print $1}')"
+
+test "$FINAL_COMMIT" = "$REMOTE_MAIN"
+test -z "$(git status --porcelain)"
+
+printf 'Final commit: %s\nRemote main:  %s\n' "$FINAL_COMMIT" "$REMOTE_MAIN"
+```
+
+تأكد أولًا أن الوسم غير موجود:
+
+```bash
+git tag -l "$TAG"
+git ls-remote --tags origin "refs/tags/$TAG" "refs/tags/$TAG^{}"
+```
+
+ثم أنشئه وادفعه:
+
+```bash
+git tag -a "$TAG" \
+  -m "Phase 2-D mastery results cloud persistence complete: 597 unique tests verified"
+
+git push origin "$TAG"
+```
+
+التحقق المحلي والبعيد:
+
+```bash
+test "$(git rev-list -n 1 "$TAG")" = "$FINAL_COMMIT"
+
+REMOTE_TAG_COMMIT="$(
+  git ls-remote --tags origin "refs/tags/$TAG^{}" | awk '{print $1}'
+)"
+
+test "$REMOTE_TAG_COMMIT" = "$FINAL_COMMIT"
+
+printf 'Final commit: %s\nRemote tag:  %s\n' "$FINAL_COMMIT" "$REMOTE_TAG_COMMIT"
+
+git show --no-patch --decorate "$TAG"
+git status
+```
+
+السطر البعيد `^{}` هو commit الذي يفكّ إليه annotated tag؛ يجب أن يساوي الالتزام النهائي حرفيًا.

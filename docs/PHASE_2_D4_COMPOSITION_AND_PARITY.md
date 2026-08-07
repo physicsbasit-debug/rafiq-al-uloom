@@ -2,7 +2,7 @@
 
 ## الحالة
 
-حزمة تطبيق نهائية بعد اعتماد المراجعة، جاهزة للرفع إلى GitHub وتشغيل اختبارات Codespaces.
+أُغلقت Phase 2-D4 رسميًا بعد إثبات التركيب الحقيقي والتكافؤ الحسابي. حزمة D4 الأساسية بُنيت فوق `e66983a`، ثم عولج فرق IEEE-754 المحدود في Fix 1، وأصبحت نقطة الإغلاق المعتمدة `1f01c66`.
 
 الخط الأساس:
 
@@ -10,13 +10,17 @@
 e66983a
 ```
 
-الحالة السابقة:
+الحالة النهائية:
 
 ```text
 Phase 2-D0  CLOSED
 Phase 2-D1  CLOSED
 Phase 2-D2  CLOSED
 Phase 2-D3  CLOSED
+Phase 2-D4  CLOSED
+
+Fix 1 commit:   f3df8ef
+D4 close commit: 1f01c66
 ```
 
 ## 1. الغرض
@@ -26,7 +30,7 @@ Phase 2-D3  CLOSED
 1. إثبات أن Auth وAuthorization وRepository المحتوى وReact Hook وخدمة النتائج وRPC وPostgreSQL تعمل معًا في مسار حقيقي واحد.
 2. إنشاء بوابة تكافؤ دائمة بين `calculateScore()` في TypeScript و`submit_mastery_attempt` في PostgreSQL.
 
-D4 لا تغيّر سلوك الإنتاج، ولا تضيف Migration، ولا تعدّل React أو خدمات D2. هي مرحلة إثبات تركيب وتكافؤ فقط.
+حزمة D4 الأساسية كانت مرحلة إثبات تركيب وتكافؤ فقط، بلا Migration ولا تعديل React أو خدمات D2. بعد الاختبار الحقيقي ظهر فرق IEEE-754 محدود في المصالحة، فعولج في Fix 1 بسطر واحد داخل خدمة D2 دون تغيير SQL أو RPC أو حساب الدرجة نفسه.
 
 ## 2. نطاق الملفات
 
@@ -40,7 +44,7 @@ README_PHASE_2_D4.md
 APPLY_PHASE_2_D4.txt
 ```
 
-لا تعديل على:
+حزمة D4 الأساسية لم تعدّل:
 
 ```text
 src/
@@ -51,6 +55,8 @@ MasteryTestView
 useMasteryResultPersistence
 خدمات mastery-results
 ```
+
+Fix 1 اللاحق عدّل فقط عتبة المطابقة في `src/services/mastery-results/mastery-results.service.ts` من `Number.EPSILON * 100` إلى `1e-9`.
 
 ## 3. قرار فصل الاختبارات
 
@@ -171,7 +177,8 @@ Array.sort
 الأسئلة تُجلب حرفيًا عبر:
 
 ```ts
-createSupabaseContentRepository(client).getMasteryQuestionsByLesson(lessonId);
+createSupabaseContentRepository(client)
+  .getMasteryQuestionsByLesson(lessonId)
 ```
 
 وهذه Repository تطلب:
@@ -220,13 +227,7 @@ calculateScore.score = RPC.percentage
 reconciliation = matched_local_result
 ```
 
-ظهور:
-
-```text
-display_reconciled_to_server
-```
-
-في أي حالة يعد فشل تكافؤ حقيقيًا.
+ظهور `display_reconciled_to_server` مع تطابق العدادات كشف في أول تشغيل فرق IEEE-754 غير دلالي بين ترتيب العمليات الحسابية في TypeScript وPostgreSQL. عولج ذلك في Fix 1 بتغيير عتبة مقارنة النسبة فقط إلى `1e-9` بعد فحصين صحيحين تامين لـ`questionCount` و`correctCount`. بعد الإصلاح أصبحت جميع حالات Parity تعيد `matched_local_result`.
 
 ## 9. اختبار الترتيب والبصمة
 
@@ -260,23 +261,19 @@ npm run test:mastery-results-composition
 npm run test:mastery-results-parity
 ```
 
-لا يُضاف `verify:mastery-results-closure` في D4. سيُبنى في D5 ويستدعي بوابة Parity صراحةً.
+لم يُضف `verify:mastery-results-closure` في حزمة D4 نفسها؛ أُضيف لاحقًا في D5-C1 وأصبح يستدعي بوابة Parity صراحةً.
 
-## 12. عدد الاختبارات
-
-```text
-Composition: 2
-Parity:      10
-D4 total:    12
-```
-
-بعد التطبيق المتوقع:
+## 12. عدد الاختبارات والدليل الفعلي
 
 ```text
-Basic tests:                508
-Supabase integration files: 8
-Supabase integration tests: 89
+Composition:                 2/2 PASS
+Parity:                     10/10 PASS
+Basic tests:               508/508 PASS
+Supabase integration files: 8/8 PASS
+Supabase integration tests: 89/89 PASS
 ```
+
+Composition وParity جزء من مجموعة Supabase التكاملية، وليستا 12 اختبارًا فريدًا إضافيًا.
 
 ## 13. المخاطر والحواجز
 
@@ -304,32 +301,26 @@ concurrent: false
 
 ## 14. معايير القبول
 
-- [ ] Build ناجح.
-- [ ] 508/508 اختبارًا أساسيًا.
-- [ ] 89/89 اختبار Supabase.
-- [ ] ملف Composition ينجح باختبارين.
-- [ ] ملف Parity ينجح بعشرة اختبارات.
-- [ ] كل حالات Parity تعيد `matched_local_result`.
-- [ ] ترتيب معرفات Unicode يطابق PostgreSQL.
-- [ ] البصمة المحلية تطابق الرسمية.
-- [ ] `already_saved` يعيد النتيجة نفسها.
-- [ ] لا Mock لخدمة النتائج أو RPC في D4.
-- [ ] لا تعديل على `src/` أو Migration.
-- [ ] Lint وPrettier و`git diff --check` ناجحة.
-- [ ] شجرة Git نظيفة ومتزامنة.
+- [x] Build ناجح.
+- [x] 508/508 اختبارًا أساسيًا.
+- [x] 89/89 اختبار Supabase.
+- [x] ملف Composition ينجح باختبارين.
+- [x] ملف Parity ينجح بعشرة اختبارات.
+- [x] كل حالات Parity تعيد `matched_local_result`.
+- [x] ترتيب معرفات Unicode يطابق PostgreSQL.
+- [x] البصمة المحلية تطابق الرسمية.
+- [x] `already_saved` يعيد النتيجة نفسها.
+- [x] لا Mock لخدمة النتائج أو RPC في D4.
+- [x] حزمة D4 الأساسية لم تعدل `src/` أو Migration؛ Fix 1 اللاحق عدّل سطر عتبة المصالحة فقط في خدمة D2 دون SQL أو RPC.
+- [x] Lint وPrettier و`git diff --check` ناجحة.
+- [x] شجرة Git نظيفة ومتزامنة.
 
 ## 15. بوابة D5
 
-بعد إغلاق D4 تنتقل الخطة إلى:
+انتقلت الخطة إلى Phase 2-D5، وأضيف الأمر الموحد:
 
 ```text
-Phase 2-D5 — Closure & Freeze
+npm run verify:mastery-results-closure
 ```
 
-وفيها يُضاف أمر موحد:
-
-```text
-verify:mastery-results-closure
-```
-
-ويجب أن يستدعي `test:mastery-results-parity` صراحةً، لا أن يكتفي بالاختبارات العامة.
+نجح كاملًا عند `f042ca9`، واستدعى Composition وParity صراحةً بعد مجموعة Supabase العامة. D5-C2 هي دفعة التوثيق والتجميد الأخيرة قبل الوسم `v0.5-mastery-results-cloud-complete`.

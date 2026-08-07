@@ -1,12 +1,14 @@
 # رفيق العلوم — المعمارية
 
-## الحالة المعمارية عند مرشح تجميد Auth
+## الحالة المعمارية عند مرشح تجميد Cloud Persistence v0.5
 
 رفيق العلوم تطبيق React + Vite + TypeScript strict. طبقة الطالب الحالية تعمل خلف عقد بيانات غير متزامن واحد، ويمكن تشغيلها بمزوّد محلي أو Supabase دون تغيير واجهات الطالب.
 
-اكتملت منظومة Auth والصلاحيات تشغيليًا حتى C5-C1 بنتيجة 508 اختبارات. يصبح
-التجميد رسميًا عندما يشير الوسم `v0.4-auth-security-complete` إلى التزام C5-C2
-النهائي الذي اجتاز `npm run verify:auth-closure`.
+منظومة Auth والصلاحيات مجمّدة بالوسم `v0.4-auth-security-complete`. واكتمل
+مسار حفظ نتائج الإتقان السحابي عبر Phase 2-D0 إلى D5-C1، ثم اجتاز أمر الإغلاق
+`npm run verify:mastery-results-closure` كاملًا عند `f042ca9` بنتيجة 508 اختبارًا
+أساسيًا و89 اختبار تكامل Supabase، أي 597 اختبارًا فريدًا. D5-C2 هي دفعة التوثيق
+والتجميد الأخيرة قبل الوسم `v0.5-mastery-results-cloud-complete`.
 
 ## القرارات المعمارية المعتمدة
 
@@ -22,8 +24,8 @@
 | اختيار المزوّد    | `getContentRepository()` مركزي وكسول                                                       |
 | الافتراضي         | `VITE_CONTENT_PROVIDER` غائب أو `local` ⇒ المزوّد المحلي                                   |
 | Supabase          | Schema + RLS + Seed + عميل + Repository + تكافؤ محلي مكتملة                                |
-| Auth والصلاحيات   | مكتملة تشغيليًا؛ تتجمد بالوسم `v0.4-auth-security-complete`                                |
-| Cloud Persistence | Phase 2-D، وتشمل `mastery_results` في الحد الأدنى                                          |
+| Auth والصلاحيات   | مكتملة ومجمّدة بالوسم `v0.4-auth-security-complete`                                        |
+| Cloud Persistence | نتائج الإتقان السحابية مكتملة عبر Service + Repository + RPC + RLS + idempotency + parity  |
 | لوحة المعلم       | Phase 3                                                                                    |
 | AI                | Phase 4                                                                                    |
 | الاختبارات        | Vitest + React Testing Library + اختبار تكامل Supabase منفصل                               |
@@ -126,6 +128,54 @@ npm run verify:auth-closure passed at f0ddb3b
 
 اختبارات C4-B تثبت تجاوز الواجهة، واختبارات C5-B تثبت تركيب Auth وProfile وAuthorization الحقيقي، بما في ذلك انتقال `active → suspended` أثناء التشغيل.
 
+## حفظ نتائج الإتقان السحابي
+
+المسار المعماري المعتمد:
+
+```text
+MasteryTestView
+→ useMasteryResultPersistence
+→ MasteryResultsService
+→ SupabaseMasteryResultsRepository
+→ submit_mastery_attempt RPC
+→ PostgreSQL
+   ├── mastery_attempts
+   └── mastery_attempt_answers
+```
+
+### عقد السلوك
+
+- النتيجة المحلية تظهر فورًا ولا تنتظر الشبكة.
+- حالات الحفظ الرسمية: `idle` و`saving` و`saved` و`failed` و`not_applicable`.
+- الزائر أو المزوّد المحلي لا يرسلان نتيجة سحابية ويستخدمان `not_applicable`.
+- التفويض يمر عبر العملية `submit_own_mastery_result` قبل الحفظ.
+- `submissionId` يُجمّد عند أول إنهاء ويُعاد استخدامه في retry المسموح.
+- RPC هي صاحبة النتيجة الرسمية المخزنة؛ العميل يصالح العرض معها دون تغيير الحمولة المجمدة.
+- `already_saved` يعيد المحاولة الرسمية نفسها دون إنشاء سجل مكرر.
+- ترتيب الأسئلة والبصمة يخضعان لترتيب PostgreSQL نفسه.
+- مطابقة النسبة تستخدم عتبة `1e-9` فقط بعد تطابق `questionCount` و`correctCount` تطابقًا تامًا، لعزل فروق IEEE-754 غير الدلالية.
+
+### حدود الوصول
+
+- اسم RPC `submit_mastery_attempt` مملوك فقط لـ`src/services/mastery-results/supabase-mastery-results.repository.ts`.
+- لا `.rpc()` مباشر داخل مكونات React.
+- لا كتابة مباشرة من العميل إلى `mastery_attempts` أو `mastery_attempt_answers`.
+- RLS وRPC وقواعد التفويض تبقى الحماية الفعلية، ولا يعتمد الأمان على حالة زر أو شاشة.
+- `scripts/check-mastery-results-client-boundaries.mjs` يثبت هذه الحدود ويمنع النجاح الكاذب إذا اختفى استدعاء RPC المعتمد كليًا.
+
+### أدلة الإغلاق الحالية
+
+```text
+508/508 basic tests
+89/89 Supabase integration tests
+Composition 2/2
+Parity 10/10
+597 unique tests
+npm run verify:mastery-results-closure → PASS at f042ca9
+```
+
+Composition وParity جزء من اختبارات Supabase الـ89، ويعاد تشغيلهما صراحةً كبوابتي إغلاق إلزاميتين؛ لذلك لا يضافان مرة ثانية إلى العدد الفريد 597.
+
 ## Mappers وحدود البيانات
 
 - صفوف قاعدة البيانات معرفة بأنواع `snake_case` مستقلة.
@@ -159,15 +209,23 @@ npx supabase db reset
 npm run test:supabase
 ```
 
-تعمل بإعداد Vitest منفصل، وتقارن دوال `ContentRepository` الثلاث عشرة مقارنة عميقة بين المزوّد المحلي وSupabase.
+تعمل بإعداد Vitest منفصل وتشمل اختبارات المحتوى وAuth والصلاحيات وحفظ نتائج الإتقان والتركيب الحقيقي والتكافؤ الحسابي.
+
+### بوابة إغلاق نتائج الإتقان
+
+```bash
+npm run verify:mastery-results-closure
+```
+
+تشغّل Build وLint و508 اختبارات أساسية وPrettier وفاحصي الحدود و`db reset` و89 اختبار Supabase، ثم تعيد Composition 2/2 وParity 10/10 صراحةً، وتتحقق أخيرًا من `git diff --check` ونظافة Git وتطابق `HEAD` مع `origin/main`.
 
 ## القاعدة الحمراء
 
 - لا استيراد متبادل بين `features/student` و`features/teacher`.
 - لا استيراد من `services/ai` قبل Phase 4.
-- لا Auth أو منطق صلاحيات واجهات قبل Phase 2-C.
-- لا كتابة محتوى إلى Supabase قبل تصميم مسار التأليف والمراجعة.
-- لا وصول مباشر إلى Repository من `features` أو queries خارج المصنع والعقد المعتمدين.
+- لا كتابة محتوى تعليمي إلى Supabase قبل تصميم مسار التأليف والمراجعة في Phase 3؛ حفظ نتائج الطالب في Phase 2-D مسار مستقل ومعتمد.
+- لا وصول مباشر إلى Content Repository من `features` أو queries خارج المصنع والعقد المعتمدين.
+- لا استدعاء مباشر لـ`submit_mastery_attempt` خارج Mastery Results Repository المعتمدة.
 - لا تعديل migration مطبقة؛ أي تصحيح لاحق يُضاف كـmigration جديدة.
 
 ## حدود حجم الملفات

@@ -2,17 +2,18 @@
 
 ## الحالة
 
-حزمة التطبيق المعتمدة لـ`Phase 2-D5-C1`. لا تعلن هذه الحزمة إغلاق Phase 2-D، ولا تنشئ وسمًا؛ الإغلاق والوسم مؤجلان إلى D5-C2 بعد نجاح أمر الإغلاق فعليًا.
+نجحت `Phase 2-D5-C1` تشغيليًا بالكامل عند الالتزام `f042ca9` بعد تشغيل `npm run verify:mastery-results-closure` من البداية إلى النهاية. هذه الوثيقة في D5-C2 تثبت الحالة النهائية وتجهز نقطة التجميد، لكنها لا تنشئ الوسم تلقائيًا.
 
-الخط الأساس:
+الحالة الحالية:
 
 ```text
-1f01c66
-Phase 2-D0  CLOSED
-Phase 2-D1  CLOSED
-Phase 2-D2  CLOSED
-Phase 2-D3  CLOSED
-Phase 2-D4  CLOSED
+Phase 2-D0     CLOSED
+Phase 2-D1     CLOSED
+Phase 2-D2     CLOSED
+Phase 2-D3     CLOSED
+Phase 2-D4     CLOSED
+Phase 2-D5-C1  CLOSED @ f042ca9
+Phase 2-D5-C2  final freeze candidate
 ```
 
 ## 1. قرار التقسيم
@@ -24,7 +25,7 @@ Phase 2-D4  CLOSED
 2-D5-C2  تحديث الحالة النهائية + إعادة التحقق + إنشاء الوسم
 ```
 
-السبب: لا يجوز تحديث `PHASES.md` إلى `CLOSED` قبل نجاح أمر الإغلاق فعليًا على الالتزام النهائي.
+السبب: فصل أدوات الإثبات عن التجميد التوثيقي يمنع إنشاء الوسم قبل وجود أمر إغلاق مُثبت. بعد نجاح C1 أصبحت C2 مسؤولة عن تحديث وثائق الحالة ثم إعادة تشغيل الأمر نفسه على التزام C2 الذي سيحمل الوسم.
 
 ## 2. مخرجات D5-C1
 
@@ -111,7 +112,7 @@ src/services/mastery-results/supabase-mastery-results.repository.ts
 
 فحص الأسرار العام يبقى مسؤولية `check-auth-client-boundaries.mjs`، ويستدعيه أمر D5 أيضًا.
 
-## 6. دليل الاختبارات المتوقع
+## 6. دليل الاختبارات المعتمد
 
 ```text
 Basic test files:          46
@@ -125,23 +126,37 @@ Unique tests:             597
 
 الـ12 اختبارًا في البوابتين جزء من الـ89 وليست اختبارات فريدة إضافية.
 
-## 7. بوابة D5-C1
+## 7. نتيجة D5-C1 الفعلية
 
-بعد اعتماد الحزمة ورفعها إلى GitHub:
+نجح أمر الإغلاق عند:
 
-```bash
-git pull origin main
-npx supabase start
-npm run verify:mastery-results-closure
+```text
+f042ca94fb17d1607b9c220d4dfec8411fbed88a
 ```
 
-يجب أن ينجح الأمر على التزام C1 نظيف ومتزامن.
+والنتيجة المثبتة:
 
-نجاح C1 يثبت أدوات الإغلاق، لكنه لا يغلق Phase 2-D نهائيًا لأن تحديثات C2 لم تُطبّق بعد.
+```text
+Build                         PASS
+Lint                          PASS
+Basic tests                   508/508
+Prettier                      PASS
+Auth client boundary scan     PASS
+Mastery-results boundary scan PASS
+Supabase db reset             PASS
+Supabase integration tests    89/89
+Composition                   2/2
+Parity                        10/10
+git diff --check              PASS
+working tree                  clean
+HEAD = origin/main            PASS
+```
 
-## 8. مخرجات D5-C2 اللاحقة
+العدد الفريد للأدلة هو 597؛ Composition وParity معادتان صراحةً كبوابات إلزامية ولا تضافان مرة ثانية إلى العدد.
 
-بعد نجاح C1، تُجهز حزمة C2 صغيرة لتحديث:
+## 8. مخرجات D5-C2 النهائية
+
+بعد نجاح C1، تحدّث C2:
 
 ```text
 docs/PHASES.md
@@ -149,27 +164,29 @@ docs/ARCHITECTURE.md
 docs/PROJECT_CHARTER.md
 docs/PHASE_2_D4_COMPOSITION_AND_PARITY.md
 docs/PHASE_2_D5_CLOSURE_AND_FREEZE.md
-README_PHASE_2_D5.md
-APPLY_PHASE_2_D5.txt
+README_PHASE_2_D5_C2.md
+APPLY_PHASE_2_D5_C2.txt
 ```
 
 وتثبت:
 
 ```text
 Phase 2-D: CLOSED
-D0-D5: CLOSED
+D0-D4: CLOSED
+D5-C1: CLOSED
+D5-C2: final freeze candidate
 508 basic
 89 Supabase integration
 597 unique tests
 ```
 
-ثم يُعاد تشغيل:
+بعد تثبيت ملفات C2 على Git يُعاد تشغيل:
 
 ```bash
 npm run verify:mastery-results-closure
 ```
 
-على التزام C2 النهائي النظيف والمتزامن.
+على التزام C2 النهائي النظيف والمتزامن. نجاح هذا التشغيل هو شرط إنشاء الوسم، لا مجرد نجاح C1 السابق.
 
 ## 9. إنشاء الوسم
 
@@ -225,23 +242,23 @@ Multiple GoTrueClient instances في Composition/jsdom
 
 ## 12. معايير قبول C1
 
-- [ ] `package.json` تضيف سكربت إغلاق واحدًا فقط.
-- [ ] `bash -n scripts/verify-mastery-results-closure.sh` ناجح.
-- [ ] `node --check scripts/check-mastery-results-client-boundaries.mjs` ناجح.
-- [ ] الفاحص يرفض RPC خارج Repository.
-- [ ] الفاحص يرفض RPC داخل TSX.
-- [ ] الفاحص يرفض الكتابة المباشرة إلى جدولي النتائج.
-- [ ] أمر الإغلاق يستدعي Composition وParity صراحةً.
-- [ ] الأمر لا ينشئ Tag.
-- [ ] `docs/PHASES.md` لا تعلن CLOSED داخل C1.
-- [ ] نجاح الأمر فعليًا على Codespaces.
+- [x] `package.json` تضيف سكربت إغلاق واحدًا فقط.
+- [x] `bash -n scripts/verify-mastery-results-closure.sh` ناجح.
+- [x] `node --check scripts/check-mastery-results-client-boundaries.mjs` ناجح.
+- [x] الفاحص يرفض RPC خارج Repository.
+- [x] الفاحص يرفض RPC داخل TSX.
+- [x] الفاحص يرفض الكتابة المباشرة إلى جدولي النتائج.
+- [x] أمر الإغلاق يستدعي Composition وParity صراحةً.
+- [x] الأمر لا ينشئ Tag.
+- [x] `docs/PHASES.md` لا تعلن CLOSED داخل C1.
+- [x] نجاح الأمر فعليًا على Codespaces.
 
 ## 13. معايير قبول C2 النهائية
 
-- [ ] وثائق الحالة تطابق الواقع.
+- [x] وثائق الحالة تطابق الواقع.
 - [ ] أمر الإغلاق ينجح على التزام C2 النهائي.
 - [ ] شجرة Git نظيفة.
 - [ ] `HEAD = origin/main`.
 - [ ] الوسم المحلي يشير إلى التزام C2.
 - [ ] الوسم البعيد المعلّم يشير إلى الالتزام نفسه.
-- [ ] لا إعلان إغلاق قبل تحقق جميع الشروط.
+- [ ] لا إعلان تجميد `v0.5` النهائي قبل تحقق جميع شروط C2 والوسم.
