@@ -2,7 +2,23 @@
 
 ## الحالة
 
-مرشح مراجعة قبل الرفع إلى GitHub.
+CLOSED رسميًا بعد التطبيق والاختبارات الفعلية على PostgreSQL المحلي.
+
+نقطة الإغلاق التنفيذية:
+
+```text
+commit 37e2858
+Phase 3-1 targeted tests 22/22
+  workflow 7/7
+  bypass 15/15
+508/508 basic
+111/111 Supabase integration
+Build PASS
+Lint PASS
+Prettier PASS
+Git clean
+HEAD = origin/main
+```
 
 نقطة الأساس التنفيذية:
 
@@ -507,23 +523,24 @@ v0.6 tag
 
 ## 14. معايير قبول 3-1
 
-قبل إغلاق الدفعة يجب أن يثبت Git/Codespaces فعليًا:
+تحققت معايير القبول فعليًا في Codespaces، وكانت النتيجة النهائية:
 
 ```text
-supabase db reset succeeds with the new migration
+clean Supabase start applied 20260807170000_add_teacher_authoring_workflow.sql
+Phase 3-1 targeted tests: 22/22
+  workflow: 7/7
+  bypass: 15/15
 Build PASS
 Lint PASS
 Prettier PASS
-508 baseline tests remain green
-all pre-existing Supabase tests remain green
-all new Phase 3-1 workflow tests green
-all new Phase 3-1 bypass tests green
+508/508 baseline tests
+111/111 Supabase integration tests across 10 files
 git diff --check PASS
 working tree clean
-HEAD = origin/main
+HEAD = origin/main = 37e2858
 ```
 
-لا تعتمد أرقام إجمالية جديدة قبل تشغيلها فعليًا.
+ظهرت قبل الإغلاق مشكلة اختبار فقط في التقاط `INSERT ... RETURNING id` عبر `psqlAdmin()`: كان خرج `psql` يضم UUID ثم `INSERT 0 1`. عولجت في Fix 1 بتحويل الاستعلام إلى CTE ينتهي بـ`SELECT id`، دون تعديل Migration أو RLS أو RPC أو helper المجمد. بعد ذلك نجحت 22/22، ثم نُسق ملفا التكامل عبر Prettier وأعيدت السلسلة الكاملة على `37e2858` بنجاح.
 
 ## 15. البوابة إلى 3-2
 

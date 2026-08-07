@@ -44,7 +44,7 @@ Git clean
 HEAD = origin/main
 ```
 
-الدفعة الحالية هي Phase 3-1: Authoring Schema + RLS + Trusted Transitions، وهي أول دفعة إنتاجية في مسار لوحة المعلم.
+أُغلقت Phase 3-1: Authoring Schema + RLS + Trusted Transitions بعد تطبيق الـMigration واختبارات PostgreSQL الحقيقية. الدفعة التالية هي Phase 3-2: Repositories + Services + Authorization Activation.
 
 ## خارطة الطريق المحدّثة
 
@@ -63,7 +63,7 @@ HEAD = origin/main
 | 2-C4     | Protected Operations + Access Guards      | عقد عمليات + محرك قرار + حراس React + اختبارات تجاوز الواجهة            | لا عملية محمية تعتمد على إخفاء الواجهة فقط               | مكتملة                                   |
 | 2-C5     | Auth Integration Tests & Security Closure | دورة حياة Auth + تركيب حقيقي + فحص أسرار + توثيق تشغيل وتجميد           | الوسم `v0.4-auth-security-complete` على الالتزام المتحقق | مكتملة                                   |
 | 2-D      | Cloud Persistence                         | حفظ نتائج الإتقان المرتبطة بالمستخدم عبر RPC وRLS مع retry وidempotency | مسار سحابي حقيقي + تكافؤ حسابي + أمر إغلاق موحد          | مكتملة / CLOSED                          |
-| 3        | Teacher Dashboard                         | تأليف بشري + مراجعة + اعتماد + نشر محكوم                                | teacher يؤلف وreviewer يراجع/يعتمد عبر حماية خلفية       | قيد التنفيذ؛ 3-0 CLOSED و3-1 مرشح مراجعة |
+| 3        | Teacher Dashboard                         | تأليف بشري + مراجعة + اعتماد + نشر محكوم                                | teacher يؤلف وreviewer يراجع/يعتمد عبر حماية خلفية       | قيد التنفيذ؛ 3-0 و3-1 CLOSED، و3-2 التالية |
 | 4        | AI-assisted Authoring                     | توليد محتوى بمراجعة بشرية                                               | لا يصل أي محتوى مولّد إلى `approved` تلقائيًا            | مخططة                                    |
 | 5        | Advanced Science Activities               | توسيع الألعاب والتجارب والمحاكاة والأنشطة العلمية                       | كل نشاط مرتبط بهدف تعلم وقابل للاختبار                   | مخططة                                    |
 | 6        | Production Readiness                      | أمن، أداء، مراقبة أخطاء، نسخ احتياطي، نشر وتوثيق تشغيل                  | قائمة جاهزية إنتاج ناجحة                                 | مخططة                                    |
@@ -122,14 +122,32 @@ Phase 2-D `CLOSED & FROZEN` عند `v0.5-mastery-results-cloud-complete`، وا�
 
 ```text
 3-0  Teacher Dashboard Contract & Architecture                 ✅ CLOSED @ 37a4024
-3-1  Authoring Schema + RLS + Trusted Transitions              🔄 review candidate
-3-2  Repositories + Services + Authorization Activation        ⏳
+3-1  Authoring Schema + RLS + Trusted Transitions              ✅ CLOSED @ 37e2858
+3-2  Repositories + Services + Authorization Activation        🔄 NEXT
 3-3  Teacher Workspace UI                                      ⏳
 3-4  Reviewer Workspace UI                                     ⏳
 3-5  Real Composition + Closure & Freeze                       ⏳
 ```
 
 دليل إغلاق 3-0: `508/508` basic + `89/89` Supabase + Git clean على `37a4024`.
+
+دليل إغلاق 3-1 على `37e2858`:
+
+```text
+Migration applied successfully on local PostgreSQL
+Phase 3-1 targeted tests: 22/22
+  workflow: 7/7
+  bypass: 15/15
+Build PASS
+Lint PASS
+Prettier PASS
+508/508 basic
+111/111 Supabase integration across 10 files
+Git clean
+HEAD = origin/main
+```
+
+Fix 1 الخاص بالتقاط UUID من `psql` اقتصر على اختبار workflow، ثم أُغلق تنسيق الاختبارين على `37e2858`. لم يتغير عقد الـMigration أو RPC/RLS أثناء هذين الإصلاحين.
 
 قاعدة Phase 3: لا تُمنح teacher أو reviewer كتابة مباشرة على جداول المحتوى المنشور. التأليف والمراجعة يمران عبر Authoring Plane منفصل، ولا يصل المحتوى إلى المسار الطلابي إلا بعد اعتماد reviewer ونشر خادمي ذري.
 
