@@ -15,8 +15,14 @@ v0.4-auth-security-complete
 → 27c1d7432066e196d66ec3a731594df0a506326e
 ```
 
-اكتملت Phase 2-D وظيفيًا ومعماريًا عبر D0 إلى D5-C1. نجح أمر الإغلاق الموحد
-`npm run verify:mastery-results-closure` كاملًا عند الالتزام `f042ca9`، وأثبت:
+أُغلقت Phase 2-D وجُمّدت رسميًا عند الوسم:
+
+```text
+v0.5-mastery-results-cloud-complete
+→ c99ecf69a5225a03108798476dc69e75987d7595
+```
+
+نجح أمر الإغلاق الموحد `npm run verify:mastery-results-closure` على الالتزام نفسه، وأثبت:
 
 ```text
 508 basic tests
@@ -26,9 +32,7 @@ Composition 2/2
 Parity 10/10
 ```
 
-Phase 2-D5-C2 هي دفعة التجميد التوثيقي النهائية. بعد تثبيت هذه الوثائق على Git
-يُعاد تشغيل أمر الإغلاق على التزام C2 نفسه، ثم يُنشأ الوسم اليدوي
-`v0.5-mastery-results-cloud-complete` على الالتزام المتحقق نفسه.
+المرحلة الرسمية التالية هي Phase 3: Teacher Dashboard. تبدأ بـPhase 3-0 كعقد معماري وتوثيقي قبل أي Schema أو RLS أو كود إنتاجي جديد.
 
 ## خارطة الطريق المحدّثة
 
@@ -47,7 +51,7 @@ Phase 2-D5-C2 هي دفعة التجميد التوثيقي النهائية. ب
 | 2-C4     | Protected Operations + Access Guards      | عقد عمليات + محرك قرار + حراس React + اختبارات تجاوز الواجهة            | لا عملية محمية تعتمد على إخفاء الواجهة فقط               | مكتملة          |
 | 2-C5     | Auth Integration Tests & Security Closure | دورة حياة Auth + تركيب حقيقي + فحص أسرار + توثيق تشغيل وتجميد           | الوسم `v0.4-auth-security-complete` على الالتزام المتحقق | مكتملة          |
 | 2-D      | Cloud Persistence                         | حفظ نتائج الإتقان المرتبطة بالمستخدم عبر RPC وRLS مع retry وidempotency | مسار سحابي حقيقي + تكافؤ حسابي + أمر إغلاق موحد          | مكتملة / CLOSED |
-| 3        | Teacher Dashboard                         | إضافة ومراجعة واعتماد المحتوى                                           | المعلم أو المراجع يعتمد درسًا كاملًا وفق الصلاحيات       | مخططة           |
+| 3        | Teacher Dashboard                         | تأليف بشري + مراجعة + اعتماد + نشر محكوم                               | teacher يؤلف وreviewer يراجع/يعتمد عبر حماية خلفية       | مخططة؛ 3-0 قيد المراجعة |
 | 4        | AI-assisted Authoring                     | توليد محتوى بمراجعة بشرية                                               | لا يصل أي محتوى مولّد إلى `approved` تلقائيًا            | مخططة           |
 | 5        | Advanced Science Activities               | توسيع الألعاب والتجارب والمحاكاة والأنشطة العلمية                       | كل نشاط مرتبط بهدف تعلم وقابل للاختبار                   | مخططة           |
 | 6        | Production Readiness                      | أمن، أداء، مراقبة أخطاء، نسخ احتياطي، نشر وتوثيق تشغيل                  | قائمة جاهزية إنتاج ناجحة                                 | مخططة           |
@@ -77,13 +81,14 @@ Tag: `v0.4-auth-security-complete` → `27c1d7432066e196d66ec3a731594df0a506326e
 2-D3     Mastery Test Integration                         ✅ CLOSED
 2-D4     Real Composition & Scoring Parity                ✅ CLOSED
 2-D5-C1  Closure Tooling & Operations                     ✅ CLOSED
-2-D5-C2  Final Documentation & Freeze                     🔄 final freeze candidate
+2-D5-C2  Final Documentation & Freeze                     ✅ CLOSED
 ```
 
-الدليل التشغيلي لـD5-C1:
+الدليل النهائي لـPhase 2-D:
 
 ```text
-commit f042ca9
+commit c99ecf69a5225a03108798476dc69e75987d7595
+tag v0.5-mastery-results-cloud-complete
 npm run verify:mastery-results-closure → PASS
 508/508 basic
 89/89 Supabase integration
@@ -92,22 +97,28 @@ npm run verify:mastery-results-closure → PASS
 597 unique tests
 Git clean
 HEAD = origin/main
+remote annotated tag ^{} = final commit
 ```
 
 ## قاعدة الإغلاق والتجميد لـPhase 2-D
 
-أصبحت Phase 2-D `CLOSED` من ناحية التنفيذ والعقود والاختبارات بعد نجاح D5-C1.
-تجميد نقطة `v0.5` لا يصبح نهائيًا إلا عند تحقق الشروط التالية على التزام D5-C2:
+Phase 2-D `CLOSED & FROZEN` عند `v0.5-mastery-results-cloud-complete`، والوسم يشير إلى الالتزام النهائي المتحقق محليًا وبعيدًا عبر annotated tag dereference `^{}`.
+
+لا تُفتح عقود Phase 2-D داخل Phase 3 بلا قرار مكتوب واختبارات مستقلة مرتبطة بالتغيير.
+
+
+## تقسيم Phase 3 المقترح
 
 ```text
-npm run verify:mastery-results-closure passes on the final D5-C2 commit
-working tree is clean
-HEAD equals origin/main
-tag v0.5-mastery-results-cloud-complete points to that exact commit locally
-remote annotated tag dereference ^{} points to that exact commit on origin
+3-0  Teacher Dashboard Contract & Architecture                 🔄 review candidate
+3-1  Authoring Schema + RLS + Trusted Transitions              ⏳
+3-2  Repositories + Services + Authorization Activation        ⏳
+3-3  Teacher Workspace UI                                      ⏳
+3-4  Reviewer Workspace UI                                     ⏳
+3-5  Real Composition + Closure & Freeze                       ⏳
 ```
 
-لا ينشئ أمر الإغلاق الوسم ولا يدفعه تلقائيًا.
+قاعدة Phase 3: لا تُمنح teacher أو reviewer كتابة مباشرة على جداول المحتوى المنشور. التأليف والمراجعة يمران عبر Authoring Plane منفصل، ولا يصل المحتوى إلى المسار الطلابي إلا بعد اعتماد reviewer ونشر خادمي ذري.
 
 ## القرارات الملزمة لـPhase 2-C و2-D
 

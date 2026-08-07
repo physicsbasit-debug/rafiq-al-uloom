@@ -1,0 +1,51 @@
+Phase 3-0 FINAL UPLOAD PACKAGE
+
+Base:
+  tag:    v0.5-mastery-results-cloud-complete
+  commit: c99ecf69a5225a03108798476dc69e75987d7595
+
+This package is approved for upload to GitHub.
+
+Apply all files at repository root, then sync the Codespace before verification.
+
+Files:
+1. docs/PHASE_3_0_TEACHER_DASHBOARD_CONTRACT.md
+2. docs/PHASES.md
+3. docs/ARCHITECTURE.md
+4. docs/PROJECT_CHARTER.md
+5. README_PHASE_3_0.md
+6. APPLY_PHASE_3_0.txt
+
+After upload:
+  git pull origin main
+  git show --stat --oneline -1
+  git status --short
+
+Verify Phase 3 roadmap state:
+  grep -n "| 3 " docs/PHASES.md
+  grep -n "3-0" docs/PHASES.md
+
+Verify this commit is documentation-only:
+  git show --name-only --format= HEAD
+
+Run closure-safe gates:
+  npm run build
+  npm run lint
+  npx prettier --check .
+  npm test
+  npm run test:supabase
+  git diff --check
+  git status
+
+Expected architectural state:
+- Phase 2-D remains CLOSED/FROZEN.
+- Phase 3 is the next official roadmap phase.
+- Phase 3-0 is the contract/architecture foundation only.
+- No production code, SQL, migration, RPC, or RLS is added by this package.
+- student/teacher/reviewer roles remain unchanged.
+- pending/active/suspended account statuses remain unchanged.
+- author_content and review_content remain unavailable until backend enforcement is implemented in later Phase 3 work.
+- canonical published content remains protected from direct teacher/reviewer writes.
+- AI remains Phase 4.
+
+Do not create the proposed v0.6 tag in Phase 3-0.
