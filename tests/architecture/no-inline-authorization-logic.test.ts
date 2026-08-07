@@ -29,7 +29,9 @@ function collectTypeScriptFiles(directory: string): string[] {
 }
 
 function stringLiteralValue(node: ts.Expression): string | null {
-  return ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node) ? node.text : null;
+  return ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)
+    ? node.text
+    : null;
 }
 
 function isRoleAccess(node: ts.Expression): boolean {
@@ -83,15 +85,17 @@ function findInlineRoleDecisions(filePath: string): number[] {
 }
 
 describe('architecture: centralized authorization decisions', () => {
-  it('لا تستخدم مكونات Auth أو App شروط أدوار لاتخاذ قرار صلاحية', () => {
+  it('لا تستخدم App أو أي feature شروط أدوار لاتخاذ قرار صلاحية', () => {
     const root = process.cwd();
     const files = [
       resolve(root, 'src/App.tsx'),
-      ...collectTypeScriptFiles(resolve(root, 'src/features/auth')),
+      ...collectTypeScriptFiles(resolve(root, 'src/features')),
     ];
 
     const violations = files.flatMap((filePath) =>
-      findInlineRoleDecisions(filePath).map((line) => `${relative(root, filePath)}:${line}`)
+      findInlineRoleDecisions(filePath).map(
+        (line) => `${relative(root, filePath)}:${line}`
+      )
     );
 
     expect(violations).toEqual([]);

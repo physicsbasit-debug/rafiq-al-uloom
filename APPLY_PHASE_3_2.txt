@@ -1,0 +1,53 @@
+PHASE 3-2 UPLOAD PACKAGE — REVIEW APPROVED / EXECUTION PENDING
+
+This is the changed-files-only upload package for:
+Phase 3-2 — Authoring Client Layer + Authorization Activation
+
+IMPORTANT:
+- Architectural review is approved.
+- Do not modify the reviewed source/test logic before execution unless a real failure is found.
+- Phase 3-2 is NOT CLOSED until the Codespaces verification gates pass.
+- Remote Supabase deployment remains intentionally deferred.
+
+APPLY
+
+1) Start from the current clean main branch in Codespaces.
+2) Upload/copy this package over the repository root, preserving paths.
+3) Review the resulting diff before commit.
+4) Start local Supabase and run the full verification gates.
+
+VERIFY
+
+  git status --short
+  git diff --check
+  npx supabase stop --no-backup
+  npx supabase start
+  npm run build
+  npm run lint
+  npx prettier --check .
+  npm test
+  npm run test:supabase
+  git diff --check
+  git status
+
+EXPECTED BASELINE / FLOOR
+
+  Build                     PASS
+  Lint                      PASS
+  Prettier                   PASS
+  Basic tests               508/508 or more
+  Supabase integration      111/111 or more
+  supabase-authoring-client-layer.integration.ts included and PASS
+  git diff --check          clean
+
+DO NOT RUN
+
+  supabase link
+  supabase db push
+
+After all gates pass, commit Phase 3-2 and confirm:
+
+  git status
+  git log -1 --oneline
+
+Only then mark Phase 3-2 CLOSED and move to Phase 3-3: Teacher Workspace UI.

@@ -39,17 +39,15 @@ function authorizeActiveRole(
   role: UserRole,
   operation: AuthorizationOperation
 ): AuthorizationDecision {
-  if (operation === 'author_content' || operation === 'review_content') {
-    return denied('operation_not_available');
-  }
-
   switch (operation) {
     case 'access_student_experience':
     case 'submit_own_mastery_result':
       return ALLOWED;
     case 'access_teacher_workspace':
+    case 'author_content':
       return role === 'teacher' ? ALLOWED : denied('role_not_allowed');
     case 'access_reviewer_workspace':
+    case 'review_content':
       return role === 'reviewer' ? ALLOWED : denied('role_not_allowed');
     default:
       return denied('operation_not_available');

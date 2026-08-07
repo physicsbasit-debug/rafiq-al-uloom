@@ -1,6 +1,6 @@
 # رفيق العلوم — المعمارية
 
-## الحالة المعمارية عند v0.5 المجمد
+## الحالة المعمارية الحالية فوق v0.5 المجمد
 
 رفيق العلوم تطبيق React + Vite + TypeScript strict. طبقة الطالب الحالية تعمل خلف عقد بيانات غير متزامن واحد، ويمكن تشغيلها بمزوّد محلي أو Supabase دون تغيير واجهات الطالب.
 
@@ -11,7 +11,7 @@ v0.5-mastery-results-cloud-complete
 → c99ecf69a5225a03108798476dc69e75987d7595
 ```
 
-وقد اجتاز أمر الإغلاق الموحد 508 اختبارًا أساسيًا و89 اختبار تكامل Supabase، أي 597 اختبارًا فريدًا، مع Composition 2/2 وParity 10/10. المرحلة التالية هي Phase 3، وتبدأ بعقد Teacher Dashboard قبل أي كتابة محتوى جديدة.
+وقد اجتاز أمر الإغلاق الموحد 508 اختبارًا أساسيًا و89 اختبار تكامل Supabase، أي 597 اختبارًا فريدًا، مع Composition 2/2 وParity 10/10. Phase 3 جارية الآن: أُغلقت 3-0 و3-1 محليًا، و3-2 تضيف طبقة Repository/Service وتفعيل عمليات التأليف والمراجعة دون UI أو Migration جديدة.
 
 ## القرارات المعمارية المعتمدة
 
@@ -179,50 +179,55 @@ npm run verify:mastery-results-closure → PASS at c99ecf69a5225a03108798476dc69
 
 Composition وParity جزء من اختبارات Supabase الـ89، ويعاد تشغيلهما صراحةً كبوابتي إغلاق إلزاميتين؛ لذلك لا يضافان مرة ثانية إلى العدد الفريد 597.
 
-## Phase 3: Teacher Dashboard — الحدود المعمارية المقترحة
+## Phase 3: Teacher Dashboard — الحدود المعمارية الفعلية
 
-Phase 3 لا تحول جداول المحتوى المنشور إلى مساحة تحرير. العقد المقترح في 3-0 يفصل بين:
+Phase 3 لا تحول جداول المحتوى المنشور إلى مساحة تحرير. 3-0 ثبّت الفصل، و3-1 أنشأت Authoring Plane المحمية خادميًا، و3-2 تضيف طبقة العميل دون UI:
 
 ```text
 Canonical Published Content
 → الجداول الحالية التي يقرأها ContentRepository والطالب
 
 Authoring Plane
-→ Revisions مملوكة للمعلم + سجل مراجعة + انتقالات موثوقة
+→ content_revisions + content_review_events
+→ trusted RPC transitions
 ```
 
-المسار المقترح:
+المسار الفعلي بعد 3-2:
 
 ```text
-Teacher Workspace
+Teacher Workspace (Phase 3-3 لاحقًا)
 → AuthoringService
 → AuthoringRepository
-→ revision storage / submit transition
+→ supabase-authoring.repositories.ts
+→ create/save/submit RPCs + RLS reads
 
-Reviewer Workspace
+Reviewer Workspace (Phase 3-4 لاحقًا)
 → ReviewService
 → ReviewRepository
-→ approve/reject transition
+→ supabase-authoring.repositories.ts
+→ pending queue + review RPC
 
 approved revision
-→ trusted atomic publish transaction
+→ trusted atomic publish transaction from Phase 3-1
 → canonical content tables
 → existing ContentRepository
 → Student Experience
 ```
 
-القواعد قبل أي تنفيذ:
+القواعد الملزمة:
 
 - الأدوار تبقى `student | teacher | reviewer`.
 - teacher يؤلف ولا يعتمد.
 - reviewer يراجع ويعتمد ولا يعدل Payload المؤلف.
-- `author_content` و`review_content` الموجودتان أصلًا تبقيان `operation_not_available` حتى وجود حماية backend واختبارات تجاوز مباشرة.
-- لا `INSERT/UPDATE/DELETE` مباشر من teacher/reviewer على canonical content tables.
+- بعد إثبات حماية backend في 3-1، تفعّل 3-2 `author_content` للمعلم النشط و`review_content` للمراجع النشط فقط.
+- لا `INSERT/UPDATE/DELETE` مباشر من teacher/reviewer على canonical content tables أو authoring tables.
+- أسماء RPCs الأربع محصورة في `src/services/authoring/supabase-authoring.repositories.ts`.
+- هوية المؤلف والمراجع تُشتق خادميًا من `auth.uid()` و`profiles`، ولا يرسل العميل `author_id` أو `reviewer_id`.
 - أي تعديل على محتوى منشور يتم عبر Revision جديدة، ولا يستبدل النسخة المنشورة حتى الاعتماد.
-- هوية المؤلف والمراجع تُشتق خادميًا من `auth.uid()` و`profiles`، لا من حقول موثوقة يرسلها العميل.
+- Remote Supabase لرفيق العلوم مؤجلة حاليًا؛ التطوير والاختبارات التكاملية تتم على Supabase المحلية في Codespaces.
 - Phase 4 AI قد تنتج Draft مستقبلًا فقط؛ لا تملك مسار نشر مباشر.
 
-التفاصيل الملزمة في `docs/PHASE_3_0_TEACHER_DASHBOARD_CONTRACT.md`.
+التفاصيل الملزمة في `docs/PHASE_3_0_TEACHER_DASHBOARD_CONTRACT.md` و`docs/PHASE_3_2_AUTHORING_CLIENT_LAYER_AUTHORIZATION.md`.
 
 ## Mappers وحدود البيانات
 
