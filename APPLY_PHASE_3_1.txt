@@ -1,0 +1,93 @@
+PHASE 3-1 FINAL APPLICATION PACKAGE
+
+Title:
+Phase 3-1: Authoring Schema + RLS + Trusted Transitions
+
+Baseline:
+v0.5-mastery-results-cloud-complete
+Phase 3-0 CLOSED @ 37a4024
+
+This package was architecture/security reviewed and is ready for GitHub upload and real Codespaces/PostgreSQL validation.
+
+FILES EXPECTED IN THE GITHUB COMMIT
+
+1. docs/PHASE_3_1_AUTHORING_SCHEMA_RLS_TRANSITIONS.md
+2. docs/PHASES.md
+3. supabase/migrations/20260807170000_add_teacher_authoring_workflow.sql
+4. tests/integration/helpers/authoring-fixtures.ts
+5. tests/integration/supabase-authoring-bypass.integration.ts
+6. tests/integration/supabase-authoring-workflow.integration.ts
+7. README_PHASE_3_1.md
+8. APPLY_PHASE_3_1.txt
+
+STEP 1 — AFTER GITHUB UPLOAD, SYNC FIRST
+
+git pull origin main
+git show --stat --oneline -1
+git status --short
+git show --name-only --format= HEAD
+
+Confirm no unexpected src/, package.json, authorization.policy.ts, or unrelated migration changes appear.
+
+STEP 2 — CONFIRM ROADMAP STATE
+
+grep -n "3-0" docs/PHASES.md
+grep -n "3-1" docs/PHASES.md
+
+Expected meaning:
+- Phase 3-0 is CLOSED.
+- Phase 3-1 is the current implementation/review candidate, not CLOSED yet.
+
+STEP 3 — CLEAN LOCAL SUPABASE START
+
+npx supabase stop --no-backup
+npx supabase start
+
+Do not run another command until the CLI prints:
+Started supabase local development setup.
+
+Then check:
+
+npx supabase status
+curl -i http://127.0.0.1:54321/auth/v1/health
+
+The clean start itself must apply all migrations, including:
+20260807170000_add_teacher_authoring_workflow.sql
+
+Do not immediately run an additional `supabase db reset` after this clean start. A previous Codespaces run demonstrated that an immediate extra reset can race container stabilization and create a false environmental failure.
+
+STEP 4 — RUN THE NEW PHASE 3-1 TESTS FIRST
+
+RUN_SUPABASE_INTEGRATION_TESTS=true npx vitest run --config vitest.supabase.config.ts tests/integration/supabase-authoring-bypass.integration.ts tests/integration/supabase-authoring-workflow.integration.ts
+
+Expected new evidence:
+- bypass suite: 15 tests
+- workflow suite: 7 tests
+- total new Phase 3-1 tests: 22
+
+If these fail, stop and preserve the exact output. Do not patch timeouts, Auth, or frozen v0.5 code blindly.
+
+STEP 5 — FULL REGRESSION GATE
+
+npm run build
+npm run lint
+npx prettier --check .
+npm test
+npm run test:supabase
+git diff --check
+git status
+git log -1 --oneline
+
+Expected pre-3-1 baseline remains green:
+- 508 basic tests minimum, plus any intentional new non-Supabase tests if later added
+- all Supabase integration suites green, including the 22 new Phase 3-1 tests
+- no regression in Auth/mastery-result persistence
+- working tree clean
+- branch up to date with origin/main
+
+STEP 6 — CLOSURE RULE
+
+Do not mark Phase 3-1 CLOSED merely because the migration uploaded successfully.
+Close Phase 3-1 only after the same final commit passes the real PostgreSQL integration gate and full regression gate above.
+
+Do not create v0.6 in this phase.
