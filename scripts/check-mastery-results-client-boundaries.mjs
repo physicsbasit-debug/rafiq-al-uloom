@@ -10,8 +10,7 @@ const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const rootDirectory = resolve(scriptDirectory, '..');
 
 const scanRoots = ['src', 'public'];
-const approvedRpcOwner =
-  'src/services/mastery-results/supabase-mastery-results.repository.ts';
+const approvedRpcOwner = 'src/services/mastery-results/supabase-mastery-results.repository.ts';
 const rpcName = 'submit_mastery_attempt';
 
 const textExtensions = new Set([
@@ -141,8 +140,7 @@ if (!existsSync(approvedOwnerPath)) {
 }
 
 const approvedOwnerText = readFileSync(approvedOwnerPath, 'utf8');
-const approvedRpcCall =
-  /\.rpc\s*\(\s*['"]submit_mastery_attempt['"]\s*,/g;
+const approvedRpcCall = /\.rpc\s*\(\s*['"]submit_mastery_attempt['"]\s*,/g;
 if (!approvedRpcCall.test(approvedOwnerText)) {
   console.error(
     `The approved repository does not contain the expected ${rpcName} RPC call: ${approvedRpcOwner}`
