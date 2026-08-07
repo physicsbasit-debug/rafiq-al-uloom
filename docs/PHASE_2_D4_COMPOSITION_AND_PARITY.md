@@ -171,8 +171,7 @@ Array.sort
 الأسئلة تُجلب حرفيًا عبر:
 
 ```ts
-createSupabaseContentRepository(client)
-  .getMasteryQuestionsByLesson(lessonId)
+createSupabaseContentRepository(client).getMasteryQuestionsByLesson(lessonId);
 ```
 
 وهذه Repository تطلب:

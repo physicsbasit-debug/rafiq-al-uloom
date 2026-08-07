@@ -121,9 +121,7 @@ describeIntegration('Phase 2-D4 real mastery composition', { concurrent: false }
       const questions = await contentRepository.getMasteryQuestionsByLesson(fixture.lessonId);
       expect(questions).toHaveLength(3);
 
-      const service = createMasteryResultsService(
-        createSupabaseMasteryResultsRepository(client)
-      );
+      const service = createMasteryResultsService(createSupabaseMasteryResultsRepository(client));
       const submissionId = randomUUID();
       const startedAt = new Date(Date.now() - 30_000).toISOString();
       const answersByQuestionId = answersForPattern(questions, [true, false, true]);
@@ -194,9 +192,7 @@ describeIntegration('Phase 2-D4 real mastery composition', { concurrent: false }
       const authorization = await signInAuthorizedStudent(harness, activeStudent);
       const contentRepository = createSupabaseContentRepository(client);
       const questions = await contentRepository.getMasteryQuestionsByLesson(fixture.lessonId);
-      const service = createMasteryResultsService(
-        createSupabaseMasteryResultsRepository(client)
-      );
+      const service = createMasteryResultsService(createSupabaseMasteryResultsRepository(client));
       const submissionId = randomUUID();
       const startedAt = new Date(Date.now() - 60_000).toISOString();
       const answersByQuestionId = answersForPattern(questions, [false, true, true]);
@@ -208,9 +204,7 @@ describeIntegration('Phase 2-D4 real mastery composition', { concurrent: false }
         now: () => startedAt,
       };
 
-      const first = renderHook(() =>
-        useMasteryResultPersistence(fixture.lessonId, dependencies)
-      );
+      const first = renderHook(() => useMasteryResultPersistence(fixture.lessonId, dependencies));
       act(() => {
         first.result.current.submitAttempt({ questions, answersByQuestionId });
       });
@@ -224,9 +218,7 @@ describeIntegration('Phase 2-D4 real mastery composition', { concurrent: false }
       expect(firstState.submissionStatus).toBe('saved');
       first.unmount();
 
-      const second = renderHook(() =>
-        useMasteryResultPersistence(fixture.lessonId, dependencies)
-      );
+      const second = renderHook(() => useMasteryResultPersistence(fixture.lessonId, dependencies));
       try {
         act(() => {
           second.result.current.submitAttempt({ questions, answersByQuestionId });

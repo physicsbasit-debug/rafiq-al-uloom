@@ -114,10 +114,7 @@ describeIntegration('Phase 2-D4 mastery scoring parity', { concurrent: false }, 
     expect(questions.map((question) => question.id)).toEqual(databaseOrder);
 
     const answersByQuestionId = answersForPattern(questions, [true, false, true]);
-    const expectedFingerprint = await createMasteryScoringFingerprint(
-      fixture.lessonId,
-      questions
-    );
+    const expectedFingerprint = await createMasteryScoringFingerprint(fixture.lessonId, questions);
     const result = await service.submitAttempt(
       buildSubmission(fixture.lessonId, questions, answersByQuestionId)
     );
