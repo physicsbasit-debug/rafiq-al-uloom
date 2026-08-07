@@ -93,9 +93,7 @@ function createClientMock(options: {
 }) {
   const queries = new Map<string, ReturnType<typeof createThenable>>();
   const from = vi.fn((table: string) => {
-    const query = createThenable(
-      options.tableResponses?.[table] ?? { data: [], error: null }
-    );
+    const query = createThenable(options.tableResponses?.[table] ?? { data: [], error: null });
     queries.set(table, query);
     return query;
   });
@@ -273,7 +271,9 @@ describe('Supabase authoring repositories', () => {
     });
     const { authoring } = createSupabaseAuthoringRepositories(mock.client);
 
-    await expect(authoring.submitLessonRevision('10000000-0000-4000-8000-000000000001')).resolves.toEqual({
+    await expect(
+      authoring.submitLessonRevision('10000000-0000-4000-8000-000000000001')
+    ).resolves.toEqual({
       status: 'rejected',
       reason,
     });

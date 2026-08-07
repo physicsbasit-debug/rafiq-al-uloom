@@ -1,8 +1,4 @@
-import {
-  authoringRejected,
-  authoringUnavailableResult,
-  isAbortError,
-} from './authoring.errors';
+import { authoringRejected, authoringUnavailableResult, isAbortError } from './authoring.errors';
 import type { AuthoringRepository } from './authoring.repository';
 import { supabaseAuthoringRepository } from './supabase-authoring.repositories';
 import type {
@@ -56,7 +52,9 @@ function validPayload(payload: LessonRevisionPayload): boolean {
   );
 }
 
-async function guardRepositoryCall<T>(call: () => Promise<T>): Promise<T | ReturnType<typeof authoringUnavailableResult>> {
+async function guardRepositoryCall<T>(
+  call: () => Promise<T>
+): Promise<T | ReturnType<typeof authoringUnavailableResult>> {
   try {
     return await call();
   } catch (error) {
@@ -127,8 +125,10 @@ function getDefaultService(): AuthoringService {
 
 export const authoringService: AuthoringService = {
   listOwnRevisions: (options) => getDefaultService().listOwnRevisions(options),
-  listReviewEvents: (revisionId, options) => getDefaultService().listReviewEvents(revisionId, options),
-  createLessonRevision: (input, options) => getDefaultService().createLessonRevision(input, options),
+  listReviewEvents: (revisionId, options) =>
+    getDefaultService().listReviewEvents(revisionId, options),
+  createLessonRevision: (input, options) =>
+    getDefaultService().createLessonRevision(input, options),
   saveLessonRevision: (revisionId, payload, options) =>
     getDefaultService().saveLessonRevision(revisionId, payload, options),
   submitLessonRevision: (revisionId, options) =>

@@ -86,10 +86,7 @@ function callRpc(
   return client.rpc(name, args) as unknown as RpcQuery;
 }
 
-function withAbort<T extends QueryLike | RpcQuery>(
-  query: T,
-  options: AuthoringRequestOptions
-): T {
+function withAbort<T extends QueryLike | RpcQuery>(query: T, options: AuthoringRequestOptions): T {
   options.signal?.throwIfAborted();
   return options.signal ? (query.abortSignal(options.signal) as T) : query;
 }
@@ -120,7 +117,11 @@ async function executeMapped<T>(
     }
 
     if (data === null) {
-      return reportUnavailable(operation, new Error(`${operation} returned no data`), reportDiagnostic);
+      return reportUnavailable(
+        operation,
+        new Error(`${operation} returned no data`),
+        reportDiagnostic
+      );
     }
 
     try {
@@ -163,10 +164,7 @@ export function createSupabaseAuthoringRepositories(
       );
     },
 
-    async listReviewEvents(
-      revisionId,
-      requestOptions = {}
-    ): Promise<ReviewEventListResult> {
+    async listReviewEvents(revisionId, requestOptions = {}): Promise<ReviewEventListResult> {
       const query = withAbort(
         queryTable(client, 'content_review_events')
           .select(REVIEW_EVENT_COLUMNS)

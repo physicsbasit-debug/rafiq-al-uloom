@@ -157,10 +157,7 @@ function mapRevisionRow(value: unknown): LessonRevision {
     authorId: requireUuid(row.author_id, 'revision.author_id'),
     status: requireRevisionStatus(row.status),
     payload: requireLessonRevisionPayload(row.payload),
-    baseFingerprint: requireNullableFingerprint(
-      row.base_fingerprint,
-      'revision.base_fingerprint'
-    ),
+    baseFingerprint: requireNullableFingerprint(row.base_fingerprint, 'revision.base_fingerprint'),
     revisionNumber: requirePositiveInteger(row.revision_number, 'revision.revision_number'),
     createdAt: requireTimestamp(row.created_at, 'revision.created_at'),
     updatedAt: requireTimestamp(row.updated_at, 'revision.updated_at'),

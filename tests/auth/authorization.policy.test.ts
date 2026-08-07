@@ -58,9 +58,10 @@ function decide(
 
 describe('authorizeOperation', () => {
   it('يرفض Auth loading بسبب profile_loading', () => {
-    expect(
-      authorizeOperation({ status: 'loading' }, null, 'access_student_experience')
-    ).toEqual({ allowed: false, reason: 'profile_loading' });
+    expect(authorizeOperation({ status: 'loading' }, null, 'access_student_experience')).toEqual({
+      allowed: false,
+      reason: 'profile_loading',
+    });
   });
 
   it('يرفض Auth error بسبب session_error', () => {
@@ -90,9 +91,10 @@ describe('authorizeOperation', () => {
   });
 
   it('يرفض Guest دفاعيًا', () => {
-    expect(
-      authorizeOperation({ status: 'guest' }, null, 'access_student_experience')
-    ).toEqual({ allowed: false, reason: 'guest' });
+    expect(authorizeOperation({ status: 'guest' }, null, 'access_student_experience')).toEqual({
+      allowed: false,
+      reason: 'guest',
+    });
   });
 
   it('يرفض المستخدم المصادق عند غياب AuthorizationState', () => {
@@ -197,15 +199,12 @@ describe('authorizeOperation', () => {
     });
   });
 
-  it.each(['student', 'reviewer'] as const)(
-    'يرفض الدور %s من عملية التأليف',
-    (role: UserRole) => {
-      expect(decide('author_content', authorized(role))).toEqual({
-        allowed: false,
-        reason: 'role_not_allowed',
-      });
-    }
-  );
+  it.each(['student', 'reviewer'] as const)('يرفض الدور %s من عملية التأليف', (role: UserRole) => {
+    expect(decide('author_content', authorized(role))).toEqual({
+      allowed: false,
+      reason: 'role_not_allowed',
+    });
+  });
 
   it('يسمح للمراجع النشط بعملية المراجعة', () => {
     expect(decide('review_content', authorized('reviewer'))).toEqual({
@@ -214,15 +213,12 @@ describe('authorizeOperation', () => {
     });
   });
 
-  it.each(['student', 'teacher'] as const)(
-    'يرفض الدور %s من عملية المراجعة',
-    (role: UserRole) => {
-      expect(decide('review_content', authorized(role))).toEqual({
-        allowed: false,
-        reason: 'role_not_allowed',
-      });
-    }
-  );
+  it.each(['student', 'teacher'] as const)('يرفض الدور %s من عملية المراجعة', (role: UserRole) => {
+    expect(decide('review_content', authorized(role))).toEqual({
+      allowed: false,
+      reason: 'role_not_allowed',
+    });
+  });
 
   it('لا يسمح للمعلم pending بعملية author_content', () => {
     expect(

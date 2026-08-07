@@ -113,7 +113,11 @@ describeIntegration('Phase 3-2 authoring client layer composition', () => {
       authorizeOperation(authenticated(teacher), authorized(teacher, 'teacher'), 'author_content')
     ).toEqual({ allowed: true, reason: 'allowed' });
     expect(
-      authorizeOperation(authenticated(reviewer), authorized(reviewer, 'reviewer'), 'review_content')
+      authorizeOperation(
+        authenticated(reviewer),
+        authorized(reviewer, 'reviewer'),
+        'review_content'
+      )
     ).toEqual({ allowed: true, reason: 'allowed' });
     expect(
       authorizeOperation(authenticated(student), authorized(student, 'student'), 'author_content')
