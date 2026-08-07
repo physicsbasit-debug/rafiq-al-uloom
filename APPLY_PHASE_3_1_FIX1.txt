@@ -1,0 +1,50 @@
+Phase 3-1 Fix 1 — application and verification
+
+Upload this package to GitHub, then in Codespaces run:
+
+git pull origin main
+git show --stat --oneline -1
+git status --short
+git show --name-only --format= HEAD
+
+Expected functional change:
+  tests/integration/supabase-authoring-workflow.integration.ts
+
+The README/APPLY files are documentation only. No migration, src, Auth, package.json, or existing shared helper should change.
+
+Start a clean local Supabase environment:
+
+npx supabase stop --no-backup
+npx supabase start
+
+Wait for:
+  Started supabase local development setup.
+
+Then verify health:
+
+curl -i http://127.0.0.1:54321/auth/v1/health
+
+Run Phase 3-1 targeted tests:
+
+RUN_SUPABASE_INTEGRATION_TESTS=true npx vitest run \
+  --config vitest.supabase.config.ts \
+  tests/integration/supabase-authoring-bypass.integration.ts \
+  tests/integration/supabase-authoring-workflow.integration.ts
+
+Expected:
+  bypass 15/15
+  workflow 7/7
+  total 22/22
+
+If and only if targeted tests pass, run the full gates:
+
+npm run build
+npm run lint
+npx prettier --check .
+npm test
+npm run test:supabase
+git diff --check
+git status
+git log -1 --oneline
+
+Do not create v0.6 and do not mark Phase 3-1 CLOSED until all gates pass on the final commit.

@@ -100,22 +100,25 @@ describeIntegration('Phase 3-1 trusted lesson authoring workflow', () => {
     `);
 
     historicalAttemptId = psqlAdmin(`
-      INSERT INTO public.mastery_attempts (
-        user_id, lesson_id, submission_id, started_at, question_count, correct_count,
-        percentage, scoring_policy_version, scoring_fingerprint, request_fingerprint
-      ) VALUES (
-        ${sqlLiteral(student.user.id)}::uuid,
-        ${sqlLiteral(sourceLessonId)},
-        gen_random_uuid(),
-        now(),
-        1,
-        1,
-        100,
-        'mastery-equal-weight-v1',
-        repeat('a', 64),
-        repeat('b', 64)
+      WITH inserted_attempt AS (
+        INSERT INTO public.mastery_attempts (
+          user_id, lesson_id, submission_id, started_at, question_count, correct_count,
+          percentage, scoring_policy_version, scoring_fingerprint, request_fingerprint
+        ) VALUES (
+          ${sqlLiteral(student.user.id)}::uuid,
+          ${sqlLiteral(sourceLessonId)},
+          gen_random_uuid(),
+          now(),
+          1,
+          1,
+          100,
+          'mastery-equal-weight-v1',
+          repeat('a', 64),
+          repeat('b', 64)
+        )
+        RETURNING id
       )
-      RETURNING id;
+      SELECT id FROM inserted_attempt;
     `);
 
     psqlAdmin(`
