@@ -152,7 +152,10 @@ describeIntegration('Phase 3-1 trusted lesson authoring workflow', () => {
         WHERE author_id = ${sqlLiteral(authorIds[0])}
           AND published_entity_id IS NOT NULL;
       `);
-      for (const id of rows.split(/\r?\n/).map((value) => value.trim()).filter(Boolean)) {
+      for (const id of rows
+        .split(/\r?\n/)
+        .map((value) => value.trim())
+        .filter(Boolean)) {
         publishedLessonIds.add(id);
       }
     }
@@ -377,9 +380,9 @@ describeIntegration('Phase 3-1 trusted lesson authoring workflow', () => {
     expect(questions.data).toHaveLength(2);
     expect(games.data).toHaveLength(1);
     expect(experiments.data).toHaveLength(1);
-    expect(links.data?.filter((row) => row.game_id.startsWith(data.publishedEntityId))).toHaveLength(
-      2
-    );
+    expect(
+      links.data?.filter((row) => row.game_id.startsWith(data.publishedEntityId))
+    ).toHaveLength(2);
 
     const approvalEvent = await reviewer.client
       .from('content_review_events')

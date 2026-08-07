@@ -63,9 +63,17 @@ describeIntegration('Phase 3-1 direct authoring and review bypass protection', (
     teacher = await fixtures.createIdentity('p31-bypass-teacher', 'teacher', 'active');
     otherTeacher = await fixtures.createIdentity('p31-bypass-other-teacher', 'teacher', 'active');
     reviewer = await fixtures.createIdentity('p31-bypass-reviewer', 'reviewer', 'active');
-    otherReviewer = await fixtures.createIdentity('p31-bypass-other-reviewer', 'reviewer', 'active');
+    otherReviewer = await fixtures.createIdentity(
+      'p31-bypass-other-reviewer',
+      'reviewer',
+      'active'
+    );
     student = await fixtures.createIdentity('p31-bypass-student', 'student', 'active');
-    pendingTeacher = await fixtures.createIdentity('p31-bypass-pending-teacher', 'teacher', 'pending');
+    pendingTeacher = await fixtures.createIdentity(
+      'p31-bypass-pending-teacher',
+      'teacher',
+      'pending'
+    );
     suspendedReviewer = await fixtures.createIdentity(
       'p31-bypass-suspended-reviewer',
       'reviewer',
@@ -90,7 +98,8 @@ describeIntegration('Phase 3-1 direct authoring and review bypass protection', (
       throw new Error(`Failed to create pending bypass draft: ${pendingCreated.error.message}`);
     }
     const pendingData = asRpc(pendingCreated.data);
-    if (pendingData.status !== 'created') throw new Error('Expected pending bypass draft creation.');
+    if (pendingData.status !== 'created')
+      throw new Error('Expected pending bypass draft creation.');
     pendingId = pendingData.revision.id;
 
     const submitted = await teacher.client.rpc('submit_lesson_revision', {
@@ -197,7 +206,10 @@ describeIntegration('Phase 3-1 direct authoring and review bypass protection', (
 
   it('hides authoring tables from students, pending accounts, and suspended accounts', async () => {
     for (const identity of [student, pendingTeacher, suspendedReviewer]) {
-      const revisions = await identity.client.from('content_revisions').select('id').eq('id', pendingId);
+      const revisions = await identity.client
+        .from('content_revisions')
+        .select('id')
+        .eq('id', pendingId);
       const events = await identity.client.from('content_review_events').select('id');
 
       expect(revisions.error).toBeNull();
@@ -262,7 +274,6 @@ describeIntegration('Phase 3-1 direct authoring and review bypass protection', (
       reason: 'revision_not_submittable',
     });
   });
-
 
   it('prevents the owning teacher from editing a pending_review payload through the save RPC', async () => {
     const save = await teacher.client.rpc('save_lesson_revision', {
