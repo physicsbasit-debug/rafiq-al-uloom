@@ -1,0 +1,30 @@
+PHASE 2-D5-C1 — FINAL APPLICATION PACKAGE
+
+Baseline:
+1f01c66
+
+Claude review:
+APPROVED
+
+Apply the package to the repository, synchronize Codespaces, then run:
+
+npm run verify:mastery-results-closure
+
+Acceptance gates:
+- build passes.
+- lint passes.
+- 508 basic tests pass.
+- Prettier passes.
+- auth client boundary scanner passes.
+- mastery-results client boundary scanner passes.
+- Supabase is already running before verification begins.
+- db reset succeeds.
+- 89 Supabase integration tests pass.
+- Composition rerun passes 2/2.
+- Parity rerun passes 10/10.
+- git diff --check passes.
+- working tree is clean.
+- HEAD equals origin/main.
+
+Do not create or push v0.5 in D5-C1.
+D5-C2 remains responsible for final CLOSED documentation and the manual tag.
