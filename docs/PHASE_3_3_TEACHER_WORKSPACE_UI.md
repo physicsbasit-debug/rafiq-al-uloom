@@ -4,7 +4,8 @@
 
 - Phase 3-3A: architecture contract approved.
 - Phase 3-3B: Workspace Shell + Draft List CLOSED locally at `cb47443c8fe4bed22d305b828ec7ef103c00b0f5`.
-- Phase 3-3C: Lesson Editor + Create/Save lifecycle — REVIEW APPROVED; EXECUTION / LOCAL VERIFICATION PENDING.
+- Phase 3-3C: Lesson Editor + Create/Save lifecycle CLOSED locally at `8047b75d24a251b9b1204276ed184e3de4e29b28`.
+- Phase 3-3D: Submit Flow + Rejected Successor Completion — REVIEW APPROVED; EXECUTION / LOCAL VERIFICATION PENDING.
 - Backend / SQL / RLS / RPC changes: none.
 - Full Supabase verification: deferred by project decision.
 
@@ -59,7 +60,7 @@ mode = new
 First successful save:
 
 ```ts
-createLessonRevision({ payload });
+createLessonRevision({ payload })
 ```
 
 Only after `status === 'created'`:
@@ -100,7 +101,7 @@ First persistence operation:
 createLessonRevision({
   payload,
   supersedesRevisionId: A,
-});
+})
 ```
 
 If and only if the server creates successor draft `B`:
@@ -119,7 +120,7 @@ This is a strict commit-on-success rule. A rejected create or unavailable respon
 
 ### Pending review and approved
 
-Both are read-only in Phase 3-3C. No create/save mutation is exposed from their editor view.
+Both are read-only. No create/save/submit mutation is exposed from their editor view.
 
 ## Approved lesson capability
 
@@ -165,7 +166,7 @@ No JSON editor or raw payload field is shown to the teacher.
 - Abort lifecycle errors are not surfaced as user-facing failures.
 - Local identity and dirty-state commits happen only after a successful server result.
 
-## Phase 3-3C error mapping
+## Authoring error mapping
 
 Teacher UI maps all 15 distinct `AuthoringRejectionReason` values:
 
@@ -195,7 +196,7 @@ The mappings are declared as exhaustive `Record<>` objects so TypeScript rejects
 
 Raw Supabase/PostgreSQL messages, stack traces, and RPC diagnostics are never rendered to the teacher.
 
-## Phase 3-3C workspace composition
+## Workspace composition
 
 3-3B callbacks remain observable for compatibility, but the workspace now owns its local list/editor screen transition:
 
@@ -208,11 +209,71 @@ Draft list
 
 No App-level authorization composition is added yet. `App.tsx` remains outside this slice.
 
+## Phase 3-3D submit contract
+
+Submit is deliberately separate from save. The editor never performs an implicit save-and-submit chain.
+
+A submit operation is available only when all of these are true:
+
+```text
+mode = edit_draft
+workingRevisionId != null
+dirty = false
+isSaving = false
+isSubmitting = false
+```
+
+If local edits are dirty, the UI disables submit and instructs the teacher to save first.
+
+The only identifier passed to `submitLessonRevision` is `workingRevisionId`. `originRevisionId` is never a submit target.
+
+For rejected revision `A`, the required lifecycle is:
+
+```text
+A rejected
+  -> create successor B with supersedesRevisionId = A
+  -> workingRevisionId = B only after create success
+  -> optional later save uses B
+  -> submitLessonRevision(B)
+  -> never submitLessonRevision(A)
+```
+
+Submit requires explicit confirmation in the UI. Cancelling confirmation performs no service call.
+
+While submit is in flight:
+
+- submit is disabled;
+- save is disabled;
+- payload editing is disabled;
+- back navigation is disabled;
+- a second submit call cannot start.
+
+A successful server response with `status === 'submitted'` is the only event that transitions the local mode to `readonly_pending_review`.
+
+Rejected or unavailable submit responses leave the session in `edit_draft`, preserve the same `workingRevisionId`, and keep the editor usable. This is the submit form of the existing commit-on-success rule.
+
+A dedicated `AbortController` is passed through `AuthoringService.submitLessonRevision`, and an active submit is aborted on editor unmount. Abort lifecycle errors are not shown as authoring failures.
+
+The existing exhaustive 15 rejection messages and three unavailable messages are reused for submit results; no raw Supabase/PostgreSQL error is rendered.
+
+## Phase 3-3D acceptance focus
+
+Review must prove directly that:
+
+- a clean existing draft can submit through its working revision id;
+- dirty content cannot submit until save succeeds;
+- cancelling confirmation makes no submit call;
+- double-submit is blocked;
+- successful submit alone switches the editor to read-only pending-review mode;
+- failed submit does not switch local mode or revision identity;
+- `revision_not_submittable`, `stale_revision`, and `not_authorized` are surfaced through the existing Arabic mapping;
+- rejected `A` creates successor `B`, later save uses `B`, submit uses `B`, and neither save nor submit ever targets `A`;
+- no App-level authorization composition or backend change enters this slice.
+
 ## Out of scope
 
-Phase 3-3C does not add:
+Phase 3-3D does not add:
 
-- submit mutation or submit confirmation;
 - review-note loading;
 - reviewer UI;
 - App authorization composition;
@@ -224,9 +285,9 @@ Phase 3-3C does not add:
 - AI generation;
 - remote Supabase deployment.
 
-## Acceptance criteria
+## Cumulative Phase 3-3C acceptance retained
 
-Phase 3-3C review must prove directly that:
+The already-closed 3-3C guarantees remain mandatory:
 
 - new editor starts with no working revision;
 - first new save calls `createLessonRevision`;
@@ -245,6 +306,6 @@ Phase 3-3C review must prove directly that:
 - teacher feature contains no direct Supabase/RPC/infrastructure dependency;
 - no App integration or backend change is present.
 
-## Next slice after approval and local closure
+## Next slice after 3-3D approval and local closure
 
-Phase 3-3D will add submit flow and its confirmation/state rules. Any dedicated structured child-content authoring UI must be explicitly scheduled and reviewed rather than silently folded into submit logic.
+Phase 3-3E will compose the Teacher Workspace behind the existing capability-based App authorization boundary. Review-note loading and any dedicated structured child-content authoring UI remain separate scope decisions and must not be silently folded into App composition.

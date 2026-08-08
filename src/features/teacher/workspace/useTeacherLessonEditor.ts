@@ -14,19 +14,15 @@ import {
 } from './teacher-workspace.utils';
 
 export type TeacherLessonEditorMode =
-  'new' | 'edit_draft' | 'revise_rejected' | 'readonly_pending_review' | 'readonly_approved';
+  | 'new'
+  | 'edit_draft'
+  | 'revise_rejected'
+  | 'readonly_pending_review'
+  | 'readonly_approved';
 
 export type TeacherLessonEditorError =
-  | {
-      readonly kind: 'rejected';
-      readonly reason: AuthoringRejectionReason;
-      readonly message: string;
-    }
-  | {
-      readonly kind: 'unavailable';
-      readonly reason: AuthoringUnavailableReason;
-      readonly message: string;
-    };
+  | { readonly kind: 'rejected'; readonly reason: AuthoringRejectionReason; readonly message: string }
+  | { readonly kind: 'unavailable'; readonly reason: AuthoringUnavailableReason; readonly message: string };
 
 interface UseTeacherLessonEditorOptions {
   readonly service: AuthoringService;
@@ -65,46 +61,52 @@ function errorFromResult(
 }
 
 function isAbortError(error: unknown): boolean {
-  return (
-    typeof error === 'object' && error !== null && 'name' in error && error.name === 'AbortError'
-  );
+  return typeof error === 'object' && error !== null && 'name' in error && error.name === 'AbortError';
 }
 
-export function useTeacherLessonEditor({
-  service,
-  revision = null,
-}: UseTeacherLessonEditorOptions) {
+export function useTeacherLessonEditor({ service, revision = null }: UseTeacherLessonEditorOptions) {
   const originRevisionId = revision?.id ?? null;
   const [mode, setMode] = useState<TeacherLessonEditorMode>(() => modeForRevision(revision));
   const [workingRevisionId, setWorkingRevisionId] = useState<string | null>(() =>
     workingIdForRevision(revision)
   );
-  const [payload, setPayload] = useState<LessonRevisionPayload>(
-    () => revision?.payload ?? createEmptyTeacherLessonPayload()
+  const [payload, setPayload] = useState<LessonRevisionPayload>(() =>
+    revision?.payload ?? createEmptyTeacherLessonPayload()
   );
   const [dirty, setDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<TeacherLessonEditorError | null>(null);
   const saveAbortRef = useRef<AbortController | null>(null);
+  const submitAbortRef = useRef<AbortController | null>(null);
+  const submitInFlightRef = useRef(false);
 
   useEffect(() => {
     return () => {
       saveAbortRef.current?.abort();
+      submitAbortRef.current?.abort();
       saveAbortRef.current = null;
+      submitAbortRef.current = null;
     };
   }, []);
 
   const isReadOnly = mode === 'readonly_pending_review' || mode === 'readonly_approved';
+  const canSubmit =
+    mode === 'edit_draft' &&
+    workingRevisionId !== null &&
+    !dirty &&
+    !isSaving &&
+    !isSubmitting;
 
   const updatePayload = (next: LessonRevisionPayload) => {
-    if (isReadOnly || isSaving) return;
+    if (isReadOnly || isSaving || isSubmitting) return;
     setPayload(next);
     setDirty(true);
     setError(null);
   };
 
   const save = async () => {
-    if (isReadOnly || isSaving || !dirty) return;
+    if (isReadOnly || isSaving || isSubmitting || submitInFlightRef.current || !dirty) return;
 
     const controller = new AbortController();
     saveAbortRef.current?.abort();
@@ -153,15 +155,68 @@ export function useTeacherLessonEditor({
     }
   };
 
+  const submit = async () => {
+    if (!canSubmit || !workingRevisionId || submitInFlightRef.current) return;
+
+    submitInFlightRef.current = true;
+    const controller = new AbortController();
+    submitAbortRef.current?.abort();
+    submitAbortRef.current = controller;
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const result = await service.submitLessonRevision(workingRevisionId, {
+        signal: controller.signal,
+      });
+
+      if (result.status === 'submitted') {
+        setMode('readonly_pending_review');
+        return;
+      }
+
+      setError(errorFromResult(result));
+    } catch (caught) {
+      if (!isAbortError(caught)) {
+        throw caught;
+      }
+    } finally {
+      if (submitAbortRef.current === controller) {
+        submitAbortRef.current = null;
+        submitInFlightRef.current = false;
+        setIsSubmitting(false);
+      }
+    }
+  };
+
   const session = useMemo(
-    () => ({ originRevisionId, workingRevisionId, mode, dirty, isSaving, isReadOnly }),
-    [originRevisionId, workingRevisionId, mode, dirty, isSaving, isReadOnly]
+    () => ({
+      originRevisionId,
+      workingRevisionId,
+      mode,
+      dirty,
+      isSaving,
+      isSubmitting,
+      isReadOnly,
+      canSubmit,
+    }),
+    [
+      originRevisionId,
+      workingRevisionId,
+      mode,
+      dirty,
+      isSaving,
+      isSubmitting,
+      isReadOnly,
+      canSubmit,
+    ]
   );
 
   return {
     payload,
     updatePayload,
     save,
+    submit,
     error,
     session,
   };

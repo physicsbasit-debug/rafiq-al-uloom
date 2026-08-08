@@ -65,19 +65,21 @@ function saveButton() {
   return screen.getByRole('button', { name: /حفظ المسودة|جارٍ الحفظ/ });
 }
 
+function submitButton() {
+  return screen.getByRole('button', { name: /إرسال للمراجعة|جارٍ الإرسال/ });
+}
+
 describe('TeacherLessonEditor', () => {
   it('ينشئ new revision في أول حفظ ثم يحفظ بالمعرف الذي أكده الخادم', async () => {
-    const createLessonRevision = vi
-      .fn<AuthoringService['createLessonRevision']>()
-      .mockResolvedValue({
-        status: 'created',
-        revision: {
-          id: SUCCESSOR_ID,
-          entityId: null,
-          revisionNumber: 1,
-          baseFingerprint: null,
-        },
-      });
+    const createLessonRevision = vi.fn<AuthoringService['createLessonRevision']>().mockResolvedValue({
+      status: 'created',
+      revision: {
+        id: SUCCESSOR_ID,
+        entityId: null,
+        revisionNumber: 1,
+        baseFingerprint: null,
+      },
+    });
     const saveLessonRevision = vi.fn<AuthoringService['saveLessonRevision']>().mockResolvedValue({
       status: 'saved',
       revisionId: SUCCESSOR_ID,
@@ -114,17 +116,15 @@ describe('TeacherLessonEditor', () => {
   });
 
   it('لا يحفظ rejected revision في مكانها ويُنشئ successor في أول حفظ', async () => {
-    const createLessonRevision = vi
-      .fn<AuthoringService['createLessonRevision']>()
-      .mockResolvedValue({
-        status: 'created',
-        revision: {
-          id: SUCCESSOR_ID,
-          entityId: null,
-          revisionNumber: 2,
-          baseFingerprint: null,
-        },
-      });
+    const createLessonRevision = vi.fn<AuthoringService['createLessonRevision']>().mockResolvedValue({
+      status: 'created',
+      revision: {
+        id: SUCCESSOR_ID,
+        entityId: null,
+        revisionNumber: 2,
+        baseFingerprint: null,
+      },
+    });
     const saveLessonRevision = vi.fn<AuthoringService['saveLessonRevision']>().mockResolvedValue({
       status: 'saved',
       revisionId: SUCCESSOR_ID,
@@ -155,34 +155,26 @@ describe('TeacherLessonEditor', () => {
       },
       { signal: expect.any(AbortSignal) }
     );
-    expect(saveLessonRevision).not.toHaveBeenCalledWith(
-      REJECTED_ID,
-      expect.anything(),
-      expect.anything()
-    );
+    expect(saveLessonRevision).not.toHaveBeenCalledWith(REJECTED_ID, expect.anything(), expect.anything());
     expect(await screen.findByText(SUCCESSOR_ID)).toBeInTheDocument();
 
     changeTitle('خصائص الموجات - النسخة الجديدة');
     fireEvent.click(saveButton());
 
     await waitFor(() => expect(saveLessonRevision).toHaveBeenCalledTimes(1));
-    expect(saveLessonRevision).toHaveBeenCalledWith(SUCCESSOR_ID, expect.anything(), {
-      signal: expect.any(AbortSignal),
-    });
-    expect(saveLessonRevision).not.toHaveBeenCalledWith(
-      REJECTED_ID,
+    expect(saveLessonRevision).toHaveBeenCalledWith(
+      SUCCESSOR_ID,
       expect.anything(),
-      expect.anything()
+      { signal: expect.any(AbortSignal) }
     );
+    expect(saveLessonRevision).not.toHaveBeenCalledWith(REJECTED_ID, expect.anything(), expect.anything());
   });
 
   it('يلتزم commit-on-success عند فشل إنشاء successor للمرفوض', async () => {
-    const createLessonRevision = vi
-      .fn<AuthoringService['createLessonRevision']>()
-      .mockResolvedValue({
-        status: 'rejected',
-        reason: 'stale_revision',
-      });
+    const createLessonRevision = vi.fn<AuthoringService['createLessonRevision']>().mockResolvedValue({
+      status: 'rejected',
+      reason: 'stale_revision',
+    });
     const saveLessonRevision = vi.fn<AuthoringService['saveLessonRevision']>();
     const authoring = service({ createLessonRevision, saveLessonRevision });
 
@@ -211,11 +203,7 @@ describe('TeacherLessonEditor', () => {
     const authoring = service({ saveLessonRevision });
 
     render(
-      <TeacherLessonEditor
-        service={authoring}
-        revision={revision(DRAFT_ID, 'draft')}
-        onBack={vi.fn()}
-      />
+      <TeacherLessonEditor service={authoring} revision={revision(DRAFT_ID, 'draft')} onBack={vi.fn()} />
     );
 
     changeTitle('خصائص الموجات - محفوظة');
@@ -227,9 +215,11 @@ describe('TeacherLessonEditor', () => {
     expect(savedPayload?.questions).toEqual(payload.questions);
     expect(savedPayload?.games).toEqual(payload.games);
     expect(savedPayload?.experiments).toEqual(payload.experiments);
-    expect(saveLessonRevision).toHaveBeenCalledWith(DRAFT_ID, expect.anything(), {
-      signal: expect.any(AbortSignal),
-    });
+    expect(saveLessonRevision).toHaveBeenCalledWith(
+      DRAFT_ID,
+      expect.anything(),
+      { signal: expect.any(AbortSignal) }
+    );
   });
 
   it.each(['pending_review', 'approved'] as const)('يعرض %s للقراءة فقط دون حفظ', (status) => {
@@ -253,10 +243,7 @@ describe('TeacherLessonEditor', () => {
 
   it('يحمي الرجوع عند وجود تغييرات غير محفوظة', () => {
     const onBack = vi.fn();
-    const confirm = vi
-      .spyOn(window, 'confirm')
-      .mockReturnValueOnce(false)
-      .mockReturnValueOnce(true);
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValueOnce(false).mockReturnValueOnce(true);
     const authoring = service();
 
     render(<TeacherLessonEditor service={authoring} onBack={onBack} />);
@@ -272,14 +259,10 @@ describe('TeacherLessonEditor', () => {
   });
 
   it('يمنع double-save بينما عملية الإنشاء جارية', async () => {
-    let resolveCreate!: (
-      value: Awaited<ReturnType<AuthoringService['createLessonRevision']>>
-    ) => void;
-    const pending = new Promise<Awaited<ReturnType<AuthoringService['createLessonRevision']>>>(
-      (resolve) => {
-        resolveCreate = resolve;
-      }
-    );
+    let resolveCreate!: (value: Awaited<ReturnType<AuthoringService['createLessonRevision']>>) => void;
+    const pending = new Promise<Awaited<ReturnType<AuthoringService['createLessonRevision']>>>((resolve) => {
+      resolveCreate = resolve;
+    });
     const createLessonRevision = vi.fn(() => pending);
     const authoring = service({ createLessonRevision });
 
@@ -303,4 +286,171 @@ describe('TeacherLessonEditor', () => {
     });
     await screen.findByText(SUCCESSOR_ID);
   });
+
+  it('يرسل draft محفوظة بالمعرف العامل ثم يحول المحرر إلى قيد المراجعة فقط بعد نجاح الخادم', async () => {
+    const submitLessonRevision = vi.fn<AuthoringService['submitLessonRevision']>().mockResolvedValue({
+      status: 'submitted',
+      revisionId: DRAFT_ID,
+    });
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const authoring = service({ submitLessonRevision });
+
+    render(
+      <TeacherLessonEditor service={authoring} revision={revision(DRAFT_ID, 'draft')} onBack={vi.fn()} />
+    );
+
+    expect(submitButton()).toBeEnabled();
+    fireEvent.click(submitButton());
+
+    await waitFor(() => expect(submitLessonRevision).toHaveBeenCalledTimes(1));
+    expect(submitLessonRevision).toHaveBeenCalledWith(DRAFT_ID, {
+      signal: expect.any(AbortSignal),
+    });
+    expect(await screen.findByText('هذه النسخة قيد المراجعة ولا يمكن تعديلها في مكانها.')).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'عنوان الدرس' })).toBeDisabled();
+    expect(screen.queryByRole('button', { name: 'إرسال للمراجعة' })).not.toBeInTheDocument();
+    confirm.mockRestore();
+  });
+
+  it('يمنع الإرسال عند وجود تغييرات غير محفوظة حتى ينجح الحفظ', async () => {
+    const saveLessonRevision = vi.fn<AuthoringService['saveLessonRevision']>().mockResolvedValue({
+      status: 'saved',
+      revisionId: DRAFT_ID,
+    });
+    const submitLessonRevision = vi.fn<AuthoringService['submitLessonRevision']>();
+    const authoring = service({ saveLessonRevision, submitLessonRevision });
+
+    render(
+      <TeacherLessonEditor service={authoring} revision={revision(DRAFT_ID, 'draft')} onBack={vi.fn()} />
+    );
+
+    changeTitle('تعديل يحتاج حفظًا');
+    expect(submitButton()).toBeDisabled();
+    expect(screen.getByRole('status')).toHaveTextContent('احفظ التعديلات أولًا');
+    fireEvent.click(submitButton());
+    expect(submitLessonRevision).not.toHaveBeenCalled();
+
+    fireEvent.click(saveButton());
+    await waitFor(() => expect(saveLessonRevision).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(submitButton()).toBeEnabled());
+  });
+
+  it('لا يستدعي submit إذا ألغى المعلم نافذة التأكيد', () => {
+    const submitLessonRevision = vi.fn<AuthoringService['submitLessonRevision']>();
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false);
+    const authoring = service({ submitLessonRevision });
+
+    render(
+      <TeacherLessonEditor service={authoring} revision={revision(DRAFT_ID, 'draft')} onBack={vi.fn()} />
+    );
+
+    fireEvent.click(submitButton());
+    expect(confirm).toHaveBeenCalledTimes(1);
+    expect(submitLessonRevision).not.toHaveBeenCalled();
+    confirm.mockRestore();
+  });
+
+  it('يمنع double-submit بينما طلب الإرسال جارٍ', async () => {
+    let resolveSubmit!: (value: Awaited<ReturnType<AuthoringService['submitLessonRevision']>>) => void;
+    const pending = new Promise<Awaited<ReturnType<AuthoringService['submitLessonRevision']>>>((resolve) => {
+      resolveSubmit = resolve;
+    });
+    const submitLessonRevision = vi.fn(() => pending);
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const authoring = service({ submitLessonRevision });
+
+    render(
+      <TeacherLessonEditor service={authoring} revision={revision(DRAFT_ID, 'draft')} onBack={vi.fn()} />
+    );
+
+    fireEvent.click(submitButton());
+    fireEvent.click(submitButton());
+    await waitFor(() => expect(submitLessonRevision).toHaveBeenCalledTimes(1));
+    expect(submitButton()).toBeDisabled();
+
+    resolveSubmit({ status: 'submitted', revisionId: DRAFT_ID });
+    expect(await screen.findByText('هذه النسخة قيد المراجعة ولا يمكن تعديلها في مكانها.')).toBeInTheDocument();
+    confirm.mockRestore();
+  });
+
+  it('يمد مسار rejected من A إلى successor B ثم يحفظ ويرسل B ولا يرسل A أبدًا', async () => {
+    const createLessonRevision = vi.fn<AuthoringService['createLessonRevision']>().mockResolvedValue({
+      status: 'created',
+      revision: {
+        id: SUCCESSOR_ID,
+        entityId: null,
+        revisionNumber: 2,
+        baseFingerprint: null,
+      },
+    });
+    const saveLessonRevision = vi.fn<AuthoringService['saveLessonRevision']>().mockResolvedValue({
+      status: 'saved',
+      revisionId: SUCCESSOR_ID,
+    });
+    const submitLessonRevision = vi.fn<AuthoringService['submitLessonRevision']>().mockResolvedValue({
+      status: 'submitted',
+      revisionId: SUCCESSOR_ID,
+    });
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const authoring = service({ createLessonRevision, saveLessonRevision, submitLessonRevision });
+
+    render(
+      <TeacherLessonEditor
+        service={authoring}
+        revision={revision(REJECTED_ID, 'rejected')}
+        onBack={vi.fn()}
+      />
+    );
+
+    changeTitle('نسخة B الأولى');
+    fireEvent.click(saveButton());
+    await waitFor(() => expect(createLessonRevision).toHaveBeenCalledTimes(1));
+    expect(await screen.findByText(SUCCESSOR_ID)).toBeInTheDocument();
+
+    changeTitle('نسخة B بعد الحفظ');
+    fireEvent.click(saveButton());
+    await waitFor(() => expect(saveLessonRevision).toHaveBeenCalledTimes(1));
+    expect(saveLessonRevision).toHaveBeenCalledWith(
+      SUCCESSOR_ID,
+      expect.anything(),
+      { signal: expect.any(AbortSignal) }
+    );
+
+    fireEvent.click(submitButton());
+    await waitFor(() => expect(submitLessonRevision).toHaveBeenCalledTimes(1));
+    expect(submitLessonRevision).toHaveBeenCalledWith(SUCCESSOR_ID, {
+      signal: expect.any(AbortSignal),
+    });
+    expect(submitLessonRevision).not.toHaveBeenCalledWith(REJECTED_ID, expect.anything());
+    expect(saveLessonRevision).not.toHaveBeenCalledWith(REJECTED_ID, expect.anything(), expect.anything());
+    confirm.mockRestore();
+  });
+
+  it.each([
+    ['revision_not_submittable', 'لا يمكن إرسال هذه النسخة للمراجعة'],
+    ['stale_revision', 'توجد نسخة أحدث من هذه المسودة'],
+    ['not_authorized', 'لا تملك صلاحية تنفيذ هذه العملية'],
+  ] as const)('يبقي draft قابلة للتحرير عند رفض submit بسبب %s', async (reason, expectedMessage) => {
+    const submitLessonRevision = vi.fn<AuthoringService['submitLessonRevision']>().mockResolvedValue({
+      status: 'rejected',
+      reason,
+    });
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const authoring = service({ submitLessonRevision });
+
+    render(
+      <TeacherLessonEditor service={authoring} revision={revision(DRAFT_ID, 'draft')} onBack={vi.fn()} />
+    );
+
+    fireEvent.click(submitButton());
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(expectedMessage);
+    expect(screen.getByRole('textbox', { name: 'عنوان الدرس' })).toBeEnabled();
+    expect(submitButton()).toBeEnabled();
+    expect(submitLessonRevision).toHaveBeenCalledWith(DRAFT_ID, {
+      signal: expect.any(AbortSignal),
+    });
+    confirm.mockRestore();
+  });
+
 });

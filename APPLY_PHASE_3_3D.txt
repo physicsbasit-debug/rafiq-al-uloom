@@ -1,0 +1,68 @@
+PHASE 3-3D APPLY
+=================
+
+Status:
+Review approved by Claude.
+Execution / local verification pending in Codespaces.
+
+Base:
+Phase 3-3C locally closed at 8047b75d24a251b9b1204276ed184e3de4e29b28.
+
+Upload workflow:
+1) Extract this ZIP locally.
+2) Upload the extracted files/folders to the repository root on GitHub, preserving paths.
+3) Commit the uploaded files to main.
+4) Open Codespaces.
+
+Codespaces verification order:
+
+git pull origin main
+git --no-pager show --stat --oneline -1
+git status --short
+
+# Critical submit lifecycle test first
+npm test -- tests/features/teacher/TeacherLessonEditor.test.tsx
+
+# Architecture invariant
+npm test -- tests/architecture/no-teacher-rejected-original-submit.test.ts
+
+# Full local gates
+npx prettier --check .
+npm run lint
+npm run build
+npm test
+git diff --check
+git status --short
+
+Expected basic-suite count if no unrelated tests changed:
+589 tests.
+This is a forecast only; Codespaces output is authoritative.
+
+Critical invariant:
+Rejected revision A must never be submitted.
+The legal sequence is:
+A rejected -> create successor B -> save B -> submit B.
+submitLessonRevision must receive workingRevisionId, never originRevisionId.
+
+If Prettier changes files, prove the changes are formatting-only before commit/push, then run the full local gates again.
+
+After successful local verification and any formatting-only commit:
+
+git fetch origin
+git status
+git rev-parse HEAD
+git rev-parse origin/main
+
+Required final Git state:
+- HEAD == origin/main
+- working tree clean
+
+Deferred by project decision:
+- full Supabase integration verification
+- remote Supabase deployment
+
+Out of scope:
+- App.tsx integration
+- reviewer UI
+- backend / SQL / migrations / RLS / RPC definition changes
+- approved-lesson revision UI

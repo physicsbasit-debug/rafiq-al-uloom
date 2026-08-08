@@ -22,12 +22,8 @@ function arrayToLines(value: readonly string[]): string {
   return value.join('\n');
 }
 
-export function TeacherLessonEditor({
-  service,
-  revision = null,
-  onBack,
-}: TeacherLessonEditorProps) {
-  const { payload, updatePayload, save, error, session } = useTeacherLessonEditor({
+export function TeacherLessonEditor({ service, revision = null, onBack }: TeacherLessonEditorProps) {
+  const { payload, updatePayload, save, submit, error, session } = useTeacherLessonEditor({
     service,
     revision,
   });
@@ -47,11 +43,20 @@ export function TeacherLessonEditor({
 
   const readOnly = session.isReadOnly;
   const requestBack = () => {
-    if (session.isSaving) return;
+    if (session.isSaving || session.isSubmitting) return;
     if (session.dirty && !window.confirm('لديك تغييرات غير محفوظة. هل تريد العودة دون حفظها؟')) {
       return;
     }
     onBack();
+  };
+
+  const requestSubmit = () => {
+    if (!session.canSubmit) return;
+    const confirmed = window.confirm(
+      'إرسال الدرس للمراجعة؟ بعد الإرسال ستصبح هذه النسخة قيد المراجعة ولن تكون قابلة للتحرير في مكانها.'
+    );
+    if (!confirmed) return;
+    void submit();
   };
 
   const title =
@@ -81,9 +86,11 @@ export function TeacherLessonEditor({
           <p style={{ margin: '0.35rem 0 0' }}>
             {session.mode === 'revise_rejected'
               ? 'سيُنشأ إصدار مسودة جديد عند أول حفظ ناجح. النسخة المرفوضة الأصلية لن تُعدّل.'
-              : readOnly
-                ? 'هذه النسخة للقراءة فقط في حالتها الحالية.'
-                : 'احفظ يدويًا عندما تنتهي من تعديلاتك.'}
+              : session.mode === 'readonly_pending_review'
+                ? 'هذه النسخة قيد المراجعة ولا يمكن تعديلها في مكانها.'
+                : session.mode === 'readonly_approved'
+                  ? 'هذه النسخة معتمدة وتُعرض للقراءة فقط في هذه المرحلة.'
+                  : 'احفظ يدويًا عندما تنتهي من تعديلاتك.'}
           </p>
         </div>
         <div style={{ width: '150px' }}>
@@ -91,7 +98,7 @@ export function TeacherLessonEditor({
             label="العودة"
             variant="secondary"
             onClick={requestBack}
-            disabled={session.isSaving}
+            disabled={session.isSaving || session.isSubmitting}
           />
         </div>
       </div>
@@ -108,10 +115,8 @@ export function TeacherLessonEditor({
           <input
             aria-label="معرف الوحدة"
             value={payload.lesson.unitId}
-            disabled={readOnly || session.isSaving}
-            onChange={(event: ChangeEvent<HTMLInputElement>) =>
-              updateLesson('unitId', event.target.value)
-            }
+            disabled={readOnly || session.isSaving || session.isSubmitting}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => updateLesson('unitId', event.target.value)}
           />
         </label>
 
@@ -120,10 +125,8 @@ export function TeacherLessonEditor({
           <input
             aria-label="عنوان الدرس"
             value={payload.lesson.title}
-            disabled={readOnly || session.isSaving}
-            onChange={(event: ChangeEvent<HTMLInputElement>) =>
-              updateLesson('title', event.target.value)
-            }
+            disabled={readOnly || session.isSaving || session.isSubmitting}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => updateLesson('title', event.target.value)}
           />
         </label>
 
@@ -134,7 +137,7 @@ export function TeacherLessonEditor({
             type="number"
             min={1}
             value={payload.lesson.displayOrder}
-            disabled={readOnly || session.isSaving}
+            disabled={readOnly || session.isSaving || session.isSubmitting}
             onChange={(event: ChangeEvent<HTMLInputElement>) =>
               updateLesson('displayOrder', Number(event.target.value))
             }
@@ -146,10 +149,8 @@ export function TeacherLessonEditor({
           <textarea
             aria-label="ملخص الدرس"
             value={payload.lesson.summary}
-            disabled={readOnly || session.isSaving}
-            onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
-              updateLesson('summary', event.target.value)
-            }
+            disabled={readOnly || session.isSaving || session.isSubmitting}
+            onChange={(event: ChangeEvent<HTMLTextAreaElement>) => updateLesson('summary', event.target.value)}
           />
         </label>
 
@@ -158,7 +159,7 @@ export function TeacherLessonEditor({
           <textarea
             aria-label="المفاهيم الأساسية"
             value={arrayToLines(payload.lesson.keyConcepts)}
-            disabled={readOnly || session.isSaving}
+            disabled={readOnly || session.isSaving || session.isSubmitting}
             onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
               updateLesson('keyConcepts', linesToArray(event.target.value))
             }
@@ -170,7 +171,7 @@ export function TeacherLessonEditor({
           <textarea
             aria-label="الأمثلة"
             value={arrayToLines(payload.lesson.examples)}
-            disabled={readOnly || session.isSaving}
+            disabled={readOnly || session.isSaving || session.isSubmitting}
             onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
               updateLesson('examples', linesToArray(event.target.value))
             }
@@ -182,7 +183,7 @@ export function TeacherLessonEditor({
           <textarea
             aria-label="التصورات البديلة"
             value={arrayToLines(payload.lesson.misconceptions)}
-            disabled={readOnly || session.isSaving}
+            disabled={readOnly || session.isSaving || session.isSubmitting}
             onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
               updateLesson('misconceptions', linesToArray(event.target.value))
             }
@@ -193,19 +194,35 @@ export function TeacherLessonEditor({
       <div style={{ marginTop: '1rem' }}>
         <p>
           المحتوى البنيوي المحفوظ: {payload.objectives.length} أهداف، {payload.questions.length}{' '}
-          أسئلة، {payload.games.length} ألعاب، {payload.experiments.length} تجارب. تبقى هذه العناصر
-          كما هي في 3-3C ولا تُحذف أثناء الحفظ.
+          أسئلة، {payload.games.length} ألعاب، {payload.experiments.length} تجارب. تبقى هذه العناصر كما هي
+          ولا تُحذف أثناء الحفظ أو الإرسال.
         </p>
       </div>
 
       {!readOnly ? (
-        <div style={{ width: '190px', marginTop: '1rem' }}>
-          <AppButton
-            label={session.isSaving ? 'جارٍ الحفظ...' : 'حفظ المسودة'}
-            onClick={() => void save()}
-            disabled={!session.dirty || session.isSaving}
-          />
+        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem', flexWrap: 'wrap' }}>
+          <div style={{ width: '190px' }}>
+            <AppButton
+              label={session.isSaving ? 'جارٍ الحفظ...' : 'حفظ المسودة'}
+              onClick={() => void save()}
+              disabled={!session.dirty || session.isSaving || session.isSubmitting}
+            />
+          </div>
+          <div style={{ width: '190px' }}>
+            <AppButton
+              label={session.isSubmitting ? 'جارٍ الإرسال...' : 'إرسال للمراجعة'}
+              variant="secondary"
+              onClick={requestSubmit}
+              disabled={!session.canSubmit}
+            />
+          </div>
         </div>
+      ) : null}
+
+      {!readOnly && session.dirty ? (
+        <p role="status" style={{ marginTop: '0.75rem' }}>
+          احفظ التعديلات أولًا قبل إرسال الدرس للمراجعة.
+        </p>
       ) : null}
 
       <dl style={{ marginTop: '1rem' }}>
