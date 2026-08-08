@@ -14,8 +14,7 @@ interface TeacherWorkspaceInternalProps extends TeacherWorkspaceProps {
 }
 
 type WorkspaceScreen =
-  | { readonly kind: 'list' }
-  | { readonly kind: 'editor'; readonly revision: LessonRevision | null };
+  { readonly kind: 'list' } | { readonly kind: 'editor'; readonly revision: LessonRevision | null };
 
 const FILTERS: readonly { value: TeacherRevisionFilter; label: string }[] = [
   { value: 'all', label: 'الكل' },

@@ -14,15 +14,19 @@ import {
 } from './teacher-workspace.utils';
 
 export type TeacherLessonEditorMode =
-  | 'new'
-  | 'edit_draft'
-  | 'revise_rejected'
-  | 'readonly_pending_review'
-  | 'readonly_approved';
+  'new' | 'edit_draft' | 'revise_rejected' | 'readonly_pending_review' | 'readonly_approved';
 
 export type TeacherLessonEditorError =
-  | { readonly kind: 'rejected'; readonly reason: AuthoringRejectionReason; readonly message: string }
-  | { readonly kind: 'unavailable'; readonly reason: AuthoringUnavailableReason; readonly message: string };
+  | {
+      readonly kind: 'rejected';
+      readonly reason: AuthoringRejectionReason;
+      readonly message: string;
+    }
+  | {
+      readonly kind: 'unavailable';
+      readonly reason: AuthoringUnavailableReason;
+      readonly message: string;
+    };
 
 interface UseTeacherLessonEditorOptions {
   readonly service: AuthoringService;
@@ -61,17 +65,22 @@ function errorFromResult(
 }
 
 function isAbortError(error: unknown): boolean {
-  return typeof error === 'object' && error !== null && 'name' in error && error.name === 'AbortError';
+  return (
+    typeof error === 'object' && error !== null && 'name' in error && error.name === 'AbortError'
+  );
 }
 
-export function useTeacherLessonEditor({ service, revision = null }: UseTeacherLessonEditorOptions) {
+export function useTeacherLessonEditor({
+  service,
+  revision = null,
+}: UseTeacherLessonEditorOptions) {
   const originRevisionId = revision?.id ?? null;
   const [mode, setMode] = useState<TeacherLessonEditorMode>(() => modeForRevision(revision));
   const [workingRevisionId, setWorkingRevisionId] = useState<string | null>(() =>
     workingIdForRevision(revision)
   );
-  const [payload, setPayload] = useState<LessonRevisionPayload>(() =>
-    revision?.payload ?? createEmptyTeacherLessonPayload()
+  const [payload, setPayload] = useState<LessonRevisionPayload>(
+    () => revision?.payload ?? createEmptyTeacherLessonPayload()
   );
   const [dirty, setDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
