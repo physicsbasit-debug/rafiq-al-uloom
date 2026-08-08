@@ -45,9 +45,7 @@ function revision(
   };
 }
 
-function serviceWithList(
-  listOwnRevisions: AuthoringService['listOwnRevisions']
-): AuthoringService {
+function serviceWithList(listOwnRevisions: AuthoringService['listOwnRevisions']): AuthoringService {
   return {
     listOwnRevisions,
     listReviewEvents: vi.fn(),
@@ -67,9 +65,11 @@ const revisions = [
 describe('TeacherWorkspace', () => {
   it('يعرض حالة التحميل ثم القائمة الناجحة', async () => {
     let resolveList!: (value: Awaited<ReturnType<AuthoringService['listOwnRevisions']>>) => void;
-    const pending = new Promise<Awaited<ReturnType<AuthoringService['listOwnRevisions']>>>((resolve) => {
-      resolveList = resolve;
-    });
+    const pending = new Promise<Awaited<ReturnType<AuthoringService['listOwnRevisions']>>>(
+      (resolve) => {
+        resolveList = resolve;
+      }
+    );
     const service = serviceWithList(vi.fn(() => pending));
 
     render(<TeacherWorkspace service={service} />);
@@ -93,18 +93,18 @@ describe('TeacherWorkspace', () => {
   });
 
   it('يعرض الحالات الأربع بالتسميات العربية ويحافظ على ترتيب الخدمة', async () => {
-    const service = serviceWithList(
-      vi.fn(async () => ({ status: 'success' as const, revisions }))
-    );
+    const service = serviceWithList(vi.fn(async () => ({ status: 'success' as const, revisions })));
 
     render(<TeacherWorkspace service={service} />);
     await screen.findByText('الدرس المعتمد');
 
-    const cards = screen.getAllByRole('button').filter((button) =>
-      ['الدرس المعتمد', 'الدرس المرفوض', 'درس بانتظار المراجعة', 'المسودة الحالية'].some((title) =>
-        button.textContent?.includes(title)
-      )
-    );
+    const cards = screen
+      .getAllByRole('button')
+      .filter((button) =>
+        ['الدرس المعتمد', 'الدرس المرفوض', 'درس بانتظار المراجعة', 'المسودة الحالية'].some(
+          (title) => button.textContent?.includes(title)
+        )
+      );
     expect(cards.map((card) => card.textContent)).toEqual([
       expect.stringContaining('الدرس المعتمد'),
       expect.stringContaining('الدرس المرفوض'),
@@ -112,8 +112,12 @@ describe('TeacherWorkspace', () => {
       expect.stringContaining('المسودة الحالية'),
     ]);
     expect(screen.getByRole('button', { name: /الدرس المعتمد/ })).toHaveTextContent('معتمد');
-    expect(screen.getByRole('button', { name: /الدرس المرفوض/ })).toHaveTextContent('يحتاج إلى تعديل');
-    expect(screen.getByRole('button', { name: /درس بانتظار المراجعة/ })).toHaveTextContent('قيد المراجعة');
+    expect(screen.getByRole('button', { name: /الدرس المرفوض/ })).toHaveTextContent(
+      'يحتاج إلى تعديل'
+    );
+    expect(screen.getByRole('button', { name: /درس بانتظار المراجعة/ })).toHaveTextContent(
+      'قيد المراجعة'
+    );
     expect(screen.getByRole('button', { name: /المسودة الحالية/ })).toHaveTextContent('مسودة');
   });
 
@@ -133,9 +137,7 @@ describe('TeacherWorkspace', () => {
 
   it('يمرر Revision المحددة نفسها عند فتح البطاقة', async () => {
     const onOpenRevision = vi.fn();
-    const service = serviceWithList(
-      vi.fn(async () => ({ status: 'success' as const, revisions }))
-    );
+    const service = serviceWithList(vi.fn(async () => ({ status: 'success' as const, revisions })));
 
     render(<TeacherWorkspace service={service} onOpenRevision={onOpenRevision} />);
     const card = await screen.findByRole('button', { name: /الدرس المرفوض/ });
@@ -174,7 +176,9 @@ describe('TeacherWorkspace', () => {
     fireEvent.click(screen.getByRole('button', { name: 'إعادة المحاولة' }));
 
     await waitFor(() => expect(listOwnRevisions).toHaveBeenCalledTimes(2));
-    expect(await screen.findByText('لا توجد لديك مسودات بعد. ابدأ بإنشاء درس جديد.')).toBeInTheDocument();
+    expect(
+      await screen.findByText('لا توجد لديك مسودات بعد. ابدأ بإنشاء درس جديد.')
+    ).toBeInTheDocument();
   });
 
   it('يلغي الطلب الجاري عند unmount', async () => {

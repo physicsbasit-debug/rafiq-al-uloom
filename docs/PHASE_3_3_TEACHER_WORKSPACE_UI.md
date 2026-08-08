@@ -53,7 +53,7 @@ The first successful persistence operation must be:
 createLessonRevision({
   payload,
   supersedesRevisionId: A,
-})
+});
 ```
 
 If the backend creates successor draft `B`, only then may local state commit:
