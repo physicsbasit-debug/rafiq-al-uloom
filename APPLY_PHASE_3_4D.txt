@@ -1,0 +1,88 @@
+Phase 3-4D APPLY — Unified Workspace Authorization Composition
+===============================================================
+
+1. Upload/extract this package at the repository root, preserving paths.
+
+2. In Codespaces, synchronize and inspect:
+
+git pull origin main
+git --no-pager show --stat --oneline -1
+git status --short
+
+3. Verify the reviewed files landed with these hashes:
+
+sha256sum \
+  src/App.tsx \
+  tests/features/AppWorkspaceComposition.test.tsx \
+  tests/architecture/app-workspace-composition-contract.test.ts
+
+Expected:
+02249a9183da7c107f48c817dfa8d09f9fba448031fb083a56c7fa707da493df  src/App.tsx
+59ce6c9407116f13ed7a49355f7be3a378848e8bab6f9c943a44ab1bfe9c3d31  tests/features/AppWorkspaceComposition.test.tsx
+033f1635b47dddc37be67825d39eaea39f9efeb8244b183eca394062be845848  tests/architecture/app-workspace-composition-contract.test.ts
+
+4. Run the new tests only:
+
+npm test -- tests/features/AppWorkspaceComposition.test.tsx
+npm test -- tests/architecture/app-workspace-composition-contract.test.ts
+
+Expected: 10/10 runtime and 6/6 architecture.
+
+5. Run the local gates BEFORE any formatting mutation:
+
+npx prettier --check .
+npm run lint
+npm run build
+npm test
+git diff --check
+git status --short
+
+Expected full Vitest count: 63 test files / 649 tests.
+The existing Vite >500 kB chunk warning is non-blocking.
+
+6. If Prettier flags only files from this phase, format only those files. Do not perform broad cleanup. Then prove every formatting change is formatting-only against HEAD before committing.
+
+Example pattern:
+
+for f in <PRETTIER_FLAGGED_FILES>
+do
+  tmp=$(mktemp)
+  git show "HEAD:$f" | npx prettier --stdin-filepath "$f" > "$tmp"
+  if cmp -s "$tmp" "$f"; then
+    echo "PASS: $f"
+  else
+    echo "FAIL: $f"
+  fi
+  rm -f "$tmp"
+done
+
+7. Re-run after formatting:
+
+npx prettier --check .
+npm run lint
+npm run build
+npm test
+git diff --check
+git status --short
+
+8. Commit/push formatting only if formatting changed files:
+
+git add -A
+git commit -m "style: format phase 3-4d authorization composition"
+git push origin main
+
+If no formatting changes remain, no extra formatting commit is needed.
+
+9. Final closure proof:
+
+git fetch origin
+git status
+git rev-parse HEAD
+git rev-parse origin/main
+
+Closure requires:
+- nothing to commit, working tree clean
+- HEAD == origin/main
+- 63 test files / 649 tests PASS
+
+Do not run or require full Supabase verification in this phase; it remains explicitly deferred.

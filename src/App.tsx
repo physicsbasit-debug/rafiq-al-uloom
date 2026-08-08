@@ -10,6 +10,7 @@ import { RequireCapability } from '@features/auth/RequireCapability';
 import { useAuthSession } from '@features/auth/useAuthSession';
 import { MatchingGameView } from '@features/games/matching/MatchingGameView';
 import { MasteryTestView } from '@features/mastery/MasteryTestView';
+import { ReviewerWorkspace } from '@features/reviewer/workspace';
 import { GradeSelection } from '@features/student/grade-selection/GradeSelection';
 import { LessonList } from '@features/student/lesson-list/LessonList';
 import { LessonView } from '@features/student/lesson-view/LessonView';
@@ -17,6 +18,9 @@ import { ReviewQuestionsView } from '@features/student/review-questions/ReviewQu
 import { SemesterSelection } from '@features/student/semester-selection/SemesterSelection';
 import { SubjectSelection } from '@features/student/subject-selection/SubjectSelection';
 import { UnitSelection } from '@features/student/unit-selection/UnitSelection';
+import { TeacherWorkspace } from '@features/teacher/workspace';
+
+type AppSurface = 'student' | 'teacher' | 'reviewer';
 
 type Step =
   | { name: 'grade' }
@@ -48,7 +52,9 @@ function StudentExperience({ step, setStep }: StudentExperienceProps) {
       ) : null}
 
       {step.name === 'grade' ? (
-        <GradeSelection onSelectGrade={(gradeId) => setStep({ name: 'semester', gradeId })} />
+        <GradeSelection
+          onSelectGrade={(gradeId) => setStep({ name: 'semester', gradeId })}
+        />
       ) : null}
 
       {step.name === 'semester' ? (
@@ -78,7 +84,9 @@ function StudentExperience({ step, setStep }: StudentExperienceProps) {
       {step.name === 'lessons' ? (
         <LessonList
           unitId={step.unitId}
-          onSelectLesson={(lessonId) => setStep({ name: 'lesson', lessonId, unitId: step.unitId })}
+          onSelectLesson={(lessonId) =>
+            setStep({ name: 'lesson', lessonId, unitId: step.unitId })
+          }
         />
       ) : null}
 
@@ -130,6 +138,7 @@ function StudentExperience({ step, setStep }: StudentExperienceProps) {
 
 export function AppContent() {
   const [step, setStep] = useState<Step>({ name: 'grade' });
+  const [appSurface, setAppSurface] = useState<AppSurface>('student');
   const session = useAuthSession();
 
   const authenticated = session.authState.status === 'authenticated';
@@ -226,9 +235,73 @@ export function AppContent() {
         {showGuestExperience ? <StudentExperience step={step} setStep={setStep} /> : null}
 
         {authenticated && session.authorizationState?.status === 'authorized' ? (
-          <RequireCapability operation="access_student_experience">
-            <StudentExperience step={step} setStep={setStep} />
-          </RequireCapability>
+          <>
+            {appSurface === 'student' ? (
+              <>
+                <div
+                  aria-label="مساحات العمل"
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '0.75rem',
+                    marginBottom: '1rem',
+                  }}
+                >
+                  <RequireCapability
+                    operation="access_teacher_workspace"
+                    fallback={<></>}
+                  >
+                    <div style={{ width: '190px' }}>
+                      <AppButton
+                        label="مساحة المعلم"
+                        variant="secondary"
+                        onClick={() => setAppSurface('teacher')}
+                      />
+                    </div>
+                  </RequireCapability>
+
+                  <RequireCapability
+                    operation="access_reviewer_workspace"
+                    fallback={<></>}
+                  >
+                    <div style={{ width: '190px' }}>
+                      <AppButton
+                        label="مساحة المراجع"
+                        variant="secondary"
+                        onClick={() => setAppSurface('reviewer')}
+                      />
+                    </div>
+                  </RequireCapability>
+                </div>
+
+                <RequireCapability operation="access_student_experience">
+                  <StudentExperience step={step} setStep={setStep} />
+                </RequireCapability>
+              </>
+            ) : (
+              <>
+                <div style={{ width: '190px', marginBottom: '1rem' }}>
+                  <AppButton
+                    label="العودة إلى التعلم"
+                    variant="secondary"
+                    onClick={() => setAppSurface('student')}
+                  />
+                </div>
+
+                {appSurface === 'teacher' ? (
+                  <RequireCapability operation="access_teacher_workspace">
+                    <TeacherWorkspace />
+                  </RequireCapability>
+                ) : null}
+
+                {appSurface === 'reviewer' ? (
+                  <RequireCapability operation="access_reviewer_workspace">
+                    <ReviewerWorkspace />
+                  </RequireCapability>
+                ) : null}
+              </>
+            )}
+          </>
         ) : null}
       </main>
     </div>
