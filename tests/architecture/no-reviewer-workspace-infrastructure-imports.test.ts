@@ -43,21 +43,20 @@ describe('architecture: reviewer workspace client boundary', () => {
     expect(violations).toEqual([]);
   });
 
-  it('تتعامل مساحة المراجع مع ReviewService كحد العميل الوحيد في 3-4B', () => {
+  it('تستخدم ReviewService وحدها لقائمة المراجعة وقرار المراجع', () => {
     const root = process.cwd();
-    const source = readFileSync(
-      resolve(root, 'src/features/reviewer/workspace/ReviewerWorkspace.tsx'),
-      'utf8'
-    );
-    const hook = readFileSync(
+    const listHook = readFileSync(
       resolve(root, 'src/features/reviewer/workspace/useReviewerPendingRevisions.ts'),
       'utf8'
     );
+    const reviewHook = readFileSync(
+      resolve(root, 'src/features/reviewer/workspace/useReviewerRevisionReview.ts'),
+      'utf8'
+    );
 
-    expect(source).toContain('ReviewService');
-    expect(source).toContain('reviewService');
-    expect(hook).toContain('service.listPendingRevisions');
-    expect(source).not.toContain('reviewLessonRevision');
-    expect(hook).not.toContain('reviewLessonRevision');
+    expect(listHook).toContain('ReviewService');
+    expect(listHook).toContain('service.listPendingRevisions');
+    expect(reviewHook).toContain('ReviewService');
+    expect(reviewHook).toContain('service.reviewLessonRevision');
   });
 });

@@ -1,0 +1,47 @@
+PHASE 3-4B + 3-4C APPLY INSTRUCTIONS
+
+1. Extract this ZIP locally.
+2. Upload the extracted files/folders to the repository root, preserving paths. Do NOT upload the ZIP itself.
+3. Commit the GitHub upload to main.
+4. Open Codespaces and run the commands below in order.
+
+FIRST SYNC:
+  git pull origin main
+  git --no-pager show --stat --oneline -1
+  git status --short
+
+CRITICAL REVIEWER TESTS FIRST:
+  npm test -- tests/features/reviewer/ReviewerWorkspace.test.tsx
+  npm test -- tests/features/reviewer/ReviewerRevisionReview.test.tsx
+  npm test -- tests/features/reviewer/ReviewerWorkspaceDecisionRefresh.test.tsx
+  npm test -- tests/architecture/no-reviewer-workspace-infrastructure-imports.test.ts
+  npm test -- tests/architecture/reviewer-review-identity-contract.test.ts
+
+FULL LOCAL GATES:
+  npx prettier --check .
+  npm run lint
+  npm run build
+  npm test
+  git diff --check
+  git status --short
+
+Expected cumulative arithmetic before any future slices:
+  589 baseline + 22 (3-4B) + 22 (3-4C) = 633 tests.
+Treat the actual Vitest result as authoritative.
+
+If Prettier reports only files from this phase, format those exact files, prove formatting-only by piping HEAD versions through Prettier and comparing with cmp, rerun all local gates, then commit/push the formatting-only change.
+
+FINAL SYNC:
+  git fetch origin
+  git status
+  git rev-parse HEAD
+  git rev-parse origin/main
+
+Acceptance requires:
+- reviewer critical tests pass
+- full local test suite passes
+- lint/build/prettier/diff-check pass
+- working tree clean
+- HEAD equals origin/main
+
+Do NOT run full Supabase verification in this phase; it remains explicitly deferred.

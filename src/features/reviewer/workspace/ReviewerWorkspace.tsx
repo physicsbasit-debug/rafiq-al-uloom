@@ -1,7 +1,10 @@
+import { useState } from 'react';
+
 import { reviewService, type LessonRevision, type ReviewService } from '@services/authoring';
 
 import { ReviewerPendingList } from './ReviewerPendingList';
-import type { ReviewerWorkspaceProps } from './reviewer-workspace.types';
+import { ReviewerRevisionReview } from './ReviewerRevisionReview';
+import type { ReviewerDecisionCommitted, ReviewerWorkspaceProps } from './reviewer-workspace.types';
 import { useReviewerPendingRevisions } from './useReviewerPendingRevisions';
 
 interface ReviewerWorkspaceInternalProps extends ReviewerWorkspaceProps {
@@ -15,6 +18,35 @@ export function ReviewerWorkspace({
   onOpenRevision = noopOpenRevision,
 }: ReviewerWorkspaceInternalProps) {
   const { revisions, isLoading, error, reload } = useReviewerPendingRevisions(service);
+  const [selectedRevision, setSelectedRevision] = useState<LessonRevision | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const openRevision = (revision: LessonRevision) => {
+    setSuccessMessage(null);
+    setSelectedRevision(revision);
+    onOpenRevision(revision);
+  };
+
+  const decisionCommitted = (outcome: ReviewerDecisionCommitted) => {
+    setSelectedRevision(null);
+    setSuccessMessage(
+      outcome.decision === 'approve'
+        ? 'تم اعتماد النسخة بنجاح.'
+        : 'تم رفض النسخة وإعادتها للتعديل بنجاح.'
+    );
+    reload();
+  };
+
+  if (selectedRevision) {
+    return (
+      <ReviewerRevisionReview
+        service={service}
+        revision={selectedRevision}
+        onBack={() => setSelectedRevision(null)}
+        onDecisionCommitted={decisionCommitted}
+      />
+    );
+  }
 
   return (
     <section aria-labelledby="reviewer-workspace-title">
@@ -27,12 +59,18 @@ export function ReviewerWorkspace({
         </p>
       </div>
 
+      {successMessage ? (
+        <p role="status" style={{ marginBottom: '1rem' }}>
+          {successMessage}
+        </p>
+      ) : null}
+
       <ReviewerPendingList
         revisions={revisions}
         isLoading={isLoading}
         error={error}
         onRetry={reload}
-        onOpenRevision={onOpenRevision}
+        onOpenRevision={openRevision}
       />
     </section>
   );

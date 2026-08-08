@@ -2,9 +2,9 @@
 
 ## Status
 
-**Phase 3-4A: Reviewer Workspace Contract — REVIEW APPROVED. Phase 3-4B: Pending Review List — REVIEW CANDIDATE.**
+**Phase 3-4A: Reviewer Workspace Contract — REVIEW APPROVED. Phase 3-4B: Pending Review List — REVIEW APPROVED / APPLY PENDING. Phase 3-4C: Review Detail + Approve/Reject — REVIEW APPROVED / APPLY PENDING.**
 
-This document defines the UI contract only. It does not add React production code, App composition, SQL, migrations, RLS, RPCs, or Supabase deployment changes.
+The Phase 3-4A sections define the governing UI contract; the implementation-slice notes at the end track later 3-4B/3-4C review candidates. App composition, SQL, migrations, RLS, RPC definitions, and Supabase deployment changes remain outside these slices.
 
 ## Baseline
 
@@ -645,3 +645,30 @@ Explicitly excluded from 3-4B:
 - Reviewer App composition.
 
 These mutation semantics remain reserved for Phase 3-4C.
+
+
+## Phase 3-4C implementation slice
+
+This review-approved implementation slice defines the decision path above without App composition or backend changes; local execution verification remains pending.
+
+### Included
+
+- exact selected `reviewRevisionId` retained for the review session,
+- read-only revision detail,
+- explicit approve payload with `note: null`,
+- reject-note trim/validation before confirmation and before any service call,
+- `ReviewService.reviewLessonRevision` as the only mutation boundary,
+- synchronous `reviewInFlightRef` protection for all four double-action combinations,
+- commit-on-success only after both the expected success status and exact `result.revisionId` match,
+- decision success closes detail and reloads `listPendingRevisions`,
+- decision success remains committed if the subsequent list refresh fails,
+- retry after refresh failure re-runs list loading only, never the completed review mutation,
+- exhaustive typed reviewer error mapping for all current rejection and unavailable reasons,
+- abort handling for in-flight review mutation.
+
+### Still excluded
+
+- `App.tsx` authorization composition (3-4D),
+- reviewer route/navigation outside the local workspace,
+- Review Events/history UI,
+- SQL, migrations, RLS, RPC definitions, or Supabase deployment changes.
