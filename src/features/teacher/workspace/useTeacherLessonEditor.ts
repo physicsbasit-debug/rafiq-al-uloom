@@ -1,0 +1,159 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+
+import type {
+  AuthoringService,
+  AuthoringUnavailableReason,
+  AuthoringRejectionReason,
+  LessonRevision,
+  LessonRevisionPayload,
+} from '@services/authoring';
+
+import {
+  createEmptyTeacherLessonPayload,
+  teacherAuthoringFailureMessage,
+} from './teacher-workspace.utils';
+
+export type TeacherLessonEditorMode =
+  | 'new'
+  | 'edit_draft'
+  | 'revise_rejected'
+  | 'readonly_pending_review'
+  | 'readonly_approved';
+
+export type TeacherLessonEditorError =
+  | { readonly kind: 'rejected'; readonly reason: AuthoringRejectionReason; readonly message: string }
+  | { readonly kind: 'unavailable'; readonly reason: AuthoringUnavailableReason; readonly message: string };
+
+interface UseTeacherLessonEditorOptions {
+  readonly service: AuthoringService;
+  readonly revision?: LessonRevision | null;
+}
+
+function modeForRevision(revision?: LessonRevision | null): TeacherLessonEditorMode {
+  if (!revision) return 'new';
+  if (revision.status === 'draft') return 'edit_draft';
+  if (revision.status === 'rejected') return 'revise_rejected';
+  if (revision.status === 'pending_review') return 'readonly_pending_review';
+  return 'readonly_approved';
+}
+
+function workingIdForRevision(revision?: LessonRevision | null): string | null {
+  return revision?.status === 'draft' ? revision.id : null;
+}
+
+function errorFromResult(
+  result:
+    | { readonly status: 'rejected'; readonly reason: AuthoringRejectionReason }
+    | { readonly status: 'unavailable'; readonly reason: AuthoringUnavailableReason }
+): TeacherLessonEditorError {
+  if (result.status === 'rejected') {
+    return {
+      kind: 'rejected',
+      reason: result.reason,
+      message: teacherAuthoringFailureMessage(result.reason),
+    };
+  }
+  return {
+    kind: 'unavailable',
+    reason: result.reason,
+    message: teacherAuthoringFailureMessage(result.reason),
+  };
+}
+
+function isAbortError(error: unknown): boolean {
+  return typeof error === 'object' && error !== null && 'name' in error && error.name === 'AbortError';
+}
+
+export function useTeacherLessonEditor({ service, revision = null }: UseTeacherLessonEditorOptions) {
+  const originRevisionId = revision?.id ?? null;
+  const [mode, setMode] = useState<TeacherLessonEditorMode>(() => modeForRevision(revision));
+  const [workingRevisionId, setWorkingRevisionId] = useState<string | null>(() =>
+    workingIdForRevision(revision)
+  );
+  const [payload, setPayload] = useState<LessonRevisionPayload>(() =>
+    revision?.payload ?? createEmptyTeacherLessonPayload()
+  );
+  const [dirty, setDirty] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<TeacherLessonEditorError | null>(null);
+  const saveAbortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => {
+      saveAbortRef.current?.abort();
+      saveAbortRef.current = null;
+    };
+  }, []);
+
+  const isReadOnly = mode === 'readonly_pending_review' || mode === 'readonly_approved';
+
+  const updatePayload = (next: LessonRevisionPayload) => {
+    if (isReadOnly || isSaving) return;
+    setPayload(next);
+    setDirty(true);
+    setError(null);
+  };
+
+  const save = async () => {
+    if (isReadOnly || isSaving || !dirty) return;
+
+    const controller = new AbortController();
+    saveAbortRef.current?.abort();
+    saveAbortRef.current = controller;
+    setIsSaving(true);
+    setError(null);
+
+    try {
+      if (mode === 'new' || mode === 'revise_rejected') {
+        const input =
+          mode === 'revise_rejected'
+            ? { payload, supersedesRevisionId: originRevisionId }
+            : { payload };
+        const result = await service.createLessonRevision(input, { signal: controller.signal });
+
+        if (result.status === 'created') {
+          setWorkingRevisionId(result.revision.id);
+          setMode('edit_draft');
+          setDirty(false);
+          return;
+        }
+
+        setError(errorFromResult(result));
+        return;
+      }
+
+      if (mode === 'edit_draft' && workingRevisionId) {
+        const result = await service.saveLessonRevision(workingRevisionId, payload, {
+          signal: controller.signal,
+        });
+        if (result.status === 'saved') {
+          setDirty(false);
+          return;
+        }
+        setError(errorFromResult(result));
+      }
+    } catch (caught) {
+      if (!isAbortError(caught)) {
+        throw caught;
+      }
+    } finally {
+      if (saveAbortRef.current === controller) {
+        saveAbortRef.current = null;
+        setIsSaving(false);
+      }
+    }
+  };
+
+  const session = useMemo(
+    () => ({ originRevisionId, workingRevisionId, mode, dirty, isSaving, isReadOnly }),
+    [originRevisionId, workingRevisionId, mode, dirty, isSaving, isReadOnly]
+  );
+
+  return {
+    payload,
+    updatePayload,
+    save,
+    error,
+    session,
+  };
+}

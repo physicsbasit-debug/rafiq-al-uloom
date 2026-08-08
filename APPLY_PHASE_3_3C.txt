@@ -1,0 +1,52 @@
+PHASE 3-3C APPLY — LESSON EDITOR + CREATE/SAVE LIFECYCLE
+
+Review status:
+APPROVED architecturally by Claude after direct code tracing.
+Final local closure requires Codespaces execution.
+
+Base commit before applying this package:
+cb47443c8fe4bed22d305b828ec7ef103c00b0f5
+
+IMPORTANT:
+- Unzip this package locally on your device.
+- Upload the unpacked files/folders to the repository root in GitHub, preserving paths.
+- Do NOT upload the ZIP itself to GitHub.
+- Commit the uploaded files to main.
+- Then open Codespaces and synchronize with git pull origin main.
+
+Critical execution gate FIRST in Codespaces:
+
+npm test -- tests/features/teacher/TeacherLessonEditor.test.tsx
+
+This targeted test must confirm the rejected-revision invariant:
+- rejected origin id is never passed to saveLessonRevision;
+- first save from revise_rejected calls createLessonRevision with supersedesRevisionId;
+- workingRevisionId changes only after status=created;
+- failed successor creation leaves workingRevisionId null and dirty state intact.
+
+After the targeted test passes, run the local closure gates:
+
+npx prettier --check .
+npm run lint
+npm run build
+npm test
+git diff --check
+git status --short
+
+Supabase integration verification remains DEFERRED by project decision.
+Do not run remote Supabase deployment as part of 3-3C.
+
+If Prettier reports changed files, format only those files, prove the changes are formatting-only using the established HEAD->Prettier comparison, rerun the closure gates, then commit/push formatting and verify:
+
+git fetch origin
+git status
+git rev-parse HEAD
+git rev-parse origin/main
+
+Local closure requires:
+- targeted TeacherLessonEditor test green;
+- full basic test suite green;
+- lint/build/prettier green;
+- git diff --check clean;
+- working tree clean after final commit;
+- HEAD == origin/main.

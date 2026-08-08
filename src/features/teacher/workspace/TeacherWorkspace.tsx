@@ -4,6 +4,7 @@ import { AppButton } from '@design-system/components/AppButton';
 import { authoringService, type AuthoringService, type LessonRevision } from '@services/authoring';
 
 import { TeacherDraftList } from './TeacherDraftList';
+import { TeacherLessonEditor } from './TeacherLessonEditor';
 import type { TeacherRevisionFilter, TeacherWorkspaceProps } from './teacher-workspace.types';
 import { filterTeacherRevisions } from './teacher-workspace.utils';
 import { useTeacherDrafts } from './useTeacherDrafts';
@@ -11,6 +12,10 @@ import { useTeacherDrafts } from './useTeacherDrafts';
 interface TeacherWorkspaceInternalProps extends TeacherWorkspaceProps {
   readonly service?: AuthoringService;
 }
+
+type WorkspaceScreen =
+  | { readonly kind: 'list' }
+  | { readonly kind: 'editor'; readonly revision: LessonRevision | null };
 
 const FILTERS: readonly { value: TeacherRevisionFilter; label: string }[] = [
   { value: 'all', label: 'الكل' },
@@ -29,12 +34,27 @@ export function TeacherWorkspace({
   onOpenRevision = noopOpenRevision,
 }: TeacherWorkspaceInternalProps) {
   const [filter, setFilter] = useState<TeacherRevisionFilter>('all');
+  const [screen, setScreen] = useState<WorkspaceScreen>({ kind: 'list' });
   const { revisions, isLoading, error, reload } = useTeacherDrafts(service);
 
   const filteredRevisions = useMemo(
     () => filterTeacherRevisions(revisions, filter),
     [filter, revisions]
   );
+
+  if (screen.kind === 'editor') {
+    return (
+      <TeacherLessonEditor
+        key={screen.revision?.id ?? 'new'}
+        service={service}
+        revision={screen.revision}
+        onBack={() => {
+          setScreen({ kind: 'list' });
+          reload();
+        }}
+      />
+    );
+  }
 
   const emptyMessage =
     revisions.length === 0
@@ -60,7 +80,13 @@ export function TeacherWorkspace({
           <p style={{ margin: '0.35rem 0 0' }}>أنشئ محتوى الدروس وتابع حالة نسخك.</p>
         </div>
         <div style={{ width: '190px' }}>
-          <AppButton label="إنشاء درس جديد" onClick={onCreateLesson} />
+          <AppButton
+            label="إنشاء درس جديد"
+            onClick={() => {
+              onCreateLesson();
+              setScreen({ kind: 'editor', revision: null });
+            }}
+          />
         </div>
       </div>
 
@@ -94,7 +120,10 @@ export function TeacherWorkspace({
         error={error}
         emptyMessage={emptyMessage}
         onRetry={reload}
-        onOpenRevision={onOpenRevision}
+        onOpenRevision={(revision) => {
+          onOpenRevision(revision);
+          setScreen({ kind: 'editor', revision });
+        }}
       />
     </section>
   );
