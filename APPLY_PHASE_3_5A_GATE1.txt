@@ -1,0 +1,48 @@
+PHASE 3-5A GATE 1 — APPLY AND RUN
+
+IMPORTANT
+- Upload the EXTRACTED files/folders to the repository root. Do not upload this ZIP itself.
+- This gate intentionally contains NO production fix.
+- Do not run the full Supabase suite before the targeted Gate 1 test.
+
+1) Sync the repository first:
+
+git pull origin main
+git --no-pager show --stat --oneline -1
+git status --short
+
+Expected baseline before this package: cba044529d929e9da1226ca97ebf219b65c78e98, unless GitHub has only the upload commit containing this package after you upload it.
+
+2) Confirm only these project files were added/changed by the package:
+
+README_PHASE_3_5A_GATE1.md
+APPLY_PHASE_3_5A_GATE1.txt
+docs/PHASE_3_5A_REAL_SUPABASE_TEACHER_REVIEWER_COMPOSITION_VERIFICATION.md
+tests/integration/supabase-teacher-reviewer-workspace-composition.integration.tsx
+APPLY_MANIFEST_PHASE_3_5A_GATE1.sha256
+
+No src/ file, SQL file, migration, or App.tsx should be changed.
+
+3) Verify the package files after the pull:
+
+sha256sum -c APPLY_MANIFEST_PHASE_3_5A_GATE1.sha256
+
+4) Rebuild the local Supabase test environment from migrations + seed:
+
+npx supabase stop --no-backup
+npx supabase start
+
+5) Run ONLY Gate 1 first:
+
+RUN_SUPABASE_INTEGRATION_TESTS=true npx vitest run \
+  --config vitest.supabase.config.ts \
+  tests/integration/supabase-teacher-reviewer-workspace-composition.integration.tsx
+
+6) STOP and send the COMPLETE output before any production change.
+
+Interpretation:
+- 3/3 PASS: Gate 1 is green; next we run the full Supabase suite.
+- access matrix PASS + lifecycle PASS + first-save FAIL containing PHASE_3_5A_FIRST_SAVE_BLOCKER: confirmed narrow blocker; DO NOT patch manually. A separate Fix 1 will be prepared.
+- any broader failure: diagnose that layer first.
+
+Do NOT run a Phase 3 closure/tag yet.
