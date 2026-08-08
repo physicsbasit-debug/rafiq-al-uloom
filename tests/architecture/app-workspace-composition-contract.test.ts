@@ -11,7 +11,9 @@ function occurrences(value: string): number {
 }
 
 function stepDeclaration(): string {
-  const match = source.match(/type\s+Step\s*=([\s\S]*?);\s*\n\s*interface\s+StudentExperienceProps/);
+  const match = source.match(
+    /type\s+Step\s*=([\s\S]*?);\s*\n\s*interface\s+StudentExperienceProps/
+  );
   if (!match?.[1]) throw new Error('تعذر العثور على اتحاد Step في src/App.tsx');
   return match[1];
 }
@@ -68,9 +70,7 @@ describe('architecture: App workspace composition contract', () => {
   });
 
   it('زر العودة يغير AppSurface فقط ولا يربط العودة بـ setStep أو خدمات الجلسة', () => {
-    const returnButton = source.match(
-      /<AppButton\s+label="العودة إلى التعلم"[\s\S]*?\/>/
-    )?.[0];
+    const returnButton = source.match(/<AppButton\s+label="العودة إلى التعلم"[\s\S]*?\/>/)?.[0];
 
     expect(returnButton).toBeDefined();
     expect(returnButton).toContain("setAppSurface('student')");

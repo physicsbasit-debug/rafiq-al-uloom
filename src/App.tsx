@@ -52,9 +52,7 @@ function StudentExperience({ step, setStep }: StudentExperienceProps) {
       ) : null}
 
       {step.name === 'grade' ? (
-        <GradeSelection
-          onSelectGrade={(gradeId) => setStep({ name: 'semester', gradeId })}
-        />
+        <GradeSelection onSelectGrade={(gradeId) => setStep({ name: 'semester', gradeId })} />
       ) : null}
 
       {step.name === 'semester' ? (
@@ -84,9 +82,7 @@ function StudentExperience({ step, setStep }: StudentExperienceProps) {
       {step.name === 'lessons' ? (
         <LessonList
           unitId={step.unitId}
-          onSelectLesson={(lessonId) =>
-            setStep({ name: 'lesson', lessonId, unitId: step.unitId })
-          }
+          onSelectLesson={(lessonId) => setStep({ name: 'lesson', lessonId, unitId: step.unitId })}
         />
       ) : null}
 
@@ -247,10 +243,7 @@ export function AppContent() {
                     marginBottom: '1rem',
                   }}
                 >
-                  <RequireCapability
-                    operation="access_teacher_workspace"
-                    fallback={<></>}
-                  >
+                  <RequireCapability operation="access_teacher_workspace" fallback={<></>}>
                     <div style={{ width: '190px' }}>
                       <AppButton
                         label="مساحة المعلم"
@@ -260,10 +253,7 @@ export function AppContent() {
                     </div>
                   </RequireCapability>
 
-                  <RequireCapability
-                    operation="access_reviewer_workspace"
-                    fallback={<></>}
-                  >
+                  <RequireCapability operation="access_reviewer_workspace" fallback={<></>}>
                     <div style={{ width: '190px' }}>
                       <AppButton
                         label="مساحة المراجع"
