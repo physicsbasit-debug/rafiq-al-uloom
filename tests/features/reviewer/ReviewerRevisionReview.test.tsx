@@ -57,11 +57,7 @@ function reviewServiceWith(
   };
 }
 
-function renderReview(
-  service: ReviewService,
-  onDecisionCommitted = vi.fn(),
-  onBack = vi.fn()
-) {
+function renderReview(service: ReviewService, onDecisionCommitted = vi.fn(), onBack = vi.fn()) {
   render(
     <ReviewerRevisionReview
       service={service}
@@ -233,9 +229,7 @@ describe('ReviewerRevisionReview', () => {
     ['not_authorized', 'لا تملك صلاحية'],
     ['review_note_required', 'اكتب ملاحظة واضحة'],
   ] as const)('يبقي التفاصيل مفتوحة عند رفض الخدمة بسبب %s', async (reason, message) => {
-    const service = reviewServiceWith(
-      vi.fn(async () => ({ status: 'rejected' as const, reason }))
-    );
+    const service = reviewServiceWith(vi.fn(async () => ({ status: 'rejected' as const, reason })));
     const onDecisionCommitted = vi.fn();
     vi.spyOn(window, 'confirm').mockReturnValue(true);
 

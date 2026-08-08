@@ -94,8 +94,8 @@ The current authorization policy permits these only for an active authorized rev
 Reviewer feature code must not make permission decisions using inline role checks such as:
 
 ```ts
-role === 'reviewer'
-role !== 'teacher'
+role === 'reviewer';
+role !== 'teacher';
 ```
 
 The UI is not a security boundary. Backend/RLS remain authoritative.
@@ -182,7 +182,7 @@ reviewLessonRevision({
   revisionId: reviewRevisionId,
   decision: 'approve',
   note: null,
-})
+});
 ```
 
 `note` is sent as `null` deliberately rather than omitted.
@@ -215,7 +215,7 @@ reviewLessonRevision({
   revisionId: reviewRevisionId,
   decision: 'reject',
   note: normalizedReviewNote,
-})
+});
 ```
 
 The service/backend `review_note_required` validation remains in place as defense in depth.
@@ -295,7 +295,7 @@ React state alone is insufficient for two synchronous clicks before rerender.
 The mutation path must therefore have an immediate in-flight guard, for example:
 
 ```ts
-reviewInFlightRef
+reviewInFlightRef;
 ```
 
 The guard is set synchronously before the first `await` and cleared in `finally`.
@@ -621,7 +621,6 @@ Phase 3-4B: Pending Review List
 
 Its scope is read-only queue loading/navigation only. Approve/reject mutations remain out of 3-4B and begin in 3-4C.
 
-
 ## 24. Phase 3-4B implementation slice
 
 Phase 3-4B implements only the read/navigation slice of this contract.
@@ -645,7 +644,6 @@ Explicitly excluded from 3-4B:
 - Reviewer App composition.
 
 These mutation semantics remain reserved for Phase 3-4C.
-
 
 ## Phase 3-4C implementation slice
 

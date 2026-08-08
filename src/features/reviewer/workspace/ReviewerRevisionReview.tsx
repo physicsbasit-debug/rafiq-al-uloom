@@ -68,7 +68,14 @@ export function ReviewerRevisionReview({
           </p>
         </div>
         <div style={{ width: '150px' }}>
-          <AppButton label="العودة للقائمة" variant="secondary" onClick={() => { if (!isReviewLocked()) onBack(); }} disabled={isReviewing} />
+          <AppButton
+            label="العودة للقائمة"
+            variant="secondary"
+            onClick={() => {
+              if (!isReviewLocked()) onBack();
+            }}
+            disabled={isReviewing}
+          />
         </div>
       </div>
 

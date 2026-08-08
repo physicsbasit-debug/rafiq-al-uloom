@@ -57,9 +57,11 @@ const revisions = [
 describe('ReviewerWorkspace', () => {
   it('يعرض حالة التحميل ثم قائمة pending_review الناجحة', async () => {
     let resolveList!: (value: Awaited<ReturnType<ReviewService['listPendingRevisions']>>) => void;
-    const pending = new Promise<Awaited<ReturnType<ReviewService['listPendingRevisions']>>>((resolve) => {
-      resolveList = resolve;
-    });
+    const pending = new Promise<Awaited<ReturnType<ReviewService['listPendingRevisions']>>>(
+      (resolve) => {
+        resolveList = resolve;
+      }
+    );
     const service = serviceWithList(vi.fn(() => pending));
 
     render(<ReviewerWorkspace service={service} />);
@@ -84,18 +86,18 @@ describe('ReviewerWorkspace', () => {
   });
 
   it('يحافظ على ترتيب القائمة القادم من ReviewService دون إعادة ترتيب محلية', async () => {
-    const service = serviceWithList(
-      vi.fn(async () => ({ status: 'success' as const, revisions }))
-    );
+    const service = serviceWithList(vi.fn(async () => ({ status: 'success' as const, revisions })));
 
     render(<ReviewerWorkspace service={service} />);
     await screen.findByText('الموجات المستعرضة');
 
-    const cards = screen.getAllByRole('button').filter((button) =>
-      ['الموجات المستعرضة', 'الموجات الطولية'].some((title) =>
-        button.textContent?.includes(title)
-      )
-    );
+    const cards = screen
+      .getAllByRole('button')
+      .filter((button) =>
+        ['الموجات المستعرضة', 'الموجات الطولية'].some((title) =>
+          button.textContent?.includes(title)
+        )
+      );
 
     expect(cards.map((card) => card.textContent)).toEqual([
       expect.stringContaining('الموجات المستعرضة'),
@@ -107,9 +109,7 @@ describe('ReviewerWorkspace', () => {
 
   it('يمرر Revision المحددة نفسها عند فتح بطاقة المراجعة', async () => {
     const onOpenRevision = vi.fn();
-    const service = serviceWithList(
-      vi.fn(async () => ({ status: 'success' as const, revisions }))
-    );
+    const service = serviceWithList(vi.fn(async () => ({ status: 'success' as const, revisions })));
 
     render(<ReviewerWorkspace service={service} onOpenRevision={onOpenRevision} />);
     const card = await screen.findByRole('button', { name: /الموجات الطولية/ });
