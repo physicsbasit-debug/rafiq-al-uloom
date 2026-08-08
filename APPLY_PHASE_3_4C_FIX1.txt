@@ -1,0 +1,25 @@
+Phase 3-4C Fix 1 — APPLY
+
+Upload the extracted file(s) to the repository root while preserving paths.
+Do not upload this ZIP itself.
+
+Changed project file:
+- tests/features/reviewer/ReviewerRevisionReview.test.tsx
+
+This fix changes tests only. No production file under src/ is included.
+
+After GitHub upload/commit, run in Codespaces:
+
+git pull origin main
+git --no-pager show --stat --oneline -1
+git status --short
+
+npm test -- tests/features/reviewer/ReviewerRevisionReview.test.tsx
+npm test
+
+Expected before formatting cleanup:
+- ReviewerRevisionReview: 17/17
+- full suite: 633/633
+- 61/61 test files
+
+Only after those pass, continue with formatting and closure gates.

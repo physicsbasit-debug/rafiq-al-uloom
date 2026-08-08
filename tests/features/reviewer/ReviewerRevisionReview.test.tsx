@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
 
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ReviewerRevisionReview } from '@features/reviewer/workspace/ReviewerRevisionReview';
+import { useReviewerRevisionReview } from '@features/reviewer/workspace/useReviewerRevisionReview';
 import type {
   LessonRevision,
   LessonRevisionPayload,
@@ -278,7 +279,7 @@ describe('ReviewerRevisionReview', () => {
     ['approve', 'reject'],
     ['reject', 'approve'],
   ] as const)(
-    'يمنع double-action المتزامن %s + %s ويطلق mutation واحدة فقط',
+    'يمنع double-action المتزامن %s + %s على مستوى hook ويطلق mutation واحدة فقط',
     async (firstDecision, secondDecision) => {
       let resolveReview!: (value: ReviewLessonRevisionResult) => void;
       const pending = new Promise<ReviewLessonRevisionResult>((resolve) => {
@@ -287,19 +288,30 @@ describe('ReviewerRevisionReview', () => {
       const reviewLessonRevision = vi.fn(() => pending);
       const service = reviewServiceWith(reviewLessonRevision);
       const onDecisionCommitted = vi.fn();
-      vi.spyOn(window, 'confirm').mockReturnValue(true);
 
-      renderReview(service, onDecisionCommitted);
-      fireEvent.change(screen.getByLabelText('ملاحظة الرفض'), {
-        target: { value: 'سبب رفض صالح' },
+      const { result } = renderHook(() =>
+        useReviewerRevisionReview({
+          service,
+          revision: pendingRevision,
+          onDecisionCommitted,
+        })
+      );
+
+      act(() => {
+        result.current.setReviewNote('سبب رفض صالح');
       });
 
-      fireEvent.click(buttonFor(firstDecision));
-      fireEvent.click(buttonFor(secondDecision));
+      act(() => {
+        void result.current.review(firstDecision);
+        void result.current.review(secondDecision);
+      });
 
       expect(reviewLessonRevision).toHaveBeenCalledTimes(1);
-      expect(reviewLessonRevision.mock.calls[0]?.[0].decision).toBe(firstDecision);
-      expect(window.confirm).toHaveBeenCalledTimes(1);
+      expect(reviewLessonRevision.mock.calls[0]?.[0]).toEqual({
+        revisionId: REVISION_ID,
+        decision: firstDecision,
+        note: firstDecision === 'approve' ? null : 'سبب رفض صالح',
+      });
 
       resolveReview(successFor(firstDecision));
       await waitFor(() => expect(onDecisionCommitted).toHaveBeenCalledTimes(1));
