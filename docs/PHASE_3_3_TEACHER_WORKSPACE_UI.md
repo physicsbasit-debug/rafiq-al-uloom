@@ -60,7 +60,7 @@ mode = new
 First successful save:
 
 ```ts
-createLessonRevision({ payload })
+createLessonRevision({ payload });
 ```
 
 Only after `status === 'created'`:
@@ -101,7 +101,7 @@ First persistence operation:
 createLessonRevision({
   payload,
   supersedesRevisionId: A,
-})
+});
 ```
 
 If and only if the server creates successor draft `B`:
