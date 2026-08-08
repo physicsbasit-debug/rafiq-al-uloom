@@ -1,0 +1,51 @@
+PHASE 3-3B APPLY PACKAGE
+========================
+
+Status:
+  Review approved. Execution / local verification pending.
+
+Base:
+  Phase 3-2 local closure @ 885afe182e44f88b671d418f74f01eaaf81a5a19
+
+Scope:
+  Teacher Workspace Shell + Draft List only.
+
+Upload workflow:
+  1. Extract this ZIP locally.
+  2. Upload the extracted files/folders to the repository root on GitHub, preserving paths.
+  3. Commit the uploaded files to main from GitHub.
+  4. Open Codespaces and synchronize with:
+       git pull origin main
+  5. Verify the received commit and files before testing.
+
+Expected production/test scope:
+  src/features/teacher/workspace/*
+  tests/features/teacher/TeacherWorkspace.test.tsx
+  tests/architecture/no-teacher-workspace-infrastructure-imports.test.ts
+
+Documentation included:
+  docs/PHASE_3_3_TEACHER_WORKSPACE_UI.md
+  README_PHASE_3_3B.md
+
+Deliberately absent:
+  App.tsx changes
+  Lesson editor
+  create/save/submit UI mutations
+  rejected-successor mutation flow
+  reviewer UI
+  SQL / migration / RLS / RPC changes
+  remote Supabase deployment
+
+Codespaces local gates after synchronization:
+  git show --stat --oneline -1
+  git status --short
+  npx prettier --check .
+  npm run lint
+  npm run build
+  npm test
+  git diff --check
+  git status
+  git log -1 --oneline
+
+Full Supabase verification remains DEFERRED by current project decision.
+Do not mark Phase 3-3B locally closed until the local gates above are green and Git synchronization is confirmed.
