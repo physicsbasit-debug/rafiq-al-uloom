@@ -1,0 +1,19 @@
+PHASE 3-4B REVIEW INSTRUCTIONS
+
+Goal:
+Review the Pending Review List slice only.
+
+Verify directly:
+1. `ReviewService.listPendingRevisions` is the only semantic queue source.
+2. No `AuthoringService` import exists under `src/features/reviewer`.
+3. No repository implementation, Supabase, or RPC access exists in the Reviewer feature.
+4. 3-4B does not call `reviewLessonRevision` at all.
+5. The selected `LessonRevision` object is passed unchanged to `onOpenRevision`.
+6. Loading / success / empty / unavailable / retry / thrown-error / abort paths are covered.
+7. Retry re-runs list loading only and cannot trigger a review mutation.
+8. Service order is preserved; no local re-sorting or broader-list filtering is introduced.
+9. App.tsx, SQL, migrations, RLS, RPC definitions, and package.json are absent.
+10. The 3-4A contract status/update accurately describes the 3-4B slice.
+
+Do not treat this review package as an APPLY package.
+After approval, an APPLY changed-files-only package will be generated with production/test files byte-identical to this review candidate.
