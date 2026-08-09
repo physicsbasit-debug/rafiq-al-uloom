@@ -23,7 +23,11 @@ function arrayToLines(value: readonly string[]): string {
   return value.join('\n');
 }
 
-export function TeacherLessonEditor({ service, revision = null, onBack }: TeacherLessonEditorProps) {
+export function TeacherLessonEditor({
+  service,
+  revision = null,
+  onBack,
+}: TeacherLessonEditorProps) {
   const { payload, updatePayload, save, submit, error, session } = useTeacherLessonEditor({
     service,
     revision,
@@ -117,7 +121,9 @@ export function TeacherLessonEditor({ service, revision = null, onBack }: Teache
             aria-label="معرف الوحدة"
             value={payload.lesson.unitId}
             disabled={readOnly || session.isSaving || session.isSubmitting}
-            onChange={(event: ChangeEvent<HTMLInputElement>) => updateLesson('unitId', event.target.value)}
+            onChange={(event: ChangeEvent<HTMLInputElement>) =>
+              updateLesson('unitId', event.target.value)
+            }
           />
         </label>
 
@@ -127,7 +133,9 @@ export function TeacherLessonEditor({ service, revision = null, onBack }: Teache
             aria-label="عنوان الدرس"
             value={payload.lesson.title}
             disabled={readOnly || session.isSaving || session.isSubmitting}
-            onChange={(event: ChangeEvent<HTMLInputElement>) => updateLesson('title', event.target.value)}
+            onChange={(event: ChangeEvent<HTMLInputElement>) =>
+              updateLesson('title', event.target.value)
+            }
           />
         </label>
 
@@ -151,7 +159,9 @@ export function TeacherLessonEditor({ service, revision = null, onBack }: Teache
             aria-label="ملخص الدرس"
             value={payload.lesson.summary}
             disabled={readOnly || session.isSaving || session.isSubmitting}
-            onChange={(event: ChangeEvent<HTMLTextAreaElement>) => updateLesson('summary', event.target.value)}
+            onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+              updateLesson('summary', event.target.value)
+            }
           />
         </label>
 
@@ -202,8 +212,8 @@ export function TeacherLessonEditor({ service, revision = null, onBack }: Teache
 
       <div style={{ marginTop: '1rem' }}>
         <p>
-          المحتوى البنيوي الحالي: {payload.objectives.length} أهداف، {payload.questions.length} أسئلة،{' '}
-          {payload.games.length} ألعاب، {payload.experiments.length} تجارب.
+          المحتوى البنيوي الحالي: {payload.objectives.length} أهداف، {payload.questions.length}{' '}
+          أسئلة، {payload.games.length} ألعاب، {payload.experiments.length} تجارب.
         </p>
       </div>
 

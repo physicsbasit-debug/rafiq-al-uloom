@@ -176,7 +176,9 @@ export function TeacherObjectivesEditor({
               value={editor.text}
               disabled={disabled}
               onChange={(event) =>
-                setEditor((current) => (current ? { ...current, text: event.target.value } : current))
+                setEditor((current) =>
+                  current ? { ...current, text: event.target.value } : current
+                )
               }
             />
           </label>
@@ -190,7 +192,12 @@ export function TeacherObjectivesEditor({
               />
             </div>
             <div style={{ width: '140px' }}>
-              <AppButton label="إلغاء" variant="secondary" onClick={cancelEdit} disabled={disabled} />
+              <AppButton
+                label="إلغاء"
+                variant="secondary"
+                onClick={cancelEdit}
+                disabled={disabled}
+              />
             </div>
           </div>
         </div>

@@ -5,6 +5,7 @@
 This APPLY package contains the exact reviewed production/test/document files approved for Fix 2B-1.
 
 Scope:
+
 - pure objective structural helpers
 - objective editor with local form buffer
 - stable client-owned objective keys
@@ -13,6 +14,7 @@ Scope:
 - focused pure/UI/editor tests
 
 Explicitly excluded:
+
 - SQL, RPC, RLS or Supabase changes
 - question editor (Fix 2B-2)
 - submission-readiness UI/runtime gate (Fix 2B-3)

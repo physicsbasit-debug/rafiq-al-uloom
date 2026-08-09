@@ -21,15 +21,17 @@ function service(overrides: Partial<AuthoringService> = {}): AuthoringService {
 
 describe('TeacherLessonEditor objective composition', () => {
   it('يضيف الهدف محليًا ثم يرسله ضمن نفس LessonRevisionPayload عند الحفظ اليدوي فقط', async () => {
-    const createLessonRevision = vi.fn<AuthoringService['createLessonRevision']>().mockResolvedValue({
-      status: 'created',
-      revision: {
-        id: '00000000-0000-4000-8000-0000000002b1',
-        entityId: null,
-        revisionNumber: 1,
-        baseFingerprint: null,
-      },
-    });
+    const createLessonRevision = vi
+      .fn<AuthoringService['createLessonRevision']>()
+      .mockResolvedValue({
+        status: 'created',
+        revision: {
+          id: '00000000-0000-4000-8000-0000000002b1',
+          entityId: null,
+          revisionNumber: 1,
+          baseFingerprint: null,
+        },
+      });
     const authoring = service({ createLessonRevision });
 
     render(<TeacherLessonEditor service={authoring} onBack={vi.fn()} />);

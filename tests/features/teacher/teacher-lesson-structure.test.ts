@@ -59,7 +59,9 @@ describe('teacher lesson structural objective helpers', () => {
   it('يكشف objectiveKey يتيمًا بوصفه خرقًا للـinvariant', () => {
     expect(hasDanglingObjectiveReferences(objectives, [question])).toBe(false);
     expect(
-      hasDanglingObjectiveReferences(objectives, [{ ...question, objectiveKey: 'missing-objective' }])
+      hasDanglingObjectiveReferences(objectives, [
+        { ...question, objectiveKey: 'missing-objective' },
+      ])
     ).toBe(true);
   });
 
