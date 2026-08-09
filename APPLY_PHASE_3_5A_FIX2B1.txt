@@ -1,0 +1,55 @@
+Phase 3-5A Fix 2B-1 APPLY instructions
+
+1) Extract this ZIP locally.
+2) Upload the EXTRACTED files/folders at the repository root. Do not upload the ZIP itself.
+3) In Codespaces, pull and inspect the upload commit:
+
+   git pull origin main
+   git --no-pager show --stat --oneline -1
+   git status --short
+
+4) Verify every APPLY file:
+
+   sha256sum -c APPLY_MANIFEST_PHASE_3_5A_FIX2B1.sha256
+
+5) Verify the two intentionally untouched teacher workflow files still match the approved baseline:
+
+   printf '%s  %s\n' \
+     '9bcdb6b422426c72d943fa626e57605dbbb4b1e1108114dadba3c025e0cf00df' \
+     'src/features/teacher/workspace/useTeacherLessonEditor.ts' \
+     | sha256sum -c -
+
+   printf '%s  %s\n' \
+     '3dcf329345d0c8827c0e6197b2a4ec79ef74750ce2f4c54dfd696785be89c146' \
+     'src/features/teacher/workspace/teacher-workspace.utils.ts' \
+     | sha256sum -c -
+
+6) Run Fix 2B-1 targeted tests first:
+
+   npx vitest run \
+     tests/features/teacher/teacher-lesson-structure.test.ts \
+     tests/features/teacher/TeacherObjectivesEditor.test.tsx \
+     tests/features/teacher/TeacherLessonEditorObjectives.test.tsx
+
+7) If targeted tests pass, run the existing teacher regression tests:
+
+   npx vitest run \
+     tests/features/teacher/TeacherLessonEditor.test.tsx \
+     tests/features/teacher/TeacherWorkspace.test.tsx \
+     tests/features/teacher/TeacherWorkspaceEditorNavigation.test.tsx \
+     tests/architecture/no-teacher-workspace-infrastructure-imports.test.ts \
+     tests/architecture/no-teacher-rejected-in-place-save.test.ts \
+     tests/architecture/no-teacher-rejected-original-submit.test.ts
+
+8) Then run local quality gates:
+
+   npx prettier --check .
+   npm run lint
+   npm run build
+   npm test
+   git diff --check
+   git status --short
+
+Do not run the full Supabase suite merely for this UI-only subphase unless a targeted test or architecture guard reveals a backend interaction. Fix 2B-1 contains no SQL/Supabase changes. The real Supabase UI composition gate belongs to Fix 2B-3 as approved in the contract.
+
+Do not commit formatting changes until they are proven formatting-only against the upload commit.

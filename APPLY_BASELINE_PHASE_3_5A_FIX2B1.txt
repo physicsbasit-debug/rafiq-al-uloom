@@ -1,0 +1,10 @@
+Phase 3-5A Fix 2B-1 apply baseline
+
+Expected stable parent before GitHub upload: c7b6405
+
+TeacherLessonEditor baseline SHA-256 before Fix 2B-1:
+32b125fb60a372366b805fd66b246a7f3bded127360fdcf2f7a3343dc52fa600  src/features/teacher/workspace/TeacherLessonEditor.tsx
+
+Files intentionally NOT changed by Fix 2B-1:
+9bcdb6b422426c72d943fa626e57605dbbb4b1e1108114dadba3c025e0cf00df  src/features/teacher/workspace/useTeacherLessonEditor.ts
+3dcf329345d0c8827c0e6197b2a4ec79ef74750ce2f4c54dfd696785be89c146  src/features/teacher/workspace/teacher-workspace.utils.ts
