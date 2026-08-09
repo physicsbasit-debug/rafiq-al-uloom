@@ -19,10 +19,7 @@ import {
   type ReviewService,
 } from '@services/authoring';
 
-import {
-  buildLessonRevisionPayload,
-  nextDisplayOrder,
-} from './helpers/authoring-fixtures';
+import { buildLessonRevisionPayload, nextDisplayOrder } from './helpers/authoring-fixtures';
 import {
   createAuthCompositionHarness,
   type AuthCompositionHarness,
@@ -201,103 +198,61 @@ describeIntegration(
     let pendingTeacher: AuthIdentity;
     let suspendedReviewer: AuthIdentity;
 
-    beforeAll(
-      async () => {
-        fixtures = new SupabaseAuthFixtures(readLocalSupabaseEnvironment());
-        activeStudent = await fixtures.createIdentity('p35a-active-student', 'student', 'active');
-        activeTeacher = await fixtures.createIdentity('p35a-active-teacher', 'teacher', 'active');
-        activeReviewer = await fixtures.createIdentity(
-          'p35a-active-reviewer',
-          'reviewer',
-          'active'
-        );
-        pendingTeacher = await fixtures.createIdentity('p35a-pending-teacher', 'teacher', 'pending');
-        suspendedReviewer = await fixtures.createIdentity(
-          'p35a-suspended-reviewer',
-          'reviewer',
-          'suspended'
-        );
-      },
-      30_000
-    );
+    beforeAll(async () => {
+      fixtures = new SupabaseAuthFixtures(readLocalSupabaseEnvironment());
+      activeStudent = await fixtures.createIdentity('p35a-active-student', 'student', 'active');
+      activeTeacher = await fixtures.createIdentity('p35a-active-teacher', 'teacher', 'active');
+      activeReviewer = await fixtures.createIdentity('p35a-active-reviewer', 'reviewer', 'active');
+      pendingTeacher = await fixtures.createIdentity('p35a-pending-teacher', 'teacher', 'pending');
+      suspendedReviewer = await fixtures.createIdentity(
+        'p35a-suspended-reviewer',
+        'reviewer',
+        'suspended'
+      );
+    }, 30_000);
 
     afterEach(() => {
       cleanup();
       vi.restoreAllMocks();
     });
 
-    afterAll(
-      async () => {
-        if (!fixtures) return;
-        if (activeTeacher?.user.id) cleanupAuthoringRows(activeTeacher.user.id);
-        await fixtures.cleanup();
-      },
-      30_000
-    );
+    afterAll(async () => {
+      if (!fixtures) return;
+      if (activeTeacher?.user.id) cleanupAuthoringRows(activeTeacher.user.id);
+      await fixtures.cleanup();
+    }, 30_000);
 
-    it(
-      'يثبت مصفوفة الوصول الحقيقية بعد تسجيل دخول Supabase وقراءة Profile الفعلية',
-      async () => {
-        const cases = [
-          {
-            identity: activeStudent,
-            teacher: { allowed: false, reason: 'role_not_allowed' },
-            reviewer: { allowed: false, reason: 'role_not_allowed' },
-          },
-          {
-            identity: activeTeacher,
-            teacher: { allowed: true, reason: 'allowed' },
-            reviewer: { allowed: false, reason: 'role_not_allowed' },
-          },
-          {
-            identity: activeReviewer,
-            teacher: { allowed: false, reason: 'role_not_allowed' },
-            reviewer: { allowed: true, reason: 'allowed' },
-          },
-          {
-            identity: pendingTeacher,
-            teacher: { allowed: false, reason: 'account_pending' },
-            reviewer: { allowed: false, reason: 'account_pending' },
-          },
-          {
-            identity: suspendedReviewer,
-            teacher: { allowed: false, reason: 'account_suspended' },
-            reviewer: { allowed: false, reason: 'account_suspended' },
-          },
-        ] as const;
+    it('يثبت مصفوفة الوصول الحقيقية بعد تسجيل دخول Supabase وقراءة Profile الفعلية', async () => {
+      const cases = [
+        {
+          identity: activeStudent,
+          teacher: { allowed: false, reason: 'role_not_allowed' },
+          reviewer: { allowed: false, reason: 'role_not_allowed' },
+        },
+        {
+          identity: activeTeacher,
+          teacher: { allowed: true, reason: 'allowed' },
+          reviewer: { allowed: false, reason: 'role_not_allowed' },
+        },
+        {
+          identity: activeReviewer,
+          teacher: { allowed: false, reason: 'role_not_allowed' },
+          reviewer: { allowed: true, reason: 'allowed' },
+        },
+        {
+          identity: pendingTeacher,
+          teacher: { allowed: false, reason: 'account_pending' },
+          reviewer: { allowed: false, reason: 'account_pending' },
+        },
+        {
+          identity: suspendedReviewer,
+          teacher: { allowed: false, reason: 'account_suspended' },
+          reviewer: { allowed: false, reason: 'account_suspended' },
+        },
+      ] as const;
 
-        for (const testCase of cases) {
-          const session = await signInRealIdentity(fixtures, testCase.identity);
-          try {
-            expect(
-              authorizeOperation(
-                session.authState,
-                session.authorizationState,
-                'access_teacher_workspace'
-              )
-            ).toEqual(testCase.teacher);
-            expect(
-              authorizeOperation(
-                session.authState,
-                session.authorizationState,
-                'access_reviewer_workspace'
-              )
-            ).toEqual(testCase.reviewer);
-          } finally {
-            await closeRealSession(session);
-          }
-        }
-      },
-      30_000
-    );
-
-    it(
-      'يجب أن ينشئ أول حفظ من TeacherWorkspace الجديدة مسودة خادمية حقيقية',
-      async () => {
-        const session = await signInRealIdentity(fixtures, activeTeacher);
-        const { authoring } = servicesFor(session.client);
-        const title = `Phase 3-5A first-save ${runId}`;
-
+      for (const testCase of cases) {
+        const session = await signInRealIdentity(fixtures, testCase.identity);
         try {
           expect(
             authorizeOperation(
@@ -305,178 +260,209 @@ describeIntegration(
               session.authorizationState,
               'access_teacher_workspace'
             )
-          ).toEqual({ allowed: true, reason: 'allowed' });
-
-          render(<TeacherWorkspace service={authoring} />);
+          ).toEqual(testCase.teacher);
           expect(
-            await screen.findByText('لا توجد لديك مسودات بعد. ابدأ بإنشاء درس جديد.', {}, { timeout: 8_000 })
-          ).toBeInTheDocument();
-
-          fireEvent.click(screen.getByRole('button', { name: 'إنشاء درس جديد' }));
-          fillNewLessonMetadata(title, nextDisplayOrder(30));
-          fireEvent.click(screen.getByRole('button', { name: 'حفظ المسودة' }));
-
-          await waitForFirstSaveOutcome();
-
-          const revisions = await authoring.listOwnRevisions();
-          expect(revisions.status).toBe('success');
-          if (revisions.status !== 'success') throw new Error('Expected real teacher revision list.');
-
-          const created = revisions.revisions.find((revision) => revision.payload.lesson.title === title);
-          expect(created).toMatchObject({
-            status: 'draft',
-            authorId: activeTeacher.user.id,
-          });
+            authorizeOperation(
+              session.authState,
+              session.authorizationState,
+              'access_reviewer_workspace'
+            )
+          ).toEqual(testCase.reviewer);
         } finally {
           await closeRealSession(session);
         }
-      },
-      30_000
-    );
+      }
+    }, 30_000);
 
-    it(
-      'يمرر مسودة صالحة عبر واجهتي المعلم والمراجع: حفظ وإرسال ورفض ثم successor واعتماد',
-      async () => {
-        const teacherSession = await signInRealIdentity(fixtures, activeTeacher);
-        const reviewerSession = await signInRealIdentity(fixtures, activeReviewer);
-        const teacherServices = servicesFor(teacherSession.client);
-        const reviewerServices = servicesFor(reviewerSession.client);
-        const title = `Phase 3-5A lifecycle ${runId}`;
-        const initialPayload = buildLessonRevisionPayload(runId, nextDisplayOrder(40), title);
-        const confirm = vi.spyOn(window, 'confirm').mockReturnValue(true);
+    it('يجب أن ينشئ أول حفظ من TeacherWorkspace الجديدة مسودة خادمية حقيقية', async () => {
+      const session = await signInRealIdentity(fixtures, activeTeacher);
+      const { authoring } = servicesFor(session.client);
+      const title = `Phase 3-5A first-save ${runId}`;
 
-        try {
-          const created = await teacherServices.authoring.createLessonRevision({
-            payload: initialPayload,
-          });
-          expect(created.status).toBe('created');
-          if (created.status !== 'created') throw new Error('Expected valid real draft creation.');
-          const revisionA = created.revision.id;
+      try {
+        expect(
+          authorizeOperation(
+            session.authState,
+            session.authorizationState,
+            'access_teacher_workspace'
+          )
+        ).toEqual({ allowed: true, reason: 'allowed' });
 
-          const teacherView = render(<TeacherWorkspace service={teacherServices.authoring} />);
-          fireEvent.click(
-            await screen.findByRole('button', { name: new RegExp(title) }, { timeout: 8_000 })
-          );
-          fireEvent.change(screen.getByRole('textbox', { name: 'ملخص الدرس' }), {
-            target: { value: `Saved through real TeacherWorkspace ${runId}` },
-          });
-          fireEvent.click(screen.getByRole('button', { name: 'حفظ المسودة' }));
-          await waitFor(
-            () => expect(screen.getByRole('button', { name: 'إرسال للمراجعة' })).toBeEnabled(),
+        render(<TeacherWorkspace service={authoring} />);
+        expect(
+          await screen.findByText(
+            'لا توجد لديك مسودات بعد. ابدأ بإنشاء درس جديد.',
+            {},
             { timeout: 8_000 }
-          );
-          fireEvent.click(screen.getByRole('button', { name: 'إرسال للمراجعة' }));
-          expect(
-            await screen.findByText(
-              'هذه النسخة قيد المراجعة ولا يمكن تعديلها في مكانها.',
-              {},
-              { timeout: 8_000 }
-            )
-          ).toBeInTheDocument();
-          teacherView.unmount();
+          )
+        ).toBeInTheDocument();
 
-          const reviewerViewA = render(<ReviewerWorkspace service={reviewerServices.review} />);
-          fireEvent.click(
-            await screen.findByRole('button', { name: new RegExp(title) }, { timeout: 8_000 })
-          );
-          fireEvent.change(screen.getByLabelText('ملاحظة الرفض'), {
-            target: { value: 'وضّح التفسير قبل الاعتماد.' },
-          });
-          fireEvent.click(screen.getByRole('button', { name: 'رفض وإعادة للتعديل' }));
-          expect(
-            await screen.findByText('تم رفض النسخة وإعادتها للتعديل بنجاح.', {}, { timeout: 8_000 })
-          ).toBeInTheDocument();
-          reviewerViewA.unmount();
+        fireEvent.click(screen.getByRole('button', { name: 'إنشاء درس جديد' }));
+        fillNewLessonMetadata(title, nextDisplayOrder(30));
+        fireEvent.click(screen.getByRole('button', { name: 'حفظ المسودة' }));
 
-          const teacherViewRejected = render(<TeacherWorkspace service={teacherServices.authoring} />);
-          fireEvent.click(
-            await screen.findByRole('button', { name: new RegExp(title) }, { timeout: 8_000 })
-          );
-          expect(await screen.findByText('تعديل نسخة مرفوضة')).toBeInTheDocument();
-          expect(screen.getByText(revisionA)).toBeInTheDocument();
-          expect(screen.getByText('لم تُنشأ بعد')).toBeInTheDocument();
+        await waitForFirstSaveOutcome();
 
-          fireEvent.change(screen.getByRole('textbox', { name: 'ملخص الدرس' }), {
-            target: { value: `Successor through real TeacherWorkspace ${runId}` },
-          });
-          fireEvent.click(screen.getByRole('button', { name: 'حفظ المسودة' }));
-          await waitFor(
-            () => expect(screen.queryByText('لم تُنشأ بعد')).not.toBeInTheDocument(),
+        const revisions = await authoring.listOwnRevisions();
+        expect(revisions.status).toBe('success');
+        if (revisions.status !== 'success') throw new Error('Expected real teacher revision list.');
+
+        const created = revisions.revisions.find(
+          (revision) => revision.payload.lesson.title === title
+        );
+        expect(created).toMatchObject({
+          status: 'draft',
+          authorId: activeTeacher.user.id,
+        });
+      } finally {
+        await closeRealSession(session);
+      }
+    }, 30_000);
+
+    it('يمرر مسودة صالحة عبر واجهتي المعلم والمراجع: حفظ وإرسال ورفض ثم successor واعتماد', async () => {
+      const teacherSession = await signInRealIdentity(fixtures, activeTeacher);
+      const reviewerSession = await signInRealIdentity(fixtures, activeReviewer);
+      const teacherServices = servicesFor(teacherSession.client);
+      const reviewerServices = servicesFor(reviewerSession.client);
+      const title = `Phase 3-5A lifecycle ${runId}`;
+      const initialPayload = buildLessonRevisionPayload(runId, nextDisplayOrder(40), title);
+      const confirm = vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+      try {
+        const created = await teacherServices.authoring.createLessonRevision({
+          payload: initialPayload,
+        });
+        expect(created.status).toBe('created');
+        if (created.status !== 'created') throw new Error('Expected valid real draft creation.');
+        const revisionA = created.revision.id;
+
+        const teacherView = render(<TeacherWorkspace service={teacherServices.authoring} />);
+        fireEvent.click(
+          await screen.findByRole('button', { name: new RegExp(title) }, { timeout: 8_000 })
+        );
+        fireEvent.change(screen.getByRole('textbox', { name: 'ملخص الدرس' }), {
+          target: { value: `Saved through real TeacherWorkspace ${runId}` },
+        });
+        fireEvent.click(screen.getByRole('button', { name: 'حفظ المسودة' }));
+        await waitFor(
+          () => expect(screen.getByRole('button', { name: 'إرسال للمراجعة' })).toBeEnabled(),
+          { timeout: 8_000 }
+        );
+        fireEvent.click(screen.getByRole('button', { name: 'إرسال للمراجعة' }));
+        expect(
+          await screen.findByText(
+            'هذه النسخة قيد المراجعة ولا يمكن تعديلها في مكانها.',
+            {},
             { timeout: 8_000 }
-          );
+          )
+        ).toBeInTheDocument();
+        teacherView.unmount();
 
-          const afterSuccessorSave = await teacherServices.authoring.listOwnRevisions();
-          expect(afterSuccessorSave.status).toBe('success');
-          if (afterSuccessorSave.status !== 'success') {
-            throw new Error('Expected real teacher revisions after successor save.');
-          }
-          const revisionB = afterSuccessorSave.revisions.find(
-            (revision) => revision.supersedesRevisionId === revisionA
-          );
-          const originalA = afterSuccessorSave.revisions.find((revision) => revision.id === revisionA);
-          expect(originalA?.status).toBe('rejected');
-          expect(revisionB).toMatchObject({ status: 'draft', supersedesRevisionId: revisionA });
-          if (!revisionB) throw new Error('Expected successor revision B.');
-          expect(revisionB.id).not.toBe(revisionA);
+        const reviewerViewA = render(<ReviewerWorkspace service={reviewerServices.review} />);
+        fireEvent.click(
+          await screen.findByRole('button', { name: new RegExp(title) }, { timeout: 8_000 })
+        );
+        fireEvent.change(screen.getByLabelText('ملاحظة الرفض'), {
+          target: { value: 'وضّح التفسير قبل الاعتماد.' },
+        });
+        fireEvent.click(screen.getByRole('button', { name: 'رفض وإعادة للتعديل' }));
+        expect(
+          await screen.findByText('تم رفض النسخة وإعادتها للتعديل بنجاح.', {}, { timeout: 8_000 })
+        ).toBeInTheDocument();
+        reviewerViewA.unmount();
 
-          await waitFor(
-            () => expect(screen.getByRole('button', { name: 'إرسال للمراجعة' })).toBeEnabled(),
-            { timeout: 8_000 }
-          );
-          fireEvent.click(screen.getByRole('button', { name: 'إرسال للمراجعة' }));
-          expect(
-            await screen.findByText(
-              'هذه النسخة قيد المراجعة ولا يمكن تعديلها في مكانها.',
-              {},
-              { timeout: 8_000 }
-            )
-          ).toBeInTheDocument();
-          teacherViewRejected.unmount();
+        const teacherViewRejected = render(
+          <TeacherWorkspace service={teacherServices.authoring} />
+        );
+        fireEvent.click(
+          await screen.findByRole('button', { name: new RegExp(title) }, { timeout: 8_000 })
+        );
+        expect(await screen.findByText('تعديل نسخة مرفوضة')).toBeInTheDocument();
+        expect(screen.getByText(revisionA)).toBeInTheDocument();
+        expect(screen.getByText('لم تُنشأ بعد')).toBeInTheDocument();
 
-          const reviewerViewB = render(<ReviewerWorkspace service={reviewerServices.review} />);
-          fireEvent.click(
-            await screen.findByRole('button', { name: new RegExp(title) }, { timeout: 8_000 })
-          );
-          fireEvent.click(screen.getByRole('button', { name: 'اعتماد النسخة' }));
-          expect(
-            await screen.findByText('تم اعتماد النسخة بنجاح.', {}, { timeout: 8_000 })
-          ).toBeInTheDocument();
-          reviewerViewB.unmount();
+        fireEvent.change(screen.getByRole('textbox', { name: 'ملخص الدرس' }), {
+          target: { value: `Successor through real TeacherWorkspace ${runId}` },
+        });
+        fireEvent.click(screen.getByRole('button', { name: 'حفظ المسودة' }));
+        await waitFor(() => expect(screen.queryByText('لم تُنشأ بعد')).not.toBeInTheDocument(), {
+          timeout: 8_000,
+        });
 
-          const finalRevisions = await teacherServices.authoring.listOwnRevisions();
-          expect(finalRevisions.status).toBe('success');
-          if (finalRevisions.status !== 'success') throw new Error('Expected final real revision list.');
-          const finalA = finalRevisions.revisions.find((revision) => revision.id === revisionA);
-          const finalB = finalRevisions.revisions.find((revision) => revision.id === revisionB.id);
-          expect(finalA?.status).toBe('rejected');
-          expect(finalA?.publishedEntityId).toBeNull();
-          expect(finalB).toMatchObject({
-            status: 'approved',
-            supersedesRevisionId: revisionA,
-          });
-          expect(finalB?.publishedEntityId).toBeTruthy();
-
-          const publishedEntityId = finalB?.publishedEntityId;
-          if (!publishedEntityId) throw new Error('Expected approved revision B to publish a lesson.');
-          const published = await activeStudent.client
-            .from('lessons')
-            .select('id, title, status, source')
-            .eq('id', publishedEntityId)
-            .single();
-          expect(published.error).toBeNull();
-          expect(published.data).toMatchObject({
-            id: publishedEntityId,
-            title,
-            status: 'approved',
-            source: 'teacher_authored',
-          });
-          expect(confirm).toHaveBeenCalled();
-        } finally {
-          await closeRealSession(reviewerSession);
-          await closeRealSession(teacherSession);
+        const afterSuccessorSave = await teacherServices.authoring.listOwnRevisions();
+        expect(afterSuccessorSave.status).toBe('success');
+        if (afterSuccessorSave.status !== 'success') {
+          throw new Error('Expected real teacher revisions after successor save.');
         }
-      },
-      45_000
-    );
+        const revisionB = afterSuccessorSave.revisions.find(
+          (revision) => revision.supersedesRevisionId === revisionA
+        );
+        const originalA = afterSuccessorSave.revisions.find(
+          (revision) => revision.id === revisionA
+        );
+        expect(originalA?.status).toBe('rejected');
+        expect(revisionB).toMatchObject({ status: 'draft', supersedesRevisionId: revisionA });
+        if (!revisionB) throw new Error('Expected successor revision B.');
+        expect(revisionB.id).not.toBe(revisionA);
+
+        await waitFor(
+          () => expect(screen.getByRole('button', { name: 'إرسال للمراجعة' })).toBeEnabled(),
+          { timeout: 8_000 }
+        );
+        fireEvent.click(screen.getByRole('button', { name: 'إرسال للمراجعة' }));
+        expect(
+          await screen.findByText(
+            'هذه النسخة قيد المراجعة ولا يمكن تعديلها في مكانها.',
+            {},
+            { timeout: 8_000 }
+          )
+        ).toBeInTheDocument();
+        teacherViewRejected.unmount();
+
+        const reviewerViewB = render(<ReviewerWorkspace service={reviewerServices.review} />);
+        fireEvent.click(
+          await screen.findByRole('button', { name: new RegExp(title) }, { timeout: 8_000 })
+        );
+        fireEvent.click(screen.getByRole('button', { name: 'اعتماد النسخة' }));
+        expect(
+          await screen.findByText('تم اعتماد النسخة بنجاح.', {}, { timeout: 8_000 })
+        ).toBeInTheDocument();
+        reviewerViewB.unmount();
+
+        const finalRevisions = await teacherServices.authoring.listOwnRevisions();
+        expect(finalRevisions.status).toBe('success');
+        if (finalRevisions.status !== 'success')
+          throw new Error('Expected final real revision list.');
+        const finalA = finalRevisions.revisions.find((revision) => revision.id === revisionA);
+        const finalB = finalRevisions.revisions.find((revision) => revision.id === revisionB.id);
+        expect(finalA?.status).toBe('rejected');
+        expect(finalA?.publishedEntityId).toBeNull();
+        expect(finalB).toMatchObject({
+          status: 'approved',
+          supersedesRevisionId: revisionA,
+        });
+        expect(finalB?.publishedEntityId).toBeTruthy();
+
+        const publishedEntityId = finalB?.publishedEntityId;
+        if (!publishedEntityId)
+          throw new Error('Expected approved revision B to publish a lesson.');
+        const published = await activeStudent.client
+          .from('lessons')
+          .select('id, title, status, source')
+          .eq('id', publishedEntityId)
+          .single();
+        expect(published.error).toBeNull();
+        expect(published.data).toMatchObject({
+          id: publishedEntityId,
+          title,
+          status: 'approved',
+          source: 'teacher_authored',
+        });
+        expect(confirm).toHaveBeenCalled();
+      } finally {
+        await closeRealSession(reviewerSession);
+        await closeRealSession(teacherSession);
+      }
+    }, 45_000);
   }
 );

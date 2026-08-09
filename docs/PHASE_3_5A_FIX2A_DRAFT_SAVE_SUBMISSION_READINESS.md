@@ -107,12 +107,12 @@ All other validation logic is preserved.
 
 The actual Phase 3-1 migration contains four validator call sites. Fix 2A classifies all four explicitly:
 
-| Caller | Completeness | Reason |
-| --- | --- | --- |
-| `create_lesson_revision` | `false` | New draft may be incomplete. |
-| `save_lesson_revision` | `false` | Existing editable draft may remain incomplete. |
-| `submit_lesson_revision` | `true` | Review queue accepts only complete content. |
-| `review_lesson_revision` approval path | `true` | Defense-in-depth before canonical publication. |
+| Caller                                 | Completeness | Reason                                         |
+| -------------------------------------- | ------------ | ---------------------------------------------- |
+| `create_lesson_revision`               | `false`      | New draft may be incomplete.                   |
+| `save_lesson_revision`                 | `false`      | Existing editable draft may remain incomplete. |
+| `submit_lesson_revision`               | `true`       | Review queue accepts only complete content.    |
+| `review_lesson_revision` approval path | `true`       | Defense-in-depth before canonical publication. |
 
 The approval path remains strict even though a normal revision must already have passed strict submission validation.
 

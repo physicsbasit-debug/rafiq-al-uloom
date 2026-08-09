@@ -103,7 +103,9 @@ describeIntegration('Phase 3-5A Fix 2A draft save vs submission readiness', () =
     expect(relaxedResult).toBe('');
 
     expect(hasPublicExecuteGrant('public.lesson_revision_payload_error(jsonb)')).toBe(false);
-    expect(hasPublicExecuteGrant('public.lesson_revision_payload_error(jsonb,boolean)')).toBe(false);
+    expect(hasPublicExecuteGrant('public.lesson_revision_payload_error(jsonb,boolean)')).toBe(
+      false
+    );
 
     for (const role of ['anon', 'authenticated', 'service_role']) {
       const oneArg = psqlAdmin(`
@@ -214,7 +216,8 @@ describeIntegration('Phase 3-5A Fix 2A draft save vs submission readiness', () =
     expect(created.error).toBeNull();
     const createdData = asRpc(created.data);
     expect(createdData.status).toBe('created');
-    if (createdData.status !== 'created') throw new Error('Expected review-defense draft creation.');
+    if (createdData.status !== 'created')
+      throw new Error('Expected review-defense draft creation.');
 
     const revisionId = createdData.revision.id;
     const submitted = await teacher.client.rpc('submit_lesson_revision', {

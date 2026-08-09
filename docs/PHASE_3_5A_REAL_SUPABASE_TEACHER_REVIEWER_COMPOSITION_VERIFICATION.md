@@ -116,7 +116,6 @@ Interpretation:
 
 No Phase 3 tag is allowed from Gate 1 alone.
 
-
 ## Cloud review refinement
 
 Cloud independently verified the current SQL contract and current editor surface and confirmed:
