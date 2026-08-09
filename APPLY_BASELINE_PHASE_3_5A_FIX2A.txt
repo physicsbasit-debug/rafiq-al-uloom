@@ -1,0 +1,10 @@
+Phase 3-5A Fix 2A baseline
+
+Expected pre-apply Gate 1 Fix 1 commit: 5c12b40
+Historical migration SHA-256:
+32aecfebb303ef3e5edcd6b1143e4eb7a136212a01fc5117c00ef2f700fa8985  supabase/migrations/20260807170000_add_teacher_authoring_workflow.sql
+
+Critical REVIEW-approved file hashes:
+312a32303ef8e4897576f6dfe1e04e544f121374da20833fc5ad831b22a0051f  supabase/migrations/20260808215000_separate_draft_save_from_submission_readiness.sql
+7f64952c67d124f8ae0cba130a15dd13bc46ecfa4c99643a04b8ff1e43d078e7  tests/integration/supabase-authoring-draft-readiness.integration.ts
+2109f9f2040b883912bfd23fea0ec984ba24be5276c75442c68f3dd4f477cae9  docs/PHASE_3_5A_FIX2A_DRAFT_SAVE_SUBMISSION_READINESS.md

@@ -1,0 +1,60 @@
+Phase 3-5A Fix 2A — APPLY
+
+1) فك الحزمة محليًا.
+2) ارفع الملفات والمجلدات المستخرجة إلى جذر المستودع، ولا ترفع ZIP نفسه.
+3) في Codespaces:
+
+   git pull origin main
+   git --no-pager show --stat --oneline -1
+   git status --short
+
+4) تحقق من الملفات:
+
+   sha256sum -c APPLY_MANIFEST_PHASE_3_5A_FIX2A.sha256
+
+5) تحقق من أن Migration Phase 3-1 التاريخية لم تتغير:
+
+   printf '%s  %s\n' \
+     '32aecfebb303ef3e5edcd6b1143e4eb7a136212a01fc5117c00ef2f700fa8985' \
+     'supabase/migrations/20260807170000_add_teacher_authoring_workflow.sql' \
+     | sha256sum -c -
+
+6) أعد Supabase من الصفر:
+
+   npx supabase stop --no-backup
+   npx supabase start
+
+7) Fix 2A فقط:
+
+   RUN_SUPABASE_INTEGRATION_TESTS=true npx vitest run \
+     --config vitest.supabase.config.ts \
+     tests/integration/supabase-authoring-draft-readiness.integration.ts
+
+   المتوقع: 7/7 PASS.
+
+8) Gate 1 نفسه دون تعديل:
+
+   RUN_SUPABASE_INTEGRATION_TESTS=true npx vitest run \
+     --config vitest.supabase.config.ts \
+     tests/integration/supabase-teacher-reviewer-workspace-composition.integration.tsx
+
+   المتوقع: 3/3 PASS.
+
+9) اختبارات Phase 3-1:
+
+   RUN_SUPABASE_INTEGRATION_TESTS=true npx vitest run \
+     --config vitest.supabase.config.ts \
+     tests/integration/supabase-authoring-bypass.integration.ts \
+     tests/integration/supabase-authoring-workflow.integration.ts
+
+10) بعد نجاح ما سبق:
+
+    npm run test:supabase
+    npx prettier --check .
+    npm run lint
+    npm run build
+    npm test
+    git diff --check
+    git status --short
+
+لا Commit/Push إذا فشل أي Gate.
