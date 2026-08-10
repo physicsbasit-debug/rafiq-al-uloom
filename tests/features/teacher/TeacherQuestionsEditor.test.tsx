@@ -2,7 +2,7 @@
 
 import '@testing-library/jest-dom/vitest';
 
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { TeacherQuestionsEditor } from '@features/teacher/workspace/TeacherQuestionsEditor';
@@ -157,7 +157,7 @@ describe('TeacherQuestionsEditor', () => {
     expect(screen.getByRole('button', { name: 'إضافة سؤال' })).toBeEnabled();
   });
 
-  it('يحافظ على Form Buffer عند اختفاء Objective المختارة ويفرغ objectiveKey فقط حتى إعادة الربط', async () => {
+  it('يحافظ على Form Buffer عند اختفاء Objective المختارة ويفرغ objectiveKey فعليًا حتى إعادة الربط', () => {
     const onChange = vi.fn();
     const { rerender } = render(
       <TeacherQuestionsEditor
@@ -189,12 +189,22 @@ describe('TeacherQuestionsEditor', () => {
     );
     expect(screen.getByRole('combobox', { name: 'غرض السؤال' })).toHaveValue('mastery');
     expect(screen.getByRole('combobox', { name: 'صعوبة السؤال' })).toHaveValue('hard');
-    await waitFor(() =>
-      expect(screen.getByRole('combobox', { name: 'الهدف المرتبط بالسؤال' })).toHaveValue('')
-    );
+    expect(screen.getByRole('combobox', { name: 'الهدف المرتبط بالسؤال' })).toHaveValue('');
     expect(screen.getByRole('alert')).toHaveTextContent('لم يعد موجودًا');
     expect(screen.getByRole('button', { name: 'إضافة السؤال' })).toBeDisabled();
     expect(onChange).not.toHaveBeenCalled();
+
+    rerender(
+      <TeacherQuestionsEditor
+        objectives={[objectiveA, objectiveB]}
+        questions={[]}
+        readOnly={false}
+        disabled={false}
+        onChange={onChange}
+      />
+    );
+
+    expect(screen.getByRole('combobox', { name: 'الهدف المرتبط بالسؤال' })).toHaveValue('');
 
     fireEvent.change(screen.getByRole('combobox', { name: 'الهدف المرتبط بالسؤال' }), {
       target: { value: objectiveB.key },
@@ -300,7 +310,7 @@ describe('TeacherQuestionsEditor', () => {
     );
 
     expect(screen.getByText(question.prompt)).toBeInTheDocument();
-    expect(screen.getByText(/ارتداد الموجة/)).toBeInTheDocument();
+    expect(screen.getByText('ارتداد الموجة — الإجابة الصحيحة')).toBeInTheDocument();
     expect(screen.getByText(/الشرح: الانعكاس هو ارتداد الموجة عن حاجز/)).toBeInTheDocument();
     expect(screen.getByText(/الصعوبة:/)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'إضافة سؤال' })).not.toBeInTheDocument();

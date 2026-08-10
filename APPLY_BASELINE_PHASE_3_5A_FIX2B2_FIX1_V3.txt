@@ -1,0 +1,19 @@
+Phase 3-5A Fix 2B-2 Fix 1 — APPLY baseline
+
+Repository baseline commit before this APPLY:
+ac58233
+
+Approved REVIEW v3 SHA-256:
+442bcf721438c4d3a41c8e119f04e763a3843691f8cdacef2e1acaab1b42797d
+
+This APPLY contains exactly the three reviewed code/test files from REVIEW v3, byte-for-byte:
+- src/features/teacher/workspace/TeacherQuestionsEditor.tsx
+- tests/features/teacher/TeacherQuestionsEditor.test.tsx
+- tests/features/teacher/TeacherLessonEditorQuestions.test.tsx
+
+Do not use this package on a baseline other than ac58233 without a fresh review.
+
+Known local Codespaces state before pulling APPLY:
+The prior diagnostic session may leave a one-line local selector fix in
+  tests/features/teacher/TeacherQuestionsEditor.test.tsx
+The APPLY already includes that fix. Verify the local diff is exactly that one line, then restore it before git pull.

@@ -160,9 +160,7 @@ describe('TeacherLessonEditor question composition', () => {
     expect(screen.getByRole('combobox', { name: 'الإجابة الصحيحة' })).toHaveValue('1');
     expect(screen.getByRole('textbox', { name: 'شرح الإجابة' })).toHaveValue('شرح محفوظ محليًا');
     expect(screen.getByRole('combobox', { name: 'صعوبة السؤال' })).toHaveValue('hard');
-    await waitFor(() =>
-      expect(screen.getByRole('combobox', { name: 'الهدف المرتبط بالسؤال' })).toHaveValue('')
-    );
+    expect(screen.getByRole('combobox', { name: 'الهدف المرتبط بالسؤال' })).toHaveValue('');
     expect(screen.getByRole('alert')).toHaveTextContent('لم يعد موجودًا');
     expect(screen.getByRole('button', { name: 'إضافة السؤال' })).toBeDisabled();
     expect(createLessonRevision).not.toHaveBeenCalled();

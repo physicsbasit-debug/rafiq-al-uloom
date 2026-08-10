@@ -1,0 +1,130 @@
+PHASE 3-5A FIX 2B-2 FIX 1 V3 — CODESPACES APPLY / VERIFICATION
+Baseline: ac58233
+
+IMPORTANT:
+- Upload this ZIP's contents to the repository root with paths preserved.
+- Do not manually edit production files in Codespaces.
+- The previous diagnostic session may have left one local test-only selector change. Clean it safely before pulling.
+
+============================================================
+0) CLEAN THE KNOWN LOCAL DIAGNOSTIC EDIT BEFORE GIT PULL
+============================================================
+
+cd /workspaces/rafiq-al-uloom
+
+git status --short
+
+git --no-pager diff -- tests/features/teacher/TeacherQuestionsEditor.test.tsx
+
+# Expected local-only diff, if present:
+# - expect(screen.getByText(/ارتداد الموجة/)).toBeInTheDocument();
+# + expect(screen.getByText('ارتداد الموجة — الإجابة الصحيحة')).toBeInTheDocument();
+#
+# If ANY other local change appears, STOP and inspect it before continuing.
+
+# If the only local modification is the exact selector line above:
+git restore tests/features/teacher/TeacherQuestionsEditor.test.tsx
+
+git status --short
+
+============================================================
+1) PULL THE GITHUB APPLY COMMIT
+============================================================
+
+git pull origin main
+git --no-pager show --stat --oneline -1
+git status --short
+
+sha256sum -c APPLY_MANIFEST_PHASE_3_5A_FIX2B2_FIX1_V3.sha256
+
+============================================================
+2) VERIFY BASELINE AND FROZEN BOUNDARIES
+============================================================
+
+# The previous APPLY commit must exist and be the comparison baseline.
+git cat-file -e ac58233^{commit} && echo "PASS: ac58233 exists"
+
+# Fix 1 must change only the three reviewed files plus APPLY metadata.
+git --no-pager diff --name-status ac58233..HEAD
+
+# Frozen production boundaries must remain untouched.
+git diff --exit-code ac58233..HEAD -- \
+  src/features/teacher/workspace/TeacherLessonEditor.tsx \
+  src/features/teacher/workspace/useTeacherLessonEditor.ts \
+  src/features/teacher/workspace/teacher-lesson-structure.ts \
+  src/services/authoring \
+  src/types/quiz.types.ts \
+  src/App.tsx \
+  supabase \
+  && echo "PASS: frozen boundaries unchanged"
+
+============================================================
+3) VERIFY THE APPROVED V3 FILE HASHES
+============================================================
+
+printf '%s  %s\n' \
+  'ab7ab12b0218885964cb1ba4f707e4c04b7d7c4d72a33f862f636841ae887c9b' \
+  'src/features/teacher/workspace/TeacherQuestionsEditor.tsx' \
+  '7cb8ea19122847e134e53828624e9a7c60f870775c09cb6cf208ecb2cf4f5b06' \
+  'tests/features/teacher/TeacherQuestionsEditor.test.tsx' \
+  'f039a800c5cf40c2fc5073bb786dff7f9fd522ec64ff44d341cac57b630e072f' \
+  'tests/features/teacher/TeacherLessonEditorQuestions.test.tsx' \
+  | sha256sum -c -
+
+============================================================
+4) LINT FIRST — THIS IS THE ROOT FIX GATE
+============================================================
+
+npm run lint
+
+# Must be silent/clean. In particular there must be no:
+# react-hooks/set-state-in-effect
+
+============================================================
+5) FIX 2B-2 TARGETED TESTS
+============================================================
+
+npx vitest run \
+  tests/features/teacher/teacher-question-structure.test.ts \
+  tests/features/teacher/TeacherQuestionsEditor.test.tsx \
+  tests/features/teacher/TeacherLessonEditorQuestions.test.tsx
+
+# Expected: 3 files, 24 tests PASS.
+
+============================================================
+6) TEACHER REGRESSION
+============================================================
+
+npx vitest run \
+  tests/features/teacher/TeacherLessonEditor.test.tsx \
+  tests/features/teacher/TeacherWorkspace.test.tsx \
+  tests/features/teacher/TeacherWorkspaceEditorNavigation.test.tsx \
+  tests/features/teacher/TeacherObjectivesEditor.test.tsx \
+  tests/features/teacher/TeacherLessonEditorObjectives.test.tsx \
+  tests/architecture/no-teacher-workspace-infrastructure-imports.test.ts \
+  tests/architecture/no-teacher-rejected-in-place-save.test.ts \
+  tests/architecture/no-teacher-rejected-original-submit.test.ts
+
+# Expected: 8 files, 45 tests PASS.
+
+============================================================
+7) BUILD + FULL SUITE + DIFF CHECK
+============================================================
+
+npm run build
+npm test
+git diff --check
+
+# Expected full suite: 69 files / 689 tests PASS.
+# Existing Vite chunk-size warning is known and non-blocking.
+
+============================================================
+8) PRETTIER CHECK — DO NOT FORMAT YET IF IT WARNS
+============================================================
+
+npx prettier --check .
+git status --short
+
+# If Prettier reports the known files, STOP here and preserve the output.
+# Do not run prettier --write until the functional/lint gates above are green.
+# Then perform formatting-only proof before committing formatting.

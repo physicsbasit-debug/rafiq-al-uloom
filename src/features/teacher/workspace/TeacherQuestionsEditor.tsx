@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { AppButton } from '@design-system/components/AppButton';
 import type { LessonRevisionPayload } from '@services/authoring';
@@ -91,25 +91,30 @@ export function TeacherQuestionsEditor({
 }: TeacherQuestionsEditorProps) {
   const [editor, setEditor] = useState<QuestionEditorState>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [previousObjectives, setPreviousObjectives] = useState(objectives);
   const questionStateIssue = getQuestionStateIssue(questions, objectives);
   const controlsDisabled = readOnly || disabled;
   const objectiveOptions = getAvailableObjectiveOptions(objectives);
 
-  useEffect(() => {
-    if (!editor?.form.objectiveKey) return;
-    if (isObjectiveKeyAvailable(objectives, editor.form.objectiveKey)) return;
+  if (objectives !== previousObjectives) {
+    setPreviousObjectives(objectives);
 
-    setEditor({
-      ...editor,
-      form: {
-        ...editor.form,
-        objectiveKey: '',
-      },
-    });
-    setMessage(
-      'الهدف الذي كان مرتبطًا بهذا السؤال لم يعد موجودًا. اختر هدفًا آخر قبل تطبيق السؤال.'
-    );
-  }, [editor, objectives]);
+    if (
+      editor?.form.objectiveKey &&
+      !isObjectiveKeyAvailable(objectives, editor.form.objectiveKey)
+    ) {
+      setEditor({
+        ...editor,
+        form: {
+          ...editor.form,
+          objectiveKey: '',
+        },
+      });
+      setMessage(
+        'الهدف الذي كان مرتبطًا بهذا السؤال لم يعد موجودًا. اختر هدفًا آخر قبل تطبيق السؤال.'
+      );
+    }
+  }
 
   const updateForm = (next: Partial<TeacherQuestionFormDraft>) => {
     if (controlsDisabled) return;
