@@ -21,15 +21,17 @@ function service(overrides: Partial<AuthoringService> = {}): AuthoringService {
 
 describe('TeacherLessonEditor question composition', () => {
   it('يبني Objective وMastery Question من UI ثم يرسل الرابط نفسه في LessonRevisionPayload عند Save اليدوي', async () => {
-    const createLessonRevision = vi.fn<AuthoringService['createLessonRevision']>().mockResolvedValue({
-      status: 'created',
-      revision: {
-        id: '00000000-0000-4000-8000-0000000002b2',
-        entityId: null,
-        revisionNumber: 1,
-        baseFingerprint: null,
-      },
-    });
+    const createLessonRevision = vi
+      .fn<AuthoringService['createLessonRevision']>()
+      .mockResolvedValue({
+        status: 'created',
+        revision: {
+          id: '00000000-0000-4000-8000-0000000002b2',
+          entityId: null,
+          revisionNumber: 1,
+          baseFingerprint: null,
+        },
+      });
     const authoring = service({ createLessonRevision });
 
     render(<TeacherLessonEditor service={authoring} onBack={vi.fn()} />);
@@ -98,15 +100,17 @@ describe('TeacherLessonEditor question composition', () => {
   });
 
   it('يبقي Question Form Buffer عند حذف Objective ثم يعيد الربط صراحة ويطبق نفس البيانات قبل Save اليدوي', async () => {
-    const createLessonRevision = vi.fn<AuthoringService['createLessonRevision']>().mockResolvedValue({
-      status: 'created',
-      revision: {
-        id: '00000000-0000-4000-8000-0000000002b3',
-        entityId: null,
-        revisionNumber: 1,
-        baseFingerprint: null,
-      },
-    });
+    const createLessonRevision = vi
+      .fn<AuthoringService['createLessonRevision']>()
+      .mockResolvedValue({
+        status: 'created',
+        revision: {
+          id: '00000000-0000-4000-8000-0000000002b3',
+          entityId: null,
+          revisionNumber: 1,
+          baseFingerprint: null,
+        },
+      });
     const authoring = service({ createLessonRevision });
     render(<TeacherLessonEditor service={authoring} onBack={vi.fn()} />);
 
@@ -200,5 +204,4 @@ describe('TeacherLessonEditor question composition', () => {
       { signal: expect.any(AbortSignal) }
     );
   });
-
 });

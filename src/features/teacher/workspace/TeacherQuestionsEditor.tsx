@@ -259,8 +259,8 @@ export function TeacherQuestionsEditor({
                 <span>الشرح: {question.explanation}</span>
                 <span>
                   الصعوبة:{' '}
-                  {DIFFICULTY_OPTIONS.find((option) => option.value === question.difficulty)?.label ??
-                    question.difficulty}
+                  {DIFFICULTY_OPTIONS.find((option) => option.value === question.difficulty)
+                    ?.label ?? question.difficulty}
                 </span>
                 {!readOnly ? (
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
@@ -435,7 +435,12 @@ export function TeacherQuestionsEditor({
               />
             </div>
             <div style={{ width: '140px' }}>
-              <AppButton label="إلغاء" variant="secondary" onClick={cancelEdit} disabled={disabled} />
+              <AppButton
+                label="إلغاء"
+                variant="secondary"
+                onClick={cancelEdit}
+                disabled={disabled}
+              />
             </div>
           </div>
         </div>

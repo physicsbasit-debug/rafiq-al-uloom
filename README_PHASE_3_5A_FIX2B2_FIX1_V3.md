@@ -31,6 +31,7 @@ The test file also contains the already-proven selector correction for the read-
 Run `APPLY_PHASE_3_5A_FIX2B2_FIX1_V3.txt` exactly in Codespaces after the GitHub upload commit exists.
 
 Expected functional results before formatting:
+
 - Fix 2B-2 targeted suite: 24/24
 - teacher regression suite: 45/45
 - full suite: 689/689 across 69 files

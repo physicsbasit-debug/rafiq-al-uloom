@@ -111,14 +111,18 @@ describe('teacher question structural helpers', () => {
       valid: false,
       reason: 'missing_objective',
     });
-    expect(validateQuestionDraft(form({ objectiveKey: 'deleted-objective' }), objectives)).toMatchObject({
+    expect(
+      validateQuestionDraft(form({ objectiveKey: 'deleted-objective' }), objectives)
+    ).toMatchObject({
       valid: false,
       reason: 'objective_not_available',
     });
   });
 
   it('يقبل review وmastery ضمن البنية نفسها ويقيّد difficulty بعقد TypeScript', () => {
-    expect(validateQuestionDraft(form({ purpose: 'mastery', difficulty: 'hard' }), objectives)).toMatchObject({
+    expect(
+      validateQuestionDraft(form({ purpose: 'mastery', difficulty: 'hard' }), objectives)
+    ).toMatchObject({
       valid: true,
     });
     expect(
@@ -131,9 +135,9 @@ describe('teacher question structural helpers', () => {
 
   it('يكشف dangling objectiveKey والحالات البنيوية الفاسدة في committed questions', () => {
     expect(getQuestionStateIssue([question], objectives)).toBeNull();
-    expect(getQuestionStateIssue([{ ...question, objectiveKey: 'deleted-objective' }], objectives)).toBe(
-      'dangling_objective'
-    );
+    expect(
+      getQuestionStateIssue([{ ...question, objectiveKey: 'deleted-objective' }], objectives)
+    ).toBe('dangling_objective');
     expect(getQuestionStateIssue([{ ...question, choices: ['واحد'] }], objectives)).toBe(
       'too_few_choices'
     );

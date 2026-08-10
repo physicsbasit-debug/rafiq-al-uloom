@@ -182,7 +182,9 @@ describe('TeacherQuestionsEditor', () => {
       />
     );
 
-    expect(screen.getByRole('textbox', { name: 'نص السؤال' })).toHaveValue('  ما أثر زيادة التردد؟  ');
+    expect(screen.getByRole('textbox', { name: 'نص السؤال' })).toHaveValue(
+      '  ما أثر زيادة التردد؟  '
+    );
     expect(screen.getByRole('textbox', { name: 'الاختيار 1' })).toHaveValue('يزداد عدد الاهتزازات');
     expect(screen.getByRole('textbox', { name: 'شرح الإجابة' })).toHaveValue(
       '  التردد هو عدد الاهتزازات في الثانية.  '
