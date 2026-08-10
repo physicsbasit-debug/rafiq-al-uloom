@@ -1,9 +1,15 @@
 import type { ChangeEvent } from 'react';
 
 import { AppButton } from '@design-system/components/AppButton';
-import type { AuthoringService, LessonRevision, LessonRevisionPayload } from '@services/authoring';
+import type {
+  AuthoringService,
+  LessonRevision,
+  LessonRevisionPayload,
+} from '@services/authoring';
 
 import { TeacherObjectivesEditor } from './TeacherObjectivesEditor';
+import { TeacherQuestionsEditor } from './TeacherQuestionsEditor';
+import { getQuestionStateIssue } from './teacher-lesson-structure';
 import { useTeacherLessonEditor } from './useTeacherLessonEditor';
 
 interface TeacherLessonEditorProps {
@@ -47,9 +53,13 @@ export function TeacherLessonEditor({
   };
 
   const readOnly = session.isReadOnly;
+  const questionStateIssue = getQuestionStateIssue(payload.questions, payload.objectives);
   const requestBack = () => {
     if (session.isSaving || session.isSubmitting) return;
-    if (session.dirty && !window.confirm('لديك تغييرات غير محفوظة. هل تريد العودة دون حفظها؟')) {
+    if (
+      session.dirty &&
+      !window.confirm('لديك تغييرات غير محفوظة. هل تريد العودة دون حفظها؟')
+    ) {
       return;
     }
     onBack();
@@ -210,10 +220,18 @@ export function TeacherLessonEditor({
         onChange={(objectives) => updatePayload({ ...payload, objectives })}
       />
 
+      <TeacherQuestionsEditor
+        objectives={payload.objectives}
+        questions={payload.questions}
+        readOnly={readOnly}
+        disabled={session.isSaving || session.isSubmitting}
+        onChange={(questions) => updatePayload({ ...payload, questions })}
+      />
+
       <div style={{ marginTop: '1rem' }}>
         <p>
-          المحتوى البنيوي الحالي: {payload.objectives.length} أهداف، {payload.questions.length}{' '}
-          أسئلة، {payload.games.length} ألعاب، {payload.experiments.length} تجارب.
+          المحتوى البنيوي الحالي: {payload.objectives.length} أهداف، {payload.questions.length} أسئلة،{' '}
+          {payload.games.length} ألعاب، {payload.experiments.length} تجارب.
         </p>
       </div>
 
@@ -223,7 +241,12 @@ export function TeacherLessonEditor({
             <AppButton
               label={session.isSaving ? 'جارٍ الحفظ...' : 'حفظ المسودة'}
               onClick={() => void save()}
-              disabled={!session.dirty || session.isSaving || session.isSubmitting}
+              disabled={
+                !session.dirty ||
+                session.isSaving ||
+                session.isSubmitting ||
+                questionStateIssue !== null
+              }
             />
           </div>
           <div style={{ width: '190px' }}>
@@ -231,7 +254,7 @@ export function TeacherLessonEditor({
               label={session.isSubmitting ? 'جارٍ الإرسال...' : 'إرسال للمراجعة'}
               variant="secondary"
               onClick={requestSubmit}
-              disabled={!session.canSubmit}
+              disabled={!session.canSubmit || questionStateIssue !== null}
             />
           </div>
         </div>

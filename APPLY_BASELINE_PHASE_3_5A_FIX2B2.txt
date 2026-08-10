@@ -1,0 +1,36 @@
+Phase 3-5A Fix 2B-2 APPLY baseline
+===================================
+
+Baseline commit:
+70f9dfcc11fdfa266909e37390efa463fdcecf3a
+
+Approved REVIEW package SHA-256:
+7f319285d59afe792456a6531bc81cbdefea881b87b1e4304ee0091250b35302
+
+Exact reviewed change-file hashes:
+0ff0b5f9c9f379b701746eb72dd972b04d7d23629ec9e06075e98b0eeb15c561  docs/PHASE_3_5A_FIX2B2_QUESTION_EDITOR.md
+ff280c58da32433bd99984ada58a053507150cc1fe40591ef3a2bdf9466ee5fb  src/features/teacher/workspace/TeacherLessonEditor.tsx
+5f46cf79840ca188def0febaafed26e27f2924df9705de9706699e5034142d6c  src/features/teacher/workspace/TeacherQuestionsEditor.tsx
+c2ab1024d873908eca8948c0c67d7aeaa89b87a77eab5a1a12170cb68eeab5db  src/features/teacher/workspace/teacher-lesson-structure.ts
+99e0a11030452b4b12962297a62895c96e8c0c7afa75fbb90a6645fca0344bad  tests/features/teacher/TeacherLessonEditorQuestions.test.tsx
+1b06571c8e4848fb9b4d5fd2d4c23d1584cdbb8847426dc8633e0297dd56377f  tests/features/teacher/TeacherQuestionsEditor.test.tsx
+12368f999983670128388277bff2ffabe9babef4db36fcee29bb4a56f0864d76  tests/features/teacher/teacher-question-structure.test.ts
+
+Frozen/reference hashes independently verified against 70f9dfc during REVIEW:
+5610454335684e6c8fd3c8d81963c4e6c2fa4b266aabb68232849a8da3e34889  src/services/authoring/authoring.types.ts
+2e0e8bec7d6fdb7f24ea72bef5f702def2403461e1435b21fbfc60d897fe8fbb  src/types/quiz.types.ts
+c88c5ea22f167ef46a9050015aaeb99762e098c1c062bce55fda17e9b18fcdf9  src/features/teacher/workspace/useTeacherLessonEditor.ts
+3dcf329345d0c8827c0e6197b2a4ec79ef74750ce2f4c54dfd696785be89c146  src/features/teacher/workspace/teacher-workspace.utils.ts
+
+Frozen boundaries for this APPLY:
+- src/features/teacher/workspace/useTeacherLessonEditor.ts
+- src/features/teacher/workspace/teacher-workspace.utils.ts
+- src/services/authoring/**
+- src/types/quiz.types.ts
+- src/App.tsx
+- supabase/**
+
+Important:
+The APPLY package does not contain any frozen/reference file. In Codespaces, verify both
+historical baseline identity (`git show 70f9dfc:<path>`) and no post-APPLY diff on the frozen
+boundaries. This avoids relying on a stored working copy as source of truth.
