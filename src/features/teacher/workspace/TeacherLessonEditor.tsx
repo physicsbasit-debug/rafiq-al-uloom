@@ -1,11 +1,7 @@
 import type { ChangeEvent } from 'react';
 
 import { AppButton } from '@design-system/components/AppButton';
-import type {
-  AuthoringService,
-  LessonRevision,
-  LessonRevisionPayload,
-} from '@services/authoring';
+import type { AuthoringService, LessonRevision, LessonRevisionPayload } from '@services/authoring';
 
 import { TeacherObjectivesEditor } from './TeacherObjectivesEditor';
 import { TeacherQuestionsEditor } from './TeacherQuestionsEditor';
@@ -70,10 +66,7 @@ export function TeacherLessonEditor({
   const submitActionReady = session.canSubmit && submissionReadiness.ready;
   const requestBack = () => {
     if (session.isSaving || session.isSubmitting) return;
-    if (
-      session.dirty &&
-      !window.confirm('لديك تغييرات غير محفوظة. هل تريد العودة دون حفظها؟')
-    ) {
+    if (session.dirty && !window.confirm('لديك تغييرات غير محفوظة. هل تريد العودة دون حفظها؟')) {
       return;
     }
     onBack();
@@ -244,16 +237,13 @@ export function TeacherLessonEditor({
 
       <div style={{ marginTop: '1rem' }}>
         <p>
-          المحتوى البنيوي الحالي: {payload.objectives.length} أهداف، {payload.questions.length} أسئلة،{' '}
-          {payload.games.length} ألعاب، {payload.experiments.length} تجارب.
+          المحتوى البنيوي الحالي: {payload.objectives.length} أهداف، {payload.questions.length}{' '}
+          أسئلة، {payload.games.length} ألعاب، {payload.experiments.length} تجارب.
         </p>
       </div>
 
       {!readOnly ? (
-        <section
-          aria-labelledby="teacher-submission-readiness-title"
-          style={{ marginTop: '1rem' }}
-        >
+        <section aria-labelledby="teacher-submission-readiness-title" style={{ marginTop: '1rem' }}>
           <h3 id="teacher-submission-readiness-title" style={{ marginBottom: '0.5rem' }}>
             جاهزية الإرسال
           </h3>

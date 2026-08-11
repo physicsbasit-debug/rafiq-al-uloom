@@ -53,13 +53,17 @@ describe('getLessonSubmissionReadiness', () => {
   it('يبقي review-only غير جاهزة بسبب غياب mastery فقط', () => {
     const reviewQuestion = { ...masteryQuestion, key: 'q-review', purpose: 'review' as const };
     expect(
-      getLessonSubmissionReadiness(payload({ objectives: [objective], questions: [reviewQuestion] }))
+      getLessonSubmissionReadiness(
+        payload({ objectives: [objective], questions: [reviewQuestion] })
+      )
     ).toEqual({ ready: false, reasons: ['missing_mastery_question'] });
   });
 
   it('يقبل payload مكتملة تحتوي mastery صالحًا', () => {
     expect(
-      getLessonSubmissionReadiness(payload({ objectives: [objective], questions: [masteryQuestion] }))
+      getLessonSubmissionReadiness(
+        payload({ objectives: [objective], questions: [masteryQuestion] })
+      )
     ).toEqual({ ready: true, reasons: [] });
   });
 

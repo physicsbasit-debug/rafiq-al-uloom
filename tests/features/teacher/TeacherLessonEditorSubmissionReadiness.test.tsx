@@ -41,7 +41,10 @@ function makePayload(overrides: Partial<LessonRevisionPayload> = {}): LessonRevi
   };
 }
 
-function revision(payload: LessonRevisionPayload, status: LessonRevision['status'] = 'draft'): LessonRevision {
+function revision(
+  payload: LessonRevisionPayload,
+  status: LessonRevision['status'] = 'draft'
+): LessonRevision {
   return {
     id: DRAFT_ID,
     entityType: 'lesson',
@@ -158,17 +161,23 @@ describe('TeacherLessonEditor submission readiness', () => {
     await waitFor(() => expect(submitButton()).toBeEnabled());
   });
 
-  it.each(['pending_review', 'approved'] as const)('يبقي %s readonly بلا أزرار mutation', (status) => {
-    render(
-      <TeacherLessonEditor
-        service={service()}
-        revision={revision(makePayload({ objectives: [objective], questions: [masteryQuestion] }), status)}
-        onBack={vi.fn()}
-      />
-    );
+  it.each(['pending_review', 'approved'] as const)(
+    'يبقي %s readonly بلا أزرار mutation',
+    (status) => {
+      render(
+        <TeacherLessonEditor
+          service={service()}
+          revision={revision(
+            makePayload({ objectives: [objective], questions: [masteryQuestion] }),
+            status
+          )}
+          onBack={vi.fn()}
+        />
+      );
 
-    expect(screen.queryByRole('button', { name: 'حفظ المسودة' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'إرسال للمراجعة' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('heading', { name: 'جاهزية الإرسال' })).not.toBeInTheDocument();
-  });
+      expect(screen.queryByRole('button', { name: 'حفظ المسودة' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'إرسال للمراجعة' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('heading', { name: 'جاهزية الإرسال' })).not.toBeInTheDocument();
+    }
+  );
 });

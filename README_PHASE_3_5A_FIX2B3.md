@@ -5,6 +5,7 @@ Baseline: `ec6ee191ba5221b5dd5cbe818f84ddc1d745b659`
 This APPLY is built from the Claude-approved REVIEW v2.
 
 Scope:
+
 - submission readiness pure helper
 - TeacherLessonEditor submission readiness UX
 - companion regression fixture/message update
@@ -12,6 +13,7 @@ Scope:
 - real Supabase UI composition gate
 
 Frozen / untouched:
+
 - `useTeacherLessonEditor.ts`
 - `teacher-workspace.utils.ts`
 - `src/services/authoring/**`
