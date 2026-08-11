@@ -1,0 +1,613 @@
+/*
+ * Phase 3-5B1 — Teacher Workspace Design-System Alignment
+ *
+ * Architectural styling decision:
+ * - Existing design-system React components use token objects + inline style props.
+ * - This teacher authoring surface uses locally scoped CSS classes because creating
+ *   new form-wrapper React primitives would add an unnecessary props/forwarding API.
+ * - Values come from the existing Tailwind v4 @theme CSS variables in src/index.css.
+ * - No new design tokens are introduced here.
+ * - Logical CSS properties are used for RTL-safe layout.
+ */
+
+.teacher-editor-shell {
+  inline-size: min(100%, 72rem);
+  margin-inline: auto;
+  padding-block-end: var(--spacing-2xl);
+  color: var(--color-text-primary);
+}
+
+.teacher-editor-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-xl);
+  flex-wrap: wrap;
+  margin-block-end: var(--spacing-xl);
+  padding: var(--spacing-xl);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: linear-gradient(135deg, var(--color-primary-soft), var(--color-surface));
+  box-shadow: var(--shadow-sm);
+}
+
+.teacher-editor-heading-copy {
+  display: grid;
+  gap: var(--spacing-xs);
+  min-inline-size: 0;
+  flex: 1 1 30rem;
+}
+
+.teacher-editor-heading-copy h2,
+.teacher-section-heading-copy h3,
+.teacher-section-heading-row h3 {
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+.teacher-editor-heading-copy h2 {
+  font-size: var(--font-size-2xl);
+  line-height: var(--line-height-md);
+}
+
+.teacher-editor-heading-copy p,
+.teacher-section-heading-copy p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-lg);
+}
+
+.teacher-editor-eyebrow,
+.teacher-section-kicker {
+  color: var(--color-primary-dark);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.teacher-editor-back-action {
+  inline-size: 9.5rem;
+  flex: 0 0 auto;
+}
+
+.teacher-editor-stack {
+  display: grid;
+  gap: var(--spacing-xl);
+}
+
+.teacher-lesson-fields,
+.teacher-question-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-lg);
+  margin-block-start: var(--spacing-lg);
+}
+
+.teacher-field {
+  display: grid;
+  align-content: start;
+  gap: var(--spacing-sm);
+  min-inline-size: 0;
+  color: var(--color-text-primary);
+}
+
+.teacher-field--wide,
+.teacher-field--full {
+  grid-column: 1 / -1;
+}
+
+.teacher-field-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.teacher-field-hint {
+  margin-block-start: calc(0rem - var(--spacing-xs));
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-md);
+}
+
+.teacher-editor-shell input,
+.teacher-editor-shell textarea,
+.teacher-editor-shell select {
+  inline-size: 100%;
+  min-block-size: 44px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font: inherit;
+  padding-block: var(--spacing-md);
+  padding-inline: var(--spacing-lg);
+  outline: none;
+  transition: border-color 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
+}
+
+.teacher-editor-shell textarea {
+  min-block-size: 7.5rem;
+  resize: vertical;
+  line-height: var(--line-height-lg);
+}
+
+.teacher-editor-shell input:hover:not(:disabled),
+.teacher-editor-shell textarea:hover:not(:disabled),
+.teacher-editor-shell select:hover:not(:disabled) {
+  border-color: var(--color-primary);
+}
+
+.teacher-editor-shell input:focus-visible,
+.teacher-editor-shell textarea:focus-visible,
+.teacher-editor-shell select:focus-visible {
+  border-color: var(--color-focus);
+  box-shadow: var(--shadow-focus);
+}
+
+.teacher-editor-shell input:disabled,
+.teacher-editor-shell textarea:disabled,
+.teacher-editor-shell select:disabled {
+  border-color: var(--color-border);
+  background: var(--color-disabled-background);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+.teacher-editor-card-section,
+.teacher-readiness-card {
+  border: 1px solid var(--color-border);
+  border-inline-start: 5px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-lg);
+}
+
+.teacher-section-heading-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+  margin-block-end: var(--spacing-lg);
+}
+
+.teacher-section-heading-copy {
+  display: grid;
+  gap: var(--spacing-xs);
+  min-inline-size: 0;
+  flex: 1 1 28rem;
+}
+
+.teacher-count-badge,
+.teacher-readiness-state,
+.teacher-purpose-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 34px;
+  border-radius: var(--radius-pill);
+  padding-block: var(--spacing-xs);
+  padding-inline: var(--spacing-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+}
+
+.teacher-count-badge,
+.teacher-purpose-badge {
+  border: 1px solid var(--color-primary);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-dark);
+}
+
+.teacher-alert {
+  margin-block-end: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  padding-block: var(--spacing-md);
+  padding-inline: var(--spacing-lg);
+  line-height: var(--line-height-lg);
+}
+
+.teacher-alert--error {
+  border: 1px solid var(--color-error);
+  background: var(--color-error-soft);
+  color: var(--color-error-dark);
+}
+
+.teacher-alert--warning {
+  border: 1px solid var(--color-warning);
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+}
+
+.teacher-empty-state {
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  color: var(--color-text-secondary);
+  padding: var(--spacing-lg);
+  text-align: center;
+}
+
+.teacher-item-list {
+  display: grid;
+  gap: var(--spacing-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.teacher-item-card {
+  display: grid;
+  gap: var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  padding: var(--spacing-lg);
+}
+
+.teacher-item-card-main,
+.teacher-question-card-title-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  min-inline-size: 0;
+}
+
+.teacher-item-number,
+.teacher-choice-index {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-dark);
+  font-weight: var(--font-weight-bold);
+}
+
+.teacher-item-title {
+  min-inline-size: 0;
+  line-height: var(--line-height-lg);
+}
+
+.teacher-inline-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.teacher-inline-action {
+  min-block-size: 40px;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-primary-dark);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  padding-block: var(--spacing-sm);
+  padding-inline: var(--spacing-lg);
+  cursor: pointer;
+}
+
+.teacher-inline-action:hover:not(:disabled) {
+  background: var(--color-primary-soft);
+}
+
+.teacher-inline-action--danger {
+  border-color: var(--color-error);
+  color: var(--color-error-dark);
+}
+
+.teacher-inline-action--danger:hover:not(:disabled) {
+  background: var(--color-error-soft);
+}
+
+.teacher-inline-action:disabled {
+  border-color: var(--color-border);
+  background: var(--color-disabled-background);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+.teacher-section-primary-action {
+  display: grid;
+  gap: var(--spacing-sm);
+  margin-block-start: var(--spacing-lg);
+}
+
+.teacher-section-primary-action,
+.teacher-section-primary-action-button {
+  inline-size: fit-content;
+  max-inline-size: 100%;
+}
+
+.teacher-section-primary-action-button {
+  inline-size: 11.5rem;
+}
+
+.teacher-section-hint {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.teacher-form-panel {
+  display: grid;
+  gap: var(--spacing-lg);
+  margin-block-start: var(--spacing-lg);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--color-primary-soft);
+  padding: var(--spacing-lg);
+}
+
+.teacher-form-panel-heading {
+  display: grid;
+  gap: var(--spacing-xs);
+}
+
+.teacher-form-panel-heading strong {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-lg);
+}
+
+.teacher-form-panel-heading span {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.teacher-question-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.teacher-question-card-title-wrap {
+  flex: 1 1 30rem;
+}
+
+.teacher-question-meta {
+  display: flex;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.teacher-choice-summary-list {
+  display: grid;
+  gap: var(--spacing-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.teacher-choice-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  padding-block: var(--spacing-sm);
+  padding-inline: var(--spacing-md);
+}
+
+.teacher-choice-summary--correct {
+  border-color: var(--color-success);
+  background: var(--color-success-soft);
+  color: var(--color-success-dark);
+}
+
+.teacher-choice-index {
+  inline-size: 1.65rem;
+  block-size: 1.65rem;
+  font-size: var(--font-size-xs);
+}
+
+.teacher-question-explanation {
+  border-inline-start: 3px solid var(--color-border-strong);
+  padding-inline-start: var(--spacing-md);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-lg);
+}
+
+.teacher-choice-fieldset {
+  display: grid;
+  gap: var(--spacing-md);
+  min-inline-size: 0;
+  margin: 0;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  background: var(--color-surface);
+}
+
+.teacher-choice-fieldset legend {
+  padding-inline: var(--spacing-sm);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-bold);
+}
+
+.teacher-choice-editor-list {
+  display: grid;
+  gap: var(--spacing-md);
+}
+
+.teacher-choice-editor-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--spacing-md);
+}
+
+.teacher-choice-editor-field {
+  min-inline-size: 0;
+}
+
+.teacher-choice-delete,
+.teacher-choice-add {
+  align-self: end;
+}
+
+.teacher-choice-add {
+  inline-size: fit-content;
+}
+
+.teacher-structure-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--spacing-md);
+}
+
+.teacher-structure-summary span {
+  display: grid;
+  place-items: center;
+  gap: var(--spacing-xs);
+  min-block-size: 5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  text-align: center;
+  padding: var(--spacing-md);
+}
+
+.teacher-structure-summary strong {
+  color: var(--color-primary-dark);
+  font-size: var(--font-size-xl);
+}
+
+.teacher-readiness-card {
+  border-inline-start-color: var(--color-warning);
+  background: var(--color-warning-soft);
+  box-shadow: var(--shadow-sm);
+}
+
+.teacher-readiness-card--ready {
+  border-inline-start-color: var(--color-success);
+  background: var(--color-success-soft);
+}
+
+.teacher-readiness-state {
+  border: 1px solid currentColor;
+  color: var(--color-warning);
+}
+
+.teacher-readiness-card--ready .teacher-readiness-state {
+  color: var(--color-success-dark);
+}
+
+.teacher-readiness-message,
+.teacher-readiness-dirty {
+  margin: 0;
+  line-height: var(--line-height-lg);
+}
+
+.teacher-readiness-list {
+  display: grid;
+  gap: var(--spacing-sm);
+  margin-block: var(--spacing-md) 0;
+  padding-inline-start: var(--spacing-xl);
+}
+
+.teacher-readiness-dirty {
+  margin-block-start: var(--spacing-md);
+  color: var(--color-warning);
+  font-weight: var(--font-weight-bold);
+}
+
+.teacher-editor-actions {
+  display: flex;
+  align-items: stretch;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.teacher-editor-actions--compact {
+  margin-block-start: 0;
+}
+
+.teacher-editor-action {
+  inline-size: 12rem;
+  max-inline-size: 100%;
+}
+
+.teacher-editor-action--secondary {
+  inline-size: 9rem;
+}
+
+.teacher-revision-metadata {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-md);
+  margin: 0;
+  border-block-start: 1px solid var(--color-border);
+  padding-block-start: var(--spacing-lg);
+}
+
+.teacher-revision-metadata > div {
+  min-inline-size: 0;
+}
+
+.teacher-revision-metadata dt {
+  margin-block-end: var(--spacing-xs);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.teacher-revision-metadata dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+@media (max-width: 48rem) {
+  .teacher-editor-header,
+  .teacher-editor-card-section,
+  .teacher-readiness-card {
+    padding: var(--spacing-lg);
+  }
+
+  .teacher-editor-back-action,
+  .teacher-editor-action,
+  .teacher-editor-action--secondary,
+  .teacher-section-primary-action,
+  .teacher-section-primary-action-button {
+    inline-size: 100%;
+  }
+
+  .teacher-lesson-fields,
+  .teacher-question-form-grid,
+  .teacher-structure-summary,
+  .teacher-revision-metadata {
+    grid-template-columns: 1fr;
+  }
+
+  .teacher-field--wide,
+  .teacher-field--full {
+    grid-column: auto;
+  }
+
+  .teacher-choice-editor-row {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .teacher-choice-delete,
+  .teacher-choice-add {
+    inline-size: 100%;
+  }
+
+  .teacher-editor-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}

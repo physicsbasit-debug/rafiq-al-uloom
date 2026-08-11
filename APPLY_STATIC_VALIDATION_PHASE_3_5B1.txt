@@ -1,0 +1,5 @@
+PASS: physical-direction CSS scan = 0 matches
+PASS: APPLY overlay source is byte-identical to APPROVED REVIEW source (see provenance file)
+PASS: overlay contains exactly four repository source files
+NOT RUN HERE: repository Prettier, ESLint, Vite build, full Vitest suite, live Supabase gate
+These remain mandatory in Codespaces before visual acceptance and closure.

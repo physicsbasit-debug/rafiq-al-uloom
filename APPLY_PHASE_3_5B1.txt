@@ -1,0 +1,118 @@
+PHASE 3-5B1 — Teacher Workspace Design-System Alignment
+STATUS: APPLY PACKAGE — APPROVED REVIEW CONTENT
+
+This package contains the exact four source files approved in REVIEW.
+Do not manually patch individual regions.
+
+IMPORTANT
+- Do not run db reset.
+- Keep the local Supabase stack available for the final 3/3 integration gate.
+- Do not change tests preemptively.
+- The approved REVIEW changed one visible readiness sentence from:
+  "غير جاهز للإرسال:"
+  to:
+  "أكمل النقاط التالية قبل الإرسال للمراجعة:"
+  If a test fails only because it asserts the old sentence, STOP and report the failure before changing either source or test.
+
+1) VERIFY BASELINE
+
+cd /workspaces/rafiq-al-uloom
+
+git fetch origin main --quiet
+
+test -z "$(git status --short)" || { echo "FAIL: working tree is not clean"; git status --short; exit 1; }
+
+test "$(git rev-parse HEAD)" = "c2092dc70934d6006b62c2b1474749cea65540a1" || { echo "FAIL: wrong HEAD"; git rev-parse HEAD; exit 1; }
+
+test "$(git rev-parse origin/main)" = "c2092dc70934d6006b62c2b1474749cea65540a1" || { echo "FAIL: origin/main moved"; git rev-parse origin/main; exit 1; }
+
+echo "PASS: baseline verified"
+
+2) APPLY OVERLAY
+
+From the extracted APPLY package directory, copy only overlay/ into the repository root:
+
+cp -a overlay/. /workspaces/rafiq-al-uloom/
+
+3) VERIFY EXACT SCOPE BEFORE FORMATTING
+
+cd /workspaces/rafiq-al-uloom
+
+git status --short
+
+git diff --name-only
+
+Expected repository source changes only:
+src/features/teacher/workspace/TeacherLessonEditor.tsx
+src/features/teacher/workspace/TeacherObjectivesEditor.tsx
+src/features/teacher/workspace/TeacherQuestionsEditor.tsx
+src/features/teacher/workspace/teacher-workspace.css
+
+4) FORMAT APPROVED SOURCE FILES ONLY
+
+npx prettier --write \
+  src/features/teacher/workspace/TeacherLessonEditor.tsx \
+  src/features/teacher/workspace/TeacherObjectivesEditor.tsx \
+  src/features/teacher/workspace/TeacherQuestionsEditor.tsx \
+  src/features/teacher/workspace/teacher-workspace.css
+
+5) LOCAL ACCEPTANCE GATE
+
+npx prettier --check .
+npm run lint
+npm run build
+npm test
+git diff --check
+
+Expected minimum:
+- Prettier PASS
+- Lint PASS
+- Build PASS
+- Full local suite >= 701 tests with zero failures
+
+6) REAL SUPABASE FIX 2B-3 GATE
+
+RUN_SUPABASE_INTEGRATION_TESTS=true npx vitest run \
+  --config vitest.supabase.config.ts \
+  tests/integration/supabase-teacher-submission-readiness.integration.tsx \
+  --reporter=verbose
+
+Expected:
+- 3/3 PASS
+- objective-only parity PASS
+- review-only parity PASS
+- relink UI -> Save -> RPC -> pending_review -> same revision in ReviewerWorkspace PASS
+
+7) FROZEN-FILE / SCOPE CHECK
+
+git diff --name-only | sort
+
+git diff --exit-code HEAD -- \
+  src/features/teacher/workspace/useTeacherLessonEditor.ts \
+  src/features/teacher/workspace/teacher-workspace.utils.ts \
+  src/features/teacher/workspace/teacher-lesson-structure.ts \
+  src/features/teacher/workspace/teacher-submission-readiness.ts \
+  src/index.css \
+  src/design-system \
+  src/services \
+  supabase
+
+echo "PASS: frozen scope untouched"
+
+8) REVIEW DIFF BEFORE COMMIT
+
+git --no-pager diff -- \
+  src/features/teacher/workspace/TeacherLessonEditor.tsx \
+  src/features/teacher/workspace/TeacherObjectivesEditor.tsx \
+  src/features/teacher/workspace/TeacherQuestionsEditor.tsx \
+  src/features/teacher/workspace/teacher-workspace.css
+
+9) DO NOT CLOSE PHASE YET
+
+After automated gates pass:
+- run the app,
+- capture desktop screenshot(s),
+- capture mobile screenshot(s),
+- user performs visual acceptance.
+
+Only after visual acceptance should Phase 3-5B1 be committed/closed.
