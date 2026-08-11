@@ -1,0 +1,32 @@
+PHASE 3-5A FIX 2B-3 REVIEW v2 VERIFICATION
+==========================================
+
+Packaging environment checks completed:
+- TypeScript transpileModule: 6/6 PASS
+- Pure readiness runtime against reconstructed getQuestionStateIssue: 7/7 PASS
+- Production files vs REVIEW v1: byte-identical PASS
+- Production infrastructure guard: PASS
+  * no Supabase import
+  * no RPC call
+  * no inline role equality
+- Save isolation guard: PASS
+  * existing questionStateIssue !== null remains in Save disabled path
+  * submit uses submitActionReady
+  * requestSubmit guards submitActionReady
+- Legacy regression companion guard: PASS
+  * shared revision payload contains >=1 objective
+  * shared revision payload contains a valid mastery question linked to obj-1
+  * old role=status / old wording assertion removed
+  * new approved dirty-submit text asserted
+- Archive manifest verified after fresh unzip.
+
+Not executed in packaging environment:
+- React/jsdom tests
+- npm lint/build/full suite
+- real Supabase tests
+These remain Codespaces gates after REVIEW approval.
+
+Baseline limitation:
+- GitHub unavailable in packaging environment.
+- Production semantic diff still requires comparison with real ec6ee19.
+- Companion TeacherLessonEditor.test.tsx semantic patch must also be compared with real ec6ee19 before APPLY.

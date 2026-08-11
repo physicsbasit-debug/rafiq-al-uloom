@@ -1,11 +1,19 @@
 import type { ChangeEvent } from 'react';
 
 import { AppButton } from '@design-system/components/AppButton';
-import type { AuthoringService, LessonRevision, LessonRevisionPayload } from '@services/authoring';
+import type {
+  AuthoringService,
+  LessonRevision,
+  LessonRevisionPayload,
+} from '@services/authoring';
 
 import { TeacherObjectivesEditor } from './TeacherObjectivesEditor';
 import { TeacherQuestionsEditor } from './TeacherQuestionsEditor';
 import { getQuestionStateIssue } from './teacher-lesson-structure';
+import {
+  getLessonSubmissionReadiness,
+  type SubmissionReadinessReason,
+} from './teacher-submission-readiness';
 import { useTeacherLessonEditor } from './useTeacherLessonEditor';
 
 interface TeacherLessonEditorProps {
@@ -24,6 +32,14 @@ function linesToArray(value: string): readonly string[] {
 function arrayToLines(value: readonly string[]): string {
   return value.join('\n');
 }
+
+const SUBMISSION_REASON_MESSAGES: Readonly<Record<SubmissionReadinessReason, string>> = {
+  missing_objective: 'أضف هدفًا تعليميًا واحدًا على الأقل.',
+  missing_question: 'أضف سؤالًا واحدًا على الأقل.',
+  missing_mastery_question: 'يجب أن يتضمن الدرس سؤال إتقان واحدًا على الأقل.',
+  dangling_objective: 'أصلح ارتباط السؤال بهدف تعلم موجود قبل الإرسال.',
+  invalid_question_structure: 'صحّح بيانات الأسئلة الحالية قبل الإرسال.',
+};
 
 export function TeacherLessonEditor({
   service,
@@ -50,16 +66,21 @@ export function TeacherLessonEditor({
 
   const readOnly = session.isReadOnly;
   const questionStateIssue = getQuestionStateIssue(payload.questions, payload.objectives);
+  const submissionReadiness = getLessonSubmissionReadiness(payload);
+  const submitActionReady = session.canSubmit && submissionReadiness.ready;
   const requestBack = () => {
     if (session.isSaving || session.isSubmitting) return;
-    if (session.dirty && !window.confirm('لديك تغييرات غير محفوظة. هل تريد العودة دون حفظها؟')) {
+    if (
+      session.dirty &&
+      !window.confirm('لديك تغييرات غير محفوظة. هل تريد العودة دون حفظها؟')
+    ) {
       return;
     }
     onBack();
   };
 
   const requestSubmit = () => {
-    if (!session.canSubmit) return;
+    if (!submitActionReady) return;
     const confirmed = window.confirm(
       'إرسال الدرس للمراجعة؟ بعد الإرسال ستصبح هذه النسخة قيد المراجعة ولن تكون قابلة للتحرير في مكانها.'
     );
@@ -223,10 +244,34 @@ export function TeacherLessonEditor({
 
       <div style={{ marginTop: '1rem' }}>
         <p>
-          المحتوى البنيوي الحالي: {payload.objectives.length} أهداف، {payload.questions.length}{' '}
-          أسئلة، {payload.games.length} ألعاب، {payload.experiments.length} تجارب.
+          المحتوى البنيوي الحالي: {payload.objectives.length} أهداف، {payload.questions.length} أسئلة،{' '}
+          {payload.games.length} ألعاب، {payload.experiments.length} تجارب.
         </p>
       </div>
+
+      {!readOnly ? (
+        <section
+          aria-labelledby="teacher-submission-readiness-title"
+          style={{ marginTop: '1rem' }}
+        >
+          <h3 id="teacher-submission-readiness-title" style={{ marginBottom: '0.5rem' }}>
+            جاهزية الإرسال
+          </h3>
+          {submissionReadiness.ready ? (
+            <p>المحتوى مكتمل للإرسال.</p>
+          ) : (
+            <>
+              <p>غير جاهز للإرسال:</p>
+              <ul>
+                {submissionReadiness.reasons.map((reason) => (
+                  <li key={reason}>{SUBMISSION_REASON_MESSAGES[reason]}</li>
+                ))}
+              </ul>
+            </>
+          )}
+          {session.dirty ? <p>احفظ التغييرات قبل الإرسال للمراجعة.</p> : null}
+        </section>
+      ) : null}
 
       {!readOnly ? (
         <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem', flexWrap: 'wrap' }}>
@@ -247,16 +292,10 @@ export function TeacherLessonEditor({
               label={session.isSubmitting ? 'جارٍ الإرسال...' : 'إرسال للمراجعة'}
               variant="secondary"
               onClick={requestSubmit}
-              disabled={!session.canSubmit || questionStateIssue !== null}
+              disabled={!submitActionReady}
             />
           </div>
         </div>
-      ) : null}
-
-      {!readOnly && session.dirty ? (
-        <p role="status" style={{ marginTop: '0.75rem' }}>
-          احفظ التعديلات أولًا قبل إرسال الدرس للمراجعة.
-        </p>
       ) : null}
 
       <dl style={{ marginTop: '1rem' }}>

@@ -1,0 +1,19 @@
+PHASE 3-5A FIX 2B-3 REVIEW v2 — DELTA FROM REVIEW v1
+======================================================
+Review v1 SHA-256:
+  4845498f141d8ea8857f1e6692173637f40d63151b13807c4ddfdd18ada00bc6
+
+Cloud found one regression-fixture defect outside the original REVIEW scope:
+- existing TeacherLessonEditor.test.tsx shared payload had objectives but questions: []
+- the new submission-readiness gate correctly made those legacy Submit tests non-submittable
+- the old dirty-submit assertion also expected role="status" and the previous wording
+
+v2 response:
+- NO production changes from REVIEW v1
+- ADD companion update to tests/features/teacher/TeacherLessonEditor.test.tsx only:
+  1) shared revision payload now includes one structurally valid mastery question linked to obj-1
+  2) dirty-submit assertion targets the approved new UX text directly
+
+The purpose is to restore the existing lifecycle tests to a content-complete fixture so they continue testing submit lifecycle behavior rather than submission completeness.
+
+Because GitHub was unavailable in the packaging environment, the companion legacy test baseline was reconstructed from the last artifact that changed it (Phase 3-3D). Cloud must compare this test semantic patch against the real ec6ee19 checkout before approval.

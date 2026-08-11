@@ -1,0 +1,17 @@
+PHASE 3-5A FIX 2B-3 REVIEW BASELINE NOTE
+=========================================
+Target Git baseline:
+  ec6ee191ba5221b5dd5cbe818f84ddc1d745b659
+
+Network access to GitHub was unavailable in the packaging environment.
+The implementation was reconstructed from the already-approved local artifacts:
+- Fix 2B-2 APPLY
+- Fix 2B-2 Fix 1 v3 APPLY
+- Gate 1 real Supabase composition APPLY
+- Fix 2A real Supabase draft-readiness APPLY
+
+Important review rule:
+Cloud must compare modified production files against the real ec6ee19 archive/checkout.
+Do not treat REFERENCE_RECONSTRUCTED as byte-authoritative for ec6ee19 because ec6ee19 contains a later formatting-only commit.
+
+The REVIEW is intentionally not APPLY-ready. APPLY will only be generated after Cloud approves the semantic diff and the real ec6ee19 baseline hashes are obtained from Git/Codespaces.

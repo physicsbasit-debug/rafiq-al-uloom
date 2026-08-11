@@ -1,0 +1,32 @@
+--- /mnt/data/fix2b3_rework/TeacherLessonEditor.test.tsx	2026-08-11 04:18:52.888634909 +0000
++++ /mnt/data/fix2b3_review_v2_build/tests/features/teacher/TeacherLessonEditor.test.tsx	2026-08-11 04:19:38.774298471 +0000
+@@ -21,7 +21,19 @@
+     misconceptions: ['كل الموجات مادية'],
+   },
+   objectives: [{ key: 'obj-1', text: 'يصف خصائص الموجات' }],
+-  questions: [],
++  questions: [
++    {
++      key: 'q-mastery-1',
++      purpose: 'mastery',
++      type: 'multiple_choice',
++      prompt: 'ما الذي يصف انعكاس الموجة؟',
++      choices: ['ارتداد الموجة عن حاجز', 'اختفاء الموجة تمامًا'],
++      correctAnswerIndex: 0,
++      explanation: 'الانعكاس هو ارتداد الموجة عن حاجز.',
++      objectiveKey: 'obj-1',
++      difficulty: 'medium',
++    },
++  ],
+   games: [],
+   experiments: [],
+ };
+@@ -326,7 +338,7 @@
+ 
+     changeTitle('تعديل يحتاج حفظًا');
+     expect(submitButton()).toBeDisabled();
+-    expect(screen.getByRole('status')).toHaveTextContent('احفظ التعديلات أولًا');
++    expect(screen.getByText('احفظ التغييرات قبل الإرسال للمراجعة.')).toBeInTheDocument();
+     fireEvent.click(submitButton());
+     expect(submitLessonRevision).not.toHaveBeenCalled();
+ 

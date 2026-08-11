@@ -1,0 +1,97 @@
+--- /mnt/data/fix2b3_sources/b2/src/features/teacher/workspace/TeacherLessonEditor.tsx	2026-08-10 17:25:45.000000000 +0000
++++ /mnt/data/fix2b3_review_build/src/features/teacher/workspace/TeacherLessonEditor.tsx	2026-08-10 20:44:51.655752389 +0000
+@@ -10,6 +10,10 @@
+ import { TeacherObjectivesEditor } from './TeacherObjectivesEditor';
+ import { TeacherQuestionsEditor } from './TeacherQuestionsEditor';
+ import { getQuestionStateIssue } from './teacher-lesson-structure';
++import {
++  getLessonSubmissionReadiness,
++  type SubmissionReadinessReason,
++} from './teacher-submission-readiness';
+ import { useTeacherLessonEditor } from './useTeacherLessonEditor';
+ 
+ interface TeacherLessonEditorProps {
+@@ -29,6 +33,14 @@
+   return value.join('\n');
+ }
+ 
++const SUBMISSION_REASON_MESSAGES: Readonly<Record<SubmissionReadinessReason, string>> = {
++  missing_objective: 'أضف هدفًا تعليميًا واحدًا على الأقل.',
++  missing_question: 'أضف سؤالًا واحدًا على الأقل.',
++  missing_mastery_question: 'يجب أن يتضمن الدرس سؤال إتقان واحدًا على الأقل.',
++  dangling_objective: 'أصلح ارتباط السؤال بهدف تعلم موجود قبل الإرسال.',
++  invalid_question_structure: 'صحّح بيانات الأسئلة الحالية قبل الإرسال.',
++};
++
+ export function TeacherLessonEditor({
+   service,
+   revision = null,
+@@ -54,6 +66,8 @@
+ 
+   const readOnly = session.isReadOnly;
+   const questionStateIssue = getQuestionStateIssue(payload.questions, payload.objectives);
++  const submissionReadiness = getLessonSubmissionReadiness(payload);
++  const submitActionReady = session.canSubmit && submissionReadiness.ready;
+   const requestBack = () => {
+     if (session.isSaving || session.isSubmitting) return;
+     if (
+@@ -66,7 +80,7 @@
+   };
+ 
+   const requestSubmit = () => {
+-    if (!session.canSubmit) return;
++    if (!submitActionReady) return;
+     const confirmed = window.confirm(
+       'إرسال الدرس للمراجعة؟ بعد الإرسال ستصبح هذه النسخة قيد المراجعة ولن تكون قابلة للتحرير في مكانها.'
+     );
+@@ -236,6 +250,30 @@
+       </div>
+ 
+       {!readOnly ? (
++        <section
++          aria-labelledby="teacher-submission-readiness-title"
++          style={{ marginTop: '1rem' }}
++        >
++          <h3 id="teacher-submission-readiness-title" style={{ marginBottom: '0.5rem' }}>
++            جاهزية الإرسال
++          </h3>
++          {submissionReadiness.ready ? (
++            <p>المحتوى مكتمل للإرسال.</p>
++          ) : (
++            <>
++              <p>غير جاهز للإرسال:</p>
++              <ul>
++                {submissionReadiness.reasons.map((reason) => (
++                  <li key={reason}>{SUBMISSION_REASON_MESSAGES[reason]}</li>
++                ))}
++              </ul>
++            </>
++          )}
++          {session.dirty ? <p>احفظ التغييرات قبل الإرسال للمراجعة.</p> : null}
++        </section>
++      ) : null}
++
++      {!readOnly ? (
+         <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem', flexWrap: 'wrap' }}>
+           <div style={{ width: '190px' }}>
+             <AppButton
+@@ -254,18 +292,12 @@
+               label={session.isSubmitting ? 'جارٍ الإرسال...' : 'إرسال للمراجعة'}
+               variant="secondary"
+               onClick={requestSubmit}
+-              disabled={!session.canSubmit || questionStateIssue !== null}
++              disabled={!submitActionReady}
+             />
+           </div>
+         </div>
+       ) : null}
+ 
+-      {!readOnly && session.dirty ? (
+-        <p role="status" style={{ marginTop: '0.75rem' }}>
+-          احفظ التعديلات أولًا قبل إرسال الدرس للمراجعة.
+-        </p>
+-      ) : null}
+-
+       <dl style={{ marginTop: '1rem' }}>
+         <dt>النسخة الأصلية</dt>
+         <dd>{session.originRevisionId ?? 'جديدة'}</dd>
