@@ -1,0 +1,87 @@
+PHASE 3-5A FIX 2B-3 — CODESPACES ACCEPTANCE
+===========================================
+
+1) Pull the uploaded APPLY and verify scope
+-------------------------------------------
+cd /workspaces/rafiq-al-uloom
+
+git pull origin main
+git --no-pager show --stat --oneline -1
+git status --short
+
+sha256sum -c APPLY_MANIFEST_PHASE_3_5A_FIX2B3.sha256
+
+git --no-pager diff --name-status ec6ee19..HEAD
+
+STOP if any of these are modified:
+- src/features/teacher/workspace/useTeacherLessonEditor.ts
+- src/features/teacher/workspace/teacher-workspace.utils.ts
+- src/services/authoring/**
+- src/types/quiz.types.ts
+- src/App.tsx
+- supabase/**
+
+2) React/jsdom + local gates FIRST
+----------------------------------
+npx vitest run \
+  tests/features/teacher/teacher-submission-readiness.test.ts \
+  tests/features/teacher/TeacherLessonEditorSubmissionReadiness.test.tsx
+
+npx vitest run \
+  tests/features/teacher/teacher-question-structure.test.ts \
+  tests/features/teacher/TeacherQuestionsEditor.test.tsx \
+  tests/features/teacher/TeacherLessonEditorQuestions.test.tsx
+
+npx vitest run \
+  tests/features/teacher/TeacherLessonEditor.test.tsx \
+  tests/features/teacher/TeacherWorkspace.test.tsx \
+  tests/features/teacher/TeacherWorkspaceEditorNavigation.test.tsx \
+  tests/features/teacher/TeacherObjectivesEditor.test.tsx \
+  tests/features/teacher/TeacherLessonEditorObjectives.test.tsx \
+  tests/architecture/no-teacher-workspace-infrastructure-imports.test.ts \
+  tests/architecture/no-teacher-rejected-in-place-save.test.ts \
+  tests/architecture/no-teacher-rejected-original-submit.test.ts
+
+npm run lint
+npm run build
+npm test
+git diff --check
+npx prettier --check .
+
+If Prettier alone fails, STOP before --write and prove formatting-only first.
+
+3) Start the real local Supabase stack
+--------------------------------------
+npx supabase status || npx supabase start
+npx supabase db reset
+
+Do not print or paste service-role keys or other secrets into chat.
+
+4) THE LIVE GATE — run Fix 2B-3 only first
+------------------------------------------
+RUN_SUPABASE_INTEGRATION_TESTS=true npx vitest run \
+  --config vitest.supabase.config.ts \
+  tests/integration/supabase-teacher-submission-readiness.integration.tsx
+
+Expected scenarios:
+- objective-only: UI blocks Submit + real server rejects invalid_payload
+- review-only: UI blocks Submit + real server rejects invalid_payload
+- real UI relink: Objective A -> delete -> Objective B -> Save -> persisted B link -> Submit -> pending_review -> same revision visible to ReviewerWorkspace
+
+If this fails, do NOT patch blindly. Diagnose end-to-end by layer:
+UI -> TeacherWorkspace -> TeacherLessonEditor -> AuthoringService -> Repository -> RPC -> SQL validator -> Persistence -> Reviewer read.
+
+5) Only after the focused live gate passes, run full Supabase integration
+------------------------------------------------------------------------
+npm run test:supabase
+
+6) Final safety
+---------------
+npx prettier --check .
+npm run lint
+npm run build
+npm test
+git diff --check
+git status --short
+
+Do not tag v0.6 yet. A successful Fix 2B-3 closes the last live gate of 3-5A; Phase 3-5A closure and Phase 3-5B freeze/tag are separate steps.

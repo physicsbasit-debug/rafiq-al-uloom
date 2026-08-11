@@ -1,0 +1,15 @@
+TARGET BASELINE
+===============
+ec6ee191ba5221b5dd5cbe818f84ddc1d745b659
+
+The APPLY was generated from the approved Fix 2B-3 REVIEW v2.
+Before running tests in Codespaces, verify that the commit immediately before the upload commit is ec6ee19 and inspect the diff scope.
+
+Expected project changes only:
+- NEW src/features/teacher/workspace/teacher-submission-readiness.ts
+- MOD src/features/teacher/workspace/TeacherLessonEditor.tsx
+- MOD tests/features/teacher/TeacherLessonEditor.test.tsx
+- NEW tests/features/teacher/TeacherLessonEditorSubmissionReadiness.test.tsx
+- NEW tests/features/teacher/teacher-submission-readiness.test.ts
+- NEW tests/integration/supabase-teacher-submission-readiness.integration.tsx
+- NEW docs/PHASE_3_5A_FIX2B3_SUBMISSION_READINESS.md
