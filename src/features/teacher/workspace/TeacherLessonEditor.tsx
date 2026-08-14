@@ -1,6 +1,7 @@
 import type { ChangeEvent } from 'react';
 
 import { AppButton } from '@design-system/components/AppButton';
+import { AppCard } from '@design-system/components/AppCard';
 import type { AuthoringService, LessonRevision, LessonRevisionPayload } from '@services/authoring';
 
 import { TeacherObjectivesEditor } from './TeacherObjectivesEditor';
@@ -11,6 +12,7 @@ import {
   type SubmissionReadinessReason,
 } from './teacher-submission-readiness';
 import { useTeacherLessonEditor } from './useTeacherLessonEditor';
+import './teacher-workspace.css';
 
 interface TeacherLessonEditorProps {
   readonly service: AuthoringService;
@@ -91,21 +93,12 @@ export function TeacherLessonEditor({
           : 'تحرير مسودة الدرس';
 
   return (
-    <section aria-labelledby="teacher-lesson-editor-title">
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          gap: '1rem',
-          flexWrap: 'wrap',
-          marginBottom: '1rem',
-        }}
-      >
-        <div>
-          <h2 id="teacher-lesson-editor-title" style={{ margin: 0 }}>
-            {title}
-          </h2>
-          <p style={{ margin: '0.35rem 0 0' }}>
+    <section className="teacher-editor-shell" aria-labelledby="teacher-lesson-editor-title">
+      <div className="teacher-editor-header">
+        <div className="teacher-editor-heading-copy">
+          <span className="teacher-editor-eyebrow">مساحة تأليف الدرس</span>
+          <h2 id="teacher-lesson-editor-title">{title}</h2>
+          <p>
             {session.mode === 'revise_rejected'
               ? 'سيُنشأ إصدار مسودة جديد عند أول حفظ ناجح. النسخة المرفوضة الأصلية لن تُعدّل.'
               : session.mode === 'readonly_pending_review'
@@ -115,7 +108,7 @@ export function TeacherLessonEditor({
                   : 'احفظ يدويًا عندما تنتهي من تعديلاتك.'}
           </p>
         </div>
-        <div style={{ width: '150px' }}>
+        <div className="teacher-editor-back-action">
           <AppButton
             label="العودة"
             variant="secondary"
@@ -126,174 +119,210 @@ export function TeacherLessonEditor({
       </div>
 
       {error ? (
-        <div role="alert" style={{ marginBottom: '1rem' }}>
+        <div className="teacher-alert teacher-alert--error" role="alert">
           {error.message}
         </div>
       ) : null}
 
-      <div style={{ display: 'grid', gap: '1rem' }}>
-        <label>
-          معرف الوحدة
-          <input
-            aria-label="معرف الوحدة"
-            value={payload.lesson.unitId}
-            disabled={readOnly || session.isSaving || session.isSubmitting}
-            onChange={(event: ChangeEvent<HTMLInputElement>) =>
-              updateLesson('unitId', event.target.value)
-            }
-          />
-        </label>
+      <div className="teacher-editor-stack">
+        <AppCard
+          title="بيانات الدرس"
+          subtitle="عرّف الدرس ومحتواه الأساسي. الحقول الطويلة تقبل أكثر من سطر عند الحاجة."
+        >
+          <div className="teacher-lesson-fields">
+            <label className="teacher-field">
+              <span className="teacher-field-label">معرف الوحدة</span>
+              <input
+                aria-label="معرف الوحدة"
+                value={payload.lesson.unitId}
+                disabled={readOnly || session.isSaving || session.isSubmitting}
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  updateLesson('unitId', event.target.value)
+                }
+              />
+            </label>
 
-        <label>
-          عنوان الدرس
-          <input
-            aria-label="عنوان الدرس"
-            value={payload.lesson.title}
-            disabled={readOnly || session.isSaving || session.isSubmitting}
-            onChange={(event: ChangeEvent<HTMLInputElement>) =>
-              updateLesson('title', event.target.value)
-            }
-          />
-        </label>
+            <label className="teacher-field teacher-field--wide">
+              <span className="teacher-field-label">عنوان الدرس</span>
+              <input
+                aria-label="عنوان الدرس"
+                value={payload.lesson.title}
+                disabled={readOnly || session.isSaving || session.isSubmitting}
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  updateLesson('title', event.target.value)
+                }
+              />
+            </label>
 
-        <label>
-          ترتيب العرض
-          <input
-            aria-label="ترتيب العرض"
-            type="number"
-            min={1}
-            value={payload.lesson.displayOrder}
-            disabled={readOnly || session.isSaving || session.isSubmitting}
-            onChange={(event: ChangeEvent<HTMLInputElement>) =>
-              updateLesson('displayOrder', Number(event.target.value))
-            }
-          />
-        </label>
+            <label className="teacher-field">
+              <span className="teacher-field-label">ترتيب العرض</span>
+              <input
+                aria-label="ترتيب العرض"
+                type="number"
+                min={1}
+                value={payload.lesson.displayOrder}
+                disabled={readOnly || session.isSaving || session.isSubmitting}
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  updateLesson('displayOrder', Number(event.target.value))
+                }
+              />
+            </label>
 
-        <label>
-          ملخص الدرس
-          <textarea
-            aria-label="ملخص الدرس"
-            value={payload.lesson.summary}
-            disabled={readOnly || session.isSaving || session.isSubmitting}
-            onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
-              updateLesson('summary', event.target.value)
-            }
-          />
-        </label>
+            <label className="teacher-field teacher-field--full">
+              <span className="teacher-field-label">ملخص الدرس</span>
+              <textarea
+                aria-label="ملخص الدرس"
+                value={payload.lesson.summary}
+                disabled={readOnly || session.isSaving || session.isSubmitting}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  updateLesson('summary', event.target.value)
+                }
+              />
+            </label>
 
-        <label>
-          المفاهيم الأساسية، مفهوم في كل سطر
-          <textarea
-            aria-label="المفاهيم الأساسية"
-            value={arrayToLines(payload.lesson.keyConcepts)}
-            disabled={readOnly || session.isSaving || session.isSubmitting}
-            onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
-              updateLesson('keyConcepts', linesToArray(event.target.value))
-            }
-          />
-        </label>
+            <label className="teacher-field teacher-field--full">
+              <span className="teacher-field-label">المفاهيم الأساسية</span>
+              <span className="teacher-field-hint">اكتب مفهومًا واحدًا في كل سطر.</span>
+              <textarea
+                aria-label="المفاهيم الأساسية"
+                value={arrayToLines(payload.lesson.keyConcepts)}
+                disabled={readOnly || session.isSaving || session.isSubmitting}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  updateLesson('keyConcepts', linesToArray(event.target.value))
+                }
+              />
+            </label>
 
-        <label>
-          الأمثلة، مثال في كل سطر
-          <textarea
-            aria-label="الأمثلة"
-            value={arrayToLines(payload.lesson.examples)}
-            disabled={readOnly || session.isSaving || session.isSubmitting}
-            onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
-              updateLesson('examples', linesToArray(event.target.value))
-            }
-          />
-        </label>
+            <label className="teacher-field teacher-field--full">
+              <span className="teacher-field-label">الأمثلة</span>
+              <span className="teacher-field-hint">اكتب مثالًا واحدًا في كل سطر.</span>
+              <textarea
+                aria-label="الأمثلة"
+                value={arrayToLines(payload.lesson.examples)}
+                disabled={readOnly || session.isSaving || session.isSubmitting}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  updateLesson('examples', linesToArray(event.target.value))
+                }
+              />
+            </label>
 
-        <label>
-          التصورات البديلة، تصور في كل سطر
-          <textarea
-            aria-label="التصورات البديلة"
-            value={arrayToLines(payload.lesson.misconceptions)}
-            disabled={readOnly || session.isSaving || session.isSubmitting}
-            onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
-              updateLesson('misconceptions', linesToArray(event.target.value))
-            }
-          />
-        </label>
-      </div>
-
-      <TeacherObjectivesEditor
-        objectives={payload.objectives}
-        questions={payload.questions}
-        readOnly={readOnly}
-        disabled={session.isSaving || session.isSubmitting}
-        onChange={(objectives) => updatePayload({ ...payload, objectives })}
-      />
-
-      <TeacherQuestionsEditor
-        objectives={payload.objectives}
-        questions={payload.questions}
-        readOnly={readOnly}
-        disabled={session.isSaving || session.isSubmitting}
-        onChange={(questions) => updatePayload({ ...payload, questions })}
-      />
-
-      <div style={{ marginTop: '1rem' }}>
-        <p>
-          المحتوى البنيوي الحالي: {payload.objectives.length} أهداف، {payload.questions.length}{' '}
-          أسئلة، {payload.games.length} ألعاب، {payload.experiments.length} تجارب.
-        </p>
-      </div>
-
-      {!readOnly ? (
-        <section aria-labelledby="teacher-submission-readiness-title" style={{ marginTop: '1rem' }}>
-          <h3 id="teacher-submission-readiness-title" style={{ marginBottom: '0.5rem' }}>
-            جاهزية الإرسال
-          </h3>
-          {submissionReadiness.ready ? (
-            <p>المحتوى مكتمل للإرسال.</p>
-          ) : (
-            <>
-              <p>غير جاهز للإرسال:</p>
-              <ul>
-                {submissionReadiness.reasons.map((reason) => (
-                  <li key={reason}>{SUBMISSION_REASON_MESSAGES[reason]}</li>
-                ))}
-              </ul>
-            </>
-          )}
-          {session.dirty ? <p>احفظ التغييرات قبل الإرسال للمراجعة.</p> : null}
-        </section>
-      ) : null}
-
-      {!readOnly ? (
-        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem', flexWrap: 'wrap' }}>
-          <div style={{ width: '190px' }}>
-            <AppButton
-              label={session.isSaving ? 'جارٍ الحفظ...' : 'حفظ المسودة'}
-              onClick={() => void save()}
-              disabled={
-                !session.dirty ||
-                session.isSaving ||
-                session.isSubmitting ||
-                questionStateIssue !== null
-              }
-            />
+            <label className="teacher-field teacher-field--full">
+              <span className="teacher-field-label">التصورات البديلة</span>
+              <span className="teacher-field-hint">اكتب تصورًا واحدًا في كل سطر.</span>
+              <textarea
+                aria-label="التصورات البديلة"
+                value={arrayToLines(payload.lesson.misconceptions)}
+                disabled={readOnly || session.isSaving || session.isSubmitting}
+                onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+                  updateLesson('misconceptions', linesToArray(event.target.value))
+                }
+              />
+            </label>
           </div>
-          <div style={{ width: '190px' }}>
-            <AppButton
-              label={session.isSubmitting ? 'جارٍ الإرسال...' : 'إرسال للمراجعة'}
-              variant="secondary"
-              onClick={requestSubmit}
-              disabled={!submitActionReady}
-            />
-          </div>
+        </AppCard>
+
+        <TeacherObjectivesEditor
+          objectives={payload.objectives}
+          questions={payload.questions}
+          readOnly={readOnly}
+          disabled={session.isSaving || session.isSubmitting}
+          onChange={(objectives) => updatePayload({ ...payload, objectives })}
+        />
+
+        <TeacherQuestionsEditor
+          objectives={payload.objectives}
+          questions={payload.questions}
+          readOnly={readOnly}
+          disabled={session.isSaving || session.isSubmitting}
+          onChange={(questions) => updatePayload({ ...payload, questions })}
+        />
+
+        <div className="teacher-structure-summary" aria-label="ملخص محتوى المسودة">
+          <span>
+            <strong>{payload.objectives.length}</strong> أهداف
+          </span>
+          <span>
+            <strong>{payload.questions.length}</strong> أسئلة
+          </span>
+          <span>
+            <strong>{payload.games.length}</strong> ألعاب
+          </span>
+          <span>
+            <strong>{payload.experiments.length}</strong> تجارب
+          </span>
         </div>
-      ) : null}
 
-      <dl style={{ marginTop: '1rem' }}>
-        <dt>النسخة الأصلية</dt>
-        <dd>{session.originRevisionId ?? 'جديدة'}</dd>
-        <dt>المسودة العاملة</dt>
-        <dd>{session.workingRevisionId ?? 'لم تُنشأ بعد'}</dd>
-      </dl>
+        {!readOnly ? (
+          <section
+            className={`teacher-readiness-card ${submissionReadiness.ready ? 'teacher-readiness-card--ready' : ''}`}
+            aria-labelledby="teacher-submission-readiness-title"
+          >
+            <div className="teacher-section-heading-row">
+              <div>
+                <span className="teacher-section-kicker">قبل الإرسال</span>
+                <h3 id="teacher-submission-readiness-title">جاهزية الإرسال</h3>
+              </div>
+              <span className="teacher-readiness-state">
+                {submissionReadiness.ready ? 'جاهز' : 'يحتاج استكمالًا'}
+              </span>
+            </div>
+
+            {submissionReadiness.ready ? (
+              <p className="teacher-readiness-message">المحتوى مكتمل للإرسال.</p>
+            ) : (
+              <>
+                <p className="teacher-readiness-message">
+                  أكمل النقاط التالية قبل الإرسال للمراجعة:
+                </p>
+                <ul className="teacher-readiness-list">
+                  {submissionReadiness.reasons.map((reason) => (
+                    <li key={reason}>{SUBMISSION_REASON_MESSAGES[reason]}</li>
+                  ))}
+                </ul>
+              </>
+            )}
+            {session.dirty ? (
+              <p className="teacher-readiness-dirty">احفظ التغييرات قبل الإرسال للمراجعة.</p>
+            ) : null}
+          </section>
+        ) : null}
+
+        {!readOnly ? (
+          <div className="teacher-editor-actions">
+            <div className="teacher-editor-action">
+              <AppButton
+                label={session.isSaving ? 'جارٍ الحفظ...' : 'حفظ المسودة'}
+                onClick={() => void save()}
+                disabled={
+                  !session.dirty ||
+                  session.isSaving ||
+                  session.isSubmitting ||
+                  questionStateIssue !== null
+                }
+              />
+            </div>
+            <div className="teacher-editor-action">
+              <AppButton
+                label={session.isSubmitting ? 'جارٍ الإرسال...' : 'إرسال للمراجعة'}
+                variant="secondary"
+                onClick={requestSubmit}
+                disabled={!submitActionReady}
+              />
+            </div>
+          </div>
+        ) : null}
+
+        <dl className="teacher-revision-metadata">
+          <div>
+            <dt>النسخة الأصلية</dt>
+            <dd>{session.originRevisionId ?? 'جديدة'}</dd>
+          </div>
+          <div>
+            <dt>المسودة العاملة</dt>
+            <dd>{session.workingRevisionId ?? 'لم تُنشأ بعد'}</dd>
+          </div>
+        </dl>
+      </div>
     </section>
   );
 }

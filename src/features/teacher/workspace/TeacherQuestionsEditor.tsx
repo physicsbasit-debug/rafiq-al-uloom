@@ -212,86 +212,116 @@ export function TeacherQuestionsEditor({
   };
 
   return (
-    <section aria-labelledby="teacher-questions-title" style={{ marginTop: '1.25rem' }}>
-      <div style={{ display: 'grid', gap: '0.35rem', marginBottom: '0.75rem' }}>
-        <h3 id="teacher-questions-title" style={{ margin: 0 }}>
-          أسئلة الدرس
-        </h3>
-        <p style={{ margin: 0 }}>
-          كل سؤال اختيار من متعدد يرتبط بهدف تعلم موجود حاليًا داخل نفس المسودة.
-        </p>
+    <section className="teacher-editor-card-section" aria-labelledby="teacher-questions-title">
+      <div className="teacher-section-heading-row">
+        <div className="teacher-section-heading-copy">
+          <span className="teacher-section-kicker">المكوّن الثالث</span>
+          <h3 id="teacher-questions-title">أسئلة الدرس</h3>
+          <p>كل سؤال اختيار من متعدد يرتبط بهدف تعلم موجود حاليًا داخل نفس المسودة.</p>
+        </div>
+        <span className="teacher-count-badge">{questions.length} أسئلة</span>
       </div>
 
       {questionStateIssue ? (
-        <div role="alert" style={{ marginBottom: '0.75rem' }}>
+        <div className="teacher-alert teacher-alert--warning" role="alert">
           بيانات الأسئلة الحالية تحتاج إلى تصحيح قبل حفظ هذه الحالة أو إرسالها.
         </div>
       ) : null}
 
       {message ? (
-        <div role="alert" style={{ marginBottom: '0.75rem' }}>
+        <div className="teacher-alert teacher-alert--warning" role="alert">
           {message}
         </div>
       ) : null}
 
       {questions.length === 0 ? (
-        <p>لا توجد أسئلة في هذه المسودة بعد.</p>
+        <div className="teacher-empty-state">لا توجد أسئلة في هذه المسودة بعد.</div>
       ) : (
-        <ol style={{ display: 'grid', gap: '0.75rem', paddingInlineStart: '1.5rem' }}>
+        <ol className="teacher-item-list teacher-question-list">
           {questions.map((question, index) => (
-            <li key={question.key}>
-              <div style={{ display: 'grid', gap: '0.4rem' }}>
-                <strong>{question.prompt}</strong>
-                <span>{question.purpose === 'mastery' ? 'إتقان' : 'مراجعة'}</span>
+            <li className="teacher-item-card teacher-question-card" key={question.key}>
+              <div className="teacher-question-card-header">
+                <div className="teacher-question-card-title-wrap">
+                  <span className="teacher-item-number" aria-hidden="true">
+                    {index + 1}
+                  </span>
+                  <strong className="teacher-item-title">{question.prompt}</strong>
+                </div>
+                <span className="teacher-purpose-badge">
+                  {question.purpose === 'mastery' ? 'إتقان' : 'مراجعة'}
+                </span>
+              </div>
+
+              <div className="teacher-question-meta">
                 <span>
                   الهدف:{' '}
                   {objectiveOptions.find((option) => option.key === question.objectiveKey)?.label ??
                     'غير موجود'}
                 </span>
-                <ul style={{ margin: 0, paddingInlineStart: '1.5rem' }}>
-                  {question.choices.map((choice, choiceIndex) => (
-                    <li key={choiceIndex}>
+              </div>
+
+              <ul className="teacher-choice-summary-list">
+                {question.choices.map((choice, choiceIndex) => (
+                  <li
+                    className={
+                      choiceIndex === question.correctAnswerIndex
+                        ? 'teacher-choice-summary teacher-choice-summary--correct'
+                        : 'teacher-choice-summary'
+                    }
+                    key={choiceIndex}
+                  >
+                    <span className="teacher-choice-index" aria-hidden="true">
+                      {choiceIndex + 1}
+                    </span>
+                    <span>
                       {choice}
                       {choiceIndex === question.correctAnswerIndex ? ' — الإجابة الصحيحة' : ''}
-                    </li>
-                  ))}
-                </ul>
-                <span>الشرح: {question.explanation}</span>
-                <span>
-                  الصعوبة:{' '}
-                  {DIFFICULTY_OPTIONS.find((option) => option.value === question.difficulty)
-                    ?.label ?? question.difficulty}
-                </span>
-                {!readOnly ? (
-                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                    <button
-                      type="button"
-                      aria-label={`تعديل السؤال ${index + 1}`}
-                      disabled={disabled}
-                      onClick={() => startEdit(question)}
-                    >
-                      تعديل
-                    </button>
-                    <button
-                      type="button"
-                      aria-label={`حذف السؤال ${index + 1}`}
-                      disabled={disabled}
-                      onClick={() => requestDelete(question)}
-                    >
-                      حذف
-                    </button>
-                  </div>
-                ) : null}
-              </div>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+
+              <span className="teacher-question-explanation">الشرح: {question.explanation}</span>
+
+              <span className="teacher-question-difficulty">
+                الصعوبة:{' '}
+                {DIFFICULTY_OPTIONS.find((option) => option.value === question.difficulty)?.label ??
+                  question.difficulty}
+              </span>
+
+              {!readOnly ? (
+                <div className="teacher-inline-actions">
+                  <button
+                    className="teacher-inline-action"
+                    type="button"
+                    aria-label={`تعديل السؤال ${index + 1}`}
+                    disabled={disabled}
+                    onClick={() => startEdit(question)}
+                  >
+                    تعديل
+                  </button>
+                  <button
+                    className="teacher-inline-action teacher-inline-action--danger"
+                    type="button"
+                    aria-label={`حذف السؤال ${index + 1}`}
+                    disabled={disabled}
+                    onClick={() => requestDelete(question)}
+                  >
+                    حذف
+                  </button>
+                </div>
+              ) : null}
             </li>
           ))}
         </ol>
       )}
 
       {!readOnly && !editor ? (
-        <div style={{ marginTop: '0.75rem' }}>
-          {objectives.length === 0 ? <p>أضف هدف تعلم أولًا حتى يمكن ربط السؤال به.</p> : null}
-          <div style={{ width: '180px' }}>
+        <div className="teacher-section-primary-action">
+          {objectives.length === 0 ? (
+            <p className="teacher-section-hint">أضف هدف تعلم أولًا حتى يمكن ربط السؤال به.</p>
+          ) : null}
+          <div className="teacher-section-primary-action-button">
             <AppButton
               label="إضافة سؤال"
               onClick={startAdd}
@@ -303,42 +333,49 @@ export function TeacherQuestionsEditor({
 
       {!readOnly && editor ? (
         <div
+          className="teacher-form-panel teacher-question-form-panel"
           role="group"
           aria-label={editor.mode === 'add' ? 'إضافة سؤال' : 'تعديل سؤال'}
-          style={{ display: 'grid', gap: '0.75rem', marginTop: '0.75rem' }}
         >
-          <label>
-            الغرض
-            <select
-              aria-label="غرض السؤال"
-              value={editor.form.purpose}
-              disabled={disabled}
-              onChange={(event) =>
-                updateForm({ purpose: event.target.value as QuestionDraft['purpose'] })
-              }
-            >
-              <option value="review">مراجعة</option>
-              <option value="mastery">إتقان</option>
-            </select>
-          </label>
+          <div className="teacher-form-panel-heading">
+            <strong>{editor.mode === 'add' ? 'سؤال جديد' : 'تعديل السؤال'}</strong>
+            <span>أكمل جميع البيانات ثم طبّق السؤال على المسودة.</span>
+          </div>
 
-          <label>
-            نص السؤال
-            <textarea
-              aria-label="نص السؤال"
-              value={editor.form.prompt}
-              disabled={disabled}
-              onChange={(event) => updateForm({ prompt: event.target.value })}
-            />
-          </label>
+          <div className="teacher-question-form-grid">
+            <label className="teacher-field">
+              <span className="teacher-field-label">الغرض</span>
+              <select
+                aria-label="غرض السؤال"
+                value={editor.form.purpose}
+                disabled={disabled}
+                onChange={(event) =>
+                  updateForm({ purpose: event.target.value as QuestionDraft['purpose'] })
+                }
+              >
+                <option value="review">مراجعة</option>
+                <option value="mastery">إتقان</option>
+              </select>
+            </label>
 
-          <fieldset disabled={disabled}>
+            <label className="teacher-field teacher-field--full">
+              <span className="teacher-field-label">نص السؤال</span>
+              <textarea
+                aria-label="نص السؤال"
+                value={editor.form.prompt}
+                disabled={disabled}
+                onChange={(event) => updateForm({ prompt: event.target.value })}
+              />
+            </label>
+          </div>
+
+          <fieldset className="teacher-choice-fieldset" disabled={disabled}>
             <legend>الاختيارات</legend>
-            <div style={{ display: 'grid', gap: '0.5rem' }}>
+            <div className="teacher-choice-editor-list">
               {editor.form.choices.map((choice, index) => (
-                <div key={index} style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  <label>
-                    الاختيار {index + 1}
+                <div className="teacher-choice-editor-row" key={index}>
+                  <label className="teacher-field teacher-choice-editor-field">
+                    <span className="teacher-field-label">الاختيار {index + 1}</span>
                     <input
                       aria-label={`الاختيار ${index + 1}`}
                       value={choice}
@@ -347,6 +384,7 @@ export function TeacherQuestionsEditor({
                   </label>
                   {editor.form.choices.length > 2 ? (
                     <button
+                      className="teacher-inline-action teacher-inline-action--danger teacher-choice-delete"
                       type="button"
                       aria-label={`حذف الاختيار ${index + 1}`}
                       onClick={() => removeChoice(index)}
@@ -357,84 +395,91 @@ export function TeacherQuestionsEditor({
                 </div>
               ))}
             </div>
-            <button type="button" onClick={addChoice}>
+            <button
+              className="teacher-inline-action teacher-choice-add"
+              type="button"
+              onClick={addChoice}
+            >
               إضافة اختيار
             </button>
           </fieldset>
 
-          <label>
-            الإجابة الصحيحة
-            <select
-              aria-label="الإجابة الصحيحة"
-              value={editor.form.correctAnswerIndex ?? ''}
-              disabled={disabled}
-              onChange={(event) =>
-                updateForm({
-                  correctAnswerIndex: event.target.value === '' ? null : Number(event.target.value),
-                })
-              }
-            >
-              <option value="">اختر الإجابة الصحيحة</option>
-              {editor.form.choices.map((choice, index) => (
-                <option key={index} value={index}>
-                  {`الاختيار ${index + 1}${choice.trim() ? `: ${choice}` : ''}`}
-                </option>
-              ))}
-            </select>
-          </label>
+          <div className="teacher-question-form-grid">
+            <label className="teacher-field">
+              <span className="teacher-field-label">الإجابة الصحيحة</span>
+              <select
+                aria-label="الإجابة الصحيحة"
+                value={editor.form.correctAnswerIndex ?? ''}
+                disabled={disabled}
+                onChange={(event) =>
+                  updateForm({
+                    correctAnswerIndex:
+                      event.target.value === '' ? null : Number(event.target.value),
+                  })
+                }
+              >
+                <option value="">اختر الإجابة الصحيحة</option>
+                {editor.form.choices.map((choice, index) => (
+                  <option key={index} value={index}>
+                    {`الاختيار ${index + 1}${choice.trim() ? `: ${choice}` : ''}`}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-          <label>
-            شرح الإجابة
-            <textarea
-              aria-label="شرح الإجابة"
-              value={editor.form.explanation}
-              disabled={disabled}
-              onChange={(event) => updateForm({ explanation: event.target.value })}
-            />
-          </label>
+            <label className="teacher-field teacher-field--full">
+              <span className="teacher-field-label">شرح الإجابة</span>
+              <textarea
+                aria-label="شرح الإجابة"
+                value={editor.form.explanation}
+                disabled={disabled}
+                onChange={(event) => updateForm({ explanation: event.target.value })}
+              />
+            </label>
 
-          <label>
-            الهدف المرتبط
-            <select
-              aria-label="الهدف المرتبط بالسؤال"
-              value={editor.form.objectiveKey}
-              disabled={disabled}
-              onChange={(event) => updateForm({ objectiveKey: event.target.value })}
-            >
-              <option value="">اختر هدف تعلم</option>
-              {objectiveOptions.map((objective) => (
-                <option key={objective.key} value={objective.key}>
-                  {objective.label}
-                </option>
-              ))}
-            </select>
-          </label>
+            <label className="teacher-field">
+              <span className="teacher-field-label">الهدف المرتبط</span>
+              <select
+                aria-label="الهدف المرتبط بالسؤال"
+                value={editor.form.objectiveKey}
+                disabled={disabled}
+                onChange={(event) => updateForm({ objectiveKey: event.target.value })}
+              >
+                <option value="">اختر هدف تعلم</option>
+                {objectiveOptions.map((objective) => (
+                  <option key={objective.key} value={objective.key}>
+                    {objective.label}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-          <label>
-            الصعوبة
-            <select
-              aria-label="صعوبة السؤال"
-              value={editor.form.difficulty}
-              disabled={disabled}
-              onChange={(event) => updateForm({ difficulty: event.target.value as Difficulty })}
-            >
-              {DIFFICULTY_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
+            <label className="teacher-field">
+              <span className="teacher-field-label">الصعوبة</span>
+              <select
+                aria-label="صعوبة السؤال"
+                value={editor.form.difficulty}
+                disabled={disabled}
+                onChange={(event) => updateForm({ difficulty: event.target.value as Difficulty })}
+              >
+                {DIFFICULTY_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
 
-          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <div style={{ width: '180px' }}>
+          <div className="teacher-editor-actions teacher-editor-actions--compact">
+            <div className="teacher-editor-action">
               <AppButton
                 label={editor.mode === 'add' ? 'إضافة السؤال' : 'حفظ تعديل السؤال'}
                 onClick={applyEdit}
                 disabled={disabled || !editor.form.objectiveKey}
               />
             </div>
-            <div style={{ width: '140px' }}>
+            <div className="teacher-editor-action teacher-editor-action--secondary">
               <AppButton
                 label="إلغاء"
                 variant="secondary"

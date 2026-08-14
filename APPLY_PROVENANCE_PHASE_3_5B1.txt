@@ -1,8 +1,0 @@
-PHASE 3-5B1 APPLY PROVENANCE
-
-PASS means APPLY overlay source is byte-identical to APPROVED REVIEW source.
-
-PASS: src/features/teacher/workspace/TeacherLessonEditor.tsx
-PASS: src/features/teacher/workspace/TeacherObjectivesEditor.tsx
-PASS: src/features/teacher/workspace/TeacherQuestionsEditor.tsx
-PASS: src/features/teacher/workspace/teacher-workspace.css

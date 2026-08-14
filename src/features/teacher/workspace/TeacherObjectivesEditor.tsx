@@ -101,76 +101,86 @@ export function TeacherObjectivesEditor({
   };
 
   return (
-    <section aria-labelledby="teacher-objectives-title" style={{ marginTop: '1.25rem' }}>
-      <div style={{ display: 'grid', gap: '0.35rem', marginBottom: '0.75rem' }}>
-        <h3 id="teacher-objectives-title" style={{ margin: 0 }}>
-          أهداف التعلم
-        </h3>
-        <p style={{ margin: 0 }}>
-          ترتبط الأسئلة لاحقًا بمفتاح داخلي ثابت لكل هدف. يظهر للمعلم نص الهدف فقط.
-        </p>
+    <section className="teacher-editor-card-section" aria-labelledby="teacher-objectives-title">
+      <div className="teacher-section-heading-row">
+        <div className="teacher-section-heading-copy">
+          <span className="teacher-section-kicker">المكوّن الثاني</span>
+          <h3 id="teacher-objectives-title">أهداف التعلم</h3>
+          <p>ترتبط الأسئلة لاحقًا بمفتاح داخلي ثابت لكل هدف. يظهر للمعلم نص الهدف فقط.</p>
+        </div>
+        <span className="teacher-count-badge">{objectives.length} أهداف</span>
       </div>
 
       {objectiveStateIssue ? (
-        <div role="alert" style={{ marginBottom: '0.75rem' }}>
+        <div className="teacher-alert teacher-alert--warning" role="alert">
           بيانات أهداف التعلم الحالية تحتاج إلى تصحيح قبل اعتمادها للحفظ.
         </div>
       ) : null}
 
       {message ? (
-        <div role="alert" style={{ marginBottom: '0.75rem' }}>
+        <div className="teacher-alert teacher-alert--warning" role="alert">
           {message}
         </div>
       ) : null}
 
       {objectives.length === 0 ? (
-        <p>لا توجد أهداف تعلم في هذه المسودة بعد.</p>
+        <div className="teacher-empty-state">لا توجد أهداف تعلم في هذه المسودة بعد.</div>
       ) : (
-        <ol style={{ display: 'grid', gap: '0.75rem', paddingInlineStart: '1.5rem' }}>
+        <ol className="teacher-item-list teacher-objective-list">
           {objectives.map((objective, index) => (
-            <li key={objective.key}>
-              <div style={{ display: 'grid', gap: '0.5rem' }}>
-                <span>{objective.text}</span>
-                {!readOnly ? (
-                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                    <button
-                      type="button"
-                      aria-label={`تعديل الهدف ${index + 1}`}
-                      disabled={disabled}
-                      onClick={() => startEdit(objective)}
-                    >
-                      تعديل
-                    </button>
-                    <button
-                      type="button"
-                      aria-label={`حذف الهدف ${index + 1}`}
-                      disabled={disabled}
-                      onClick={() => requestDelete(objective)}
-                    >
-                      حذف
-                    </button>
-                  </div>
-                ) : null}
+            <li className="teacher-item-card" key={objective.key}>
+              <div className="teacher-item-card-main">
+                <span className="teacher-item-number" aria-hidden="true">
+                  {index + 1}
+                </span>
+                <span className="teacher-item-title">{objective.text}</span>
               </div>
+              {!readOnly ? (
+                <div className="teacher-inline-actions">
+                  <button
+                    className="teacher-inline-action"
+                    type="button"
+                    aria-label={`تعديل الهدف ${index + 1}`}
+                    disabled={disabled}
+                    onClick={() => startEdit(objective)}
+                  >
+                    تعديل
+                  </button>
+                  <button
+                    className="teacher-inline-action teacher-inline-action--danger"
+                    type="button"
+                    aria-label={`حذف الهدف ${index + 1}`}
+                    disabled={disabled}
+                    onClick={() => requestDelete(objective)}
+                  >
+                    حذف
+                  </button>
+                </div>
+              ) : null}
             </li>
           ))}
         </ol>
       )}
 
       {!readOnly && !editor ? (
-        <div style={{ width: '180px', marginTop: '0.75rem' }}>
+        <div className="teacher-section-primary-action">
           <AppButton label="إضافة هدف" onClick={startAdd} disabled={disabled} />
         </div>
       ) : null}
 
       {!readOnly && editor ? (
         <div
+          className="teacher-form-panel"
           role="group"
           aria-label={editor.mode === 'add' ? 'إضافة هدف تعلم' : 'تعديل هدف تعلم'}
-          style={{ display: 'grid', gap: '0.75rem', marginTop: '0.75rem' }}
         >
-          <label>
-            نص هدف التعلم
+          <div className="teacher-form-panel-heading">
+            <strong>{editor.mode === 'add' ? 'هدف تعلم جديد' : 'تعديل هدف التعلم'}</strong>
+            <span>اكتب الهدف بصياغة واضحة ومباشرة.</span>
+          </div>
+
+          <label className="teacher-field">
+            <span className="teacher-field-label">نص هدف التعلم</span>
             <input
               aria-label="نص هدف التعلم"
               value={editor.text}
@@ -183,15 +193,15 @@ export function TeacherObjectivesEditor({
             />
           </label>
 
-          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <div style={{ width: '180px' }}>
+          <div className="teacher-editor-actions teacher-editor-actions--compact">
+            <div className="teacher-editor-action">
               <AppButton
                 label={editor.mode === 'add' ? 'إضافة الهدف' : 'حفظ تعديل الهدف'}
                 onClick={applyEdit}
                 disabled={disabled}
               />
             </div>
-            <div style={{ width: '140px' }}>
+            <div className="teacher-editor-action teacher-editor-action--secondary">
               <AppButton
                 label="إلغاء"
                 variant="secondary"
