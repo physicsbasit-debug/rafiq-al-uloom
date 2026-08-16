@@ -15,6 +15,26 @@ VITE_SUPABASE_ANON_KEY
 
 `VITE_SUPABASE_ANON_KEY` مفتاح عميل عام، وتظل الحماية معتمدة على RLS وGRANT.
 
+### 2.1 عقود البيئة حسب وضع التشغيل
+
+في تطوير المتصفح، يتتبع Git العنوان فقط عبر `.env.development`:
+
+```text
+VITE_SUPABASE_URL=/supabase
+```
+
+يبقى `VITE_SUPABASE_ANON_KEY` في `.env.local` المحلي غير المتتبع، ولا يُحفظ اسم Codespace أو عنوان Tunnel. يحل العميل `/supabase` من `window.location.origin` ثم يمر الطلب عبر Vite proxy إلى Supabase المحلية على `127.0.0.1:54321`.
+
+في Vitest، يستخدم وضع `test` عنوانًا مباشرًا عبر `.env.test`:
+
+```text
+VITE_SUPABASE_URL=http://127.0.0.1:54321
+```
+
+اختبارات التكامل التي تنشئ عملاء معزولين تكتشف بيئة Supabase المحلية مباشرة من `supabase status -o env`، لذلك لا تعتمد على Proxy المتصفح أو اسم Codespace.
+
+في الإنتاج لا يوجد `.env.production` متتبع. يجب على منصة النشر المستقبلية حقن `VITE_SUPABASE_URL` و`VITE_SUPABASE_ANON_KEY` وقت البناء. نجاح `vite build` وحده لا يثبت وجود تلك القيم في منصة نشر لم تُعرّف بعد.
+
 الممنوع داخل `src/` و`public/` و`dist/`:
 
 ```text

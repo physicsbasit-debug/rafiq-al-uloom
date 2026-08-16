@@ -7,6 +7,15 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  server: {
+    proxy: {
+      '/supabase': {
+        target: 'http://127.0.0.1:54321',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/supabase/, ''),
+      },
+    },
+  },
   test: {
     setupFiles: ['./tests/setup.ts'],
   },
