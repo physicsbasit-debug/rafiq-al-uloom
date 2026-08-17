@@ -1,6 +1,6 @@
 # رفيق العلوم — المعمارية
 
-## الحالة المعمارية الحالية فوق v0.5 المجمد
+## الحالة المعمارية الحالية — Phase 3 freeze candidate فوق v0.5 المجمد
 
 رفيق العلوم تطبيق React + Vite + TypeScript strict. طبقة الطالب الحالية تعمل خلف عقد بيانات غير متزامن واحد، ويمكن تشغيلها بمزوّد محلي أو Supabase دون تغيير واجهات الطالب.
 
@@ -11,7 +11,7 @@ v0.5-mastery-results-cloud-complete
 → c99ecf69a5225a03108798476dc69e75987d7595
 ```
 
-وقد اجتاز أمر الإغلاق الموحد 508 اختبارًا أساسيًا و89 اختبار تكامل Supabase، أي 597 اختبارًا فريدًا، مع Composition 2/2 وParity 10/10. Phase 3 جارية الآن: أُغلقت 3-0 و3-1 محليًا، و3-2 تضيف طبقة Repository/Service وتفعيل عمليات التأليف والمراجعة دون UI أو Migration جديدة.
+وقد اجتاز أمر الإغلاق الموحد 508 اختبارًا أساسيًا و89 اختبار تكامل Supabase، أي 597 اختبارًا فريدًا، مع Composition 2/2 وParity 10/10. النطاق الوظيفي لـPhase 3 موجود الآن على مرشح التجميد `bf413caccd4019847fa4bd311176771714d93870`: Authoring Plane وطبقة Repository/Service وTeacher Workspace وReviewer Workspace وSubmission Readiness واختبار تركيب Teacher/Reviewer حقيقي على Supabase المحلية. الإغلاق النهائي مشروط بنجاح `verify:phase-3-closure` وMobile Visual Acceptance ووجود الوسم `v0.6-teacher-dashboard-complete` على الالتزام نفسه.
 
 ## القرارات المعمارية المعتمدة
 
@@ -29,7 +29,7 @@ v0.5-mastery-results-cloud-complete
 | Supabase          | Schema + RLS + Seed + عميل + Repository + تكافؤ محلي مكتملة                                |
 | Auth والصلاحيات   | مكتملة ومجمّدة بالوسم `v0.4-auth-security-complete`                                        |
 | Cloud Persistence | نتائج الإتقان السحابية مكتملة عبر Service + Repository + RPC + RLS + idempotency + parity  |
-| لوحة المعلم       | Phase 3                                                                                    |
+| لوحة المعلم       | Phase 3 functional scope complete؛ final freeze candidate                                  |
 | AI                | Phase 4                                                                                    |
 | الاختبارات        | Vitest + React Testing Library + اختبار تكامل Supabase منفصل                               |
 
@@ -181,7 +181,7 @@ Composition وParity جزء من اختبارات Supabase الـ89، ويعاد
 
 ## Phase 3: Teacher Dashboard — الحدود المعمارية الفعلية
 
-Phase 3 لا تحول جداول المحتوى المنشور إلى مساحة تحرير. 3-0 ثبّت الفصل، و3-1 أنشأت Authoring Plane المحمية خادميًا، و3-2 تضيف طبقة العميل دون UI:
+Phase 3 لا تحول جداول المحتوى المنشور إلى مساحة تحرير. 3-0 ثبّت الفصل، و3-1 أنشأت Authoring Plane المحمية خادميًا، ثم أضيفت طبقة العميل وواجهتا المعلم والمراجع وبوابات الجاهزية والتركيب الحقيقي دون كسر الفصل بين التأليف والمحتوى المنشور:
 
 ```text
 Canonical Published Content
@@ -192,16 +192,16 @@ Authoring Plane
 → trusted RPC transitions
 ```
 
-المسار الفعلي بعد 3-2:
+المسار الفعلي في مرشح التجميد:
 
 ```text
-Teacher Workspace (Phase 3-3 لاحقًا)
+Teacher Workspace
 → AuthoringService
 → AuthoringRepository
 → supabase-authoring.repositories.ts
 → create/save/submit RPCs + RLS reads
 
-Reviewer Workspace (Phase 3-4 لاحقًا)
+Reviewer Workspace
 → ReviewService
 → ReviewRepository
 → supabase-authoring.repositories.ts
@@ -225,9 +225,16 @@ approved revision
 - هوية المؤلف والمراجع تُشتق خادميًا من `auth.uid()` و`profiles`، ولا يرسل العميل `author_id` أو `reviewer_id`.
 - أي تعديل على محتوى منشور يتم عبر Revision جديدة، ولا يستبدل النسخة المنشورة حتى الاعتماد.
 - Remote Supabase لرفيق العلوم مؤجلة حاليًا؛ التطوير والاختبارات التكاملية تتم على Supabase المحلية في Codespaces.
+- `src/App.css` يحذف في 3-5B بعد تدقيق ثلاثي أثبت أنه غير مستورد ولا تعتمد selectors الخاصة به وأن build ينجح بدونه؛ التنسيق الحي يبقى في design-system وCSS الخاص بالميزات.
+- إغلاق Phase 3 لا يغيّر SQL/RPC/RLS/Auth أو عقود Mastery Results؛ أي تغيير من هذا النوع يحتاج مرحلة مستقلة.
 - Phase 4 AI قد تنتج Draft مستقبلًا فقط؛ لا تملك مسار نشر مباشر.
 
-التفاصيل الملزمة في `docs/PHASE_3_0_TEACHER_DASHBOARD_CONTRACT.md` و`docs/PHASE_3_2_AUTHORING_CLIENT_LAYER_AUTHORIZATION.md`.
+التفاصيل الملزمة موزعة بين عقود Phase 3 التاريخية، وتثبت بوابة التجميد النهائية في:
+
+```text
+docs/PHASE_3_5B_CLOSURE_AND_FREEZE.md
+docs/PHASE_3_MOBILE_VISUAL_ACCEPTANCE.md
+```
 
 ## Mappers وحدود البيانات
 
@@ -271,6 +278,16 @@ npm run verify:mastery-results-closure
 ```
 
 تشغّل Build وLint و508 اختبارات أساسية وPrettier وفاحصي الحدود و`db reset` و89 اختبار Supabase، ثم تعيد Composition 2/2 وParity 10/10 صراحةً، وتتحقق أخيرًا من `git diff --check` ونظافة Git وتطابق `HEAD` مع `origin/main`.
+
+### بوابة إغلاق Phase 3
+
+```bash
+npm run verify:phase-3-closure
+```
+
+تشغّل فحص إزالة `App.css` وPrettier وLint وBuild والاختبارات الأساسية وفاحصي الحدود ثم تعيد بناء Supabase المحلية وتشغّل المجموعة التكاملية الكاملة وتعيد بوابة Teacher/Reviewer الحقيقية صراحةً، ثم تتحقق من `git diff --check` ونظافة Git وتطابق `HEAD` مع `origin/main`.
+
+العدد النهائي للاختبارات لا يُثبت مسبقًا داخل عقد 3-5B؛ خرج التنفيذ هو المرجع. النجاح الآلي لا ينشئ الوسم ولا يستبدل Mobile Visual Acceptance.
 
 ## القاعدة الحمراء
 

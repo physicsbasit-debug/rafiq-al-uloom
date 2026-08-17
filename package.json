@@ -13,7 +13,8 @@
     "test:mastery-results-composition": "RUN_SUPABASE_INTEGRATION_TESTS=true vitest run --config vitest.supabase.config.ts tests/integration/supabase-mastery-composition.integration.tsx",
     "test:mastery-results-parity": "RUN_SUPABASE_INTEGRATION_TESTS=true vitest run --config vitest.supabase.config.ts tests/integration/supabase-mastery-scoring-parity.integration.ts",
     "verify:auth-closure": "bash scripts/verify-auth-security.sh",
-    "verify:mastery-results-closure": "bash scripts/verify-mastery-results-closure.sh"
+    "verify:mastery-results-closure": "bash scripts/verify-mastery-results-closure.sh",
+    "verify:phase-3-closure": "bash scripts/verify-phase-3-closure.sh"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.111.0",

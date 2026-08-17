@@ -44,7 +44,9 @@ Git clean
 HEAD = origin/main
 ```
 
-أُغلقت Phase 3-1: Authoring Schema + RLS + Trusted Transitions بعد تطبيق الـMigration واختبارات PostgreSQL الحقيقية محليًا. اكتملت المراجعة المعمارية لـPhase 3-2: Repositories + Services + Authorization Activation واعتمدت، وبقي الإغلاق التنفيذي بعد تطبيق الحزمة وتشغيل بوابات build/lint/prettier والاختبارات المحلية. Remote Supabase لرفيق العلوم ما زالت مؤجلة عمدًا.
+اكتمل النطاق الوظيفي الحالي لـPhase 3 فوق المسار المحلي: Authoring Plane وRepository/Service وTeacher Workspace وReviewer Workspace وSubmission Readiness وبوابة التركيب الحقيقي Teacher/Reviewer موجودة على مرشح التجميد. الالتزام `bf413caccd4019847fa4bd311176771714d93870` هو baseline مراجعة Phase 3-5B، وقد اجتاز تدقيق `App.css` الثلاثي مع build ناجح بعد حذفه مؤقتًا وGit نظيف.
+
+قاعدة الحالة: تُعد Phase 3 `CLOSED & FROZEN` فقط إذا نجح `npm run verify:phase-3-closure` وMobile Visual Acceptance وكان الوسم `v0.6-teacher-dashboard-complete` موجودًا على الالتزام النهائي نفسه. ويُستخدم وصف **final freeze candidate** عندما لا تكون هذه الشروط مجتمعة. Remote Supabase لرفيق العلوم ما زالت مؤجلة عمدًا.
 
 ## خارطة الطريق المحدّثة
 
@@ -63,7 +65,7 @@ HEAD = origin/main
 | 2-C4     | Protected Operations + Access Guards      | عقد عمليات + محرك قرار + حراس React + اختبارات تجاوز الواجهة            | لا عملية محمية تعتمد على إخفاء الواجهة فقط               | مكتملة                                                                 |
 | 2-C5     | Auth Integration Tests & Security Closure | دورة حياة Auth + تركيب حقيقي + فحص أسرار + توثيق تشغيل وتجميد           | الوسم `v0.4-auth-security-complete` على الالتزام المتحقق | مكتملة                                                                 |
 | 2-D      | Cloud Persistence                         | حفظ نتائج الإتقان المرتبطة بالمستخدم عبر RPC وRLS مع retry وidempotency | مسار سحابي حقيقي + تكافؤ حسابي + أمر إغلاق موحد          | مكتملة / CLOSED                                                        |
-| 3        | Teacher Dashboard                         | تأليف بشري + مراجعة + اعتماد + نشر محكوم                                | teacher يؤلف وreviewer يراجع/يعتمد عبر حماية خلفية       | قيد التنفيذ؛ 3-0 و3-1 CLOSED، و3-2 REVIEW APPROVED / execution pending |
+| 3        | Teacher Dashboard                         | تأليف بشري + مراجعة + اعتماد + نشر محكوم                                | teacher يؤلف وreviewer يراجع/يعتمد عبر حماية خلفية       | final freeze candidate؛ 3-5B verification + mobile acceptance pending |
 | 4        | AI-assisted Authoring                     | توليد محتوى بمراجعة بشرية                                               | لا يصل أي محتوى مولّد إلى `approved` تلقائيًا            | مخططة                                                                  |
 | 5        | Advanced Science Activities               | توسيع الألعاب والتجارب والمحاكاة والأنشطة العلمية                       | كل نشاط مرتبط بهدف تعلم وقابل للاختبار                   | مخططة                                                                  |
 | 6        | Production Readiness                      | أمن، أداء، مراقبة أخطاء، نسخ احتياطي، نشر وتوثيق تشغيل                  | قائمة جاهزية إنتاج ناجحة                                 | مخططة                                                                  |
@@ -121,12 +123,13 @@ Phase 2-D `CLOSED & FROZEN` عند `v0.5-mastery-results-cloud-complete`، وا�
 ## تقسيم Phase 3 المقترح
 
 ```text
-3-0  Teacher Dashboard Contract & Architecture                 ✅ CLOSED @ 37a4024
-3-1  Authoring Schema + RLS + Trusted Transitions              ✅ CLOSED @ 37e2858
-3-2  Repositories + Services + Authorization Activation        🔄 REVIEW APPROVED / execution pending
-3-3  Teacher Workspace UI                                      ⏳
-3-4  Reviewer Workspace UI                                     ⏳
-3-5  Real Composition + Closure & Freeze                       ⏳
+3-0   Teacher Dashboard Contract & Architecture                 ✅ CLOSED @ 37a4024
+3-1   Authoring Schema + RLS + Trusted Transitions              ✅ CLOSED @ 37e2858
+3-2   Repositories + Services + Authorization Activation        ✅ COMPLETE ON FREEZE BASELINE
+3-3   Teacher Workspace UI                                      ✅ COMPLETE ON FREEZE BASELINE
+3-4   Reviewer Workspace UI                                     ✅ COMPLETE ON FREEZE BASELINE
+3-5A  Real Teacher/Reviewer Supabase Composition + Fixes         ✅ COMPLETE ON FREEZE BASELINE
+3-5B  Closure + Mobile Visual Acceptance + Freeze                🔄 FINAL FREEZE CANDIDATE
 ```
 
 دليل إغلاق 3-0: `508/508` basic + `89/89` Supabase + Git clean على `37a4024`.
@@ -153,9 +156,38 @@ Fix 1 الخاص بالتقاط UUID من `psql` اقتصر على اختبار 
 
 قرار التشغيل الحالي: Remote Supabase لمشروع `rafiq-al-uloom` مؤجلة عمدًا. تُجرى مراحل Phase 3 الحالية على Supabase المحلية داخل Codespaces، ولا يدخل `supabase link` أو `db push` ضمن بوابات الإغلاق المحلية حتى اعتماد خطة نشر بعيدة لاحقًا.
 
-Phase 3-2 لا تضيف Migration أو UI؛ نطاقها طبقة Repository/Service في TypeScript وتفعيل `author_content` و`review_content` بعد أن أثبتت 3-1 الحماية الخلفية واختبارات التجاوز.
+Phase 3-2 و3-3 و3-4 و3-5A أصبحت جزءًا من baseline التجميد الحالي. المسار الفعلي يشمل طبقة Repository/Service، Teacher Workspace، Reviewer Workspace، محرري الأهداف والأسئلة، Submission Readiness، واختبار تركيب حقيقي على Supabase المحلية. 3-5B لا تعيد فتح هذه العقود؛ وظيفتها الإغلاق والتجميد فقط.
 
 قاعدة Phase 3: لا تُمنح teacher أو reviewer كتابة مباشرة على جداول المحتوى المنشور. التأليف والمراجعة يمران عبر Authoring Plane منفصل، ولا يصل المحتوى إلى المسار الطلابي إلا بعد اعتماد reviewer ونشر خادمي ذري.
+
+## قاعدة الإغلاق والتجميد لـPhase 3
+
+قاعدة الحالة الشرطية:
+
+```text
+Phase 3 functional scope: complete on freeze baseline
+CLOSED & FROZEN: only when automated gate + mobile visual gate + tag all match the same final commit
+Required tag: v0.6-teacher-dashboard-complete
+```
+
+لا تُعلن Phase 3 `CLOSED & FROZEN` إلا إذا اجتمعت على الالتزام النهائي نفسه:
+
+```text
+npm run verify:phase-3-closure -> PASS
+Mobile Visual Acceptance -> PASS
+git status --short -> empty
+HEAD = origin/main
+remote annotated tag ^{} -> same final commit
+```
+
+قرار `App.css`: يحذف `src/App.css` في 3-5B بعد تدقيق تنفيذي مستقل أثبت عدم وجود reference أو selectors حية ونجاح build بعد حذفه مؤقتًا. هذا تنظيف dead code فقط ولا يفتح نطاق UI جديدًا.
+
+تفاصيل الإغلاق في:
+
+```text
+docs/PHASE_3_5B_CLOSURE_AND_FREEZE.md
+docs/PHASE_3_MOBILE_VISUAL_ACCEPTANCE.md
+```
 
 ## القرارات الملزمة لـPhase 2-C و2-D
 
