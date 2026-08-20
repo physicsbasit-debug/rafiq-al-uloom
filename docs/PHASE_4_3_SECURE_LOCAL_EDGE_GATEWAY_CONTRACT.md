@@ -2,15 +2,15 @@
 
 ## Secure Local Supabase Edge Gateway — Draft Contract for Architectural Review
 
-**Baseline المغلق:** Phase 4-2 — Field-level AI Authoring UX  
-**Baseline commit:** `0cc9427fb7dda83d9e260d4e7482d80a977e608a`  
+**Baseline المغلق:** Phase 4-2 — Field-level AI Authoring UX
+**Baseline commit:** `0cc9427fb7dda83d9e260d4e7482d80a977e608a`
 **يعتمد على:**
 
 - `docs/PHASE_4_0_AI_AUTHORING_CONTRACT_ARCHITECTURE.md`
 - `docs/PHASE_4_1_PROVIDER_NEUTRAL_DOMAIN.md`
 - `docs/PHASE_4_2_FIELD_LEVEL_AI_UX.md`
 
-**طبيعة هذه الوثيقة:** عقد ومعمارية فقط.  
+**طبيعة هذه الوثيقة:** عقد ومعمارية فقط.
 **لا كود، لا نشر بعيد، لا تغيير لعقود Phase 3/4-1/4-2 المجمّدة قبل اعتماد هذه الوثيقة.**
 
 ---
