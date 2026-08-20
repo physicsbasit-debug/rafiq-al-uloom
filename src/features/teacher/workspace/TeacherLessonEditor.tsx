@@ -2,22 +2,102 @@ import type { ChangeEvent } from 'react';
 
 import { AppButton } from '@design-system/components/AppButton';
 import { AppCard } from '@design-system/components/AppCard';
+import type { AiAuthoringProvider, AiLessonContext } from '@services/ai-authoring';
 import type { AuthoringService, LessonRevision, LessonRevisionPayload } from '@services/authoring';
+import { getContentRepository } from '@services/data/content-repository.provider';
+import type { ContentRepository } from '@services/data/content.repository';
 
+import { TeacherAiSuggestionPanel } from './TeacherAiSuggestionPanel';
 import { TeacherObjectivesEditor } from './TeacherObjectivesEditor';
 import { TeacherQuestionsEditor } from './TeacherQuestionsEditor';
+import { createAiDestinationSnapshot, hasAiDestinationChanged } from './teacher-ai-acceptance';
 import { getQuestionStateIssue } from './teacher-lesson-structure';
 import {
   getLessonSubmissionReadiness,
   type SubmissionReadinessReason,
 } from './teacher-submission-readiness';
+import { useTeacherAiLessonContext } from './useTeacherAiLessonContext';
+import { useTeacherAiSuggestion } from './useTeacherAiSuggestion';
 import { useTeacherLessonEditor } from './useTeacherLessonEditor';
 import './teacher-workspace.css';
 
 interface TeacherLessonEditorProps {
   readonly service: AuthoringService;
+  readonly aiProvider?: AiAuthoringProvider | null;
+  readonly contentRepository?: ContentRepository;
   readonly revision?: LessonRevision | null;
   readonly onBack: () => void;
+}
+
+interface SummaryAiAssistantProps {
+  readonly provider: AiAuthoringProvider;
+  readonly lessonContext: AiLessonContext | null;
+  readonly contextKey: string;
+  readonly summary: string;
+  readonly disabled: boolean;
+  readonly onAccept: (summary: string) => void;
+}
+
+function SummaryAiAssistant({
+  provider,
+  lessonContext,
+  contextKey,
+  summary,
+  disabled,
+  onAccept,
+}: SummaryAiAssistantProps) {
+  const ai = useTeacherAiSuggestion({
+    provider,
+    activeIdentity: 'lesson-summary',
+    contextKey,
+  });
+
+  const requestSuggestion = () => {
+    if (!lessonContext || disabled) return;
+    void ai.requestSuggestion(
+      {
+        target: 'lesson_summary',
+        context: {
+          ...lessonContext,
+          currentSummary: summary,
+        },
+      },
+      createAiDestinationSnapshot(summary)
+    );
+  };
+
+  const acceptSuggestion = () => {
+    if (ai.state.status !== 'suggested' || ai.state.result.target !== 'lesson_summary') return;
+
+    if (
+      hasAiDestinationChanged(ai.state.destinationSnapshot, summary) &&
+      !window.confirm(
+        'لديك تعديلات كتبتها بعد طلب الاقتراح. استخدام الاقتراح سيستبدل ملخص الدرس الحالي.'
+      )
+    ) {
+      return;
+    }
+
+    onAccept(ai.state.result.suggestion.text);
+    ai.rejectSuggestion();
+  };
+
+  return (
+    <TeacherAiSuggestionPanel
+      state={ai.state}
+      disabled={disabled}
+      requestLabel="اقترح ملخصًا"
+      contextAvailable={lessonContext !== null}
+      onRequest={requestSuggestion}
+      onAccept={acceptSuggestion}
+      onReject={ai.rejectSuggestion}
+      preview={
+        ai.state.status === 'suggested' && ai.state.result.target === 'lesson_summary' ? (
+          <p>{ai.state.result.suggestion.text}</p>
+        ) : null
+      }
+    />
+  );
 }
 
 function linesToArray(value: string): readonly string[] {
@@ -41,6 +121,8 @@ const SUBMISSION_REASON_MESSAGES: Readonly<Record<SubmissionReadinessReason, str
 
 export function TeacherLessonEditor({
   service,
+  aiProvider = null,
+  contentRepository = getContentRepository(),
   revision = null,
   onBack,
 }: TeacherLessonEditorProps) {
@@ -63,6 +145,22 @@ export function TeacherLessonEditor({
   };
 
   const readOnly = session.isReadOnly;
+  const aiContextState = useTeacherAiLessonContext({
+    repository: contentRepository,
+    unitId: payload.lesson.unitId,
+    lessonTitle: payload.lesson.title,
+    enabled: aiProvider !== null && !readOnly,
+  });
+  const aiLessonContext = aiContextState.status === 'resolved' ? aiContextState.context : null;
+  const aiBaseContextKey = JSON.stringify({
+    unitId: payload.lesson.unitId,
+    lessonTitle: payload.lesson.title,
+    context: aiLessonContext,
+  });
+  const questionAiContextKey = JSON.stringify({
+    base: aiBaseContextKey,
+    objectives: payload.objectives.map(({ key, text }) => ({ key, text })),
+  });
   const questionStateIssue = getQuestionStateIssue(payload.questions, payload.objectives);
   const submissionReadiness = getLessonSubmissionReadiness(payload);
   const submitActionReady = session.canSubmit && submissionReadiness.ready;
@@ -180,6 +278,19 @@ export function TeacherLessonEditor({
               />
             </label>
 
+            {!readOnly && aiProvider ? (
+              <div className="teacher-field teacher-field--full">
+                <SummaryAiAssistant
+                  provider={aiProvider}
+                  lessonContext={aiLessonContext}
+                  contextKey={aiBaseContextKey}
+                  summary={payload.lesson.summary}
+                  disabled={session.isSaving || session.isSubmitting}
+                  onAccept={(summary) => updateLesson('summary', summary)}
+                />
+              </div>
+            ) : null}
+
             <label className="teacher-field teacher-field--full">
               <span className="teacher-field-label">المفاهيم الأساسية</span>
               <span className="teacher-field-hint">اكتب مفهومًا واحدًا في كل سطر.</span>
@@ -226,6 +337,15 @@ export function TeacherLessonEditor({
           questions={payload.questions}
           readOnly={readOnly}
           disabled={session.isSaving || session.isSubmitting}
+          ai={
+            !readOnly && aiProvider
+              ? {
+                  provider: aiProvider,
+                  lessonContext: aiLessonContext,
+                  contextKey: aiBaseContextKey,
+                }
+              : undefined
+          }
           onChange={(objectives) => updatePayload({ ...payload, objectives })}
         />
 
@@ -234,6 +354,15 @@ export function TeacherLessonEditor({
           questions={payload.questions}
           readOnly={readOnly}
           disabled={session.isSaving || session.isSubmitting}
+          ai={
+            !readOnly && aiProvider
+              ? {
+                  provider: aiProvider,
+                  lessonContext: aiLessonContext,
+                  contextKey: questionAiContextKey,
+                }
+              : undefined
+          }
           onChange={(questions) => updatePayload({ ...payload, questions })}
         />
 

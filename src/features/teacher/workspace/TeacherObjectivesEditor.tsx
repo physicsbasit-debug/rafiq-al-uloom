@@ -1,8 +1,15 @@
 import { useState } from 'react';
 
 import { AppButton } from '@design-system/components/AppButton';
+import type { AiAuthoringProvider, AiLessonContext } from '@services/ai-authoring';
 import type { LessonRevisionPayload } from '@services/authoring';
 
+import { TeacherAiSuggestionPanel } from './TeacherAiSuggestionPanel';
+import {
+  acceptObjectiveAiSuggestion,
+  createAiDestinationSnapshot,
+  hasAiDestinationChanged,
+} from './teacher-ai-acceptance';
 import {
   createObjectiveKey,
   getObjectiveStateIssue,
@@ -11,6 +18,7 @@ import {
   replaceObjectiveText,
   validateObjectiveDraft,
 } from './teacher-lesson-structure';
+import { useTeacherAiSuggestion } from './useTeacherAiSuggestion';
 
 type ObjectiveDraft = LessonRevisionPayload['objectives'][number];
 type QuestionDraft = LessonRevisionPayload['questions'][number];
@@ -25,7 +33,83 @@ interface TeacherObjectivesEditorProps {
   readonly questions: readonly QuestionDraft[];
   readonly readOnly: boolean;
   readonly disabled: boolean;
+  readonly ai?: {
+    readonly provider: AiAuthoringProvider;
+    readonly lessonContext: AiLessonContext | null;
+    readonly contextKey: string;
+  };
   readonly onChange: (objectives: readonly ObjectiveDraft[]) => void;
+}
+
+interface ObjectiveAiAssistantProps {
+  readonly provider: AiAuthoringProvider;
+  readonly lessonContext: AiLessonContext | null;
+  readonly contextKey: string;
+  readonly identity: string;
+  readonly text: string;
+  readonly disabled: boolean;
+  readonly onAccepted: (text: string) => void;
+  readonly onMessage: (message: string | null) => void;
+}
+
+function ObjectiveAiAssistant({
+  provider,
+  lessonContext,
+  contextKey,
+  identity,
+  text,
+  disabled,
+  onAccepted,
+  onMessage,
+}: ObjectiveAiAssistantProps) {
+  const ai = useTeacherAiSuggestion({ provider, activeIdentity: identity, contextKey });
+
+  const requestSuggestion = () => {
+    if (!lessonContext || disabled) return;
+    onMessage(null);
+    void ai.requestSuggestion(
+      { target: 'objective', context: lessonContext },
+      createAiDestinationSnapshot(text)
+    );
+  };
+
+  const acceptSuggestion = () => {
+    if (ai.state.status !== 'suggested' || ai.state.result.target !== 'objective') return;
+    if (
+      hasAiDestinationChanged(ai.state.destinationSnapshot, text) &&
+      !window.confirm(
+        'لديك تعديلات كتبتها بعد طلب الاقتراح. استخدام الاقتراح سيستبدل نص الهدف الحالي.'
+      )
+    ) {
+      return;
+    }
+
+    const acceptance = acceptObjectiveAiSuggestion(ai.state.result.suggestion);
+    if (!acceptance.valid) {
+      onMessage('وصل اقتراح هدف غير صالح، ولم يتغير النموذج.');
+      return;
+    }
+    onAccepted(acceptance.text);
+    onMessage(null);
+    ai.rejectSuggestion();
+  };
+
+  return (
+    <TeacherAiSuggestionPanel
+      state={ai.state}
+      disabled={disabled}
+      requestLabel="اقترح هدفًا"
+      contextAvailable={lessonContext !== null}
+      onRequest={requestSuggestion}
+      onAccept={acceptSuggestion}
+      onReject={ai.rejectSuggestion}
+      preview={
+        ai.state.status === 'suggested' && ai.state.result.target === 'objective' ? (
+          <p>{ai.state.result.suggestion.text}</p>
+        ) : null
+      }
+    />
+  );
 }
 
 export function TeacherObjectivesEditor({
@@ -33,6 +117,7 @@ export function TeacherObjectivesEditor({
   questions,
   readOnly,
   disabled,
+  ai,
   onChange,
 }: TeacherObjectivesEditorProps) {
   const [editor, setEditor] = useState<ObjectiveEditorState>(null);
@@ -192,6 +277,22 @@ export function TeacherObjectivesEditor({
               }
             />
           </label>
+
+          {ai ? (
+            <ObjectiveAiAssistant
+              key={editor.mode === 'add' ? 'objective:add' : `objective:${editor.key}`}
+              provider={ai.provider}
+              lessonContext={ai.lessonContext}
+              contextKey={ai.contextKey}
+              identity={editor.mode === 'add' ? 'objective:add' : `objective:${editor.key}`}
+              text={editor.text}
+              disabled={disabled}
+              onAccepted={(text) =>
+                setEditor((current) => (current ? { ...current, text } : current))
+              }
+              onMessage={setMessage}
+            />
+          ) : null}
 
           <div className="teacher-editor-actions teacher-editor-actions--compact">
             <div className="teacher-editor-action">

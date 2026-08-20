@@ -572,6 +572,59 @@
   font-size: var(--font-size-sm);
 }
 
+.teacher-ai-panel {
+  display: grid;
+  gap: var(--spacing-md);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  padding: var(--spacing-md);
+}
+
+.teacher-ai-panel-heading {
+  display: grid;
+  gap: var(--spacing-xs);
+}
+
+.teacher-ai-panel-heading span,
+.teacher-ai-panel-note,
+.teacher-ai-panel-status {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.teacher-ai-suggestion {
+  display: grid;
+  gap: var(--spacing-md);
+  border-inline-start: 3px solid var(--color-primary);
+  padding-inline-start: var(--spacing-md);
+}
+
+.teacher-ai-suggestion-preview p,
+.teacher-ai-question-preview ul {
+  margin: 0;
+}
+
+.teacher-ai-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.teacher-ai-action {
+  inline-size: 12rem;
+  max-inline-size: 100%;
+}
+
+.teacher-ai-action--secondary {
+  inline-size: 10rem;
+}
+
+.teacher-ai-request {
+  inline-size: fit-content;
+}
+
 @media (max-width: 48rem) {
   .teacher-editor-header,
   .teacher-editor-card-section,
@@ -612,5 +665,16 @@
   .teacher-editor-actions {
     display: grid;
     grid-template-columns: 1fr;
+  }
+
+  .teacher-ai-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .teacher-ai-action,
+  .teacher-ai-action--secondary,
+  .teacher-ai-request {
+    inline-size: 100%;
   }
 }

@@ -1,8 +1,16 @@
 import { useState } from 'react';
 
 import { AppButton } from '@design-system/components/AppButton';
+import type { AiAuthoringProvider, AiLessonContext } from '@services/ai-authoring';
 import type { LessonRevisionPayload } from '@services/authoring';
 
+import { TeacherAiSuggestionPanel } from './TeacherAiSuggestionPanel';
+import {
+  acceptQuestionAiSuggestion,
+  createAiDestinationSnapshot,
+  createQuestionAiDestinationValue,
+  hasAiDestinationChanged,
+} from './teacher-ai-acceptance';
 import {
   createQuestionKey,
   getAvailableObjectiveOptions,
@@ -13,6 +21,7 @@ import {
   validateQuestionDraft,
   type TeacherQuestionFormDraft,
 } from './teacher-lesson-structure';
+import { useTeacherAiSuggestion } from './useTeacherAiSuggestion';
 
 type ObjectiveDraft = LessonRevisionPayload['objectives'][number];
 type QuestionDraft = LessonRevisionPayload['questions'][number];
@@ -28,7 +37,111 @@ interface TeacherQuestionsEditorProps {
   readonly questions: readonly QuestionDraft[];
   readonly readOnly: boolean;
   readonly disabled: boolean;
+  readonly ai?: {
+    readonly provider: AiAuthoringProvider;
+    readonly lessonContext: AiLessonContext | null;
+    readonly contextKey: string;
+  };
   readonly onChange: (questions: readonly QuestionDraft[]) => void;
+}
+
+interface QuestionAiAssistantProps {
+  readonly provider: AiAuthoringProvider;
+  readonly lessonContext: AiLessonContext | null;
+  readonly contextKey: string;
+  readonly identity: string;
+  readonly form: TeacherQuestionFormDraft;
+  readonly objectives: readonly ObjectiveDraft[];
+  readonly disabled: boolean;
+  readonly onAccepted: (form: TeacherQuestionFormDraft) => void;
+  readonly onMessage: (message: string | null) => void;
+}
+
+function QuestionAiAssistant({
+  provider,
+  lessonContext,
+  contextKey,
+  identity,
+  form,
+  objectives,
+  disabled,
+  onAccepted,
+  onMessage,
+}: QuestionAiAssistantProps) {
+  const ai = useTeacherAiSuggestion({ provider, activeIdentity: identity, contextKey });
+
+  const requestSuggestion = () => {
+    if (!lessonContext || disabled || objectives.length === 0) return;
+    onMessage(null);
+    void ai.requestSuggestion(
+      {
+        target: form.purpose === 'mastery' ? 'mastery_question' : 'review_question',
+        context: {
+          ...lessonContext,
+          objectives: objectives.map(({ key, text }) => ({ key, text })),
+        },
+      },
+      createAiDestinationSnapshot(createQuestionAiDestinationValue(form))
+    );
+  };
+
+  const acceptSuggestion = () => {
+    if (ai.state.status !== 'suggested' || ai.state.result.suggestion.kind !== 'question') return;
+
+    if (
+      hasAiDestinationChanged(
+        ai.state.destinationSnapshot,
+        createQuestionAiDestinationValue(form)
+      ) &&
+      !window.confirm(
+        'لديك تعديلات كتبتها بعد طلب الاقتراح. استخدام الاقتراح سيستبدل بيانات السؤال الحالية.'
+      )
+    ) {
+      return;
+    }
+
+    const acceptance = acceptQuestionAiSuggestion(
+      ai.state.result.suggestion,
+      form.purpose,
+      objectives
+    );
+    if (!acceptance.valid) {
+      onMessage(
+        acceptance.reason === 'objective_not_available'
+          ? 'الهدف المرتبط بهذا الاقتراح لم يعد موجودًا. اختر هدفًا حاليًا ثم اطلب اقتراحًا جديدًا.'
+          : 'وصل اقتراح سؤال لا يمر عبر تحقق السؤال الحالي، ولم يتغير النموذج.'
+      );
+      return;
+    }
+
+    onAccepted(acceptance.form);
+    onMessage(null);
+    ai.rejectSuggestion();
+  };
+
+  return (
+    <TeacherAiSuggestionPanel
+      state={ai.state}
+      disabled={disabled}
+      requestLabel="اقترح سؤالًا"
+      contextAvailable={lessonContext !== null && objectives.length > 0}
+      onRequest={requestSuggestion}
+      onAccept={acceptSuggestion}
+      onReject={ai.rejectSuggestion}
+      preview={
+        ai.state.status === 'suggested' && ai.state.result.suggestion.kind === 'question' ? (
+          <div className="teacher-ai-question-preview">
+            <strong>{ai.state.result.suggestion.prompt}</strong>
+            <ul>
+              {ai.state.result.suggestion.choices.map((choice, index) => (
+                <li key={index}>{choice}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null
+      }
+    />
+  );
 }
 
 const DIFFICULTY_OPTIONS: readonly { readonly value: Difficulty; readonly label: string }[] = [
@@ -87,6 +200,7 @@ export function TeacherQuestionsEditor({
   questions,
   readOnly,
   disabled,
+  ai,
   onChange,
 }: TeacherQuestionsEditorProps) {
   const [editor, setEditor] = useState<QuestionEditorState>(null);
@@ -470,6 +584,23 @@ export function TeacherQuestionsEditor({
               </select>
             </label>
           </div>
+
+          {ai ? (
+            <QuestionAiAssistant
+              key={editor.mode === 'add' ? 'question:add' : `question:${editor.key}`}
+              provider={ai.provider}
+              lessonContext={ai.lessonContext}
+              contextKey={ai.contextKey}
+              identity={editor.mode === 'add' ? 'question:add' : `question:${editor.key}`}
+              form={editor.form}
+              objectives={objectives}
+              disabled={disabled}
+              onAccepted={(form) =>
+                setEditor((current) => (current ? { ...current, form } : current))
+              }
+              onMessage={setMessage}
+            />
+          ) : null}
 
           <div className="teacher-editor-actions teacher-editor-actions--compact">
             <div className="teacher-editor-action">

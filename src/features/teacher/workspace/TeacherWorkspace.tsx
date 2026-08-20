@@ -1,7 +1,10 @@
 import { useMemo, useState } from 'react';
 
 import { AppButton } from '@design-system/components/AppButton';
+import { DeterministicAiAuthoringProvider, type AiAuthoringProvider } from '@services/ai-authoring';
 import { authoringService, type AuthoringService, type LessonRevision } from '@services/authoring';
+import { getContentRepository } from '@services/data/content-repository.provider';
+import type { ContentRepository } from '@services/data/content.repository';
 
 import { TeacherDraftList } from './TeacherDraftList';
 import { TeacherLessonEditor } from './TeacherLessonEditor';
@@ -11,6 +14,8 @@ import { useTeacherDrafts } from './useTeacherDrafts';
 
 interface TeacherWorkspaceInternalProps extends TeacherWorkspaceProps {
   readonly service?: AuthoringService;
+  readonly aiProvider?: AiAuthoringProvider;
+  readonly contentRepository?: ContentRepository;
 }
 
 type WorkspaceScreen =
@@ -26,9 +31,12 @@ const FILTERS: readonly { value: TeacherRevisionFilter; label: string }[] = [
 
 const noopCreate = () => undefined;
 const noopOpenRevision: (revision: LessonRevision) => void = () => undefined;
+const defaultAiProvider = new DeterministicAiAuthoringProvider();
 
 export function TeacherWorkspace({
   service = authoringService,
+  aiProvider = defaultAiProvider,
+  contentRepository = getContentRepository(),
   onCreateLesson = noopCreate,
   onOpenRevision = noopOpenRevision,
 }: TeacherWorkspaceInternalProps) {
@@ -46,6 +54,8 @@ export function TeacherWorkspace({
       <TeacherLessonEditor
         key={screen.revision?.id ?? 'new'}
         service={service}
+        aiProvider={aiProvider}
+        contentRepository={contentRepository}
         revision={screen.revision}
         onBack={() => {
           setScreen({ kind: 'list' });
