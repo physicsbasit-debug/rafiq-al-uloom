@@ -7,6 +7,7 @@ import {
 
 import { generateFakeServerResult } from './fake-server-provider.ts';
 import { authorizeActiveTeacher } from './gateway-auth.ts';
+import { consumeAiAuthoringQuota } from './gateway-quota.ts';
 
 const MAX_BODY_BYTES = 32 * 1024;
 const ALLOWED_ORIGINS = new Set([
@@ -55,6 +56,28 @@ function jsonResponse(request: Request, status: number, body: unknown): Response
 
 function genericError(request: Request, status: number, error: string): Response {
   return jsonResponse(request, status, { error });
+}
+
+function rateLimitedResponse(
+  request: Request,
+  quota: Extract<Awaited<ReturnType<typeof consumeAiAuthoringQuota>>, { status: 'rate_limited' }>
+): Response {
+  const headers = responseHeaders(request);
+  headers.set('retry-after', String(quota.retryAfterSeconds));
+
+  return new Response(
+    JSON.stringify({
+      error: 'rate_limited',
+      limitReason: quota.limitReason,
+      remainingBurst: quota.remainingBurst,
+      remainingDaily: quota.remainingDaily,
+      retryAfterSeconds: quota.retryAfterSeconds,
+    }),
+    {
+      status: 429,
+      headers,
+    }
+  );
 }
 
 function readDeclaredLength(request: Request): number | null {
@@ -192,5 +215,19 @@ export async function handleAiAuthoringGatewayRequest(request: Request): Promise
   }
 
   const generationRequest = parsed.body as RuntimeAiGenerationRequest;
+
+  // Phase 4-3B: reserve quota only after strict request validation and immediately
+  // before provider invocation. A committed reservation is intentionally not refunded.
+  const quota = await consumeAiAuthoringQuota(request);
+  if (quota.status === 'forbidden') {
+    return genericError(request, 403, 'forbidden');
+  }
+  if (quota.status === 'unavailable') {
+    return genericError(request, 503, 'quota_unavailable');
+  }
+  if (quota.status === 'rate_limited') {
+    return rateLimitedResponse(request, quota);
+  }
+
   return jsonResponse(request, 200, generateFakeServerResult(generationRequest));
 }

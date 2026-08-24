@@ -27,6 +27,10 @@ const RUNTIME_CONTRACT = resolve(
   process.cwd(),
   'src/services/ai-authoring/ai-authoring.runtime-contract.ts'
 );
+const QUOTA_MIGRATION = resolve(
+  process.cwd(),
+  'supabase/migrations/20260821183000_add_ai_authoring_quota.sql'
+);
 
 function readGatewayFiles(): readonly { readonly path: string; readonly content: string }[] {
   return readdirSync(GATEWAY_DIR)
@@ -37,7 +41,7 @@ function readGatewayFiles(): readonly { readonly path: string; readonly content:
     }));
 }
 
-describe('architecture: Phase 4-3A local AI gateway boundary', () => {
+describe('architecture: Phase 4-3A/4-3B local AI gateway boundary', () => {
   it('يستخدم مصدر validator تنفيذيًا واحدًا للمتصفح والـEdge', () => {
     const publicContract = readFileSync(PUBLIC_CONTRACT, 'utf8');
     const handler = readFileSync(resolve(GATEWAY_DIR, 'gateway-handler.ts'), 'utf8');
@@ -95,11 +99,47 @@ describe('architecture: Phase 4-3A local AI gateway boundary', () => {
     expect(sizeRead).toBeLessThan(authRead);
   });
 
-  it('لا يملك Gateway أي مسار نشر/Revision أو Service Role أو RPC', () => {
+  it('يضع الحصة بعد validation وقبل provider دون مسار تجاوز', () => {
+    const handler = readFileSync(resolve(GATEWAY_DIR, 'gateway-handler.ts'), 'utf8');
+
+    const validation = handler.lastIndexOf('validateAiGenerationRequestRuntime(parsed.body)');
+    const quota = handler.lastIndexOf('await consumeAiAuthoringQuota(request)');
+    const provider = handler.lastIndexOf('generateFakeServerResult(generationRequest)');
+
+    expect(validation).toBeGreaterThan(-1);
+    expect(quota).toBeGreaterThan(validation);
+    expect(provider).toBeGreaterThan(quota);
+
+    expect(handler).toContain("quota.status === 'forbidden'");
+    expect(handler).toContain("quota.status === 'unavailable'");
+    expect(handler).toContain("quota.status === 'rate_limited'");
+    expect(handler).toContain("'quota_unavailable'");
+  });
+
+  it('يجمد عقد quota الذري بلا معاملات ولا وقت أو حدود من العميل', () => {
+    const migration = readFileSync(QUOTA_MIGRATION, 'utf8');
+    const quotaClient = readFileSync(resolve(GATEWAY_DIR, 'gateway-quota.ts'), 'utf8');
+
+    expect(migration).toMatch(
+      /CREATE FUNCTION public\.consume_ai_authoring_quota\(\)\s*RETURNS TABLE/
+    );
+    expect(migration).toContain('v_user_id := auth.uid()');
+    expect(migration).toContain('ON CONFLICT (user_id) DO NOTHING');
+    expect(migration).toContain('FOR UPDATE');
+    expect(migration).toContain('clock_timestamp()');
+    expect(migration).toContain('SECURITY DEFINER');
+    expect(migration).toContain("SET search_path = ''");
+    expect(migration).toContain('TO authenticated');
+
+    expect(quotaClient).toContain('/rest/v1/rpc/consume_ai_authoring_quota');
+    expect(quotaClient).toContain("body: '{}'");
+    expect(quotaClient).not.toMatch(/\b(userId|user_id|quotaLimit|quota_limit|timestamp)\b/);
+  });
+
+  it('لا يملك Gateway أي مسار نشر/Revision أو Service Role', () => {
     const forbidden = [
       'SUPABASE_SERVICE_ROLE_KEY',
       'service_role',
-      '.rpc(',
       'create_lesson_revision',
       'save_lesson_revision',
       'submit_lesson_revision',
@@ -117,7 +157,7 @@ describe('architecture: Phase 4-3A local AI gateway boundary', () => {
     expect(violations).toEqual([]);
   });
 
-  it('لا يدخل مفتاح AI أو مزود حي إلى 4-3A', () => {
+  it('لا يدخل مفتاح AI أو مزود حي إلى 4-3B', () => {
     const forbidden = [
       'OPENAI_API_KEY',
       'ANTHROPIC_API_KEY',
@@ -134,7 +174,7 @@ describe('architecture: Phase 4-3A local AI gateway boundary', () => {
     expect(violations).toEqual([]);
   });
 
-  it('يبقي المزود الخادمي في 4-3A حتميًا ومحليًا', () => {
+  it('يبقي المزود الخادمي في 4-3B حتميًا ومحليًا', () => {
     const provider = readFileSync(resolve(GATEWAY_DIR, 'fake-server-provider.ts'), 'utf8');
 
     expect(provider).toContain("providerFamily: 'local_fake'");

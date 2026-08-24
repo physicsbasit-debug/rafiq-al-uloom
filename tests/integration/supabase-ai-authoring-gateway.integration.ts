@@ -1,6 +1,7 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import {
+  psqlAdmin,
   readLocalSupabaseEnvironment,
   SupabaseAuthFixtures,
   type AuthIdentity,
@@ -22,24 +23,41 @@ function lessonContext() {
   } as const;
 }
 
-describeIntegration('Supabase AI authoring gateway 4-3A', () => {
+function uuidLiteral(id: string): string {
+  if (!/^[0-9a-f-]{36}$/i.test(id)) {
+    throw new Error(`Unexpected fixture UUID: ${id}`);
+  }
+  return `'${id}'::uuid`;
+}
+
+describeIntegration('Supabase AI authoring gateway 4-3B', () => {
   let env: LocalSupabaseEnvironment;
   let fixtures: SupabaseAuthFixtures;
   let teacher: AuthIdentity;
   let student: AuthIdentity;
   let reviewer: AuthIdentity;
+  let pendingTeacher: AuthIdentity;
   let suspendedTeacher: AuthIdentity;
 
   beforeAll(async () => {
     env = readLocalSupabaseEnvironment();
     fixtures = new SupabaseAuthFixtures(env);
 
-    [teacher, student, reviewer, suspendedTeacher] = await Promise.all([
+    [teacher, student, reviewer, pendingTeacher, suspendedTeacher] = await Promise.all([
       fixtures.createIdentity('ai-gateway-teacher', 'teacher', 'active'),
       fixtures.createIdentity('ai-gateway-student', 'student', 'active'),
       fixtures.createIdentity('ai-gateway-reviewer', 'reviewer', 'active'),
+      fixtures.createIdentity('ai-gateway-pending', 'teacher', 'pending'),
       fixtures.createIdentity('ai-gateway-suspended', 'teacher', 'suspended'),
     ]);
+  });
+
+  beforeEach(() => {
+    const ids = [teacher, student, reviewer, pendingTeacher, suspendedTeacher]
+      .map((identity) => uuidLiteral(identity.user.id))
+      .join(', ');
+
+    psqlAdmin(`DELETE FROM private.ai_authoring_quota_state WHERE user_id IN (${ids});`);
   });
 
   afterAll(async () => {
@@ -96,10 +114,10 @@ describeIntegration('Supabase AI authoring gateway 4-3A', () => {
     }
   });
 
-  it('يرفض الطالب والمراجع والمعلم الموقوف خادميًا', async () => {
+  it('يرفض الطالب والمراجع والمعلم pending أو suspended خادميًا', async () => {
     const request = { target: 'objective', context: lessonContext() };
 
-    for (const identity of [student, reviewer, suspendedTeacher]) {
+    for (const identity of [student, reviewer, pendingTeacher, suspendedTeacher]) {
       const response = await invoke(identity, request);
       expect(response.status).toBe(403);
       expect(await readJson(response)).toEqual({ error: 'forbidden' });
@@ -123,6 +141,55 @@ describeIntegration('Supabase AI authoring gateway 4-3A', () => {
     expect(body.status).toBe('rejected');
     expect(body.reason).toBe('invalid_request');
     expect(body.requestReason).toBe('unexpected_request_fields');
+  });
+
+  it('لا تستهلك الطلبات غير الصالحة الحصة قبل validator', async () => {
+    for (let index = 0; index < 8; index += 1) {
+      const invalid = await invoke(teacher, {
+        target: 'objective',
+        context: lessonContext(),
+        rawPrompt: `invalid-${index}`,
+      });
+      expect(invalid.status).toBe(400);
+    }
+
+    for (let index = 0; index < 6; index += 1) {
+      const valid = await invoke(teacher, {
+        target: 'objective',
+        context: lessonContext(),
+      });
+      expect(valid.status).toBe(200);
+    }
+
+    const limited = await invoke(teacher, {
+      target: 'objective',
+      context: lessonContext(),
+    });
+    expect(limited.status).toBe(429);
+  });
+
+  it('يعيد 429 وRetry-After بعد ست محاولات صالحة في نافذة burst', async () => {
+    const request = { target: 'objective', context: lessonContext() };
+
+    for (let index = 0; index < 6; index += 1) {
+      const response = await invoke(teacher, request);
+      expect(response.status).toBe(200);
+    }
+
+    const response = await invoke(teacher, request);
+    expect(response.status).toBe(429);
+
+    const body = await readJson(response);
+    expect(body.error).toBe('rate_limited');
+    expect(body.limitReason).toBe('burst');
+    expect(body.remainingBurst).toBe(0);
+    expect(body.remainingDaily).toBe(74);
+    expect(body.retryAfterSeconds).toEqual(expect.any(Number));
+
+    const retryAfter = Number(response.headers.get('retry-after'));
+    expect(Number.isInteger(retryAfter)).toBe(true);
+    expect(retryAfter).toBeGreaterThanOrEqual(1);
+    expect(retryAfter).toBeLessThanOrEqual(60);
   });
 
   it('يرفض target غير صالح عند حد HTTP دون اختراع target مزيف', async () => {
