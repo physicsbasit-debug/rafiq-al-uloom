@@ -1,4 +1,4 @@
-import { type Dispatch, type SetStateAction, useState } from 'react';
+import { type Dispatch, type SetStateAction, useMemo, useState } from 'react';
 
 import { AppButton } from '@design-system/components/AppButton';
 import { colors } from '@design-system/theme/colors';
@@ -19,6 +19,8 @@ import { SemesterSelection } from '@features/student/semester-selection/Semester
 import { SubjectSelection } from '@features/student/subject-selection/SubjectSelection';
 import { UnitSelection } from '@features/student/unit-selection/UnitSelection';
 import { TeacherWorkspace } from '@features/teacher/workspace';
+import { GatewayAiAuthoringProvider } from '@services/ai-authoring';
+import { getSupabaseClient } from '@services/data/supabase-client';
 
 type AppSurface = 'student' | 'teacher' | 'reviewer';
 
@@ -132,10 +134,28 @@ function StudentExperience({ step, setStep }: StudentExperienceProps) {
   );
 }
 
+function resolveAiGatewayUrl(baseUrl: string | undefined): string {
+  const normalized = baseUrl?.trim().replace(/\/+$/, '') ?? '';
+  return normalized ? `${normalized}/functions/v1/ai-authoring-gateway` : '';
+}
+
 export function AppContent() {
   const [step, setStep] = useState<Step>({ name: 'grade' });
   const [appSurface, setAppSurface] = useState<AppSurface>('student');
   const session = useAuthSession();
+  const aiProvider = useMemo(
+    () =>
+      new GatewayAiAuthoringProvider({
+        gatewayUrl: resolveAiGatewayUrl(import.meta.env.VITE_SUPABASE_URL),
+        publicApiKey: import.meta.env.VITE_SUPABASE_ANON_KEY ?? '',
+        getAccessToken: async () => {
+          const { data, error } = await getSupabaseClient().auth.getSession();
+          if (error) return null;
+          return data.session?.access_token ?? null;
+        },
+      }),
+    []
+  );
 
   const authenticated = session.authState.status === 'authenticated';
   const showGuestExperience =
@@ -280,7 +300,7 @@ export function AppContent() {
 
                 {appSurface === 'teacher' ? (
                   <RequireCapability operation="access_teacher_workspace">
-                    <TeacherWorkspace />
+                    <TeacherWorkspace aiProvider={aiProvider} />
                   </RequireCapability>
                 ) : null}
 

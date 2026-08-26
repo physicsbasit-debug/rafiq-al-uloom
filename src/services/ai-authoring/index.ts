@@ -5,6 +5,10 @@ export {
   type DeterministicAiAuthoringProviderOptions,
   type DeterministicAiBehavior,
 } from './deterministic-ai-authoring.provider';
+export {
+  GatewayAiAuthoringProvider,
+  type GatewayAiAuthoringProviderDependencies,
+} from './gateway-ai-authoring.provider';
 export type {
   AiAuthoringLanguage,
   AiAuthoringTarget,

@@ -9,6 +9,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest
 import { ReviewerWorkspace } from '@features/reviewer/workspace/ReviewerWorkspace';
 import { TeacherLessonEditor } from '@features/teacher/workspace/TeacherLessonEditor';
 import { TeacherWorkspace } from '@features/teacher/workspace/TeacherWorkspace';
+import { DeterministicAiAuthoringProvider } from '@services/ai-authoring';
 import type { ReadyAuthState } from '@services/auth/auth.types';
 import type { AuthorizationState } from '@services/auth/authorization.types';
 import {
@@ -32,6 +33,8 @@ import {
   SupabaseAuthFixtures,
   type AuthIdentity,
 } from './helpers/supabase-auth-fixtures';
+
+const aiProvider = new DeterministicAiAuthoringProvider();
 
 const runIntegration = process.env.RUN_SUPABASE_INTEGRATION_TESTS === 'true';
 const describeIntegration = runIntegration ? describe : describe.skip;
@@ -275,7 +278,9 @@ describeIntegration(
       const confirm = vi.spyOn(window, 'confirm').mockReturnValue(true);
 
       try {
-        const teacherView = render(<TeacherWorkspace service={teacherServices.authoring} />);
+        const teacherView = render(
+          <TeacherWorkspace aiProvider={aiProvider} service={teacherServices.authoring} />
+        );
         await screen.findByRole('heading', { name: 'مساحة المعلم' }, { timeout: 8_000 });
         fireEvent.click(screen.getByRole('button', { name: 'إنشاء درس جديد' }));
         fillNewLessonMetadata(title, nextDisplayOrder(80));

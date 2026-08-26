@@ -8,6 +8,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest
 
 import { ReviewerWorkspace } from '@features/reviewer/workspace/ReviewerWorkspace';
 import { TeacherWorkspace } from '@features/teacher/workspace/TeacherWorkspace';
+import { DeterministicAiAuthoringProvider } from '@services/ai-authoring';
 import type { ReadyAuthState } from '@services/auth/auth.types';
 import { authorizeOperation } from '@services/auth/authorization.policy';
 import type { AuthorizationState } from '@services/auth/authorization.types';
@@ -31,6 +32,8 @@ import {
   SupabaseAuthFixtures,
   type AuthIdentity,
 } from './helpers/supabase-auth-fixtures';
+
+const aiProvider = new DeterministicAiAuthoringProvider();
 
 const runIntegration = process.env.RUN_SUPABASE_INTEGRATION_TESTS === 'true';
 const describeIntegration = runIntegration ? describe : describe.skip;
@@ -288,7 +291,7 @@ describeIntegration(
           )
         ).toEqual({ allowed: true, reason: 'allowed' });
 
-        render(<TeacherWorkspace service={authoring} />);
+        render(<TeacherWorkspace aiProvider={aiProvider} service={authoring} />);
         expect(
           await screen.findByText(
             'لا توجد لديك مسودات بعد. ابدأ بإنشاء درس جديد.',
@@ -336,7 +339,9 @@ describeIntegration(
         if (created.status !== 'created') throw new Error('Expected valid real draft creation.');
         const revisionA = created.revision.id;
 
-        const teacherView = render(<TeacherWorkspace service={teacherServices.authoring} />);
+        const teacherView = render(
+          <TeacherWorkspace aiProvider={aiProvider} service={teacherServices.authoring} />
+        );
         fireEvent.click(
           await screen.findByRole('button', { name: new RegExp(title) }, { timeout: 8_000 })
         );
@@ -372,7 +377,7 @@ describeIntegration(
         reviewerViewA.unmount();
 
         const teacherViewRejected = render(
-          <TeacherWorkspace service={teacherServices.authoring} />
+          <TeacherWorkspace aiProvider={aiProvider} service={teacherServices.authoring} />
         );
         fireEvent.click(
           await screen.findByRole('button', { name: new RegExp(title) }, { timeout: 8_000 })

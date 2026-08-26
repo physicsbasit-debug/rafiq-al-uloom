@@ -44,7 +44,7 @@ describe('architecture: App workspace composition contract', () => {
     expect(source).not.toMatch(/['"]reviewer['"]\s*(?:===|!==|==|!=)\s*[^\n]*\.role/);
   });
 
-  it('لا يستورد App خدمات التأليف أو المراجعة أو مستودعاتها أو Supabase', () => {
+  it('لا يستورد App خدمات التأليف أو المراجعة أو Supabase SDK مباشرة', () => {
     const forbidden = [
       'authoringService',
       'reviewService',
@@ -65,7 +65,7 @@ describe('architecture: App workspace composition contract', () => {
   it('يربط App مساحتي العمل عبر حدود feature فقط', () => {
     expect(source).toContain("import { TeacherWorkspace } from '@features/teacher/workspace';");
     expect(source).toContain("import { ReviewerWorkspace } from '@features/reviewer/workspace';");
-    expect(source).toContain('<TeacherWorkspace />');
+    expect(source).toContain('<TeacherWorkspace aiProvider={aiProvider} />');
     expect(source).toContain('<ReviewerWorkspace />');
   });
 

@@ -4,7 +4,10 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { TeacherWorkspace } from '@features/teacher/workspace/TeacherWorkspace';
+import { DeterministicAiAuthoringProvider } from '@services/ai-authoring';
 import type { AuthoringService, LessonRevision } from '@services/authoring';
+
+const aiProvider = new DeterministicAiAuthoringProvider();
 
 function service(revisions: readonly LessonRevision[] = []): AuthoringService {
   return {
@@ -19,7 +22,7 @@ function service(revisions: readonly LessonRevision[] = []): AuthoringService {
 describe('TeacherWorkspace editor navigation', () => {
   it('يفتح محرر new محليًا دون mutation عند الضغط على إنشاء درس', async () => {
     const authoring = service();
-    render(<TeacherWorkspace service={authoring} />);
+    render(<TeacherWorkspace service={authoring} aiProvider={aiProvider} />);
 
     await screen.findByText('لا توجد لديك مسودات بعد. ابدأ بإنشاء درس جديد.');
     fireEvent.click(screen.getByRole('button', { name: 'إنشاء درس جديد' }));

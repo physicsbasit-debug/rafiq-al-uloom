@@ -4,7 +4,10 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { TeacherWorkspace } from '@features/teacher/workspace/TeacherWorkspace';
+import { DeterministicAiAuthoringProvider } from '@services/ai-authoring';
 import type { AuthoringService, LessonRevision, LessonRevisionPayload } from '@services/authoring';
+
+const aiProvider = new DeterministicAiAuthoringProvider();
 
 const payload: LessonRevisionPayload = {
   lesson: {
@@ -72,7 +75,7 @@ describe('TeacherWorkspace', () => {
     );
     const service = serviceWithList(vi.fn(() => pending));
 
-    render(<TeacherWorkspace service={service} />);
+    render(<TeacherWorkspace service={service} aiProvider={aiProvider} />);
     expect(screen.getByRole('status')).toHaveTextContent('جارٍ تحميل مسوداتك...');
 
     resolveList({ status: 'success', revisions });
@@ -85,7 +88,7 @@ describe('TeacherWorkspace', () => {
     const listOwnRevisions = vi.fn(async () => ({ status: 'success' as const, revisions: [] }));
     const service = serviceWithList(listOwnRevisions);
 
-    render(<TeacherWorkspace service={service} />);
+    render(<TeacherWorkspace service={service} aiProvider={aiProvider} />);
     await screen.findByText('لا توجد لديك مسودات بعد. ابدأ بإنشاء درس جديد.');
 
     expect(listOwnRevisions).toHaveBeenCalledTimes(1);
@@ -95,7 +98,7 @@ describe('TeacherWorkspace', () => {
   it('يعرض الحالات الأربع بالتسميات العربية ويحافظ على ترتيب الخدمة', async () => {
     const service = serviceWithList(vi.fn(async () => ({ status: 'success' as const, revisions })));
 
-    render(<TeacherWorkspace service={service} />);
+    render(<TeacherWorkspace service={service} aiProvider={aiProvider} />);
     await screen.findByText('الدرس المعتمد');
 
     const cards = screen
@@ -125,7 +128,7 @@ describe('TeacherWorkspace', () => {
     const listOwnRevisions = vi.fn(async () => ({ status: 'success' as const, revisions }));
     const service = serviceWithList(listOwnRevisions);
 
-    render(<TeacherWorkspace service={service} />);
+    render(<TeacherWorkspace service={service} aiProvider={aiProvider} />);
     await screen.findByText('المسودة الحالية');
 
     fireEvent.click(screen.getByRole('button', { name: 'يحتاج إلى تعديل' }));
@@ -139,7 +142,9 @@ describe('TeacherWorkspace', () => {
     const onOpenRevision = vi.fn();
     const service = serviceWithList(vi.fn(async () => ({ status: 'success' as const, revisions })));
 
-    render(<TeacherWorkspace service={service} onOpenRevision={onOpenRevision} />);
+    render(
+      <TeacherWorkspace service={service} aiProvider={aiProvider} onOpenRevision={onOpenRevision} />
+    );
     const card = await screen.findByRole('button', { name: /الدرس المرفوض/ });
     fireEvent.click(card);
 
@@ -155,7 +160,9 @@ describe('TeacherWorkspace', () => {
       createLessonRevision,
     };
 
-    render(<TeacherWorkspace service={service} onCreateLesson={onCreateLesson} />);
+    render(
+      <TeacherWorkspace service={service} aiProvider={aiProvider} onCreateLesson={onCreateLesson} />
+    );
     await screen.findByText('لا توجد لديك مسودات بعد. ابدأ بإنشاء درس جديد.');
     fireEvent.click(screen.getByRole('button', { name: 'إنشاء درس جديد' }));
 
@@ -170,7 +177,7 @@ describe('TeacherWorkspace', () => {
       .mockResolvedValueOnce({ status: 'success', revisions: [] });
     const service = serviceWithList(listOwnRevisions);
 
-    render(<TeacherWorkspace service={service} />);
+    render(<TeacherWorkspace service={service} aiProvider={aiProvider} />);
     expect(await screen.findByRole('alert')).toHaveTextContent('تعذر الاتصال بالخدمة');
 
     fireEvent.click(screen.getByRole('button', { name: 'إعادة المحاولة' }));
@@ -190,7 +197,7 @@ describe('TeacherWorkspace', () => {
       })
     );
 
-    const view = render(<TeacherWorkspace service={service} />);
+    const view = render(<TeacherWorkspace service={service} aiProvider={aiProvider} />);
     await waitFor(() => expect(capturedSignal).toBeDefined());
     expect(capturedSignal?.aborted).toBe(false);
 
