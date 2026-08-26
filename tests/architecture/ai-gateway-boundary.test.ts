@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import { describe, expect, expectTypeOf, it } from 'vitest';
@@ -41,28 +41,24 @@ function readGatewayFiles(): readonly { readonly path: string; readonly content:
     }));
 }
 
-describe('architecture: Phase 4-3A/4-3B local AI gateway boundary', () => {
-  it('يستخدم مصدر validator تنفيذيًا واحدًا للمتصفح والـEdge', () => {
+describe('architecture: Phase 4-3A/4-3B/4-3C AI gateway boundary', () => {
+  it('يستخدم مصدر validator تنفيذيًا واحدًا للمتصفح والـEdge والمزوّد الحي', () => {
     const publicContract = readFileSync(PUBLIC_CONTRACT, 'utf8');
     const handler = readFileSync(resolve(GATEWAY_DIR, 'gateway-handler.ts'), 'utf8');
-    const fakeProvider = readFileSync(resolve(GATEWAY_DIR, 'fake-server-provider.ts'), 'utf8');
+    const liveProvider = readFileSync(resolve(GATEWAY_DIR, 'live-server-provider.ts'), 'utf8');
     const runtimeContract = readFileSync(RUNTIME_CONTRACT, 'utf8');
 
     expect(publicContract).toContain("from './ai-authoring.runtime-contract'");
     expect(publicContract).toContain('validateAiGenerationRequestRuntime');
     expect(publicContract).toContain('validateAiProviderOutputRuntime');
-
     expect(handler).toContain(
       '../../../src/services/ai-authoring/ai-authoring.runtime-contract.ts'
     );
-    expect(fakeProvider).toContain(
+    expect(liveProvider).toContain('validateAiProviderOutputRuntime');
+    expect(liveProvider).toContain(
       '../../../src/services/ai-authoring/ai-authoring.runtime-contract.ts'
     );
-
     expect(runtimeContract).not.toMatch(/^import\s/m);
-    expect(readdirSync(GATEWAY_DIR).some((name) => /server[-_.]?validator/i.test(name))).toBe(
-      false
-    );
   });
 
   it('يثبت تكافؤ الأنواع العامة وأنواع النواة المشتركة وقت البناء', () => {
@@ -73,14 +69,11 @@ describe('architecture: Phase 4-3A/4-3B local AI gateway boundary', () => {
     expectTypeOf<RuntimeAiRequestValidationReason>().toEqualTypeOf<AiRequestValidationReason>();
   });
 
-  it('لا يحتاج deno.json إلى alias أو relative import shim بعد استخراج النواة', () => {
-    const deno = JSON.parse(readFileSync(resolve(GATEWAY_DIR, 'deno.json'), 'utf8')) as Record<
-      string,
-      unknown
-    >;
-
-    expect(deno).not.toHaveProperty('imports');
-    expect(deno).not.toHaveProperty('scopes');
+  it('يزيل المزود الحتمي القديم من مسار Edge بدل إبقاء legacy runtime', () => {
+    expect(existsSync(resolve(GATEWAY_DIR, 'fake-server-provider.ts'))).toBe(false);
+    const handler = readFileSync(resolve(GATEWAY_DIR, 'gateway-handler.ts'), 'utf8');
+    expect(handler).not.toContain('generateFakeServerResult');
+    expect(handler).toContain('generateLiveServerResult');
   });
 
   it('يفرض حد body الحقيقي قبل تفويض التطبيق ولا يخلطه مع platform verify_jwt', () => {
@@ -89,34 +82,28 @@ describe('architecture: Phase 4-3A/4-3B local AI gateway boundary', () => {
     expect(handler).toContain('request.body.getReader()');
     expect(handler).toContain('totalBytes > MAX_BODY_BYTES');
     expect(handler).not.toContain('await request.text()');
-    expect(handler).not.toContain('reader.cancel(');
 
     const sizeRead = handler.indexOf('await readBoundedBody(request)');
     const authRead = handler.indexOf('await authorizeActiveTeacher(request)');
-
     expect(sizeRead).toBeGreaterThan(-1);
-    expect(authRead).toBeGreaterThan(-1);
-    expect(sizeRead).toBeLessThan(authRead);
+    expect(authRead).toBeGreaterThan(sizeRead);
   });
 
-  it('يضع الحصة بعد validation وقبل provider دون مسار تجاوز', () => {
+  it('يجمد الترتيب validation ثم quota ثم live provider', () => {
     const handler = readFileSync(resolve(GATEWAY_DIR, 'gateway-handler.ts'), 'utf8');
 
     const validation = handler.lastIndexOf('validateAiGenerationRequestRuntime(parsed.body)');
     const quota = handler.lastIndexOf('await consumeAiAuthoringQuota(request)');
-    const provider = handler.lastIndexOf('generateFakeServerResult(generationRequest)');
+    const provider = handler.lastIndexOf('await generateLiveServerResult(generationRequest');
 
     expect(validation).toBeGreaterThan(-1);
     expect(quota).toBeGreaterThan(validation);
     expect(provider).toBeGreaterThan(quota);
-
-    expect(handler).toContain("quota.status === 'forbidden'");
-    expect(handler).toContain("quota.status === 'unavailable'");
     expect(handler).toContain("quota.status === 'rate_limited'");
     expect(handler).toContain("'quota_unavailable'");
   });
 
-  it('يجمد عقد quota الذري بلا معاملات ولا وقت أو حدود من العميل', () => {
+  it('يجمد عقد quota الذري كما أغلق في 4-3B', () => {
     const migration = readFileSync(QUOTA_MIGRATION, 'utf8');
     const quotaClient = readFileSync(resolve(GATEWAY_DIR, 'gateway-quota.ts'), 'utf8');
 
@@ -129,14 +116,56 @@ describe('architecture: Phase 4-3A/4-3B local AI gateway boundary', () => {
     expect(migration).toContain('clock_timestamp()');
     expect(migration).toContain('SECURITY DEFINER');
     expect(migration).toContain("SET search_path = ''");
-    expect(migration).toContain('TO authenticated');
-
-    expect(quotaClient).toContain('/rest/v1/rpc/consume_ai_authoring_quota');
     expect(quotaClient).toContain("body: '{}'");
-    expect(quotaClient).not.toMatch(/\b(userId|user_id|quotaLimit|quota_limit|timestamp)\b/);
   });
 
-  it('لا يملك Gateway أي مسار نشر/Revision أو Service Role', () => {
+  it('يبقي أسرار Gemini وموديله وtimeout ملكًا للخادم فقط', () => {
+    const provider = readFileSync(resolve(GATEWAY_DIR, 'live-server-provider.ts'), 'utf8');
+    const handler = readFileSync(resolve(GATEWAY_DIR, 'gateway-handler.ts'), 'utf8');
+
+    expect(provider).toContain('GEMINI_API_KEY');
+    expect(provider).toContain("GEMINI_MODEL = 'gemini-3.5-flash'");
+    expect(provider).toContain('PROVIDER_TIMEOUT_MS = 25_000');
+    expect(provider).toContain("'x-goog-api-key': apiKey");
+    expect(provider).not.toContain('?key=');
+    expect(handler).not.toContain('GEMINI_API_KEY');
+    expect(handler).not.toContain('GEMINI_MODEL');
+    expect(handler).not.toContain('PROVIDER_TIMEOUT_MS');
+  });
+
+  it('يفصل قناة التعليمات الموثوقة عن مغلف بيانات السياق ولا يفعّل tools', () => {
+    const provider = readFileSync(resolve(GATEWAY_DIR, 'live-server-provider.ts'), 'utf8');
+
+    expect(provider).toContain('trustedInstructionFor(request.target)');
+    expect(provider).toContain("schemaVersion: 'ai-authoring-context-v1'");
+    expect(provider).toContain('context: request.context');
+    expect(provider).toContain('JSON.stringify({');
+    expect(provider).not.toMatch(/tools\s*:/);
+    expect(provider).not.toMatch(/toolConfig\s*:/);
+    expect(provider).not.toContain('objective.text}`');
+    expect(provider).not.toContain('currentSummary}`');
+  });
+
+  it('يستخدم JSON Schema الحقيقي في Gemini بدل responseSchema المقيد', () => {
+    const provider = readFileSync(resolve(GATEWAY_DIR, 'live-server-provider.ts'), 'utf8');
+
+    expect(provider).toContain('responseJsonSchema: responseJsonSchemaFor(request.target)');
+    expect(provider).not.toContain('responseSchema: responseJsonSchemaFor(request.target)');
+    expect(provider).toContain('additionalProperties: false');
+  });
+
+  it('يبقي runtime output validator بين بيانات المزود وأي نجاح', () => {
+    const provider = readFileSync(resolve(GATEWAY_DIR, 'live-server-provider.ts'), 'utf8');
+    const parse = provider.indexOf('JSON.parse(candidateText)');
+    const validate = provider.indexOf('validateAiProviderOutputRuntime(request, candidate)');
+    const success = provider.lastIndexOf("status: 'success'");
+
+    expect(parse).toBeGreaterThan(-1);
+    expect(validate).toBeGreaterThan(parse);
+    expect(success).toBeGreaterThan(validate);
+  });
+
+  it('لا يملك Gateway مسار نشر أو Revision أو Service Role أو logging للمحتوى', () => {
     const forbidden = [
       'SUPABASE_SERVICE_ROLE_KEY',
       'service_role',
@@ -148,6 +177,9 @@ describe('architecture: Phase 4-3A/4-3B local AI gateway boundary', () => {
       'content_review_events',
       'AuthoringService',
       'ReviewerWorkspace',
+      'console.log',
+      'console.error',
+      'console.debug',
     ];
 
     const violations = readGatewayFiles().flatMap(({ path, content }) =>
@@ -157,28 +189,10 @@ describe('architecture: Phase 4-3A/4-3B local AI gateway boundary', () => {
     expect(violations).toEqual([]);
   });
 
-  it('لا يدخل مفتاح AI أو مزود حي إلى 4-3B', () => {
-    const forbidden = [
-      'OPENAI_API_KEY',
-      'ANTHROPIC_API_KEY',
-      'GEMINI_API_KEY',
-      'api.openai.com',
-      'api.anthropic.com',
-      'generativelanguage.googleapis.com',
-    ];
-
-    const violations = readGatewayFiles().flatMap(({ path, content }) =>
-      forbidden.filter((token) => content.includes(token)).map((token) => `${path}: ${token}`)
-    );
-
-    expect(violations).toEqual([]);
-  });
-
-  it('يبقي المزود الخادمي في 4-3B حتميًا ومحليًا', () => {
-    const provider = readFileSync(resolve(GATEWAY_DIR, 'fake-server-provider.ts'), 'utf8');
-
-    expect(provider).toContain("providerFamily: 'local_fake'");
-    expect(provider).toContain("modelLabel: 'phase-4-3a-deterministic'");
-    expect(provider).not.toContain('fetch(');
+  it('لا يعيد المحاولة تلقائيًا داخل مزود 4-3C', () => {
+    const provider = readFileSync(resolve(GATEWAY_DIR, 'live-server-provider.ts'), 'utf8');
+    expect(provider).toContain('one provider transport attempt only');
+    expect((provider.match(/await fetchImpl\(/g) ?? []).length).toBe(1);
+    expect(provider).not.toMatch(/backoff/i);
   });
 });

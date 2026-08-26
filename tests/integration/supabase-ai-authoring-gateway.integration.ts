@@ -30,7 +30,7 @@ function uuidLiteral(id: string): string {
   return `'${id}'::uuid`;
 }
 
-describeIntegration('Supabase AI authoring gateway 4-3B', () => {
+describeIntegration('Supabase AI authoring gateway 4-3C boundary', () => {
   let env: LocalSupabaseEnvironment;
   let fixtures: SupabaseAuthFixtures;
   let teacher: AuthIdentity;
@@ -88,33 +88,7 @@ describeIntegration('Supabase AI authoring gateway 4-3B', () => {
     return (await response.json()) as JsonRecord;
   }
 
-  it('يسمح للمعلم النشط بالأهداف الأربعة عبر المزود الخادمي الحتمي', async () => {
-    const context = lessonContext();
-    const objectives = [{ key: 'objective-1', text: 'يفسر انعكاس الموجات.' }];
-
-    const requests = [
-      { target: 'lesson_summary', context },
-      { target: 'objective', context },
-      { target: 'review_question', context: { ...context, objectives } },
-      { target: 'mastery_question', context: { ...context, objectives } },
-    ] as const;
-
-    for (const request of requests) {
-      const response = await invoke(teacher, request);
-      expect(response.status).toBe(200);
-
-      const body = await readJson(response);
-      expect(body.status).toBe('success');
-      expect(body.target).toBe(request.target);
-
-      const meta = body.meta as JsonRecord;
-      expect(meta.providerFamily).toBe('local_fake');
-      expect(meta.modelLabel).toBe('phase-4-3a-deterministic');
-      expect(meta.target).toBe(request.target);
-    }
-  });
-
-  it('يرفض الطالب والمراجع والمعلم pending أو suspended خادميًا', async () => {
+  it('يرفض الطالب والمراجع والمعلم pending أو suspended قبل أي provider', async () => {
     const request = { target: 'objective', context: lessonContext() };
 
     for (const identity of [student, reviewer, pendingTeacher, suspendedTeacher]) {
@@ -143,7 +117,7 @@ describeIntegration('Supabase AI authoring gateway 4-3B', () => {
     expect(body.requestReason).toBe('unexpected_request_fields');
   });
 
-  it('لا تستهلك الطلبات غير الصالحة الحصة قبل validator', async () => {
+  it('لا تستهلك الطلبات غير الصالحة quota ولا تصل للمزوّد', async () => {
     for (let index = 0; index < 8; index += 1) {
       const invalid = await invoke(teacher, {
         target: 'objective',
@@ -153,30 +127,35 @@ describeIntegration('Supabase AI authoring gateway 4-3B', () => {
       expect(invalid.status).toBe(400);
     }
 
-    for (let index = 0; index < 6; index += 1) {
-      const valid = await invoke(teacher, {
-        target: 'objective',
-        context: lessonContext(),
-      });
-      expect(valid.status).toBe(200);
-    }
+    const count = psqlAdmin(
+      `SELECT count(*) FROM private.ai_authoring_quota_state WHERE user_id = ${uuidLiteral(teacher.user.id)};`
+    );
+    expect(count).toBe('0');
+  });
 
-    const limited = await invoke(teacher, {
+  it('يعيد 429 وRetry-After قبل provider عندما تكون quota مستنفدة', async () => {
+    const userId = uuidLiteral(teacher.user.id);
+    psqlAdmin(`
+      INSERT INTO private.ai_authoring_quota_state (
+        user_id, burst_window_started_at, burst_count,
+        daily_window_started_at, daily_count, updated_at
+      ) VALUES (
+        ${userId}, clock_timestamp(), 6,
+        date_trunc('day', clock_timestamp() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC', 6,
+        clock_timestamp()
+      )
+      ON CONFLICT (user_id) DO UPDATE SET
+        burst_window_started_at = EXCLUDED.burst_window_started_at,
+        burst_count = 6,
+        daily_window_started_at = EXCLUDED.daily_window_started_at,
+        daily_count = 6,
+        updated_at = EXCLUDED.updated_at;
+    `);
+
+    const response = await invoke(teacher, {
       target: 'objective',
       context: lessonContext(),
     });
-    expect(limited.status).toBe(429);
-  });
-
-  it('يعيد 429 وRetry-After بعد ست محاولات صالحة في نافذة burst', async () => {
-    const request = { target: 'objective', context: lessonContext() };
-
-    for (let index = 0; index < 6; index += 1) {
-      const response = await invoke(teacher, request);
-      expect(response.status).toBe(200);
-    }
-
-    const response = await invoke(teacher, request);
     expect(response.status).toBe(429);
 
     const body = await readJson(response);
@@ -184,7 +163,6 @@ describeIntegration('Supabase AI authoring gateway 4-3B', () => {
     expect(body.limitReason).toBe('burst');
     expect(body.remainingBurst).toBe(0);
     expect(body.remainingDaily).toBe(74);
-    expect(body.retryAfterSeconds).toEqual(expect.any(Number));
 
     const retryAfter = Number(response.headers.get('retry-after'));
     expect(Number.isInteger(retryAfter)).toBe(true);

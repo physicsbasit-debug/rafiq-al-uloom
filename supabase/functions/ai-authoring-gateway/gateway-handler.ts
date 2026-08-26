@@ -5,9 +5,9 @@ import {
   type RuntimeAiGenerationResult,
 } from '../../../src/services/ai-authoring/ai-authoring.runtime-contract.ts';
 
-import { generateFakeServerResult } from './fake-server-provider.ts';
 import { authorizeActiveTeacher } from './gateway-auth.ts';
 import { consumeAiAuthoringQuota } from './gateway-quota.ts';
+import { generateLiveServerResult } from './live-server-provider.ts';
 
 const MAX_BODY_BYTES = 32 * 1024;
 const ALLOWED_ORIGINS = new Set([
@@ -127,11 +127,9 @@ async function readBoundedBody(request: Request): Promise<BoundedBodyResult> {
   return { status: 'success', bytes };
 }
 
-function parseJsonBody(bytes: Uint8Array):
-  | { readonly valid: true; readonly body: unknown }
-  | {
-      readonly valid: false;
-    } {
+function parseJsonBody(
+  bytes: Uint8Array
+): { readonly valid: true; readonly body: unknown } | { readonly valid: false } {
   try {
     const text = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
     return { valid: true, body: JSON.parse(text) as unknown };
@@ -179,8 +177,8 @@ export async function handleAiAuthoringGatewayRequest(request: Request): Promise
     return genericError(request, 415, 'unsupported_media_type');
   }
 
-  // Enforce the real byte ceiling before any Auth/Profile/provider work. This keeps
-  // oversized requests cheap even when Content-Length is missing or stripped.
+  // Enforce the real byte ceiling before any Auth/Profile/provider work. Platform
+  // verify_jwt still occurs before the function is entered in the normal deployed path.
   const boundedBody = await readBoundedBody(request);
   if (boundedBody.status === 'too_large') {
     return genericError(request, 413, 'request_too_large');
@@ -216,8 +214,8 @@ export async function handleAiAuthoringGatewayRequest(request: Request): Promise
 
   const generationRequest = parsed.body as RuntimeAiGenerationRequest;
 
-  // Phase 4-3B: reserve quota only after strict request validation and immediately
-  // before provider invocation. A committed reservation is intentionally not refunded.
+  // Phase 4-3B invariant: reserve quota only after strict validation and immediately
+  // before provider invocation. A committed reservation is never refunded.
   const quota = await consumeAiAuthoringQuota(request);
   if (quota.status === 'forbidden') {
     return genericError(request, 403, 'forbidden');
@@ -229,5 +227,23 @@ export async function handleAiAuthoringGatewayRequest(request: Request): Promise
     return rateLimitedResponse(request, quota);
   }
 
-  return jsonResponse(request, 200, generateFakeServerResult(generationRequest));
+  const provider = await generateLiveServerResult(generationRequest, { signal: request.signal });
+
+  if (provider.status === 'domain_result') {
+    return jsonResponse(request, 200, provider.result);
+  }
+  if (provider.status === 'caller_aborted') {
+    return jsonResponse(request, 200, { status: 'aborted', target: generationRequest.target });
+  }
+  if (provider.status === 'provider_timeout') {
+    return genericError(request, 504, 'provider_timeout');
+  }
+  if (provider.status === 'provider_unavailable') {
+    return genericError(request, 503, 'provider_unavailable');
+  }
+  if (provider.status === 'provider_rejected') {
+    return genericError(request, 502, 'provider_rejected');
+  }
+
+  return genericError(request, 502, 'provider_invalid_response');
 }
