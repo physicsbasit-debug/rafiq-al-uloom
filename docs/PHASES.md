@@ -32,44 +32,40 @@ Composition 2/2
 Parity 10/10
 ```
 
-بدأت Phase 3: Teacher Dashboard رسميًا. أُغلقت Phase 3-0 بعد اعتماد العقد وتشغيل بوابات القبول على الالتزام `37a4024`:
+أُغلقت Phase 3 وجُمّدت رسميًا عند الوسم `v0.6-teacher-dashboard-complete` على الالتزام `3f2eb668d1c08ea6699f1a60cb56c58617ad98d7`.
 
-```text
-Build PASS
-Lint PASS
-Prettier PASS
-508/508 basic
-89/89 Supabase integration
-Git clean
-HEAD = origin/main
-```
+أصبح Authoring Plane وTeacher Workspace وReviewer Workspace وSubmission Readiness جزءًا من baseline مجمّد لا تعيد Phase 4 فتحه.
 
-اكتمل النطاق الوظيفي الحالي لـPhase 3 فوق المسار المحلي: Authoring Plane وRepository/Service وTeacher Workspace وReviewer Workspace وSubmission Readiness وبوابة التركيب الحقيقي Teacher/Reviewer موجودة على مرشح التجميد. الالتزام `bf413caccd4019847fa4bd311176771714d93870` هو baseline مراجعة Phase 3-5B، وقد اجتاز تدقيق `App.css` الثلاثي مع build ناجح بعد حذفه مؤقتًا وGit نظيف.
+اكتمل النطاق الوظيفي لـPhase 4: AI-assisted Authoring، بما يشمل العقود المحايدة للمزوّد، واجهة اقتراحات المعلم، Edge Gateway الخادمي، quota، Gemini الحي، الحواجز التربوية، وقرار provenance المؤقت.
 
-قاعدة الحالة: تُعد Phase 3 `CLOSED & FROZEN` فقط إذا نجح `npm run verify:phase-3-closure` وMobile Visual Acceptance وكان الوسم `v0.6-teacher-dashboard-complete` موجودًا على الالتزام النهائي نفسه. ويُستخدم وصف **final freeze candidate** عندما لا تكون هذه الشروط مجتمعة. Remote Supabase لرفيق العلوم ما زالت مؤجلة عمدًا.
+أثبت 4-6B المسار الحي من اقتراح Gemini المقبول حتى Revision والمراجعة والنشر.
+
+تُعد Phase 4 CLOSED & FROZEN فقط بعد نجاح `npm run verify:phase-4-closure` وإنشاء الوسم `v0.7-ai-assisted-authoring-complete` على الالتزام النهائي نفسه.
+
+Remote Supabase لرفيق العلوم ما زالت مؤجلة عمدًا.
 
 ## خارطة الطريق المحدّثة
 
-| المرحلة  | الهدف                                     | المخرجات                                                                | معيار القبول                                             | الحالة                                                                |
-| -------- | ----------------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------- | --------------------------------------------------------------------- |
-| 0-A      | قرارات تأسيسية                            | وثيقة معتمدة                                                            | اعتماد كتابي                                             | مكتملة                                                                |
-| 0-B      | Project Skeleton                          | مشروع + مجلدات + أنواع + Theme + Docs                                   | build/lint/prettier ناجحة                                | مكتملة                                                                |
-| 1        | Local Prototype                           | تجربة طالب كاملة بمحتوى TypeScript محلي                                 | تصفح كامل من الصف إلى النتيجة                            | مكتملة                                                                |
-| 2-A      | Async Data Contract                       | ContentRepository غير متزامن + hooks مشتركة + ترحيل واجهات الطالب       | الاختبارات المحلية مستقلة عن الشبكة                      | مكتملة                                                                |
-| 2-B      | Supabase Content Data Layer               | Schema + RLS + Seed + Repository + Provider Selection                   | تكافؤ كامل بين local وSupabase                           | مكتملة                                                                |
-| 2-Freeze | Data Layer Freeze                         | توثيق المعمارية والخارطة + الوسم `v0.3-data-layer-complete`             | الوسم يشير إلى commit التجميد المعتمد                    | مكتملة                                                                |
-| 2-C0     | Auth & Authorization Architecture         | قرارات Supabase Auth + Profiles + Roles + Account Status + حدود RLS     | اعتماد الوثيقة المعمارية دون كود                         | مكتملة                                                                |
-| 2-C1     | Auth Client & Session Contract            | Auth types + service + session + sign-in/sign-up/sign-out + unit tests  | عقد Auth واختباراته ناجحة بلا Profiles أو UI             | مكتملة                                                                |
-| 2-C2     | Profiles + Roles + Authorization RLS      | Profiles + Trigger + AuthorizationState + RLS + اختبارات SQL وتكامل     | لا تصعيد ذاتي للصلاحيات ولا مستخدم يتيم                  | مكتملة                                                                |
-| 2-C3     | Login / Logout / Session UI               | واجهات Auth ورسائل الجلسة والتأكيد                                      | تجربة RTL واضحة بلا وميض واجهة محمية                     | مكتملة                                                                |
-| 2-C4     | Protected Operations + Access Guards      | عقد عمليات + محرك قرار + حراس React + اختبارات تجاوز الواجهة            | لا عملية محمية تعتمد على إخفاء الواجهة فقط               | مكتملة                                                                |
-| 2-C5     | Auth Integration Tests & Security Closure | دورة حياة Auth + تركيب حقيقي + فحص أسرار + توثيق تشغيل وتجميد           | الوسم `v0.4-auth-security-complete` على الالتزام المتحقق | مكتملة                                                                |
-| 2-D      | Cloud Persistence                         | حفظ نتائج الإتقان المرتبطة بالمستخدم عبر RPC وRLS مع retry وidempotency | مسار سحابي حقيقي + تكافؤ حسابي + أمر إغلاق موحد          | مكتملة / CLOSED                                                       |
-| 3        | Teacher Dashboard                         | تأليف بشري + مراجعة + اعتماد + نشر محكوم                                | teacher يؤلف وreviewer يراجع/يعتمد عبر حماية خلفية       | final freeze candidate؛ 3-5B verification + mobile acceptance pending |
-| 4        | AI-assisted Authoring                     | توليد محتوى بمراجعة بشرية                                               | لا يصل أي محتوى مولّد إلى `approved` تلقائيًا            | مخططة                                                                 |
-| 5        | Advanced Science Activities               | توسيع الألعاب والتجارب والمحاكاة والأنشطة العلمية                       | كل نشاط مرتبط بهدف تعلم وقابل للاختبار                   | مخططة                                                                 |
-| 6        | Production Readiness                      | أمن، أداء، مراقبة أخطاء، نسخ احتياطي، نشر وتوثيق تشغيل                  | قائمة جاهزية إنتاج ناجحة                                 | مخططة                                                                 |
-| 1.0      | الإطلاق الرسمي                            | نسخة مستقرة قابلة للاستخدام والتوسع                                     | قبول وظيفي وتشغيلي كامل                                  | الهدف النهائي                                                         |
+| المرحلة  | الهدف                                     | المخرجات                                                                | معيار القبول                                             | الحالة                                       |
+| -------- | ----------------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------- | -------------------------------------------- |
+| 0-A      | قرارات تأسيسية                            | وثيقة معتمدة                                                            | اعتماد كتابي                                             | مكتملة                                       |
+| 0-B      | Project Skeleton                          | مشروع + مجلدات + أنواع + Theme + Docs                                   | build/lint/prettier ناجحة                                | مكتملة                                       |
+| 1        | Local Prototype                           | تجربة طالب كاملة بمحتوى TypeScript محلي                                 | تصفح كامل من الصف إلى النتيجة                            | مكتملة                                       |
+| 2-A      | Async Data Contract                       | ContentRepository غير متزامن + hooks مشتركة + ترحيل واجهات الطالب       | الاختبارات المحلية مستقلة عن الشبكة                      | مكتملة                                       |
+| 2-B      | Supabase Content Data Layer               | Schema + RLS + Seed + Repository + Provider Selection                   | تكافؤ كامل بين local وSupabase                           | مكتملة                                       |
+| 2-Freeze | Data Layer Freeze                         | توثيق المعمارية والخارطة + الوسم `v0.3-data-layer-complete`             | الوسم يشير إلى commit التجميد المعتمد                    | مكتملة                                       |
+| 2-C0     | Auth & Authorization Architecture         | قرارات Supabase Auth + Profiles + Roles + Account Status + حدود RLS     | اعتماد الوثيقة المعمارية دون كود                         | مكتملة                                       |
+| 2-C1     | Auth Client & Session Contract            | Auth types + service + session + sign-in/sign-up/sign-out + unit tests  | عقد Auth واختباراته ناجحة بلا Profiles أو UI             | مكتملة                                       |
+| 2-C2     | Profiles + Roles + Authorization RLS      | Profiles + Trigger + AuthorizationState + RLS + اختبارات SQL وتكامل     | لا تصعيد ذاتي للصلاحيات ولا مستخدم يتيم                  | مكتملة                                       |
+| 2-C3     | Login / Logout / Session UI               | واجهات Auth ورسائل الجلسة والتأكيد                                      | تجربة RTL واضحة بلا وميض واجهة محمية                     | مكتملة                                       |
+| 2-C4     | Protected Operations + Access Guards      | عقد عمليات + محرك قرار + حراس React + اختبارات تجاوز الواجهة            | لا عملية محمية تعتمد على إخفاء الواجهة فقط               | مكتملة                                       |
+| 2-C5     | Auth Integration Tests & Security Closure | دورة حياة Auth + تركيب حقيقي + فحص أسرار + توثيق تشغيل وتجميد           | الوسم `v0.4-auth-security-complete` على الالتزام المتحقق | مكتملة                                       |
+| 2-D      | Cloud Persistence                         | حفظ نتائج الإتقان المرتبطة بالمستخدم عبر RPC وRLS مع retry وidempotency | مسار سحابي حقيقي + تكافؤ حسابي + أمر إغلاق موحد          | مكتملة / CLOSED                              |
+| 3        | Teacher Dashboard                         | تأليف بشري + مراجعة + اعتماد + نشر محكوم                                | teacher يؤلف وreviewer يراجع/يعتمد عبر حماية خلفية       | مكتملة / CLOSED & FROZEN                     |
+| 4        | AI-assisted Authoring                     | توليد مساعد مع قبول بشري وحواجز خادمية وحراسة تربوية                    | لا حفظ أو اعتماد أو نشر مباشر من AI                      | functional scope complete / FREEZE CANDIDATE |
+| 5        | Advanced Science Activities               | توسيع الألعاب والتجارب والمحاكاة والأنشطة العلمية                       | كل نشاط مرتبط بهدف تعلم وقابل للاختبار                   | مخططة                                        |
+| 6        | Production Readiness                      | أمن، أداء، مراقبة أخطاء، نسخ احتياطي، نشر وتوثيق تشغيل                  | قائمة جاهزية إنتاج ناجحة                                 | مخططة                                        |
+| 1.0      | الإطلاق الرسمي                            | نسخة مستقرة قابلة للاستخدام والتوسع                                     | قبول وظيفي وتشغيلي كامل                                  | الهدف النهائي                                |
 
 ## تقسيم Phase 2-C5
 
@@ -120,7 +116,7 @@ Phase 2-D `CLOSED & FROZEN` عند `v0.5-mastery-results-cloud-complete`، وا�
 
 لا تُفتح عقود Phase 2-D داخل Phase 3 بلا قرار مكتوب واختبارات مستقلة مرتبطة بالتغيير.
 
-## تقسيم Phase 3 المقترح
+## تقسيم Phase 3
 
 ```text
 3-0   Teacher Dashboard Contract & Architecture                 ✅ CLOSED @ 37a4024
@@ -129,7 +125,7 @@ Phase 2-D `CLOSED & FROZEN` عند `v0.5-mastery-results-cloud-complete`، وا�
 3-3   Teacher Workspace UI                                      ✅ COMPLETE ON FREEZE BASELINE
 3-4   Reviewer Workspace UI                                     ✅ COMPLETE ON FREEZE BASELINE
 3-5A  Real Teacher/Reviewer Supabase Composition + Fixes         ✅ COMPLETE ON FREEZE BASELINE
-3-5B  Closure + Mobile Visual Acceptance + Freeze                🔄 FINAL FREEZE CANDIDATE
+3-5B  Closure + Mobile Visual Acceptance + Freeze                ✅ CLOSED @ 3f2eb66
 ```
 
 دليل إغلاق 3-0: `508/508` basic + `89/89` Supabase + Git clean على `37a4024`.
@@ -188,6 +184,27 @@ remote annotated tag ^{} -> same final commit
 docs/PHASE_3_5B_CLOSURE_AND_FREEZE.md
 docs/PHASE_3_MOBILE_VISUAL_ACCEPTANCE.md
 ```
+
+## تقسيم Phase 4
+
+```text
+4-0   Contract & Architecture                         ✅ CLOSED
+4-1   Provider-neutral Domain                         ✅ CLOSED
+4-2   Teacher AI UX                                   ✅ CLOSED
+4-3   Secure Edge Gateway + Live Gemini               ✅ CLOSED
+4-4   Pedagogical Guardrails                          ✅ CLOSED
+4-5   Provenance Decision                             ✅ CLOSED
+4-6B  Real AI Acceptance → Publication                ✅ CLOSED @ 625be6c
+4-6C  Closure + Final Freeze                          🔄 FREEZE CANDIDATE
+```
+
+القرار النهائي: `NO DURABLE AI PROVENANCE PERSISTENCE IN v0.7`.
+
+بوابة الإغلاق: `npm run verify:phase-4-closure`.
+
+الوسم المطلوب: `v0.7-ai-assisted-authoring-complete`.
+
+التفاصيل: `docs/PHASE_4_6_CLOSURE_AND_FREEZE.md`.
 
 ## القرارات الملزمة لـPhase 2-C و2-D
 
