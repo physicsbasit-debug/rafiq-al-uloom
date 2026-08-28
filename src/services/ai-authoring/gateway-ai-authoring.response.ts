@@ -1,4 +1,4 @@
-import { validateAiProviderOutput } from './ai-authoring.contract';
+import { validateGuardedAiProviderOutput } from './ai-authoring.contract';
 import type {
   AiGenerationRequest,
   AiGenerationResult,
@@ -81,7 +81,7 @@ function matchesValidatedSuggestion(
       return false;
     }
 
-    const validation = validateAiProviderOutput(request, { text: networkSuggestion.text });
+    const validation = validateGuardedAiProviderOutput(request, { text: networkSuggestion.text });
     return (
       validation.valid &&
       validation.suggestion.kind === 'lesson_summary' &&
@@ -97,7 +97,7 @@ function matchesValidatedSuggestion(
       return false;
     }
 
-    const validation = validateAiProviderOutput(request, { text: networkSuggestion.text });
+    const validation = validateGuardedAiProviderOutput(request, { text: networkSuggestion.text });
     return (
       validation.valid &&
       validation.suggestion.kind === 'objective' &&
@@ -120,7 +120,7 @@ function matchesValidatedSuggestion(
     return false;
   }
 
-  const validation = validateAiProviderOutput(request, {
+  const validation = validateGuardedAiProviderOutput(request, {
     prompt: networkSuggestion.prompt,
     choices: networkSuggestion.choices,
     correctAnswerIndex: networkSuggestion.correctAnswerIndex,

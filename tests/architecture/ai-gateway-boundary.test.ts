@@ -27,6 +27,10 @@ const RUNTIME_CONTRACT = resolve(
   process.cwd(),
   'src/services/ai-authoring/ai-authoring.runtime-contract.ts'
 );
+const PEDAGOGICAL_GUARDRAILS = resolve(
+  process.cwd(),
+  'src/services/ai-authoring/ai-authoring.pedagogical-guardrails.runtime.ts'
+);
 const QUOTA_MIGRATION = resolve(
   process.cwd(),
   'supabase/migrations/20260821183000_add_ai_authoring_quota.sql'
@@ -42,22 +46,30 @@ function readGatewayFiles(): readonly { readonly path: string; readonly content:
 }
 
 describe('architecture: Phase 4-3A/4-3B/4-3C AI gateway boundary', () => {
-  it('يستخدم مصدر validator تنفيذيًا واحدًا للمتصفح والـEdge والمزوّد الحي', () => {
+  it('يبقي الفاحص البنيوي مصدر الحقيقة ويضيف الحارس التربوي كطبقة composition مشتركة', () => {
     const publicContract = readFileSync(PUBLIC_CONTRACT, 'utf8');
     const handler = readFileSync(resolve(GATEWAY_DIR, 'gateway-handler.ts'), 'utf8');
     const liveProvider = readFileSync(resolve(GATEWAY_DIR, 'live-server-provider.ts'), 'utf8');
     const runtimeContract = readFileSync(RUNTIME_CONTRACT, 'utf8');
+    const pedagogicalGuardrails = readFileSync(PEDAGOGICAL_GUARDRAILS, 'utf8');
 
     expect(publicContract).toContain("from './ai-authoring.runtime-contract'");
+    expect(publicContract).toContain("from './ai-authoring.pedagogical-guardrails.runtime'");
     expect(publicContract).toContain('validateAiGenerationRequestRuntime');
     expect(publicContract).toContain('validateAiProviderOutputRuntime');
+    expect(publicContract).toContain('validateGuardedAiProviderOutputRuntime');
+
     expect(handler).toContain(
       '../../../src/services/ai-authoring/ai-authoring.runtime-contract.ts'
     );
-    expect(liveProvider).toContain('validateAiProviderOutputRuntime');
+
+    expect(liveProvider).toContain('validateGuardedAiProviderOutputRuntime');
     expect(liveProvider).toContain(
-      '../../../src/services/ai-authoring/ai-authoring.runtime-contract.ts'
+      '../../../src/services/ai-authoring/ai-authoring.pedagogical-guardrails.runtime.ts'
     );
+
+    expect(pedagogicalGuardrails).toContain('validateAiProviderOutputRuntime');
+    expect(pedagogicalGuardrails).toContain("from './ai-authoring.runtime-contract.ts'");
     expect(runtimeContract).not.toMatch(/^import\s/m);
   });
 
@@ -154,10 +166,10 @@ describe('architecture: Phase 4-3A/4-3B/4-3C AI gateway boundary', () => {
     expect(provider).toContain('additionalProperties: false');
   });
 
-  it('يبقي runtime output validator بين بيانات المزود وأي نجاح', () => {
+  it('يبقي guarded runtime validator بين بيانات المزود وأي نجاح', () => {
     const provider = readFileSync(resolve(GATEWAY_DIR, 'live-server-provider.ts'), 'utf8');
     const parse = provider.indexOf('JSON.parse(candidateText)');
-    const validate = provider.indexOf('validateAiProviderOutputRuntime(request, candidate)');
+    const validate = provider.indexOf('validateGuardedAiProviderOutputRuntime(request, candidate)');
     const success = provider.lastIndexOf("status: 'success'");
 
     expect(parse).toBeGreaterThan(-1);

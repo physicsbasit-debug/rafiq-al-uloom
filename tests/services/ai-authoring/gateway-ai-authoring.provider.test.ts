@@ -28,6 +28,29 @@ const validSuccess = {
   },
 } as const;
 
+const summaryRequest: AiGenerationRequest = {
+  target: 'lesson_summary',
+  context: request.context,
+};
+
+const reviewRequest: AiGenerationRequest = {
+  target: 'review_question',
+  context: {
+    ...request.context,
+    objectives: [{ key: 'objective-1', text: 'يفسر انعكاس الموجات.' }],
+  },
+};
+
+function successMeta(target: AiGenerationRequest['target']) {
+  return {
+    generationId: `generation-${target}`,
+    providerFamily: 'google_gemini',
+    modelLabel: 'gemini-3.5-flash',
+    generatedAt: '2026-08-27T12:00:00.000Z',
+    target,
+  };
+}
+
 function jsonResponse(status: number, body: unknown): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -291,6 +314,74 @@ describe('GatewayAiAuthoringProvider', () => {
       ) as typeof fetch,
     }).generate(request);
     expect(result.status).toBe('unavailable');
+  });
+  it('يرفض دفاعيًا HTTP 200 success بملخص إنجليزي فقط', async () => {
+    const body = {
+      status: 'success',
+      target: 'lesson_summary',
+      suggestion: { kind: 'lesson_summary', text: 'English only summary.' },
+      meta: successMeta('lesson_summary'),
+    } as const;
+
+    const result = await provider({
+      fetchImpl: vi.fn(async () => jsonResponse(200, body)) as typeof fetch,
+    }).generate(summaryRequest);
+
+    expect(result).toEqual({
+      status: 'unavailable',
+      target: 'lesson_summary',
+      reason: 'provider_unavailable',
+    });
+  });
+
+  it('يرفض دفاعيًا HTTP 200 success بسؤال ذي خيارات متكررة', async () => {
+    const body = {
+      status: 'success',
+      target: 'review_question',
+      suggestion: {
+        kind: 'question',
+        prompt: 'أي العبارات تصف الانعكاس؟',
+        choices: ['H₂O', ' H2O '],
+        correctAnswerIndex: 0,
+        explanation: 'هذا شرح عربي صالح بنيويًا.',
+        objectiveKey: 'objective-1',
+        difficulty: 'medium',
+      },
+      meta: successMeta('review_question'),
+    } as const;
+
+    const result = await provider({
+      fetchImpl: vi.fn(async () => jsonResponse(200, body)) as typeof fetch,
+    }).generate(reviewRequest);
+
+    expect(result).toEqual({
+      status: 'unavailable',
+      target: 'review_question',
+      reason: 'provider_unavailable',
+    });
+  });
+
+  it('يسمح دفاعيًا بخيارات علمية غير عربية عندما يكون prompt والشرح عربيين', async () => {
+    const body = {
+      status: 'success',
+      target: 'review_question',
+      suggestion: {
+        kind: 'question',
+        prompt: 'أي قيمة تمثل سرعة مناسبة في المثال؟',
+        choices: ['H₂O', 'NaCl', '3 m/s'],
+        correctAnswerIndex: 2,
+        explanation: 'الخيار الثالث يمثل قيمة سرعة بوحدة متر لكل ثانية.',
+        objectiveKey: 'objective-1',
+        difficulty: 'medium',
+      },
+      meta: successMeta('review_question'),
+    } as const;
+
+    const result = await provider({
+      fetchImpl: vi.fn(async () => jsonResponse(200, body)) as typeof fetch,
+    }).generate(reviewRequest);
+
+    expect(result).toEqual(body);
   });
 });
 

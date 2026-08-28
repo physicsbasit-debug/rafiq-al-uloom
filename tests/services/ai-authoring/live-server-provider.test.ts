@@ -106,6 +106,83 @@ describe('Phase 4-3C live server provider', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
+  it('يضع القواعد التربوية الموثوقة في systemInstruction لا في بيانات الدرس', async () => {
+    const fetchMock = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
+      const body = JSON.parse(String(init?.body)) as Record<string, unknown>;
+      const systemInstruction = body.systemInstruction as { parts: Array<{ text: string }> };
+      const instruction = systemInstruction.parts[0].text;
+
+      expect(instruction).toContain('التزم بالصف والمادة والوحدة والدرس والأهداف المرسلة');
+      expect(instruction).toContain('سؤال إتقان');
+      expect(instruction).toContain('تطبيقًا أو تفسيرًا أو استدلالًا');
+      expect(instruction).toContain('تجنب تحويله إلى مجرد تعريف أو حفظ سطحي');
+
+      return geminiJson({
+        prompt: 'ما التفسير الأنسب لارتداد الموجة؟',
+        choices: ['انعكاس', 'انكسار'],
+        correctAnswerIndex: 0,
+        explanation: 'ترتد الموجة عن السطح في ظاهرة الانعكاس.',
+        objectiveKey: 'objective-1',
+        difficulty: 'medium',
+      });
+    }) as typeof fetch;
+
+    const request = {
+      ...questionRequest(),
+      target: 'mastery_question',
+    } as RuntimeAiGenerationRequest;
+    const result = await generateLiveServerResult(request, {}, deterministicDeps(fetchMock));
+
+    expect(result.status).toBe('domain_result');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('لا يحول مرشحًا إنجليزيًا فقط إلى success', async () => {
+    const fetchMock = vi.fn(async () =>
+      geminiJson({ text: 'English only objective.' })
+    ) as typeof fetch;
+
+    const result = await generateLiveServerResult(
+      {
+        target: 'objective',
+        context: summaryRequest().context,
+      },
+      {},
+      deterministicDeps(fetchMock)
+    );
+
+    expect(result).toEqual({
+      status: 'domain_result',
+      result: { status: 'invalid_output', target: 'objective', reason: 'invalid_text' },
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('يرفض مرشح السؤال ذي الخيارات المتكررة دون استدعاء مزود ثانٍ', async () => {
+    const fetchMock = vi.fn(async () =>
+      geminiJson({
+        prompt: 'أي العبارات تصف الانعكاس؟',
+        choices: ['H₂O', ' H2O '],
+        correctAnswerIndex: 0,
+        explanation: 'هذا اختبار حتمي لمنع تكرار الخيارات.',
+        objectiveKey: 'objective-1',
+        difficulty: 'medium',
+      })
+    ) as typeof fetch;
+
+    const result = await generateLiveServerResult(
+      questionRequest(),
+      {},
+      deterministicDeps(fetchMock)
+    );
+
+    expect(result).toEqual({
+      status: 'domain_result',
+      result: { status: 'invalid_output', target: 'review_question', reason: 'invalid_choices' },
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
   it('يستخدم Gemini خادميًا بمفتاح header ولا يضع السر في URL', async () => {
     const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input);

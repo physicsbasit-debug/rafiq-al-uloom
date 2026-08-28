@@ -1,4 +1,8 @@
-export { validateAiGenerationRequest, validateAiProviderOutput } from './ai-authoring.contract';
+export {
+  validateAiGenerationRequest,
+  validateAiProviderOutput,
+  validateGuardedAiProviderOutput,
+} from './ai-authoring.contract';
 export type { AiAuthoringProvider } from './ai-authoring.provider';
 export {
   DeterministicAiAuthoringProvider,

@@ -1,4 +1,7 @@
-import { validateAiGenerationRequest, validateAiProviderOutput } from './ai-authoring.contract';
+import {
+  validateAiGenerationRequest,
+  validateGuardedAiProviderOutput,
+} from './ai-authoring.contract';
 import type { AiAuthoringProvider } from './ai-authoring.provider';
 import type {
   AiGenerationOptions,
@@ -186,7 +189,7 @@ export class DeterministicAiAuthoringProvider implements AiAuthoringProvider {
       this.#behavior === 'invalid_output'
         ? buildInvalidRawSuggestion(request)
         : buildValidRawSuggestion(request);
-    const validation = validateAiProviderOutput(request, rawSuggestion);
+    const validation = validateGuardedAiProviderOutput(request, rawSuggestion);
 
     if (!validation.valid) {
       return { status: 'invalid_output', target: request.target, reason: validation.reason };
