@@ -214,6 +214,44 @@ cleanup_edge_runtime() {
   EDGE_LOG=""
 }
 
+start_nonlive_edge_runtime() {
+  local attempt
+  local http_code
+
+  cleanup_edge_runtime
+
+  EDGE_LOG="${TMPDIR:-/tmp}/rafiq-phase4-edge-nonlive-$$.log"
+  rm -f "$EDGE_LOG"
+
+  env -u GEMINI_API_KEY \
+    npx --no-install supabase functions serve \
+    ai-authoring-gateway \
+    >"$EDGE_LOG" 2>&1 &
+
+  EDGE_PID=$!
+
+  for attempt in {1..30}; do
+    if ! kill -0 "$EDGE_PID" >/dev/null 2>&1; then
+      echo "Non-live AI Edge process exited before readiness." >&2
+      tail -80 "$EDGE_LOG" >&2 || true
+      return 1
+    fi
+
+    http_code="$(curl --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:54321/functions/v1/ai-authoring-gateway || true)"
+
+    if [[ "$http_code" == "401" ]]; then
+      echo "PASS: non-live AI Edge gateway ready with JWT protection"
+      return 0
+    fi
+
+    sleep 1
+  done
+
+  echo "Non-live AI Edge gateway did not become ready." >&2
+  tail -80 "$EDGE_LOG" >&2 || true
+  return 1
+}
+
 start_live_edge_runtime() {
   local attempt
   local http_code
@@ -373,8 +411,14 @@ run_step \
   verify_supabase_after_reset
 
 run_step \
+  "Start non-live AI Edge gateway" \
+  start_nonlive_edge_runtime
+
+run_step \
   "Full Supabase non-live integration suite" \
   npm run test:supabase
+
+cleanup_edge_runtime
 
 run_step \
   "Frozen Teacher/Reviewer real composition" \

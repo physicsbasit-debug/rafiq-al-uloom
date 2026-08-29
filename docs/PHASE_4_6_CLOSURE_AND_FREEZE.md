@@ -28,6 +28,18 @@ UPDATE  tests/architecture/browser-ai-gateway-boundary.test.ts
 
 بدأت 4-6C بوصفها دفعة closure tooling فقط. أثناء تشغيل بوابة الإغلاق كُشفت مخالفة Auth boundary في App.tsx، فعولجت في Fix1 بنقل قراءة access token إلى auth.service.ts وتحديث الحارس والاختبارات المرتبطة فقط. لم تتغير SQL أو migrations أو Edge Functions أو Auth state أو Authorization أو Authoring أو Reviewer أو LessonRevisionPayload.
 
+### Closure runtime reconciliation Fix2
+
+أثبت تشغيل بوابة الإغلاق أن مجموعة Supabase غير الحية كانت تستدعي اختبار AI Gateway قبل تشغيل Edge runtime، فكانت جميع حالات HTTP تعود 503 رغم سلامة المنطق. أثبت اختبار إعادة الإنتاج أن تشغيل ai-authoring-gateway أولًا يعيد حماية JWT برمز 401 ثم تنجح اختبارات Gateway الثمانية كاملة.
+
+يعالج Fix2 ترتيب بوابة الإغلاق فقط: يشغّل Edge runtime غير الحي قبل المجموعة التكاملية الكاملة، ينظفه بعدها، ثم يشغّل لاحقًا Edge جديدًا مستقلًا مع GEMINI_API_KEY لاختبارات Gemini الحية. لا يتغير production code أو SQL أو migrations أو Edge Function أو عقود التطبيق.
+
+### Closure runtime reconciliation Fix2
+
+أثبت تشغيل بوابة الإغلاق أن مجموعة Supabase غير الحية كانت تستدعي اختبار AI Gateway قبل تشغيل Edge runtime، فكانت جميع حالات HTTP تعود 503 رغم سلامة المنطق. أثبت اختبار إعادة الإنتاج أن تشغيل ai-authoring-gateway أولًا يعيد حماية JWT برمز 401 ثم تنجح اختبارات Gateway الثمانية كاملة.
+
+يعالج Fix2 ترتيب بوابة الإغلاق فقط: يشغّل Edge runtime غير الحي قبل المجموعة التكاملية الكاملة، ينظفه بعدها، ثم يشغّل لاحقًا Edge جديدًا مستقلًا مع GEMINI_API_KEY لاختبارات Gemini الحية. لا يتغير production code أو SQL أو migrations أو Edge Function أو عقود التطبيق.
+
 ## المراحل المغلقة قبل التجميد
 
 ```text
@@ -74,7 +86,7 @@ NO DURABLE AI PROVENANCE PERSISTENCE IN v0.7
 npm run verify:phase-4-closure
 ```
 
-تتحقق البوابة من formatting وlint وbuild والاختبارات الأساسية وحدود Auth وMastery وحدود AI وSupabase reset وAuth smoke الحقيقي والتعافي المضبوط والمجموعة التكاملية الكاملة وTeacher/Reviewer composition واختبارات Gemini الحية ثم سلامة Git.
+تتحقق البوابة من formatting وlint وbuild والاختبارات الأساسية وحدود Auth وMastery وحدود AI وSupabase reset وAuth smoke الحقيقي والتعافي المضبوط وتشغيل Edge غير الحي قبل المجموعة التكاملية الكاملة وتنظيفه بعدها وTeacher/Reviewer composition ثم تشغيل Edge حي جديد لاختبارات Gemini وأخيرًا سلامة Git.
 
 ## Live Gemini
 
