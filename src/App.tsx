@@ -20,7 +20,7 @@ import { SubjectSelection } from '@features/student/subject-selection/SubjectSel
 import { UnitSelection } from '@features/student/unit-selection/UnitSelection';
 import { TeacherWorkspace } from '@features/teacher/workspace';
 import { GatewayAiAuthoringProvider } from '@services/ai-authoring';
-import { getSupabaseClient } from '@services/data/supabase-client';
+import { getCurrentAccessToken } from '@services/auth/auth.service';
 
 type AppSurface = 'student' | 'teacher' | 'reviewer';
 
@@ -148,11 +148,7 @@ export function AppContent() {
       new GatewayAiAuthoringProvider({
         gatewayUrl: resolveAiGatewayUrl(import.meta.env.VITE_SUPABASE_URL),
         publicApiKey: import.meta.env.VITE_SUPABASE_ANON_KEY ?? '',
-        getAccessToken: async () => {
-          const { data, error } = await getSupabaseClient().auth.getSession();
-          if (error) return null;
-          return data.session?.access_token ?? null;
-        },
+        getAccessToken: getCurrentAccessToken,
       }),
     []
   );

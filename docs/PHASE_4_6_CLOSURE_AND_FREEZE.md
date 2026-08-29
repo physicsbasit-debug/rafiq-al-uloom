@@ -3,7 +3,7 @@
 ## Closure, Security Reconciliation & Freeze
 
 **الحالة:** FINAL FREEZE CANDIDATE
-**Implementation baseline:** `625be6c7eedc8bc58e6d5cfa61e73300c6cb7ccb`
+**Pre-closure implementation baseline:** `625be6c7eedc8bc58e6d5cfa61e73300c6cb7ccb`
 **الوسم النهائي المطلوب:** `v0.7-ai-assisted-authoring-complete`
 
 هذه الدفعة لا تضيف ميزة جديدة. وظيفتها إغلاق Phase 4 بالأدلة وإعادة التحقق من المسار الحي الكامل قبل التجميد.
@@ -17,7 +17,16 @@ UPDATE  package.json
 UPDATE  docs/PHASES.md
 ```
 
-لا تتغير في هذه الدفعة production code أو SQL أو migrations أو Edge Functions أو عقود Auth أو Authoring أو Reviewer أو LessonRevisionPayload.
+### Security reconciliation Fix1
+
+```text
+UPDATE  src/App.tsx
+UPDATE  src/services/auth/auth.service.ts
+UPDATE  tests/auth/auth.service.test.ts
+UPDATE  tests/architecture/browser-ai-gateway-boundary.test.ts
+```
+
+بدأت 4-6C بوصفها دفعة closure tooling فقط. أثناء تشغيل بوابة الإغلاق كُشفت مخالفة Auth boundary في App.tsx، فعولجت في Fix1 بنقل قراءة access token إلى auth.service.ts وتحديث الحارس والاختبارات المرتبطة فقط. لم تتغير SQL أو migrations أو Edge Functions أو Auth state أو Authorization أو Authoring أو Reviewer أو LessonRevisionPayload.
 
 ## المراحل المغلقة قبل التجميد
 

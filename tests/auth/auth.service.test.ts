@@ -1,7 +1,7 @@
 import type { AuthChangeEvent, Session, SupabaseClient, User } from '@supabase/supabase-js';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { createAuthService } from '@services/auth/auth.service';
+import { createAuthService, getCurrentAccessToken } from '@services/auth/auth.service';
 
 function createUser(overrides: Partial<User> = {}): User {
   return {
@@ -322,5 +322,29 @@ describe('Auth service', () => {
     vi.stubEnv('VITE_SUPABASE_ANON_KEY', '');
 
     await expect(import('@services/auth/auth.service')).resolves.toBeDefined();
+  });
+});
+
+describe('Current access token', () => {
+  it('يعيد access token الحالي بعد تطبيعه', async () => {
+    const mock = createClientMock();
+    mock.auth.getSession.mockResolvedValue({
+      data: { session: createSession({ access_token: '  gateway-token  ' }) },
+      error: null,
+    });
+    await expect(getCurrentAccessToken(mock.client)).resolves.toBe('gateway-token');
+  });
+
+  it('يفشل مغلقًا عند غياب الجلسة أو خطأ Auth أو exception', async () => {
+    const mock = createClientMock();
+    mock.auth.getSession.mockResolvedValueOnce({ data: { session: null }, error: null });
+    await expect(getCurrentAccessToken(mock.client)).resolves.toBeNull();
+    mock.auth.getSession.mockResolvedValueOnce({
+      data: { session: null },
+      error: { message: 'auth failed' },
+    });
+    await expect(getCurrentAccessToken(mock.client)).resolves.toBeNull();
+    mock.auth.getSession.mockRejectedValueOnce(new Error('network failed'));
+    await expect(getCurrentAccessToken(mock.client)).resolves.toBeNull();
   });
 });

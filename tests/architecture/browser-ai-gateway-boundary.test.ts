@@ -63,7 +63,9 @@ describe('architecture: Phase 4-3D browser AI gateway boundary', () => {
     const app = read(APP_PATH);
     expect(app).toContain('useMemo(');
     expect(app).toContain('new GatewayAiAuthoringProvider({');
-    expect(app).toContain('getSupabaseClient().auth.getSession()');
+    expect(app).toContain('getAccessToken: getCurrentAccessToken');
+    expect(app).not.toContain('getSupabaseClient');
+    expect(app).not.toContain('.auth.getSession()');
     expect(app).toContain('publicApiKey: import.meta.env.VITE_SUPABASE_ANON_KEY');
     expect(app).toContain('<TeacherWorkspace aiProvider={aiProvider} />');
     expect(app).not.toContain('<TeacherWorkspace aiProvider={new GatewayAiAuthoringProvider');

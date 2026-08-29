@@ -42,6 +42,20 @@ type AuthClient = Pick<SupabaseClient, 'auth'>;
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+export async function getCurrentAccessToken(
+  client: Pick<SupabaseClient, 'auth'> = getSupabaseClient()
+): Promise<string | null> {
+  try {
+    const { data, error } = await client.auth.getSession();
+    if (error) return null;
+
+    const token = data.session?.access_token?.trim() ?? '';
+    return token || null;
+  } catch {
+    return null;
+  }
+}
+
 function mapUser(user: User): AuthUser {
   return {
     id: user.id,
