@@ -40,7 +40,7 @@ Parity 10/10
 
 أثبت 4-6B المسار الحي من اقتراح Gemini المقبول حتى Revision والمراجعة والنشر.
 
-تُعد Phase 4 CLOSED & FROZEN فقط بعد نجاح `npm run verify:phase-4-closure` وإنشاء الوسم `v0.7-ai-assisted-authoring-complete` على الالتزام النهائي نفسه.
+أُغلقت Phase 4 وجُمّدت رسميًا عند الوسم `v0.7-ai-assisted-authoring-complete` على الالتزام `05f2e323005735365f9509c74aec70f8752c7e50` بعد نجاح `npm run verify:phase-4-closure` على الالتزام نفسه.
 
 Remote Supabase لرفيق العلوم ما زالت مؤجلة عمدًا.
 
@@ -62,8 +62,8 @@ Remote Supabase لرفيق العلوم ما زالت مؤجلة عمدًا.
 | 2-C5     | Auth Integration Tests & Security Closure | دورة حياة Auth + تركيب حقيقي + فحص أسرار + توثيق تشغيل وتجميد           | الوسم `v0.4-auth-security-complete` على الالتزام المتحقق | مكتملة                                       |
 | 2-D      | Cloud Persistence                         | حفظ نتائج الإتقان المرتبطة بالمستخدم عبر RPC وRLS مع retry وidempotency | مسار سحابي حقيقي + تكافؤ حسابي + أمر إغلاق موحد          | مكتملة / CLOSED                              |
 | 3        | Teacher Dashboard                         | تأليف بشري + مراجعة + اعتماد + نشر محكوم                                | teacher يؤلف وreviewer يراجع/يعتمد عبر حماية خلفية       | مكتملة / CLOSED & FROZEN                     |
-| 4        | AI-assisted Authoring                     | توليد مساعد مع قبول بشري وحواجز خادمية وحراسة تربوية                    | لا حفظ أو اعتماد أو نشر مباشر من AI                      | functional scope complete / FREEZE CANDIDATE |
-| 5        | Advanced Science Activities               | توسيع الألعاب والتجارب والمحاكاة والأنشطة العلمية                       | كل نشاط مرتبط بهدف تعلم وقابل للاختبار                   | مخططة                                        |
+| 4        | AI-assisted Authoring                     | توليد مساعد مع قبول بشري وحواجز خادمية وحراسة تربوية                    | لا حفظ أو اعتماد أو نشر مباشر من AI                      | مكتملة / CLOSED & FROZEN                     |
+| 5        | Advanced Science Activities               | توسيع الألعاب والتجارب والمحاكاة والأنشطة العلمية                       | كل نشاط مرتبط بهدف تعلم وقابل للاختبار                   | 5-0 ARCHITECTURE IN PROGRESS                 |
 | 6        | Production Readiness                      | أمن، أداء، مراقبة أخطاء، نسخ احتياطي، نشر وتوثيق تشغيل                  | قائمة جاهزية إنتاج ناجحة                                 | مخططة                                        |
 | 1.0      | الإطلاق الرسمي                            | نسخة مستقرة قابلة للاستخدام والتوسع                                     | قبول وظيفي وتشغيلي كامل                                  | الهدف النهائي                                |
 
@@ -195,14 +195,14 @@ docs/PHASE_3_MOBILE_VISUAL_ACCEPTANCE.md
 4-4   Pedagogical Guardrails                          ✅ CLOSED
 4-5   Provenance Decision                             ✅ CLOSED
 4-6B  Real AI Acceptance → Publication                ✅ CLOSED @ 625be6c
-4-6C  Closure + Final Freeze                          🔄 FREEZE CANDIDATE
+4-6C  Closure + Final Freeze                          ✅ CLOSED @ 05f2e32
 ```
 
 القرار النهائي: `NO DURABLE AI PROVENANCE PERSISTENCE IN v0.7`.
 
 بوابة الإغلاق: `npm run verify:phase-4-closure`.
 
-الوسم المطلوب: `v0.7-ai-assisted-authoring-complete`.
+الوسم المعتمد: `v0.7-ai-assisted-authoring-complete` → `05f2e323005735365f9509c74aec70f8752c7e50`.
 
 التفاصيل: `docs/PHASE_4_6_CLOSURE_AND_FREEZE.md`.
 
