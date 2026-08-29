@@ -34,12 +34,6 @@ UPDATE  tests/architecture/browser-ai-gateway-boundary.test.ts
 
 يعالج Fix2 ترتيب بوابة الإغلاق فقط: يشغّل Edge runtime غير الحي قبل المجموعة التكاملية الكاملة، ينظفه بعدها، ثم يشغّل لاحقًا Edge جديدًا مستقلًا مع GEMINI_API_KEY لاختبارات Gemini الحية. لا يتغير production code أو SQL أو migrations أو Edge Function أو عقود التطبيق.
 
-### Closure runtime reconciliation Fix2
-
-أثبت تشغيل بوابة الإغلاق أن مجموعة Supabase غير الحية كانت تستدعي اختبار AI Gateway قبل تشغيل Edge runtime، فكانت جميع حالات HTTP تعود 503 رغم سلامة المنطق. أثبت اختبار إعادة الإنتاج أن تشغيل ai-authoring-gateway أولًا يعيد حماية JWT برمز 401 ثم تنجح اختبارات Gateway الثمانية كاملة.
-
-يعالج Fix2 ترتيب بوابة الإغلاق فقط: يشغّل Edge runtime غير الحي قبل المجموعة التكاملية الكاملة، ينظفه بعدها، ثم يشغّل لاحقًا Edge جديدًا مستقلًا مع GEMINI_API_KEY لاختبارات Gemini الحية. لا يتغير production code أو SQL أو migrations أو Edge Function أو عقود التطبيق.
-
 ## المراحل المغلقة قبل التجميد
 
 ```text
