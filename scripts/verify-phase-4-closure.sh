@@ -376,6 +376,11 @@ run_step \
     tests/architecture/browser-ai-gateway-boundary.test.ts
 
 run_step \
+  "Phase 4-6 V2 permanent closure contract" \
+  npx --no-install vitest run \
+    tests/architecture/phase-4-6-v2-closure-contract.test.ts
+
+run_step \
   "Phase 4 targeted AI tests" \
   npx --no-install vitest run \
     tests/ai-authoring/ai-authoring-adversarial.test.ts \
@@ -428,6 +433,13 @@ run_step \
     tests/integration/supabase-teacher-reviewer-workspace-composition.integration.tsx
 
 run_step \
+  "Phase 4-6 V2 canonical deterministic AI-assisted composition" \
+  env RUN_SUPABASE_INTEGRATION_TESTS=true \
+  npx --no-install vitest run \
+    --config vitest.supabase.config.ts \
+    tests/integration/supabase-ai-assisted-authoring-composition.integration.tsx
+
+run_step \
   "Start fresh live Gemini Edge gateway" \
   start_live_edge_runtime
 
@@ -441,7 +453,7 @@ run_step \
     tests/integration/supabase-ai-authoring-browser-gateway-live.integration.ts
 
 run_step \
-  "Phase 4 live AI acceptance → publication composition" \
+  "Phase 4 supplemental live AI composition smoke" \
   env \
     RUN_SUPABASE_INTEGRATION_TESTS=true \
     RUN_LIVE_GEMINI_TESTS=true \
@@ -474,7 +486,10 @@ printf '%s\n' \
   'PASS: Browser → Edge → live Gemini'
 
 printf '%s\n' \
-  'PASS: live Gemini → teacher acceptance → revision → reviewer → publication'
+  'PASS: canonical deterministic AI → teacher acceptance/apply → manual Save → reviewer visibility → trusted publication'
+
+printf '%s\n' \
+  'PASS: supplemental live AI composition smoke'
 
 printf '%s\n' \
   'PASS: AI provenance remains ephemeral in v0.7'

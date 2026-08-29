@@ -17,6 +17,23 @@ function lines(value: readonly string[]): string {
   return value.length ? value.join('، ') : 'لا يوجد';
 }
 
+function difficultyLabel(
+  value: LessonRevision['payload']['questions'][number]['difficulty']
+): string {
+  switch (value) {
+    case 'easy':
+      return 'سهل';
+    case 'medium':
+      return 'متوسط';
+    case 'hard':
+      return 'صعب';
+  }
+}
+
+function purposeLabel(value: LessonRevision['payload']['questions'][number]['purpose']): string {
+  return value === 'mastery' ? 'إتقان' : 'مراجعة';
+}
+
 export function ReviewerRevisionReview({
   service,
   revision,
@@ -33,6 +50,10 @@ export function ReviewerRevisionReview({
     isReviewing,
     error,
   } = useReviewerRevisionReview({ service, revision, onDecisionCommitted });
+
+  const objectiveTextByKey = new Map(
+    revision.payload.objectives.map((objective) => [objective.key, objective.text] as const)
+  );
 
   const requestApprove = () => {
     if (isReviewLocked()) return;
@@ -110,12 +131,81 @@ export function ReviewerRevisionReview({
         <div>
           <strong>التصورات البديلة:</strong> {lines(revision.payload.lesson.misconceptions)}
         </div>
-        <div>
-          <strong>المحتوى البنيوي:</strong> {revision.payload.objectives.length} أهداف،{' '}
-          {revision.payload.questions.length} أسئلة، {revision.payload.games.length} ألعاب،{' '}
-          {revision.payload.experiments.length} تجارب.
-        </div>
       </div>
+
+      <section aria-labelledby="reviewer-objectives-title" style={{ marginTop: '1.25rem' }}>
+        <h3 id="reviewer-objectives-title">أهداف التعلم</h3>
+        {revision.payload.objectives.length === 0 ? (
+          <p>لا توجد أهداف تعلم في هذه النسخة.</p>
+        ) : (
+          <ol>
+            {revision.payload.objectives.map((objective, index) => (
+              <li key={objective.key}>
+                <strong>الهدف {index + 1}:</strong> {objective.text}
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
+
+      <section aria-labelledby="reviewer-questions-title" style={{ marginTop: '1.25rem' }}>
+        <h3 id="reviewer-questions-title">أسئلة الدرس</h3>
+        {revision.payload.questions.length === 0 ? (
+          <p>لا توجد أسئلة في هذه النسخة.</p>
+        ) : (
+          <div style={{ display: 'grid', gap: '1rem' }}>
+            {revision.payload.questions.map((question, index) => {
+              const correctAnswer = question.choices[question.correctAnswerIndex] ?? 'غير محددة';
+              const linkedObjective = objectiveTextByKey.get(question.objectiveKey) ?? 'غير موجود';
+
+              return (
+                <article
+                  key={question.key}
+                  aria-label={`تفاصيل السؤال ${index + 1}`}
+                  style={{
+                    border: '1px solid currentColor',
+                    borderRadius: '12px',
+                    padding: '1rem',
+                  }}
+                >
+                  <div>
+                    <strong>الغرض:</strong> {purposeLabel(question.purpose)}
+                  </div>
+                  <div>
+                    <strong>نص السؤال:</strong> {question.prompt}
+                  </div>
+                  <div>
+                    <strong>الاختيارات:</strong>
+                    <ol>
+                      {question.choices.map((choice, choiceIndex) => (
+                        <li key={choiceIndex}>
+                          {choice}
+                          {choiceIndex === question.correctAnswerIndex ? ' — الإجابة الصحيحة' : ''}
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                  <div>
+                    <strong>الإجابة الصحيحة:</strong> {correctAnswer}
+                  </div>
+                  <div>
+                    <strong>شرح الإجابة:</strong> {question.explanation}
+                  </div>
+                  <div>
+                    <strong>الصعوبة:</strong> {difficultyLabel(question.difficulty)}
+                  </div>
+                  <div>
+                    <strong>الهدف المرتبط:</strong> {linkedObjective}
+                  </div>
+                  <div>
+                    <strong>مفتاح الهدف المرتبط:</strong> <code>{question.objectiveKey}</code>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
+      </section>
 
       <label style={{ display: 'grid', gap: '0.35rem', marginTop: '1rem' }}>
         ملاحظة الرفض

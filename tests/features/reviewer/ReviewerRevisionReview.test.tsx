@@ -1,6 +1,14 @@
 // @vitest-environment jsdom
 
-import { act, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ReviewerRevisionReview } from '@features/reviewer/workspace/ReviewerRevisionReview';
@@ -26,8 +34,25 @@ const payload: LessonRevisionPayload = {
     examples: ['موجات الماء'],
     misconceptions: ['السرعة تساوي التردد'],
   },
-  objectives: [],
-  questions: [],
+  objectives: [
+    {
+      key: 'objective-wave',
+      text: 'يفسر انعكاس الموجات',
+    },
+  ],
+  questions: [
+    {
+      key: 'mastery-wave',
+      purpose: 'mastery',
+      type: 'multiple_choice',
+      prompt: 'أي وصف يعبّر عن انعكاس الموجات؟',
+      choices: ['ارتداد الموجة', 'تغير سرعتها فقط', 'اختفاء الموجة'],
+      correctAnswerIndex: 0,
+      explanation: 'الانعكاس هو ارتداد الموجة عند اصطدامها بحد فاصل.',
+      objectiveKey: 'objective-wave',
+      difficulty: 'medium',
+    },
+  ],
   games: [],
   experiments: [],
 };
@@ -86,6 +111,44 @@ afterEach(() => {
 });
 
 describe('ReviewerRevisionReview', () => {
+  it('يعرض للمراجع تفاصيل الهدف والسؤال كاملة قبل اتخاذ القرار', () => {
+    const service = reviewServiceWith(vi.fn<ReviewService['reviewLessonRevision']>());
+
+    renderReview(service);
+
+    const objectivesRegion = screen.getByRole('region', { name: 'أهداف التعلم' });
+    expect(within(objectivesRegion).getByText('يفسر انعكاس الموجات')).toBeInTheDocument();
+
+    const question = screen.getByRole('article', { name: 'تفاصيل السؤال 1' });
+
+    expect(within(question).getByText('إتقان')).toBeInTheDocument();
+    expect(within(question).getByText('أي وصف يعبّر عن انعكاس الموجات؟')).toBeInTheDocument();
+
+    expect(within(question).getByText('ارتداد الموجة — الإجابة الصحيحة')).toBeInTheDocument();
+    expect(within(question).getByText('تغير سرعتها فقط')).toBeInTheDocument();
+    expect(within(question).getByText('اختفاء الموجة')).toBeInTheDocument();
+
+    expect(within(question).getByText('الإجابة الصحيحة:').parentElement).toHaveTextContent(
+      'الإجابة الصحيحة: ارتداد الموجة'
+    );
+
+    expect(within(question).getByText('شرح الإجابة:').parentElement).toHaveTextContent(
+      'شرح الإجابة: الانعكاس هو ارتداد الموجة عند اصطدامها بحد فاصل.'
+    );
+
+    expect(within(question).getByText('الصعوبة:').parentElement).toHaveTextContent(
+      'الصعوبة: متوسط'
+    );
+
+    expect(within(question).getByText('الهدف المرتبط:').parentElement).toHaveTextContent(
+      'الهدف المرتبط: يفسر انعكاس الموجات'
+    );
+
+    expect(within(question).getByText('مفتاح الهدف المرتبط:').parentElement).toHaveTextContent(
+      'مفتاح الهدف المرتبط: objective-wave'
+    );
+  });
+
   it('يعتمد reviewRevisionId نفسه ويرسل note:null ثم يلتزم محليًا فقط بعد نجاح الخادم', async () => {
     let resolveReview!: (value: ReviewLessonRevisionResult) => void;
     const pending = new Promise<ReviewLessonRevisionResult>((resolve) => {
