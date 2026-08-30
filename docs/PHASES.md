@@ -40,7 +40,9 @@ Parity 10/10
 
 أثبت 4-6B المسار الحي من اقتراح Gemini المقبول حتى Revision والمراجعة والنشر.
 
-أُغلقت Phase 4 وجُمّدت رسميًا عند الوسم `v0.7-ai-assisted-authoring-complete` على الالتزام `05f2e323005735365f9509c74aec70f8752c7e50` بعد نجاح `npm run verify:phase-4-closure` على الالتزام نفسه.
+أُغلقت Phase 4 وجُمّدت رسميًا بعد إصلاح عقد V2 عند الوسم التصحيحي `v0.7.1-ai-assisted-authoring-closure-repair` على الالتزام `f63fdcf886911d8c884241701721cce2aaa47c61`، بعد نجاح `npm run verify:phase-4-closure` على `main` نظيف ومتزامن واعتماد المراجعة المستقلة النهائية.
+
+يبقى الوسم `v0.7-ai-assisted-authoring-complete` محفوظًا كوسم تاريخي لمحاولة الإغلاق السابقة، ولا يُعد baseline المعتمد لعقد Phase 4 V2.
 
 Remote Supabase لرفيق العلوم ما زالت مؤجلة عمدًا.
 
