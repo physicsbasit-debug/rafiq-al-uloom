@@ -2,8 +2,9 @@
 
 ## Science Activities Contract & Architecture
 
-**الحالة:** ARCHITECTURE BASELINE CANDIDATE
-**Phase 4 frozen baseline:** `v0.7-ai-assisted-authoring-complete`
+**الحالة:** ARCHITECTURE BASELINE CANDIDATE — RE-APPROVAL PENDING
+**Phase 4 frozen baseline:** `v0.7.1-ai-assisted-authoring-closure-repair` → `f63fdcf886911d8c884241701721cce2aaa47c61`
+**Historical attempted Phase 4 tag:** `v0.7-ai-assisted-authoring-complete` — retained for history, not the V2 frozen baseline
 **Phase 5:** Advanced Science Activities
 
 ## الهدف

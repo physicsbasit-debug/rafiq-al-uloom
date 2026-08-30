@@ -1,10 +1,11 @@
 # Phase 4-6R — V2 Contract Restoration & Closure Repair
 
-**Status:** IMPLEMENTATION COMPLETE LOCALLY — FINAL CLOSURE PENDING
-**Branch:** `phase-4-6r-v2-contract-restoration`
-**Baseline:** `2473b5468962064dab5cd99752d08f122acb02c1`
+**Status:** CLOSED & FROZEN
+**Repair branch:** `phase-4-6r-v2-contract-restoration`
+**Repair baseline:** `2473b5468962064dab5cd99752d08f122acb02c1`
 **Historical attempted freeze tag:** `v0.7-ai-assisted-authoring-complete`
-**Corrective tag candidate after final approval:** `v0.7.1-ai-assisted-authoring-closure-repair`
+**Canonical corrective freeze tag:** `v0.7.1-ai-assisted-authoring-closure-repair`
+**Frozen commit:** `f63fdcf886911d8c884241701721cce2aaa47c61`
 
 ## Why this repair exists
 
@@ -199,19 +200,37 @@ If the repaired implementation passes the complete closure process and independe
 
 The corrective tag is not created by this implementation stage.
 
-## Remaining closure work
+## Final closure evidence
 
-This document does not declare Phase 4 closed.
+Phase 4 is formally closed and frozen under:
 
-The remaining work is:
+`v0.7.1-ai-assisted-authoring-closure-repair`
 
-1. run the full pre-closure repository gates on the repaired branch;
-2. run the live Browser → Edge → Gemini gate with the real Gemini secret;
-3. run the supplemental live composition smoke;
-4. obtain an independent implementation review against the approved Phase 4-6R scope;
-5. merge through a reviewed PR;
-6. run the final closure command on the clean synchronized merged candidate;
-7. only after all gates pass, update phase-status documentation and create the corrective tag.
+→ `f63fdcf886911d8c884241701721cce2aaa47c61`
+
+Final closure evidence:
+
+1. the complete Phase 4-6R implementation received independent implementation approval;
+2. PR #2 was merged to `main` with merge commit `cb98be6e5467659b5b208d52aaba3f808ccce517`;
+3. the inherited `docs/PHASES.md` formatting debt was repaired in an isolated formatting-only commit;
+4. `npm run verify:phase-4-closure` completed successfully on clean synchronized `main`;
+5. the command printed `PHASE 4 AUTOMATED CLOSURE VERIFICATION PASSED`;
+6. Browser → Edge → live Gemini passed;
+7. canonical deterministic AI-assisted composition passed;
+8. supplemental live AI composition passed;
+9. the final independent closure review returned `PHASE_4_6R_FINAL_INDEPENDENT_CLOSURE=APPROVED`;
+10. the corrective annotated tag was created and verified locally and remotely;
+11. the historical `v0.7-ai-assisted-authoring-complete` tag remains unchanged.
+
+Final raw closure log SHA-256:
+
+`6421bd57d1132f486eff841eab5383c96222c4f12d836ce8ae2129ad275afc8b`
+
+Corrective annotated tag object:
+
+`830bd9445d765d76b01f2930869ba681d725b1dd`
+
+GitHub verification status for the annotated tag is `unsigned`, matching the repository's historical tag practice.
 
 ## Permanent process rule adopted
 
