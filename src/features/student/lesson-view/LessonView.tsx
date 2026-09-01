@@ -20,6 +20,7 @@ interface LessonViewProps {
   lessonId: string;
   onBackToLessons: () => void;
   onOpenReviewQuestions: () => void;
+  onOpenActivities: () => void;
   onOpenMatchingGame: () => void;
   onOpenMasteryTest: () => void;
 }
@@ -36,6 +37,7 @@ function LessonViewContent({
   experiments,
   onBackToLessons,
   onOpenReviewQuestions,
+  onOpenActivities,
   onOpenMatchingGame,
   onOpenMasteryTest,
 }: LessonViewContentProps) {
@@ -78,6 +80,7 @@ function LessonViewContent({
         }}
       >
         <AppButton label="أسئلة المراجعة" onClick={onOpenReviewQuestions} />
+        <AppButton label="الأنشطة العلمية" onClick={onOpenActivities} />
         <AppButton label="لعبة تعليمية" onClick={onOpenMatchingGame} />
         <AppButton label="اختبار الإتقان" onClick={onOpenMasteryTest} />
         <AppButton label="العودة إلى الدروس" variant="secondary" onClick={onBackToLessons} />
@@ -90,6 +93,7 @@ export function LessonView({
   lessonId,
   onBackToLessons,
   onOpenReviewQuestions,
+  onOpenActivities,
   onOpenMatchingGame,
   onOpenMasteryTest,
 }: LessonViewProps) {
@@ -115,6 +119,7 @@ export function LessonView({
         experiments={experimentsQuery.data}
         onBackToLessons={onBackToLessons}
         onOpenReviewQuestions={onOpenReviewQuestions}
+        onOpenActivities={onOpenActivities}
         onOpenMatchingGame={onOpenMatchingGame}
         onOpenMasteryTest={onOpenMasteryTest}
       />
