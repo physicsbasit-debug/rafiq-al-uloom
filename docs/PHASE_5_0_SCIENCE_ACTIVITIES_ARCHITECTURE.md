@@ -2,10 +2,12 @@
 
 ## Science Activities Contract & Architecture
 
-**الحالة:** ARCHITECTURE BASELINE CANDIDATE — RE-APPROVAL PENDING
+**الحالة:** APPROVED ARCHITECTURE BASELINE — CLOSED
 **Phase 4 frozen baseline:** `v0.7.1-ai-assisted-authoring-closure-repair` → `f63fdcf886911d8c884241701721cce2aaa47c61`
 **Historical attempted Phase 4 tag:** `v0.7-ai-assisted-authoring-complete` — retained for history, not the V2 frozen baseline
 **Phase 5:** Advanced Science Activities
+**5-0R rebind:** APPROVED against the frozen Phase 4 V2 baseline.
+**5-1 completion:** Experiment Objective Linkage CLOSED on `main` at `5108a69867b7b94d4c54b6c26f14b4a7ed34b037`; this completion does not reopen or alter any Phase 5-0 architecture decision.
 
 ## الهدف
 

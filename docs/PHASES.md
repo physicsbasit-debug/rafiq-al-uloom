@@ -65,9 +65,20 @@ Remote Supabase لرفيق العلوم ما زالت مؤجلة عمدًا.
 | 2-D      | Cloud Persistence                         | حفظ نتائج الإتقان المرتبطة بالمستخدم عبر RPC وRLS مع retry وidempotency | مسار سحابي حقيقي + تكافؤ حسابي + أمر إغلاق موحد          | مكتملة / CLOSED              |
 | 3        | Teacher Dashboard                         | تأليف بشري + مراجعة + اعتماد + نشر محكوم                                | teacher يؤلف وreviewer يراجع/يعتمد عبر حماية خلفية       | مكتملة / CLOSED & FROZEN     |
 | 4        | AI-assisted Authoring                     | توليد مساعد مع قبول بشري وحواجز خادمية وحراسة تربوية                    | لا حفظ أو اعتماد أو نشر مباشر من AI                      | مكتملة / CLOSED & FROZEN     |
-| 5        | Advanced Science Activities               | توسيع الألعاب والتجارب والمحاكاة والأنشطة العلمية                       | كل نشاط مرتبط بهدف تعلم وقابل للاختبار                   | 5-0 ARCHITECTURE IN PROGRESS |
+| 5        | Advanced Science Activities               | توسيع الألعاب والتجارب والمحاكاة والأنشطة العلمية                       | كل نشاط مرتبط بهدف تعلم وقابل للاختبار                   | 5-2 CURRENT — 5-0/5-1 CLOSED |
 | 6        | Production Readiness                      | أمن، أداء، مراقبة أخطاء، نسخ احتياطي، نشر وتوثيق تشغيل                  | قائمة جاهزية إنتاج ناجحة                                 | مخططة                        |
 | 1.0      | الإطلاق الرسمي                            | نسخة مستقرة قابلة للاستخدام والتوسع                                     | قبول وظيفي وتشغيلي كامل                                  | الهدف النهائي                |
+
+
+## حالة Phase 5 الحالية
+
+```text
+5-0  Science Activities Contract & Architecture             ✅ APPROVED / CLOSED
+5-1  Experiment Objective Linkage                            ✅ CLOSED @ 5108a69867b7b94d4c54b6c26f14b4a7ed34b037
+5-2  Activity Domain + Registry + Student Activity Hub       ▶ CURRENT
+```
+
+`5-0R` أعاد ربط baseline المعماري رسميًا بوسم Phase 4 V2 المجمد، و`5-1` أُغلقت بعد تنفيذ Experiment Objective Linkage ودمج PR #5. هذه السطور تسجل الحالة فقط ولا تعيد فتح أو تعدل عقود المراحل السابقة.
 
 ## تقسيم Phase 2-C5
 
