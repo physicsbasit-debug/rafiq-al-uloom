@@ -160,6 +160,16 @@ ON CONFLICT (id) DO UPDATE SET
   status = EXCLUDED.status,
   source = EXCLUDED.source;
 
+INSERT INTO public.experiment_objectives (experiment_id, objective_id, lesson_id, position)
+VALUES
+  ('l1-exp', 'l1-o2', 'g10-phy-waves-l1', 0),
+  ('l2-exp', 'l2-o1', 'g10-phy-waves-l2', 0),
+  ('l3-exp', 'l3-o1', 'g10-phy-waves-l3', 0),
+  ('l4-exp', 'l4-o1', 'g10-phy-waves-l4', 0)
+ON CONFLICT (experiment_id, objective_id) DO UPDATE SET
+  lesson_id = EXCLUDED.lesson_id,
+  position = EXCLUDED.position;
+
 INSERT INTO public.game_objectives (game_id, objective_id, position)
 VALUES
   ('l1-game', 'l1-o1', 0),

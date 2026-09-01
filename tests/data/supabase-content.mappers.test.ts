@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  mapExperimentObjectiveRow,
   mapExperimentRow,
   mapGameObjectiveRow,
   mapGameRow,
@@ -179,14 +180,56 @@ describe('supabase content mappers', () => {
     );
   });
 
+  it('يبني التجربة من الصف وروابط الأهداف ويحافظ على ترتيبها', () => {
+    const objectiveIds = ['objective-2', 'objective-1'];
+    const experiment = mapExperimentRow(experimentRow, objectiveIds);
+
+    expect(experiment.objectiveIds).toEqual(objectiveIds);
+    expect(experiment.objectiveIds).not.toBe(objectiveIds);
+  });
+
+  it('يرفض تجربة بلا objectiveIds أو ذات روابط مكررة', () => {
+    expect(() => mapExperimentRow(experimentRow, [])).toThrow(
+      'objectiveIds must contain at least one objective'
+    );
+    expect(() => mapExperimentRow(experimentRow, ['objective-1', 'objective-1'])).toThrow(
+      'objectiveIds must not contain duplicates'
+    );
+  });
+
+  it('يحوّل صف experiment_objectives ويتحقق من lesson_id وposition', () => {
+    expect(
+      mapExperimentObjectiveRow({
+        experiment_id: 'experiment-1',
+        objective_id: 'objective-1',
+        lesson_id: 'lesson-1',
+        position: 0,
+      })
+    ).toEqual({
+      experiment_id: 'experiment-1',
+      objective_id: 'objective-1',
+      lesson_id: 'lesson-1',
+      position: 0,
+    });
+
+    expect(() =>
+      mapExperimentObjectiveRow({
+        experiment_id: 'experiment-1',
+        objective_id: 'objective-1',
+        lesson_id: 'lesson-1',
+        position: -1,
+      })
+    ).toThrow('position must be non-negative');
+  });
+
   it('يدعم homeAlternative بقيمة null', () => {
-    expect(mapExperimentRow(experimentRow).homeAlternative).toBeNull();
+    expect(mapExperimentRow(experimentRow, ['objective-1']).homeAlternative).toBeNull();
   });
 
   it('يرفض null في homeAlternative إذا كانت القيمة ليست نصًا أو null', () => {
-    expect(() => mapExperimentRow({ ...experimentRow, home_alternative: 42 })).toThrow(
-      'home_alternative must be a string or null'
-    );
+    expect(() =>
+      mapExperimentRow({ ...experimentRow, home_alternative: 42 }, ['objective-1'])
+    ).toThrow('home_alternative must be a string or null');
   });
 
   it('يرفض مصفوفة نصية غير صالحة', () => {

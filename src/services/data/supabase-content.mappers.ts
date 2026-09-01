@@ -12,7 +12,7 @@ import type { Experiment, SafetyLevel } from '@shared-types/experiment.types';
 import type { Game, GameType, MatchingItem } from '@shared-types/game.types';
 import type { Difficulty, Question, QuestionType } from '@shared-types/quiz.types';
 
-import type { GameObjectiveRow } from './supabase-content.rows';
+import type { ExperimentObjectiveRow, GameObjectiveRow } from './supabase-content.rows';
 
 const CONTENT_STATUSES = ['draft', 'pending_review', 'approved'] as const;
 const CONTENT_SOURCES = ['ai_generated', 'teacher_authored', 'curriculum_seed'] as const;
@@ -112,6 +112,24 @@ function requireEnum<T extends string>(
 
 function requireObjectiveIds(value: unknown, entity: string, id: string): string[] {
   return requireStringArray(value, 'objectiveIds', entity, id);
+}
+
+function requireExperimentObjectiveIds(value: unknown, id: string): string[] {
+  const objectiveIds = requireStringArray(value, 'objectiveIds', 'experiment', id);
+
+  if (objectiveIds.length === 0) {
+    invalid('experiment', id, 'objectiveIds must contain at least one objective');
+  }
+
+  if (objectiveIds.some((objectiveId) => objectiveId.length === 0)) {
+    invalid('experiment', id, 'objectiveIds must not contain empty ids');
+  }
+
+  if (new Set(objectiveIds).size !== objectiveIds.length) {
+    invalid('experiment', id, 'objectiveIds must not contain duplicates');
+  }
+
+  return objectiveIds;
 }
 
 function mapMatchingItems(value: unknown, gameId: string): MatchingItem[] {
@@ -263,7 +281,7 @@ export function mapGameRow(input: unknown, objectiveIds: readonly string[]): Gam
   };
 }
 
-export function mapExperimentRow(input: unknown): Experiment {
+export function mapExperimentRow(input: unknown, objectiveIds: readonly string[]): Experiment {
   const row = asRecord(input, 'experiment');
   const id = rowId(row);
   return {
@@ -271,6 +289,7 @@ export function mapExperimentRow(input: unknown): Experiment {
     lessonId: requireString(row, 'lesson_id', 'experiment', id),
     title: requireString(row, 'title', 'experiment', id),
     objective: requireString(row, 'objective', 'experiment', id),
+    objectiveIds: requireExperimentObjectiveIds(objectiveIds, id),
     tools: requireStringArray(row.tools, 'tools', 'experiment', id),
     steps: requireStringArray(row.steps, 'steps', 'experiment', id),
     safetyNotes: requireStringArray(row.safety_notes, 'safety_notes', 'experiment', id),
@@ -286,6 +305,27 @@ export function mapExperimentRow(input: unknown): Experiment {
     homeAlternative: requireNullableString(row, 'home_alternative', 'experiment', id),
     status: requireEnum(row.status, CONTENT_STATUSES, 'status', 'experiment', id) as ContentStatus,
     source: requireEnum(row.source, CONTENT_SOURCES, 'source', 'experiment', id) as ContentSource,
+  };
+}
+
+export function mapExperimentObjectiveRow(input: unknown): ExperimentObjectiveRow {
+  const row = asRecord(input, 'experiment_objective');
+  const id = `${String(row.experiment_id ?? '<unknown>')}:${String(
+    row.objective_id ?? '<unknown>'
+  )}`;
+  const experimentId = requireString(row, 'experiment_id', 'experiment_objective', id);
+  const objectiveId = requireString(row, 'objective_id', 'experiment_objective', id);
+  const lessonId = requireString(row, 'lesson_id', 'experiment_objective', id);
+
+  if (experimentId.length === 0 || objectiveId.length === 0 || lessonId.length === 0) {
+    invalid('experiment_objective', id, 'ids must be non-empty strings');
+  }
+
+  return {
+    experiment_id: experimentId,
+    objective_id: objectiveId,
+    lesson_id: lessonId,
+    position: requireNonNegativeInteger(row, 'position', 'experiment_objective', id),
   };
 }
 

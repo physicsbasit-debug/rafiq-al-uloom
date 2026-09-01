@@ -918,6 +918,7 @@ export const grade10PhysicsWavesExperiments: Experiment[] = [
     lessonId: 'g10-phy-waves-l1',
     title: 'تكوين موجة طولية وأخرى عرضية',
     objective: 'التمييز عمليًا بين الموجة الطولية والعرضية.',
+    objectiveIds: ['l1-o2'],
     tools: ['حبل مرن أو نابض لعبة (سلينكي)', 'سطح مستوٍ'],
     steps: [
       'ثبّت أحد طرفي الحبل واجعل الطرف الآخر بيدك.',
@@ -938,6 +939,7 @@ export const grade10PhysicsWavesExperiments: Experiment[] = [
     lessonId: 'g10-phy-waves-l2',
     title: 'تقدير التردد من عدّ الموجات',
     objective: 'ربط التردد بعدد الموجات المتكوّنة في زمن محدد.',
+    objectiveIds: ['l2-o1'],
     tools: ['حبل مرن', 'ساعة توقيت (هاتف)'],
     steps: [
       'ثبّت طرف الحبل وحرّك الطرف الآخر بانتظام لتكوين موجات متتابعة.',
@@ -958,6 +960,7 @@ export const grade10PhysicsWavesExperiments: Experiment[] = [
     lessonId: 'g10-phy-waves-l3',
     title: 'هاتف الكوبين والخيط',
     objective: 'توضيح انتقال الصوت عبر وسط صلب مقارنة بالهواء.',
+    objectiveIds: ['l3-o1'],
     tools: ['كوبان ورقيان أو بلاستيكيان', 'خيط طويل (3–5 أمتار)', 'مسمار صغير لعمل ثقب'],
     steps: [
       'اثقب قاع كل كوب ثقبًا صغيرًا ومرّر الخيط خلاله واعقده من الداخل.',
@@ -978,6 +981,7 @@ export const grade10PhysicsWavesExperiments: Experiment[] = [
     lessonId: 'g10-phy-waves-l4',
     title: 'انكسار الضوء الظاهري',
     objective: 'ملاحظة انكسار الضوء عند انتقاله بين الهواء والماء.',
+    objectiveIds: ['l4-o1'],
     tools: ['كأس شفاف', 'ماء', 'قلم رصاص'],
     steps: [
       'املأ الكأس بالماء حتى منتصفه.',

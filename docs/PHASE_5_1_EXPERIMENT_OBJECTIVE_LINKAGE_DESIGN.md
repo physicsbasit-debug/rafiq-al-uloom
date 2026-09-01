@@ -2,11 +2,21 @@
 
 ## Experiment Objective Linkage Contract & Data Integrity Design
 
-**الحالة:** DESIGN CANDIDATE — INDEPENDENT REVIEW PENDING  
+**الحالة:** APPROVED DESIGN — SECURITY ALIGNMENT CORRECTION RECORDED
 **Baseline:** `40cb589d8c7793e589ce784961bb810cfada305d`  
 **Phase 5-0:** APPROVED ARCHITECTURE BASELINE  
 **Phase 4 frozen baseline:** `v0.7.1-ai-assisted-authoring-closure-repair` → `f63fdcf886911d8c884241701721cce2aaa47c61`  
 **Phase:** `5-1 — Experiment Objective Linkage`
+
+> **Security Alignment Correction — Phase 5-1 FIX1**
+>
+> أثناء التنفيذ كشف pgTAP تعارضًا بين صياغة RLS الأصلية في هذه الوثيقة وبين
+> عقد الصلاحيات المعتمد تاريخيًا في Phase 2-C2-A. المرجع الأمني الأعلى هو
+> Phase 2-C2-A: لا يملك `anon` صلاحية `SELECT` على جداول المحتوى المحمية،
+> بينما يملك `authenticated` و`service_role` صلاحية القراءة الصريحة، وتُقيّد
+> قراءة `authenticated` بسياسة RLS تتطلب ملفًا شخصيًا نشطًا ودورًا مسموحًا
+> ومحتوى معتمدًا. هذا التصحيح يغيّر بنود Security/RLS والاختبارات المرتبطة
+> بها فقط، ولا يغيّر Domain Contract أو Data Model أو Seed/Repository design.
 
 ## الهدف
 
@@ -350,23 +360,17 @@ getExperimentsByLesson(
 
 ## RLS & Grants
 
-المشروع الحالي يستخدم explicit table grants.
+المشروع يستخدم explicit table grants، ويظل عقد Phase 2-C2-A هو المرجع الأمني.
 
-لذلك migration الجديدة يجب أن تمنح صراحة:
-
-```text
-SELECT
-```
-
-على `experiment_objectives` إلى:
+لذلك migration الجديدة يجب أن تضمن صراحة:
 
 ```text
-anon
-authenticated
-service_role
+anon          = no SELECT
+authenticated = SELECT
+service_role  = SELECT
 ```
 
-مع عدم منح write access.
+على `experiment_objectives`، مع عدم منح أي write access لأدوار التطبيق.
 
 ## RLS Policy
 
@@ -378,16 +382,27 @@ ENABLE ROW LEVEL SECURITY
 
 على `experiment_objectives`.
 
-وتسمح سياسة القراءة لـanon/authenticated بقراءة الرابط فقط عندما:
+سياسة القراءة تكون:
 
 ```text
+TO authenticated
+```
+
+وتسمح بالقراءة فقط عندما تتحقق الشروط جميعًا:
+
+```text
+profile.status = active
+profile.role IN (student, teacher, reviewer)
 experiment.status = approved
 lesson.status = approved
 ```
 
-ولا تكشف links لتجارب غير منشورة.
+وبذلك:
 
-`service_role` يحتفظ بسلوك bypass الخاص به، لكنه يحتاج explicit SELECT table privilege.
+- `anon` لا يملك table-level `SELECT` أصلًا.
+- المستخدم `authenticated` غير النشط لا يرى الروابط حتى لو كان المحتوى معتمدًا.
+- المستخدم النشط لا يرى روابط تجارب أو دروس غير معتمدة.
+- `service_role` يحتفظ بسلوك bypass الخاص به، مع explicit `SELECT` table privilege.
 
 ## Existing Security Boundary
 
@@ -435,12 +450,13 @@ stable ordered positions
 يجب إثبات:
 
 ```text
-anon cannot read links of draft experiment
-authenticated cannot read links of draft experiment
-anon can read links of approved experiment in approved lesson
-authenticated can read links of approved experiment in approved lesson
+anon has no SELECT privilege
+active authenticated can read approved linkage
+active authenticated cannot read draft linkage
+pending authenticated cannot read approved linkage
+suspended authenticated cannot read approved linkage
 service_role can read required rows
-no write grant was introduced
+no client write grant was introduced
 ```
 
 تعمل هذه الاختبارات على Supabase المحلية.

@@ -7,6 +7,7 @@ export interface Experiment {
   lessonId: string;
   title: string;
   objective: string;
+  objectiveIds: string[];
   tools: string[];
   steps: string[];
   safetyNotes: string[];

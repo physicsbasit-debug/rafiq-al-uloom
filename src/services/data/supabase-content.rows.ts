@@ -103,6 +103,13 @@ export interface ExperimentRow {
   source: ContentSourceRow;
 }
 
+export interface ExperimentObjectiveRow {
+  experiment_id: string;
+  objective_id: string;
+  lesson_id: string;
+  position: number;
+}
+
 export interface GameObjectiveRow {
   game_id: string;
   objective_id: string;
