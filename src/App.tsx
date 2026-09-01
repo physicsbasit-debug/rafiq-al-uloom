@@ -2,6 +2,7 @@ import { type Dispatch, type SetStateAction, useMemo, useState } from 'react';
 
 import { AppButton } from '@design-system/components/AppButton';
 import { colors } from '@design-system/theme/colors';
+import { StudentActivityHub } from '@features/activities/StudentActivityHub';
 import { AccountControls } from '@features/auth/AccountControls';
 import { AccountStatusView } from '@features/auth/AccountStatusView';
 import { AuthEntryView } from '@features/auth/AuthEntryView';
@@ -32,6 +33,7 @@ type Step =
   | { name: 'lessons'; unitId: string }
   | { name: 'lesson'; lessonId: string; unitId: string }
   | { name: 'review'; lessonId: string; unitId: string }
+  | { name: 'activities'; lessonId: string; unitId: string }
   | { name: 'game'; lessonId: string; unitId: string }
   | { name: 'mastery'; lessonId: string; unitId: string };
 
@@ -95,6 +97,9 @@ function StudentExperience({ step, setStep }: StudentExperienceProps) {
           onOpenReviewQuestions={() =>
             setStep({ name: 'review', lessonId: step.lessonId, unitId: step.unitId })
           }
+          onOpenActivities={() =>
+            setStep({ name: 'activities', lessonId: step.lessonId, unitId: step.unitId })
+          }
           onOpenMatchingGame={() =>
             setStep({ name: 'game', lessonId: step.lessonId, unitId: step.unitId })
           }
@@ -106,6 +111,15 @@ function StudentExperience({ step, setStep }: StudentExperienceProps) {
 
       {step.name === 'review' ? (
         <ReviewQuestionsView
+          lessonId={step.lessonId}
+          onBackToLesson={() =>
+            setStep({ name: 'lesson', lessonId: step.lessonId, unitId: step.unitId })
+          }
+        />
+      ) : null}
+
+      {step.name === 'activities' ? (
+        <StudentActivityHub
           lessonId={step.lessonId}
           onBackToLesson={() =>
             setStep({ name: 'lesson', lessonId: step.lessonId, unitId: step.unitId })
