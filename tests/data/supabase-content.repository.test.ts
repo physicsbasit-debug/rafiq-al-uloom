@@ -113,6 +113,22 @@ const gameRow = {
   source: 'curriculum_seed',
 };
 
+const experimentRow = {
+  id: 'experiment-1',
+  lesson_id: 'lesson-1',
+  title: 'تجربة',
+  objective: 'هدف وصفي',
+  tools: ['أداة'],
+  steps: ['خطوة'],
+  safety_notes: ['ملاحظة'],
+  safety_level: 'safe_home',
+  observation_prompt: 'ماذا لاحظت؟',
+  conclusion_prompt: 'ماذا تستنتج؟',
+  home_alternative: null,
+  status: 'draft',
+  source: 'curriculum_seed',
+};
+
 describe('supabase content repository', () => {
   it('يجلب الدروس والأهداف باستعلامين ثابتين ويحافظ على ترتيب objectiveIds', async () => {
     const { client, calls } = createFakeClient([
@@ -167,6 +183,74 @@ describe('supabase content repository', () => {
       { name: 'order', args: ['game_id'] },
       { name: 'order', args: ['position'] },
     ]);
+  });
+
+  it('يجلب التجارب وروابط أهدافها باستعلامين ويحافظ على ترتيب position', async () => {
+    const { client, calls } = createFakeClient([
+      { table: 'experiments', data: [experimentRow] },
+      {
+        table: 'experiment_objectives',
+        data: [
+          {
+            experiment_id: 'experiment-1',
+            objective_id: 'o2',
+            lesson_id: 'lesson-1',
+            position: 0,
+          },
+          {
+            experiment_id: 'experiment-1',
+            objective_id: 'o1',
+            lesson_id: 'lesson-1',
+            position: 1,
+          },
+        ],
+      },
+    ]);
+    const repository = createSupabaseContentRepository(client);
+
+    const result = await repository.getExperimentsByLesson('lesson-1');
+
+    expect(result[0]?.objectiveIds).toEqual(['o2', 'o1']);
+    expect(calls).toHaveLength(2);
+    expect(calls.map((call) => call.table)).toEqual(['experiments', 'experiment_objectives']);
+    expect(calls[1]?.operations).toContainEqual({
+      name: 'in',
+      args: ['experiment_id', ['experiment-1']],
+    });
+    expect(calls[1]?.operations.filter((operation) => operation.name === 'order')).toEqual([
+      { name: 'order', args: ['experiment_id'] },
+      { name: 'order', args: ['position'] },
+    ]);
+  });
+
+  it('لا ينفذ استعلام روابط تجارب عندما لا توجد تجارب', async () => {
+    const { client, calls } = createFakeClient([{ table: 'experiments', data: [] }]);
+    const repository = createSupabaseContentRepository(client);
+
+    await expect(repository.getExperimentsByLesson('missing')).resolves.toEqual([]);
+    expect(calls).toHaveLength(1);
+  });
+
+  it('يرفض رابط تجربة يحمل lesson_id مختلفًا عن التجربة المطلوبة', async () => {
+    const { client } = createFakeClient([
+      { table: 'experiments', data: [experimentRow] },
+      {
+        table: 'experiment_objectives',
+        data: [
+          {
+            experiment_id: 'experiment-1',
+            objective_id: 'o1',
+            lesson_id: 'lesson-2',
+            position: 0,
+          },
+        ],
+      },
+    ]);
+    const repository = createSupabaseContentRepository(client);
+
+    await expect(repository.getExperimentsByLesson('lesson-1')).rejects.toThrow(
+      'lesson_id lesson-2 does not match experiment lesson lesson-1'
+    );
   });
 
   it('يمرر AbortSignal إلى كل استعلام في العملية متعددة الدفعات', async () => {

@@ -171,6 +171,28 @@ export function validateSeedGraph(seedData: SeedData): void {
 
   for (const experiment of seedData.experiments) {
     requireReference('experiment', experiment.id, 'lessonId', experiment.lessonId, lessonIds);
+
+    if (experiment.objectiveIds.length === 0) {
+      throw new Error(`Invalid seed relationship: experiment ${experiment.id} has no objectiveIds`);
+    }
+
+    const seenObjectiveIds = new Set<string>();
+    for (const objectiveId of experiment.objectiveIds) {
+      if (seenObjectiveIds.has(objectiveId)) {
+        throw new Error(
+          `Invalid seed relationship: experiment ${experiment.id} has duplicate objectiveId ${objectiveId}`
+        );
+      }
+      seenObjectiveIds.add(objectiveId);
+
+      requireReference('experiment', experiment.id, 'objectiveId', objectiveId, objectiveIds);
+      const objective = objectivesById.get(objectiveId);
+      if (objective && objective.lessonId !== experiment.lessonId) {
+        throw new Error(
+          `Invalid seed relationship: experiment ${experiment.id} references objective ${objectiveId} from another lesson`
+        );
+      }
+    }
   }
 }
 
@@ -441,6 +463,21 @@ export function buildSeedSql(seedData: SeedData): string {
         'status',
         'source',
       ]
+    ),
+    '',
+    createInsertStatement(
+      'experiment_objectives',
+      ['experiment_id', 'objective_id', 'lesson_id', 'position'],
+      seedData.experiments.flatMap((experiment) =>
+        experiment.objectiveIds.map((objectiveId, position) => [
+          sqlText(experiment.id),
+          sqlText(objectiveId),
+          sqlText(experiment.lessonId),
+          sqlInteger(position),
+        ])
+      ),
+      'experiment_id, objective_id',
+      ['lesson_id', 'position']
     ),
     '',
     createInsertStatement(

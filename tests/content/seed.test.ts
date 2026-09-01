@@ -147,6 +147,29 @@ describe('seed: التجارب', () => {
     }
   });
 
+  it('كل تجربة تحمل objectiveIds صحيحة ومن الدرس نفسه بلا تكرار', () => {
+    const objectivesById = new Map(
+      grade10PhysicsWavesObjectives.map((objective) => [objective.id, objective])
+    );
+    const expectedByExperiment = new Map<string, string[]>([
+      ['l1-exp', ['l1-o2']],
+      ['l2-exp', ['l2-o1']],
+      ['l3-exp', ['l3-o1']],
+      ['l4-exp', ['l4-o1']],
+    ]);
+
+    for (const experiment of grade10PhysicsWavesExperiments) {
+      expect(experiment.objectiveIds).toEqual(expectedByExperiment.get(experiment.id));
+      expect(experiment.objectiveIds.length).toBeGreaterThan(0);
+      expect(new Set(experiment.objectiveIds).size).toBe(experiment.objectiveIds.length);
+
+      for (const objectiveId of experiment.objectiveIds) {
+        expect(objectiveIds.has(objectiveId)).toBe(true);
+        expect(objectivesById.get(objectiveId)?.lessonId).toBe(experiment.lessonId);
+      }
+    }
+  });
+
   it('كل تجربة تحمل safetyLevel صالحًا', () => {
     for (const e of grade10PhysicsWavesExperiments) {
       expect(validLevels).toContain(e.safetyLevel);

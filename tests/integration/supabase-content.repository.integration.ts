@@ -160,10 +160,15 @@ describeIntegration('SupabaseContentRepository parity', () => {
     );
   });
 
-  it('getExperimentsByLesson', async () => {
-    expect(await context.supabase.getExperimentsByLesson(context.lessonId)).toEqual(
-      await context.local.getExperimentsByLesson(context.lessonId)
-    );
+  it('getExperimentsByLesson يحافظ على objectiveIds ويطابق Local', async () => {
+    const supabaseExperiments = await context.supabase.getExperimentsByLesson(context.lessonId);
+    const localExperiments = await context.local.getExperimentsByLesson(context.lessonId);
+
+    expect(supabaseExperiments).toEqual(localExperiments);
+    expect(supabaseExperiments.length).toBeGreaterThan(0);
+    for (const experiment of supabaseExperiments) {
+      expect(experiment.objectiveIds.length).toBeGreaterThan(0);
+    }
   });
 
   it('getReviewQuestionsByLesson', async () => {

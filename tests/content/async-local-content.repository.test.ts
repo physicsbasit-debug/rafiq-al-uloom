@@ -79,8 +79,10 @@ describe('async local content repository', () => {
     await expect(asyncLocalContentRepository.getObjectivesByIds(objectiveIds)).resolves.toEqual(
       localContent.getObjectivesByIds(objectiveIds)
     );
+    const experiments = localContent.getExperimentsByLesson(lessonId);
+    expect(experiments.every((experiment) => experiment.objectiveIds.length > 0)).toBe(true);
     await expect(asyncLocalContentRepository.getExperimentsByLesson(lessonId)).resolves.toEqual(
-      localContent.getExperimentsByLesson(lessonId)
+      experiments
     );
     await expect(asyncLocalContentRepository.getReviewQuestionsByLesson(lessonId)).resolves.toEqual(
       localContent.getReviewQuestionsByLesson(lessonId)

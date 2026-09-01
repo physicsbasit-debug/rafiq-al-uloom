@@ -4,6 +4,7 @@ import type { ContentRepository, RepositoryRequestOptions } from './content.repo
 import { orderEntitiesByIds, uniqueIdsInOrder } from './content-ordering';
 import { getSupabaseClient } from './supabase-client';
 import {
+  mapExperimentObjectiveRow,
   mapExperimentRow,
   mapGameObjectiveRow,
   mapGameRow,
@@ -16,6 +17,7 @@ import {
   mapUnitRow,
 } from './supabase-content.mappers';
 import type {
+  ExperimentObjectiveRow,
   ExperimentRow,
   GameObjectiveRow,
   GameRow,
@@ -52,6 +54,7 @@ const COLUMNS = {
   games: 'id,lesson_id,type,title,instructions,items,status,source',
   experiments:
     'id,lesson_id,title,objective,tools,steps,safety_notes,safety_level,observation_prompt,conclusion_prompt,home_alternative,status,source',
+  experimentObjectives: 'experiment_id,objective_id,lesson_id,position',
   gameObjectives: 'game_id,objective_id,position',
 } as const;
 
@@ -137,6 +140,39 @@ function groupObjectiveIdsByGame(rows: readonly GameObjectiveRow[]): Map<string,
     const ids = grouped.get(row.game_id) ?? [];
     ids.push(row.objective_id);
     grouped.set(row.game_id, ids);
+  }
+
+  return grouped;
+}
+
+function groupObjectiveIdsByExperiment(
+  rows: readonly ExperimentObjectiveRow[],
+  experiments: readonly ExperimentRow[]
+): Map<string, string[]> {
+  const grouped = new Map<string, string[]>();
+  const experimentsById = new Map(experiments.map((experiment) => [experiment.id, experiment]));
+
+  for (const rawRow of rows) {
+    const row = mapExperimentObjectiveRow(rawRow);
+    const experiment = experimentsById.get(row.experiment_id);
+
+    if (!experiment) {
+      throw new Error(
+        `Invalid experiment_objective row "${row.experiment_id}:${row.objective_id}": ` +
+          'experiment_id is outside the requested experiments'
+      );
+    }
+
+    if (row.lesson_id !== experiment.lesson_id) {
+      throw new Error(
+        `Invalid experiment_objective row "${row.experiment_id}:${row.objective_id}": ` +
+          `lesson_id ${row.lesson_id} does not match experiment lesson ${experiment.lesson_id}`
+      );
+    }
+
+    const ids = grouped.get(row.experiment_id) ?? [];
+    ids.push(row.objective_id);
+    grouped.set(row.experiment_id, ids);
   }
 
   return grouped;
@@ -336,18 +372,40 @@ export function createSupabaseContentRepository(
     },
 
     async getExperimentsByLesson(lessonId, options) {
-      const query = withAbortSignal(
+      const experimentQuery = withAbortSignal(
         queryFrom(client, 'experiments')
           .select(COLUMNS.experiments)
           .eq('lesson_id', lessonId)
           .order('id'),
         options
       );
-      const rows = await executeQuery<ExperimentRow[]>(
-        'getExperimentsByLesson',
-        query as unknown as QueryResponse<ExperimentRow[]>
+      const experiments = await executeQuery<ExperimentRow[]>(
+        'getExperimentsByLesson:experiments',
+        experimentQuery as unknown as QueryResponse<ExperimentRow[]>
       );
-      return rows.map(mapExperimentRow);
+
+      if (experiments.length === 0) {
+        return [];
+      }
+
+      const experimentIds = experiments.map((experiment) => experiment.id);
+      const objectiveQuery = withAbortSignal(
+        queryFrom(client, 'experiment_objectives')
+          .select(COLUMNS.experimentObjectives)
+          .in('experiment_id', experimentIds)
+          .order('experiment_id')
+          .order('position'),
+        options
+      );
+      const objectiveRows = await executeQuery<ExperimentObjectiveRow[]>(
+        'getExperimentsByLesson:objectives',
+        objectiveQuery as unknown as QueryResponse<ExperimentObjectiveRow[]>
+      );
+      const objectiveIdsByExperiment = groupObjectiveIdsByExperiment(objectiveRows, experiments);
+
+      return experiments.map((experiment) =>
+        mapExperimentRow(experiment, objectiveIdsByExperiment.get(experiment.id) ?? [])
+      );
     },
 
     async getReviewQuestionsByLesson(lessonId, options) {
