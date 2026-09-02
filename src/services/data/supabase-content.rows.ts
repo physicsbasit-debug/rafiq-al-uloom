@@ -13,6 +13,7 @@ export type QuestionTypeRow = 'multiple_choice';
 export type QuestionDifficultyRow = 'easy' | 'medium' | 'hard';
 export type GameTypeRow = 'matching';
 export type SafetyLevelRow = 'safe_home' | 'teacher_supervised' | 'lab_only' | 'not_allowed';
+export type SimulationEngineKindRow = 'transverse_wave_v1';
 
 export interface GradeRow {
   id: string;
@@ -113,5 +114,23 @@ export interface ExperimentObjectiveRow {
 export interface GameObjectiveRow {
   game_id: string;
   objective_id: string;
+  position: number;
+}
+
+export interface SimulationRow {
+  id: string;
+  lesson_id: string;
+  title: string;
+  instructions: string;
+  engine_kind: SimulationEngineKindRow;
+  config: unknown;
+  status: ContentStatusRow;
+  source: ContentSourceRow;
+}
+
+export interface SimulationObjectiveRow {
+  simulation_id: string;
+  objective_id: string;
+  lesson_id: string;
   position: number;
 }

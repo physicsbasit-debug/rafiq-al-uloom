@@ -9,6 +9,7 @@ import type {
 import type { Experiment } from '@shared-types/experiment.types';
 import type { Game } from '@shared-types/game.types';
 import type { Question } from '@shared-types/quiz.types';
+import type { Simulation } from '@shared-types/simulation.types';
 
 export interface RepositoryRequestOptions {
   signal?: AbortSignal;
@@ -56,4 +57,9 @@ export interface ContentRepository {
   ): Promise<Question[]>;
 
   getGamesByLesson(lessonId: string, options?: RepositoryRequestOptions): Promise<Game[]>;
+
+  getSimulationsByLesson(
+    lessonId: string,
+    options?: RepositoryRequestOptions
+  ): Promise<Simulation[]>;
 }

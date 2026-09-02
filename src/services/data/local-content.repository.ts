@@ -9,6 +9,7 @@ import type {
 import type { Experiment } from '@shared-types/experiment.types';
 import type { Game } from '@shared-types/game.types';
 import type { Question } from '@shared-types/quiz.types';
+import type { Simulation } from '@shared-types/simulation.types';
 import {
   learningCatalogGrades,
   learningCatalogSemesters,
@@ -22,6 +23,7 @@ import {
   grade10PhysicsWavesMasteryQuestions,
   grade10PhysicsWavesObjectives,
   grade10PhysicsWavesReviewQuestions,
+  grade10PhysicsWavesSimulations,
 } from '@content/seed/grade10-physics-waves';
 import { orderEntitiesByIds, uniqueIdsInOrder } from './content-ordering';
 
@@ -104,4 +106,8 @@ export function getMasteryQuestionsByLesson(lessonId: string): Question[] {
 
 export function getGamesByLesson(lessonId: string): Game[] {
   return grade10PhysicsWavesGames.filter((game) => game.lessonId === lessonId);
+}
+
+export function getSimulationsByLesson(lessonId: string): Simulation[] {
+  return grade10PhysicsWavesSimulations.filter((simulation) => simulation.lessonId === lessonId);
 }

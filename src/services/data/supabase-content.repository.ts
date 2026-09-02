@@ -15,6 +15,8 @@ import {
   mapSemesterRow,
   mapSubjectRow,
   mapUnitRow,
+  mapSimulationObjectiveRow,
+  mapSimulationRow,
 } from './supabase-content.mappers';
 import type {
   ExperimentObjectiveRow,
@@ -28,6 +30,8 @@ import type {
   SemesterRow,
   SubjectRow,
   UnitRow,
+  SimulationObjectiveRow,
+  SimulationRow,
 } from './supabase-content.rows';
 
 type QueryResponse<T> = PromiseLike<{ data: T | null; error: unknown }>;
@@ -56,6 +60,8 @@ const COLUMNS = {
     'id,lesson_id,title,objective,tools,steps,safety_notes,safety_level,observation_prompt,conclusion_prompt,home_alternative,status,source',
   experimentObjectives: 'experiment_id,objective_id,lesson_id,position',
   gameObjectives: 'game_id,objective_id,position',
+  simulations: 'id,lesson_id,title,instructions,engine_kind,config,status,source',
+  simulationObjectives: 'simulation_id,objective_id,lesson_id,position',
 } as const;
 
 function isAbortError(error: unknown): boolean {
@@ -140,6 +146,39 @@ function groupObjectiveIdsByGame(rows: readonly GameObjectiveRow[]): Map<string,
     const ids = grouped.get(row.game_id) ?? [];
     ids.push(row.objective_id);
     grouped.set(row.game_id, ids);
+  }
+
+  return grouped;
+}
+
+function groupObjectiveIdsBySimulation(
+  rows: readonly SimulationObjectiveRow[],
+  simulations: readonly SimulationRow[]
+): Map<string, string[]> {
+  const grouped = new Map<string, string[]>();
+  const simulationsById = new Map(simulations.map((simulation) => [simulation.id, simulation]));
+
+  for (const rawRow of rows) {
+    const row = mapSimulationObjectiveRow(rawRow);
+    const simulation = simulationsById.get(row.simulation_id);
+
+    if (!simulation) {
+      throw new Error(
+        `Invalid simulation_objective row "${row.simulation_id}:${row.objective_id}": ` +
+          'simulation_id is outside the requested simulations'
+      );
+    }
+
+    if (row.lesson_id !== simulation.lesson_id) {
+      throw new Error(
+        `Invalid simulation_objective row "${row.simulation_id}:${row.objective_id}": ` +
+          `lesson_id ${row.lesson_id} does not match simulation lesson ${simulation.lesson_id}`
+      );
+    }
+
+    const ids = grouped.get(row.simulation_id) ?? [];
+    ids.push(row.objective_id);
+    grouped.set(row.simulation_id, ids);
   }
 
   return grouped;
@@ -440,6 +479,43 @@ export function createSupabaseContentRepository(
       return rows.map(mapQuestionRow);
     },
 
+    async getSimulationsByLesson(lessonId, options) {
+      const simulationQuery = withAbortSignal(
+        queryFrom(client, 'simulations')
+          .select(COLUMNS.simulations)
+          .eq('lesson_id', lessonId)
+          .order('id'),
+        options
+      );
+      const simulations = await executeQuery<SimulationRow[]>(
+        'getSimulationsByLesson:simulations',
+        simulationQuery as unknown as QueryResponse<SimulationRow[]>
+      );
+
+      if (simulations.length === 0) {
+        return [];
+      }
+
+      const simulationIds = simulations.map((simulation) => simulation.id);
+      const objectiveQuery = withAbortSignal(
+        queryFrom(client, 'simulation_objectives')
+          .select(COLUMNS.simulationObjectives)
+          .in('simulation_id', simulationIds)
+          .order('simulation_id')
+          .order('position'),
+        options
+      );
+      const objectiveRows = await executeQuery<SimulationObjectiveRow[]>(
+        'getSimulationsByLesson:objectives',
+        objectiveQuery as unknown as QueryResponse<SimulationObjectiveRow[]>
+      );
+      const objectiveIdsBySimulation = groupObjectiveIdsBySimulation(objectiveRows, simulations);
+
+      return simulations.map((simulation) =>
+        mapSimulationRow(simulation, objectiveIdsBySimulation.get(simulation.id) ?? [])
+      );
+    },
+
     async getGamesByLesson(lessonId, options) {
       const gameQuery = withAbortSignal(
         queryFrom(client, 'games').select(COLUMNS.games).eq('lesson_id', lessonId).order('id'),
@@ -505,4 +581,6 @@ export const supabaseContentRepository: ContentRepository = {
     getDefaultRepository().getMasteryQuestionsByLesson(lessonId, options),
   getGamesByLesson: (lessonId, options) =>
     getDefaultRepository().getGamesByLesson(lessonId, options),
+  getSimulationsByLesson: (lessonId, options) =>
+    getDefaultRepository().getSimulationsByLesson(lessonId, options),
 };

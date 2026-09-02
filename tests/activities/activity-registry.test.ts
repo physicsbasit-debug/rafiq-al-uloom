@@ -15,16 +15,17 @@ describe('activity registry', () => {
     expect(orders).toEqual([...orders].sort((a, b) => a - b));
   });
 
-  it('يجعل matching وexperiment فقط متاحين حاليًا', () => {
+  it('يجعل matching وexperiment وsimulation متاحة ويبقي inquiry وdata مخططتين', () => {
     expect(getAvailableActivityRegistryEntries().map((entry) => entry.kind)).toEqual([
       'matching',
       'experiment',
+      'simulation',
     ]);
 
     expect(
-      ACTIVITY_REGISTRY.filter((entry) =>
-        ['simulation', 'inquiry', 'data'].includes(entry.kind)
-      ).every((entry) => entry.availability === 'planned')
+      ACTIVITY_REGISTRY.filter((entry) => ['inquiry', 'data'].includes(entry.kind)).every(
+        (entry) => entry.availability === 'planned'
+      )
     ).toBe(true);
   });
 

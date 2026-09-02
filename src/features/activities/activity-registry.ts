@@ -36,10 +36,10 @@ export const ACTIVITY_REGISTRY: readonly ActivityRegistryEntry[] = [
     kind: 'simulation',
     label: 'محاكاة',
     displayOrder: 30,
-    availability: 'planned',
+    availability: 'available',
     interactionMode: 'interactive',
     physical: false,
-    sessionProgress: false,
+    sessionProgress: true,
   },
   {
     kind: 'inquiry',

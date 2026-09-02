@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { AppButton } from '@design-system/components/AppButton';
 import { ExperimentCard } from '@features/experiments/experiment-card';
 import { MatchingGameRunner } from '@features/games/matching/MatchingGameRunner';
+import { WaveSimulationRunner } from '@features/simulations/wave/WaveSimulationRunner';
 import type { AvailableLearningActivity, LearningActivityKind } from '@shared-types/activity.types';
 import type { Objective } from '@shared-types/content.types';
 
@@ -54,9 +55,21 @@ function renderExperimentActivity({
   );
 }
 
+function renderSimulationActivity({
+  activity,
+  onBackToActivities,
+}: StudentActivityRendererProps): ReactNode {
+  if (activity.kind !== 'simulation') {
+    throw new Error('Simulation activity renderer received a non-simulation activity.');
+  }
+
+  return <WaveSimulationRunner simulation={activity.content} onBack={onBackToActivities} />;
+}
+
 const STUDENT_ACTIVITY_RENDERERS: Partial<Record<LearningActivityKind, StudentActivityRenderer>> = {
   matching: renderMatchingActivity,
   experiment: renderExperimentActivity,
+  simulation: renderSimulationActivity,
 };
 
 export function getStudentActivityRenderer(

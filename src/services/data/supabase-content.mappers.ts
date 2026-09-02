@@ -11,8 +11,14 @@ import type {
 import type { Experiment, SafetyLevel } from '@shared-types/experiment.types';
 import type { Game, GameType, MatchingItem } from '@shared-types/game.types';
 import type { Difficulty, Question, QuestionType } from '@shared-types/quiz.types';
+import { parseSimulationConfig } from '@shared-types/simulation.types';
+import type { Simulation, SimulationEngineKind } from '@shared-types/simulation.types';
 
-import type { ExperimentObjectiveRow, GameObjectiveRow } from './supabase-content.rows';
+import type {
+  ExperimentObjectiveRow,
+  GameObjectiveRow,
+  SimulationObjectiveRow,
+} from './supabase-content.rows';
 
 const CONTENT_STATUSES = ['draft', 'pending_review', 'approved'] as const;
 const CONTENT_SOURCES = ['ai_generated', 'teacher_authored', 'curriculum_seed'] as const;
@@ -21,6 +27,7 @@ const QUESTION_TYPES = ['multiple_choice'] as const;
 const DIFFICULTIES = ['easy', 'medium', 'hard'] as const;
 const GAME_TYPES = ['matching'] as const;
 const SAFETY_LEVELS = ['safe_home', 'teacher_supervised', 'lab_only', 'not_allowed'] as const;
+const SIMULATION_ENGINE_KINDS = ['transverse_wave_v1'] as const;
 
 function invalid(entity: string, id: string, detail: string): never {
   throw new Error(`Invalid ${entity} row "${id}": ${detail}`);
@@ -336,5 +343,65 @@ export function mapGameObjectiveRow(input: unknown): GameObjectiveRow {
     game_id: requireString(row, 'game_id', 'game_objective', id),
     objective_id: requireString(row, 'objective_id', 'game_objective', id),
     position: requireNonNegativeInteger(row, 'position', 'game_objective', id),
+  };
+}
+
+export function mapSimulationRow(input: unknown, objectiveIds: readonly string[]): Simulation {
+  const row = asRecord(input, 'simulation');
+  const id = rowId(row);
+  const ids = requireStringArray(objectiveIds, 'objectiveIds', 'simulation', id);
+
+  if (ids.length === 0) {
+    invalid('simulation', id, 'objectiveIds must contain at least one objective');
+  }
+  if (ids.some((objectiveId) => objectiveId.length === 0)) {
+    invalid('simulation', id, 'objectiveIds must not contain empty ids');
+  }
+  if (new Set(ids).size !== ids.length) {
+    invalid('simulation', id, 'objectiveIds must not contain duplicates');
+  }
+
+  const engineKind = requireEnum(
+    row.engine_kind,
+    SIMULATION_ENGINE_KINDS,
+    'engine_kind',
+    'simulation',
+    id
+  ) as SimulationEngineKind;
+  const config = parseSimulationConfig(row.config);
+  if (config.engineKind !== engineKind) {
+    invalid('simulation', id, 'engine_kind must match config.engineKind');
+  }
+
+  return {
+    id: requireString(row, 'id', 'simulation', id),
+    lessonId: requireString(row, 'lesson_id', 'simulation', id),
+    title: requireString(row, 'title', 'simulation', id),
+    instructions: requireString(row, 'instructions', 'simulation', id),
+    objectiveIds: ids,
+    config,
+    status: requireEnum(row.status, CONTENT_STATUSES, 'status', 'simulation', id) as ContentStatus,
+    source: requireEnum(row.source, CONTENT_SOURCES, 'source', 'simulation', id) as ContentSource,
+  };
+}
+
+export function mapSimulationObjectiveRow(input: unknown): SimulationObjectiveRow {
+  const row = asRecord(input, 'simulation_objective');
+  const id = `${String(row.simulation_id ?? '<unknown>')}:${String(
+    row.objective_id ?? '<unknown>'
+  )}`;
+  const simulationId = requireString(row, 'simulation_id', 'simulation_objective', id);
+  const objectiveId = requireString(row, 'objective_id', 'simulation_objective', id);
+  const lessonId = requireString(row, 'lesson_id', 'simulation_objective', id);
+
+  if (simulationId.length === 0 || objectiveId.length === 0 || lessonId.length === 0) {
+    invalid('simulation_objective', id, 'ids must be non-empty strings');
+  }
+
+  return {
+    simulation_id: simulationId,
+    objective_id: objectiveId,
+    lesson_id: lessonId,
+    position: requireNonNegativeInteger(row, 'position', 'simulation_objective', id),
   };
 }
