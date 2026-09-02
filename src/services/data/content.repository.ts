@@ -8,6 +8,7 @@ import type {
 } from '@shared-types/content.types';
 import type { Experiment } from '@shared-types/experiment.types';
 import type { Game } from '@shared-types/game.types';
+import type { Inquiry } from '@shared-types/inquiry.types';
 import type { Question } from '@shared-types/quiz.types';
 import type { Simulation } from '@shared-types/simulation.types';
 
@@ -62,4 +63,6 @@ export interface ContentRepository {
     lessonId: string,
     options?: RepositoryRequestOptions
   ): Promise<Simulation[]>;
+
+  getInquiriesByLesson(lessonId: string, options?: RepositoryRequestOptions): Promise<Inquiry[]>;
 }

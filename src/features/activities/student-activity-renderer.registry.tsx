@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { AppButton } from '@design-system/components/AppButton';
 import { ExperimentCard } from '@features/experiments/experiment-card';
 import { MatchingGameRunner } from '@features/games/matching/MatchingGameRunner';
+import { InquiryRunner } from '@features/inquiries/InquiryRunner';
 import { WaveSimulationRunner } from '@features/simulations/wave/WaveSimulationRunner';
 import type { AvailableLearningActivity, LearningActivityKind } from '@shared-types/activity.types';
 import type { Objective } from '@shared-types/content.types';
@@ -66,10 +67,22 @@ function renderSimulationActivity({
   return <WaveSimulationRunner simulation={activity.content} onBack={onBackToActivities} />;
 }
 
+function renderInquiryActivity({
+  activity,
+  onBackToActivities,
+}: StudentActivityRendererProps): ReactNode {
+  if (activity.kind !== 'inquiry') {
+    throw new Error('Inquiry activity renderer received a non-inquiry activity.');
+  }
+
+  return <InquiryRunner inquiry={activity.content} onBack={onBackToActivities} />;
+}
+
 const STUDENT_ACTIVITY_RENDERERS: Partial<Record<LearningActivityKind, StudentActivityRenderer>> = {
   matching: renderMatchingActivity,
   experiment: renderExperimentActivity,
   simulation: renderSimulationActivity,
+  inquiry: renderInquiryActivity,
 };
 
 export function getStudentActivityRenderer(

@@ -45,10 +45,10 @@ export const ACTIVITY_REGISTRY: readonly ActivityRegistryEntry[] = [
     kind: 'inquiry',
     label: 'استقصاء',
     displayOrder: 40,
-    availability: 'planned',
+    availability: 'available',
     interactionMode: 'guided',
     physical: false,
-    sessionProgress: false,
+    sessionProgress: true,
   },
   {
     kind: 'data',

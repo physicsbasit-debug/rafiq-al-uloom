@@ -10,6 +10,8 @@ import type {
 } from '@shared-types/content.types';
 import type { Experiment, SafetyLevel } from '@shared-types/experiment.types';
 import type { Game, GameType, MatchingItem } from '@shared-types/game.types';
+import { assertInquiry } from '@shared-types/inquiry.types';
+import type { Inquiry } from '@shared-types/inquiry.types';
 import type { Difficulty, Question, QuestionType } from '@shared-types/quiz.types';
 import { parseSimulationConfig } from '@shared-types/simulation.types';
 import type { Simulation, SimulationEngineKind } from '@shared-types/simulation.types';
@@ -17,6 +19,7 @@ import type { Simulation, SimulationEngineKind } from '@shared-types/simulation.
 import type {
   ExperimentObjectiveRow,
   GameObjectiveRow,
+  InquiryObjectiveRow,
   SimulationObjectiveRow,
 } from './supabase-content.rows';
 
@@ -343,6 +346,46 @@ export function mapGameObjectiveRow(input: unknown): GameObjectiveRow {
     game_id: requireString(row, 'game_id', 'game_objective', id),
     objective_id: requireString(row, 'objective_id', 'game_objective', id),
     position: requireNonNegativeInteger(row, 'position', 'game_objective', id),
+  };
+}
+
+export function mapInquiryRow(input: unknown, objectiveIds: readonly string[]): Inquiry {
+  const row = asRecord(input, 'inquiry');
+  const id = rowId(row);
+
+  return assertInquiry({
+    id: requireString(row, 'id', 'inquiry', id),
+    lessonId: requireString(row, 'lesson_id', 'inquiry', id),
+    title: requireString(row, 'title', 'inquiry', id),
+    instructions: requireString(row, 'instructions', 'inquiry', id),
+    objectiveIds: requireStringArray(objectiveIds, 'objectiveIds', 'inquiry', id),
+    context: requireString(row, 'context', 'inquiry', id),
+    drivingQuestion: requireString(row, 'driving_question', 'inquiry', id),
+    hypothesisPrompt: requireString(row, 'hypothesis_prompt', 'inquiry', id),
+    observationPrompt: requireString(row, 'observation_prompt', 'inquiry', id),
+    conclusionPrompt: requireString(row, 'conclusion_prompt', 'inquiry', id),
+    status: requireEnum(row.status, CONTENT_STATUSES, 'status', 'inquiry', id) as ContentStatus,
+    source: requireEnum(row.source, CONTENT_SOURCES, 'source', 'inquiry', id) as ContentSource,
+  });
+}
+
+export function mapInquiryObjectiveRow(input: unknown): InquiryObjectiveRow {
+  const row = asRecord(input, 'inquiry_objective');
+  const id = `${String(row.inquiry_id ?? '<unknown>')}:${String(row.objective_id ?? '<unknown>')}`;
+
+  const inquiryId = requireString(row, 'inquiry_id', 'inquiry_objective', id);
+  const objectiveId = requireString(row, 'objective_id', 'inquiry_objective', id);
+  const lessonId = requireString(row, 'lesson_id', 'inquiry_objective', id);
+
+  if (inquiryId.length === 0 || objectiveId.length === 0 || lessonId.length === 0) {
+    invalid('inquiry_objective', id, 'ids must be non-empty strings');
+  }
+
+  return {
+    inquiry_id: inquiryId,
+    objective_id: objectiveId,
+    lesson_id: lessonId,
+    position: requireNonNegativeInteger(row, 'position', 'inquiry_objective', id),
   };
 }
 

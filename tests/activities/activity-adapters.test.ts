@@ -2,11 +2,13 @@ import { describe, expect, it } from 'vitest';
 import {
   buildLessonActivities,
   toExperimentActivity,
+  toInquiryActivity,
   toMatchingActivity,
   toSimulationActivity,
 } from '@features/activities/activity-adapters';
 import type { Experiment } from '@shared-types/experiment.types';
 import type { Game } from '@shared-types/game.types';
+import type { Inquiry } from '@shared-types/inquiry.types';
 import type { Simulation } from '@shared-types/simulation.types';
 
 const game: Game = {
@@ -54,6 +56,21 @@ const simulation: Simulation = {
   source: 'curriculum_seed',
 };
 
+const inquiry: Inquiry = {
+  id: 'inquiry-one',
+  lessonId: 'lesson-one',
+  title: 'استقصاء',
+  instructions: 'سجّل استدلالك.',
+  objectiveIds: ['objective-four'],
+  context: 'حالة علمية.',
+  drivingQuestion: 'ماذا تستنتج؟',
+  hypothesisPrompt: 'فرضيتك؟',
+  observationPrompt: 'دليلك؟',
+  conclusionPrompt: 'استنتاجك؟',
+  status: 'approved',
+  source: 'curriculum_seed',
+};
+
 describe('activity adapters', () => {
   it('ينتج matching wrapper ويحافظ على payload دون mutation', () => {
     const snapshot = structuredClone(game);
@@ -94,6 +111,17 @@ describe('activity adapters', () => {
     expect(simulation).toEqual(snapshot);
   });
 
+  it('ينتج inquiry wrapper ويحافظ على payload دون mutation', () => {
+    const snapshot = structuredClone(inquiry);
+    const activity = toInquiryActivity(inquiry);
+
+    expect(activity.kind).toBe('inquiry');
+    expect(activity.content).toBe(inquiry);
+    expect(activity.objectiveIds).toEqual(['objective-four']);
+    expect(activity.objectiveIds).not.toBe(inquiry.objectiveIds);
+    expect(inquiry).toEqual(snapshot);
+  });
+
   it.each([
     { objectiveIds: [], label: 'empty' },
     { objectiveIds: [''], label: 'blank' },
@@ -104,7 +132,12 @@ describe('activity adapters', () => {
 
   it('يرفض خلط محتوى أكثر من درس', () => {
     expect(() =>
-      buildLessonActivities([game], [{ ...experiment, lessonId: 'lesson-two' }], [simulation])
+      buildLessonActivities(
+        [game],
+        [{ ...experiment, lessonId: 'lesson-two' }],
+        [simulation],
+        [inquiry]
+      )
     ).toThrow(/multiple lessons/);
   });
 
@@ -113,9 +146,19 @@ describe('activity adapters', () => {
     const experimentTwo = { ...experiment, id: 'experiment-two', title: 'تجربة 2' };
 
     expect(
-      buildLessonActivities([gameTwo, game], [experimentTwo, experiment], [simulation]).map(
-        (activity) => activity.id
-      )
-    ).toEqual(['game-two', 'game-one', 'experiment-two', 'experiment-one', 'simulation-one']);
+      buildLessonActivities(
+        [gameTwo, game],
+        [experimentTwo, experiment],
+        [simulation],
+        [inquiry]
+      ).map((activity) => activity.id)
+    ).toEqual([
+      'game-two',
+      'game-one',
+      'experiment-two',
+      'experiment-one',
+      'simulation-one',
+      'inquiry-one',
+    ]);
   });
 });

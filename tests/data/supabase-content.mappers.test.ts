@@ -6,6 +6,8 @@ import {
   mapGameObjectiveRow,
   mapGameRow,
   mapGradeRow,
+  mapInquiryObjectiveRow,
+  mapInquiryRow,
   mapLessonRow,
   mapObjectiveRow,
   mapQuestionRow,
@@ -68,6 +70,20 @@ const experimentRow = {
   observation_prompt: 'ماذا لاحظت؟',
   conclusion_prompt: 'ماذا تستنتج؟',
   home_alternative: null,
+  status: 'draft',
+  source: 'curriculum_seed',
+};
+
+const inquiryRow = {
+  id: 'inquiry-1',
+  lesson_id: 'lesson-1',
+  title: 'استقصاء',
+  instructions: 'سجّل استدلالك.',
+  context: 'حالة علمية.',
+  driving_question: 'ماذا تستنتج؟',
+  hypothesis_prompt: 'اكتب فرضيتك.',
+  observation_prompt: 'اكتب دليلك.',
+  conclusion_prompt: 'اكتب استنتاجك.',
   status: 'draft',
   source: 'curriculum_seed',
 };
@@ -242,6 +258,45 @@ describe('supabase content mappers', () => {
     expect(() => mapQuestionRow({ ...questionRow, correct_answer_index: 2 })).toThrow(
       'correct_answer_index must reference an existing choice'
     );
+  });
+
+  it('يبني Inquiry من الصف وروابط الأهداف ويتحقق من الحقول البنيوية', () => {
+    const inquiry = mapInquiryRow(inquiryRow, ['objective-2', 'objective-1']);
+    expect(inquiry).toMatchObject({
+      id: 'inquiry-1',
+      lessonId: 'lesson-1',
+      objectiveIds: ['objective-2', 'objective-1'],
+    });
+
+    expect(() => mapInquiryRow(inquiryRow, [])).toThrow('objectiveIds must not be empty');
+    expect(() => mapInquiryRow({ ...inquiryRow, driving_question: '' }, ['objective-1'])).toThrow(
+      'drivingQuestion must not be blank'
+    );
+  });
+
+  it('يحوّل inquiry_objectives ويتحقق من lesson_id وposition', () => {
+    expect(
+      mapInquiryObjectiveRow({
+        inquiry_id: 'inquiry-1',
+        objective_id: 'objective-1',
+        lesson_id: 'lesson-1',
+        position: 0,
+      })
+    ).toEqual({
+      inquiry_id: 'inquiry-1',
+      objective_id: 'objective-1',
+      lesson_id: 'lesson-1',
+      position: 0,
+    });
+
+    expect(() =>
+      mapInquiryObjectiveRow({
+        inquiry_id: 'inquiry-1',
+        objective_id: 'objective-1',
+        lesson_id: 'lesson-1',
+        position: -1,
+      })
+    ).toThrow('position must be non-negative');
   });
 
   it('يحوّل صف game_objectives ويتحقق من position', () => {

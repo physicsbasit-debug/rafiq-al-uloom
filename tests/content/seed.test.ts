@@ -6,6 +6,7 @@ import {
   grade10PhysicsWavesMasteryQuestions,
   grade10PhysicsWavesGames,
   grade10PhysicsWavesExperiments,
+  grade10PhysicsWavesInquiries,
 } from '../../src/content/seed/grade10-physics-waves';
 import type { SafetyLevel } from '../../src/types/experiment.types';
 
@@ -190,12 +191,38 @@ describe('seed: التجارب', () => {
   });
 });
 
+describe('seed: الاستقصاء', () => {
+  it('يحتوي Inquiry واحدًا مرتبطًا بالدرس الثالث والهدف l3-o1', () => {
+    expect(grade10PhysicsWavesInquiries).toHaveLength(1);
+    expect(grade10PhysicsWavesInquiries[0]).toMatchObject({
+      id: 'g10-phy-waves-l3-inquiry-sound-medium',
+      lessonId: 'g10-phy-waves-l3',
+      objectiveIds: ['l3-o1'],
+      status: 'draft',
+      source: 'curriculum_seed',
+    });
+  });
+
+  it('يحمل حقول الاستقصاء الموجهة نصوصًا غير فارغة', () => {
+    for (const inquiry of grade10PhysicsWavesInquiries) {
+      expect(inquiry.title.trim()).not.toBe('');
+      expect(inquiry.instructions.trim()).not.toBe('');
+      expect(inquiry.context.trim()).not.toBe('');
+      expect(inquiry.drivingQuestion.trim()).not.toBe('');
+      expect(inquiry.hypothesisPrompt.trim()).not.toBe('');
+      expect(inquiry.observationPrompt.trim()).not.toBe('');
+      expect(inquiry.conclusionPrompt.trim()).not.toBe('');
+    }
+  });
+});
+
 describe('seed: سلامة الحقول المشتركة', () => {
   const allContent = [
     ...grade10PhysicsWavesReviewQuestions,
     ...grade10PhysicsWavesMasteryQuestions,
     ...grade10PhysicsWavesGames,
     ...grade10PhysicsWavesExperiments,
+    ...grade10PhysicsWavesInquiries,
   ];
 
   it('كل عنصر محتوى مصدره curriculum_seed', () => {
@@ -215,6 +242,7 @@ describe('seed: سلامة الحقول المشتركة', () => {
       ...grade10PhysicsWavesMasteryQuestions.map((x) => x.id),
       ...grade10PhysicsWavesGames.map((x) => x.id),
       ...grade10PhysicsWavesExperiments.map((x) => x.id),
+      ...grade10PhysicsWavesInquiries.map((x) => x.id),
     ];
     expect(new Set(allIds).size).toBe(allIds.length);
   });
