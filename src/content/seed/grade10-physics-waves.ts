@@ -2,6 +2,7 @@ import type { Lesson, Objective } from '@shared-types/content.types';
 import type { Question } from '@shared-types/quiz.types';
 import type { Game } from '@shared-types/game.types';
 import type { Experiment } from '@shared-types/experiment.types';
+import type { Inquiry } from '@shared-types/inquiry.types';
 import type { Simulation } from '@shared-types/simulation.types';
 /**
  * Seed content — الصف العاشر / الفيزياء / وحدة الموجات.
@@ -1014,6 +1015,25 @@ export const grade10PhysicsWavesSimulations: Simulation[] = [
       frequencyHz: { min: 0.5, max: 4, step: 0.5, initial: 1 },
       amplitudeM: { min: 0.2, max: 1, step: 0.1, initial: 0.5 },
     },
+    status: 'draft',
+    source: 'curriculum_seed',
+  },
+];
+
+export const grade10PhysicsWavesInquiries: Inquiry[] = [
+  {
+    id: 'g10-phy-waves-l3-inquiry-sound-medium',
+    lessonId: 'g10-phy-waves-l3',
+    title: 'هل ينتقل الصوت دون وسط مادي؟',
+    instructions:
+      'اقرأ الحالة العلمية ثم سجّل فرضيتك والملاحظة التي تستند إليها والاستنتاج الذي توصلت إليه.',
+    objectiveIds: ['l3-o1'],
+    context:
+      'يوضع جرس كهربائي يعمل داخل وعاء يمكن سحب الهواء منه. يستمر الجرس في الاهتزاز، لكن الصوت المسموع يضعف تدريجيًا كلما قل الهواء داخل الوعاء.',
+    drivingQuestion: 'ماذا تشير هذه الملاحظة إلى دور الوسط المادي في انتقال الصوت؟',
+    hypothesisPrompt: 'اكتب فرضيتك قبل تفسير النتيجة.',
+    observationPrompt: 'اكتب الملاحظة أو الدليل الذي تعتمد عليه من وصف الحالة.',
+    conclusionPrompt: 'اكتب استنتاجك العلمي حول حاجة الصوت إلى وسط مادي للانتقال.',
     status: 'draft',
     source: 'curriculum_seed',
   },

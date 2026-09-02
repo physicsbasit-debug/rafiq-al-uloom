@@ -129,6 +129,20 @@ const experimentRow = {
   source: 'curriculum_seed',
 };
 
+const inquiryRow = {
+  id: 'inquiry-1',
+  lesson_id: 'lesson-1',
+  title: 'استقصاء',
+  instructions: 'سجّل استدلالك.',
+  context: 'حالة علمية.',
+  driving_question: 'ماذا تستنتج؟',
+  hypothesis_prompt: 'اكتب فرضيتك.',
+  observation_prompt: 'اكتب دليلك.',
+  conclusion_prompt: 'اكتب استنتاجك.',
+  status: 'draft',
+  source: 'curriculum_seed',
+};
+
 describe('supabase content repository', () => {
   it('يجلب الدروس والأهداف باستعلامين ثابتين ويحافظ على ترتيب objectiveIds', async () => {
     const { client, calls } = createFakeClient([
@@ -250,6 +264,65 @@ describe('supabase content repository', () => {
 
     await expect(repository.getExperimentsByLesson('lesson-1')).rejects.toThrow(
       'lesson_id lesson-2 does not match experiment lesson lesson-1'
+    );
+  });
+
+  it('يجلب الاستقصاءات وروابط أهدافها باستعلامين ويحافظ على position', async () => {
+    const { client, calls } = createFakeClient([
+      { table: 'inquiries', data: [inquiryRow] },
+      {
+        table: 'inquiry_objectives',
+        data: [
+          {
+            inquiry_id: 'inquiry-1',
+            objective_id: 'o2',
+            lesson_id: 'lesson-1',
+            position: 0,
+          },
+          {
+            inquiry_id: 'inquiry-1',
+            objective_id: 'o1',
+            lesson_id: 'lesson-1',
+            position: 1,
+          },
+        ],
+      },
+    ]);
+    const repository = createSupabaseContentRepository(client);
+
+    const result = await repository.getInquiriesByLesson('lesson-1');
+
+    expect(result[0]?.objectiveIds).toEqual(['o2', 'o1']);
+    expect(calls.map((call) => call.table)).toEqual(['inquiries', 'inquiry_objectives']);
+    expect(calls[1]?.operations).toContainEqual({
+      name: 'in',
+      args: ['inquiry_id', ['inquiry-1']],
+    });
+    expect(calls[1]?.operations.filter((operation) => operation.name === 'order')).toEqual([
+      { name: 'order', args: ['inquiry_id'] },
+      { name: 'order', args: ['position'] },
+    ]);
+  });
+
+  it('يرفض رابط Inquiry يحمل lesson_id مختلفًا', async () => {
+    const { client } = createFakeClient([
+      { table: 'inquiries', data: [inquiryRow] },
+      {
+        table: 'inquiry_objectives',
+        data: [
+          {
+            inquiry_id: 'inquiry-1',
+            objective_id: 'o1',
+            lesson_id: 'lesson-2',
+            position: 0,
+          },
+        ],
+      },
+    ]);
+    const repository = createSupabaseContentRepository(client);
+
+    await expect(repository.getInquiriesByLesson('lesson-1')).rejects.toThrow(
+      'lesson_id lesson-2 does not match inquiry lesson lesson-1'
     );
   });
 

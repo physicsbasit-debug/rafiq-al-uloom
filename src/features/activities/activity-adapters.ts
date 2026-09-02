@@ -2,11 +2,13 @@ import { getActivityRegistryEntry } from '@features/activities/activity-registry
 import type {
   AvailableLearningActivity,
   ExperimentActivity,
+  InquiryActivity,
   MatchingActivity,
   SimulationActivity,
 } from '@shared-types/activity.types';
 import type { Experiment } from '@shared-types/experiment.types';
 import type { Game } from '@shared-types/game.types';
+import type { Inquiry } from '@shared-types/inquiry.types';
 import type { Simulation } from '@shared-types/simulation.types';
 
 function assertStructuralIds(
@@ -93,15 +95,32 @@ export function toSimulationActivity(simulation: Simulation): SimulationActivity
   };
 }
 
+export function toInquiryActivity(inquiry: Inquiry): InquiryActivity {
+  assertStructuralIds('inquiry', inquiry.id, inquiry.lessonId, inquiry.objectiveIds);
+
+  return {
+    id: inquiry.id,
+    lessonId: inquiry.lessonId,
+    kind: 'inquiry',
+    title: inquiry.title,
+    objectiveIds: [...inquiry.objectiveIds],
+    status: inquiry.status,
+    source: inquiry.source,
+    content: inquiry,
+  };
+}
+
 export function buildLessonActivities(
   games: Game[],
   experiments: Experiment[],
-  simulations: Simulation[]
+  simulations: Simulation[],
+  inquiries: Inquiry[]
 ): AvailableLearningActivity[] {
   const activities: AvailableLearningActivity[] = [
     ...games.map(toMatchingActivity),
     ...experiments.map(toExperimentActivity),
     ...simulations.map(toSimulationActivity),
+    ...inquiries.map(toInquiryActivity),
   ];
 
   assertSingleLesson(activities);

@@ -37,7 +37,7 @@ afterEach(() => {
 });
 
 describe('async local content repository', () => {
-  it('يطابق الدوال الثلاث عشرة في المستودع المحلي الحالي', async () => {
+  it('يطابق الدوال الخمس عشرة في المستودع المحلي الحالي', async () => {
     const grades = localContent.getGrades();
     const gradeId = grades[0]?.id ?? 'missing-grade';
 
@@ -93,6 +93,12 @@ describe('async local content repository', () => {
     await expect(asyncLocalContentRepository.getGamesByLesson(lessonId)).resolves.toEqual(
       localContent.getGamesByLesson(lessonId)
     );
+    await expect(asyncLocalContentRepository.getSimulationsByLesson(lessonId)).resolves.toEqual(
+      localContent.getSimulationsByLesson(lessonId)
+    );
+    await expect(asyncLocalContentRepository.getInquiriesByLesson(lessonId)).resolves.toEqual(
+      localContent.getInquiriesByLesson(lessonId)
+    );
   });
 
   it('يعيد القيم الفارغة نفسها للمعرفات غير الموجودة', async () => {
@@ -131,6 +137,12 @@ describe('async local content repository', () => {
     await expect(asyncLocalContentRepository.getGamesByLesson('missing-lesson')).resolves.toEqual(
       []
     );
+    await expect(
+      asyncLocalContentRepository.getSimulationsByLesson('missing-lesson')
+    ).resolves.toEqual([]);
+    await expect(
+      asyncLocalContentRepository.getInquiriesByLesson('missing-lesson')
+    ).resolves.toEqual([]);
   });
 
   it('يرفض جميع الاستدعاءات عند وصول إشارة ملغاة مسبقًا', async () => {
@@ -177,6 +189,12 @@ describe('async local content repository', () => {
     ).rejects.toMatchObject({ name: 'AbortError' });
     await expect(
       asyncLocalContentRepository.getGamesByLesson('lesson', options)
+    ).rejects.toMatchObject({ name: 'AbortError' });
+    await expect(
+      asyncLocalContentRepository.getSimulationsByLesson('lesson', options)
+    ).rejects.toMatchObject({ name: 'AbortError' });
+    await expect(
+      asyncLocalContentRepository.getInquiriesByLesson('lesson', options)
     ).rejects.toMatchObject({ name: 'AbortError' });
   });
 

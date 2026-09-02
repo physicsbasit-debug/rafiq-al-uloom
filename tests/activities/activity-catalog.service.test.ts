@@ -3,6 +3,7 @@ import { createActivityCatalogService } from '@services/activities/activity-cata
 import type { ContentRepository } from '@services/data/content.repository';
 import type { Experiment } from '@shared-types/experiment.types';
 import type { Game } from '@shared-types/game.types';
+import type { Inquiry } from '@shared-types/inquiry.types';
 import type { Simulation } from '@shared-types/simulation.types';
 
 const game: Game = {
@@ -50,27 +51,50 @@ const simulation: Simulation = {
   source: 'curriculum_seed',
 };
 
+const inquiry: Inquiry = {
+  id: 'inquiry-one',
+  lessonId: 'lesson-one',
+  title: 'استقصاء',
+  instructions: 'سجّل استدلالك.',
+  objectiveIds: ['objective-four'],
+  context: 'حالة علمية.',
+  drivingQuestion: 'ماذا تستنتج؟',
+  hypothesisPrompt: 'فرضيتك؟',
+  observationPrompt: 'دليلك؟',
+  conclusionPrompt: 'استنتاجك؟',
+  status: 'approved',
+  source: 'curriculum_seed',
+};
+
 function repositoryWith(
   getGamesByLesson: ContentRepository['getGamesByLesson'],
   getExperimentsByLesson: ContentRepository['getExperimentsByLesson'],
   getSimulationsByLesson: ContentRepository['getSimulationsByLesson'] = vi
     .fn()
-    .mockResolvedValue([])
+    .mockResolvedValue([]),
+  getInquiriesByLesson: ContentRepository['getInquiriesByLesson'] = vi.fn().mockResolvedValue([])
 ): ContentRepository {
   return {
     getGamesByLesson,
     getExperimentsByLesson,
     getSimulationsByLesson,
+    getInquiriesByLesson,
   } as ContentRepository;
 }
 
 describe('ActivityCatalogService', () => {
-  it('يجلب games وexperiments وsimulations مرة واحدة وبنفس AbortSignal', async () => {
+  it('يجلب الأنواع الأربعة مرة واحدة وبنفس AbortSignal', async () => {
     const getGamesByLesson = vi.fn().mockResolvedValue([game]);
     const getExperimentsByLesson = vi.fn().mockResolvedValue([experiment]);
     const getSimulationsByLesson = vi.fn().mockResolvedValue([simulation]);
+    const getInquiriesByLesson = vi.fn().mockResolvedValue([inquiry]);
     const service = createActivityCatalogService(
-      repositoryWith(getGamesByLesson, getExperimentsByLesson, getSimulationsByLesson)
+      repositoryWith(
+        getGamesByLesson,
+        getExperimentsByLesson,
+        getSimulationsByLesson,
+        getInquiriesByLesson
+      )
     );
     const controller = new AbortController();
 
@@ -78,29 +102,30 @@ describe('ActivityCatalogService', () => {
       signal: controller.signal,
     });
 
-    expect(getGamesByLesson).toHaveBeenCalledTimes(1);
-    expect(getExperimentsByLesson).toHaveBeenCalledTimes(1);
-    expect(getSimulationsByLesson).toHaveBeenCalledTimes(1);
-    expect(getGamesByLesson).toHaveBeenCalledWith('lesson-one', {
-      signal: controller.signal,
-    });
-    expect(getExperimentsByLesson).toHaveBeenCalledWith('lesson-one', {
-      signal: controller.signal,
-    });
-    expect(getSimulationsByLesson).toHaveBeenCalledWith('lesson-one', {
-      signal: controller.signal,
-    });
+    for (const method of [
+      getGamesByLesson,
+      getExperimentsByLesson,
+      getSimulationsByLesson,
+      getInquiriesByLesson,
+    ]) {
+      expect(method).toHaveBeenCalledTimes(1);
+      expect(method).toHaveBeenCalledWith('lesson-one', { signal: controller.signal });
+    }
+
     expect(result.map((activity) => activity.kind)).toEqual([
       'matching',
       'experiment',
       'simulation',
+      'inquiry',
     ]);
   });
 
-  it('يبدأ طلبي repository قبل انتظار أي واحد منهما', async () => {
+  it('يبدأ طلبات repository الأربعة قبل انتظار أي واحد منها', async () => {
     let resolveGames!: (value: Game[]) => void;
     let resolveExperiments!: (value: Experiment[]) => void;
     let resolveSimulations!: (value: Simulation[]) => void;
+    let resolveInquiries!: (value: Inquiry[]) => void;
+
     const gamesPromise = new Promise<Game[]>((resolve) => {
       resolveGames = resolve;
     });
@@ -110,11 +135,21 @@ describe('ActivityCatalogService', () => {
     const simulationsPromise = new Promise<Simulation[]>((resolve) => {
       resolveSimulations = resolve;
     });
+    const inquiriesPromise = new Promise<Inquiry[]>((resolve) => {
+      resolveInquiries = resolve;
+    });
+
     const getGamesByLesson = vi.fn(() => gamesPromise);
     const getExperimentsByLesson = vi.fn(() => experimentsPromise);
     const getSimulationsByLesson = vi.fn(() => simulationsPromise);
+    const getInquiriesByLesson = vi.fn(() => inquiriesPromise);
     const service = createActivityCatalogService(
-      repositoryWith(getGamesByLesson, getExperimentsByLesson, getSimulationsByLesson)
+      repositoryWith(
+        getGamesByLesson,
+        getExperimentsByLesson,
+        getSimulationsByLesson,
+        getInquiriesByLesson
+      )
     );
 
     const resultPromise = service.getActivitiesByLesson('lesson-one');
@@ -122,12 +157,14 @@ describe('ActivityCatalogService', () => {
     expect(getGamesByLesson).toHaveBeenCalledTimes(1);
     expect(getExperimentsByLesson).toHaveBeenCalledTimes(1);
     expect(getSimulationsByLesson).toHaveBeenCalledTimes(1);
+    expect(getInquiriesByLesson).toHaveBeenCalledTimes(1);
 
     resolveGames([game]);
     resolveExperiments([experiment]);
     resolveSimulations([simulation]);
+    resolveInquiries([inquiry]);
 
-    await expect(resultPromise).resolves.toHaveLength(3);
+    await expect(resultPromise).resolves.toHaveLength(4);
   });
 
   it('يمرر فشل repository بدل إخفائه', async () => {

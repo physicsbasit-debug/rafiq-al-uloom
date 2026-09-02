@@ -9,6 +9,8 @@ import {
   mapGameObjectiveRow,
   mapGameRow,
   mapGradeRow,
+  mapInquiryObjectiveRow,
+  mapInquiryRow,
   mapLessonRow,
   mapObjectiveRow,
   mapQuestionRow,
@@ -24,6 +26,8 @@ import type {
   GameObjectiveRow,
   GameRow,
   GradeRow,
+  InquiryObjectiveRow,
+  InquiryRow,
   LessonRow,
   ObjectiveRow,
   QuestionRow,
@@ -62,6 +66,9 @@ const COLUMNS = {
   gameObjectives: 'game_id,objective_id,position',
   simulations: 'id,lesson_id,title,instructions,engine_kind,config,status,source',
   simulationObjectives: 'simulation_id,objective_id,lesson_id,position',
+  inquiries:
+    'id,lesson_id,title,instructions,context,driving_question,hypothesis_prompt,observation_prompt,conclusion_prompt,status,source',
+  inquiryObjectives: 'inquiry_id,objective_id,lesson_id,position',
 } as const;
 
 function isAbortError(error: unknown): boolean {
@@ -146,6 +153,39 @@ function groupObjectiveIdsByGame(rows: readonly GameObjectiveRow[]): Map<string,
     const ids = grouped.get(row.game_id) ?? [];
     ids.push(row.objective_id);
     grouped.set(row.game_id, ids);
+  }
+
+  return grouped;
+}
+
+function groupObjectiveIdsByInquiry(
+  rows: readonly InquiryObjectiveRow[],
+  inquiries: readonly InquiryRow[]
+): Map<string, string[]> {
+  const grouped = new Map<string, string[]>();
+  const inquiriesById = new Map(inquiries.map((inquiry) => [inquiry.id, inquiry]));
+
+  for (const rawRow of rows) {
+    const row = mapInquiryObjectiveRow(rawRow);
+    const inquiry = inquiriesById.get(row.inquiry_id);
+
+    if (!inquiry) {
+      throw new Error(
+        `Invalid inquiry_objective row "${row.inquiry_id}:${row.objective_id}": ` +
+          'inquiry_id is outside the requested inquiries'
+      );
+    }
+
+    if (row.lesson_id !== inquiry.lesson_id) {
+      throw new Error(
+        `Invalid inquiry_objective row "${row.inquiry_id}:${row.objective_id}": ` +
+          `lesson_id ${row.lesson_id} does not match inquiry lesson ${inquiry.lesson_id}`
+      );
+    }
+
+    const ids = grouped.get(row.inquiry_id) ?? [];
+    ids.push(row.objective_id);
+    grouped.set(row.inquiry_id, ids);
   }
 
   return grouped;
@@ -516,6 +556,43 @@ export function createSupabaseContentRepository(
       );
     },
 
+    async getInquiriesByLesson(lessonId, options) {
+      const inquiryQuery = withAbortSignal(
+        queryFrom(client, 'inquiries')
+          .select(COLUMNS.inquiries)
+          .eq('lesson_id', lessonId)
+          .order('id'),
+        options
+      );
+      const inquiries = await executeQuery<InquiryRow[]>(
+        'getInquiriesByLesson:inquiries',
+        inquiryQuery as unknown as QueryResponse<InquiryRow[]>
+      );
+
+      if (inquiries.length === 0) {
+        return [];
+      }
+
+      const inquiryIds = inquiries.map((inquiry) => inquiry.id);
+      const objectiveQuery = withAbortSignal(
+        queryFrom(client, 'inquiry_objectives')
+          .select(COLUMNS.inquiryObjectives)
+          .in('inquiry_id', inquiryIds)
+          .order('inquiry_id')
+          .order('position'),
+        options
+      );
+      const objectiveRows = await executeQuery<InquiryObjectiveRow[]>(
+        'getInquiriesByLesson:objectives',
+        objectiveQuery as unknown as QueryResponse<InquiryObjectiveRow[]>
+      );
+      const objectiveIdsByInquiry = groupObjectiveIdsByInquiry(objectiveRows, inquiries);
+
+      return inquiries.map((inquiry) =>
+        mapInquiryRow(inquiry, objectiveIdsByInquiry.get(inquiry.id) ?? [])
+      );
+    },
+
     async getGamesByLesson(lessonId, options) {
       const gameQuery = withAbortSignal(
         queryFrom(client, 'games').select(COLUMNS.games).eq('lesson_id', lessonId).order('id'),
@@ -583,4 +660,6 @@ export const supabaseContentRepository: ContentRepository = {
     getDefaultRepository().getGamesByLesson(lessonId, options),
   getSimulationsByLesson: (lessonId, options) =>
     getDefaultRepository().getSimulationsByLesson(lessonId, options),
+  getInquiriesByLesson: (lessonId, options) =>
+    getDefaultRepository().getInquiriesByLesson(lessonId, options),
 };

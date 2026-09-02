@@ -134,3 +134,24 @@ export interface SimulationObjectiveRow {
   lesson_id: string;
   position: number;
 }
+
+export interface InquiryRow {
+  id: string;
+  lesson_id: string;
+  title: string;
+  instructions: string;
+  context: string;
+  driving_question: string;
+  hypothesis_prompt: string;
+  observation_prompt: string;
+  conclusion_prompt: string;
+  status: ContentStatusRow;
+  source: ContentSourceRow;
+}
+
+export interface InquiryObjectiveRow {
+  inquiry_id: string;
+  objective_id: string;
+  lesson_id: string;
+  position: number;
+}

@@ -15,18 +15,21 @@ describe('activity registry', () => {
     expect(orders).toEqual([...orders].sort((a, b) => a - b));
   });
 
-  it('يجعل matching وexperiment وsimulation متاحة ويبقي inquiry وdata مخططتين', () => {
+  it('يجعل inquiry متاحة ويبقي data مخططة', () => {
     expect(getAvailableActivityRegistryEntries().map((entry) => entry.kind)).toEqual([
       'matching',
       'experiment',
       'simulation',
+      'inquiry',
     ]);
 
-    expect(
-      ACTIVITY_REGISTRY.filter((entry) => ['inquiry', 'data'].includes(entry.kind)).every(
-        (entry) => entry.availability === 'planned'
-      )
-    ).toBe(true);
+    expect(ACTIVITY_REGISTRY.find((entry) => entry.kind === 'inquiry')).toMatchObject({
+      availability: 'available',
+      interactionMode: 'guided',
+      physical: false,
+      sessionProgress: true,
+    });
+    expect(ACTIVITY_REGISTRY.find((entry) => entry.kind === 'data')?.availability).toBe('planned');
   });
 
   it('يبقي Domain Registry خاليًا من React', () => {

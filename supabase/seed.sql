@@ -172,11 +172,33 @@ ON CONFLICT (id) DO UPDATE SET
   status = EXCLUDED.status,
   source = EXCLUDED.source;
 
+INSERT INTO public.inquiries (id, lesson_id, title, instructions, context, driving_question, hypothesis_prompt, observation_prompt, conclusion_prompt, status, source)
+VALUES
+  ('g10-phy-waves-l3-inquiry-sound-medium', 'g10-phy-waves-l3', 'هل ينتقل الصوت دون وسط مادي؟', 'اقرأ الحالة العلمية ثم سجّل فرضيتك والملاحظة التي تستند إليها والاستنتاج الذي توصلت إليه.', 'يوضع جرس كهربائي يعمل داخل وعاء يمكن سحب الهواء منه. يستمر الجرس في الاهتزاز، لكن الصوت المسموع يضعف تدريجيًا كلما قل الهواء داخل الوعاء.', 'ماذا تشير هذه الملاحظة إلى دور الوسط المادي في انتقال الصوت؟', 'اكتب فرضيتك قبل تفسير النتيجة.', 'اكتب الملاحظة أو الدليل الذي تعتمد عليه من وصف الحالة.', 'اكتب استنتاجك العلمي حول حاجة الصوت إلى وسط مادي للانتقال.', 'draft', 'curriculum_seed')
+ON CONFLICT (id) DO UPDATE SET
+  lesson_id = EXCLUDED.lesson_id,
+  title = EXCLUDED.title,
+  instructions = EXCLUDED.instructions,
+  context = EXCLUDED.context,
+  driving_question = EXCLUDED.driving_question,
+  hypothesis_prompt = EXCLUDED.hypothesis_prompt,
+  observation_prompt = EXCLUDED.observation_prompt,
+  conclusion_prompt = EXCLUDED.conclusion_prompt,
+  status = EXCLUDED.status,
+  source = EXCLUDED.source;
+
 INSERT INTO public.simulation_objectives (simulation_id, objective_id, lesson_id, position)
 VALUES
   ('g10-phy-waves-l2-sim-wave-properties', 'l2-o1', 'g10-phy-waves-l2', 0),
   ('g10-phy-waves-l2-sim-wave-properties', 'l2-o2', 'g10-phy-waves-l2', 1)
 ON CONFLICT (simulation_id, objective_id) DO UPDATE SET
+  lesson_id = EXCLUDED.lesson_id,
+  position = EXCLUDED.position;
+
+INSERT INTO public.inquiry_objectives (inquiry_id, objective_id, lesson_id, position)
+VALUES
+  ('g10-phy-waves-l3-inquiry-sound-medium', 'l3-o1', 'g10-phy-waves-l3', 0)
+ON CONFLICT (inquiry_id, objective_id) DO UPDATE SET
   lesson_id = EXCLUDED.lesson_id,
   position = EXCLUDED.position;
 
