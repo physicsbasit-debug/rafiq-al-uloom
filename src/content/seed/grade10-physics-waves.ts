@@ -2,6 +2,7 @@ import type { Lesson, Objective } from '@shared-types/content.types';
 import type { Question } from '@shared-types/quiz.types';
 import type { Game } from '@shared-types/game.types';
 import type { Experiment } from '@shared-types/experiment.types';
+import type { Simulation } from '@shared-types/simulation.types';
 /**
  * Seed content — الصف العاشر / الفيزياء / وحدة الموجات.
  * Phase 1-A: محتوى فقط. لا واجهة، لا محركات.
@@ -994,6 +995,25 @@ export const grade10PhysicsWavesExperiments: Experiment[] = [
     observationPrompt: 'كيف بدا القلم عند سطح الماء؟',
     conclusionPrompt: 'استنتج سبب ظهور القلم مكسورًا بربط ذلك بتغيّر سرعة الضوء بين الوسطين.',
     homeAlternative: 'وضع قطعة نقود في وعاء وملؤه بالماء تدريجيًا وملاحظة تغيّر موضعها الظاهري.',
+    status: 'draft',
+    source: 'curriculum_seed',
+  },
+];
+
+export const grade10PhysicsWavesSimulations: Simulation[] = [
+  {
+    id: 'g10-phy-waves-l2-sim-wave-properties',
+    lessonId: 'g10-phy-waves-l2',
+    title: 'محاكاة خصائص الموجة',
+    instructions:
+      'غيّر التردد والسعة ولاحظ كيف يتغير شكل الموجة والطول الموجي مع بقاء سرعة الوسط التعليمي ثابتة.',
+    objectiveIds: ['l2-o1', 'l2-o2'],
+    config: {
+      engineKind: 'transverse_wave_v1',
+      mediumSpeedMps: 12,
+      frequencyHz: { min: 0.5, max: 4, step: 0.5, initial: 1 },
+      amplitudeM: { min: 0.2, max: 1, step: 0.1, initial: 0.5 },
+    },
     status: 'draft',
     source: 'curriculum_seed',
   },

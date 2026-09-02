@@ -3,9 +3,11 @@ import type {
   AvailableLearningActivity,
   ExperimentActivity,
   MatchingActivity,
+  SimulationActivity,
 } from '@shared-types/activity.types';
 import type { Experiment } from '@shared-types/experiment.types';
 import type { Game } from '@shared-types/game.types';
+import type { Simulation } from '@shared-types/simulation.types';
 
 function assertStructuralIds(
   kind: AvailableLearningActivity['kind'],
@@ -76,13 +78,30 @@ export function toExperimentActivity(experiment: Experiment): ExperimentActivity
   };
 }
 
+export function toSimulationActivity(simulation: Simulation): SimulationActivity {
+  assertStructuralIds('simulation', simulation.id, simulation.lessonId, simulation.objectiveIds);
+
+  return {
+    id: simulation.id,
+    lessonId: simulation.lessonId,
+    kind: 'simulation',
+    title: simulation.title,
+    objectiveIds: [...simulation.objectiveIds],
+    status: simulation.status,
+    source: simulation.source,
+    content: simulation,
+  };
+}
+
 export function buildLessonActivities(
   games: Game[],
-  experiments: Experiment[]
+  experiments: Experiment[],
+  simulations: Simulation[]
 ): AvailableLearningActivity[] {
   const activities: AvailableLearningActivity[] = [
     ...games.map(toMatchingActivity),
     ...experiments.map(toExperimentActivity),
+    ...simulations.map(toSimulationActivity),
   ];
 
   assertSingleLesson(activities);

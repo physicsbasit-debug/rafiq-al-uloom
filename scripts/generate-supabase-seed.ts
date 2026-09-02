@@ -15,11 +15,13 @@ import {
   grade10PhysicsWavesMasteryQuestions,
   grade10PhysicsWavesObjectives,
   grade10PhysicsWavesReviewQuestions,
+  grade10PhysicsWavesSimulations,
 } from '../src/content/seed/grade10-physics-waves';
 import type { Experiment } from '../src/types/experiment.types';
 import type { Game } from '../src/types/game.types';
 import type { Grade, Lesson, Objective, Semester, Subject, Unit } from '../src/types/content.types';
 import type { Question } from '../src/types/quiz.types';
+import type { Simulation } from '../src/types/simulation.types';
 
 export type SeedQuestion = Question & { purpose: 'review' | 'mastery' };
 
@@ -33,6 +35,7 @@ export interface SeedData {
   questions: SeedQuestion[];
   games: Game[];
   experiments: Experiment[];
+  simulations: Simulation[];
 }
 
 export const currentSeedData: SeedData = {
@@ -54,6 +57,7 @@ export const currentSeedData: SeedData = {
   ],
   games: grade10PhysicsWavesGames,
   experiments: grade10PhysicsWavesExperiments,
+  simulations: grade10PhysicsWavesSimulations,
 };
 
 function assertUniqueIds(entityName: string, values: Array<{ id: string }>): void {
@@ -91,6 +95,7 @@ export function validateSeedGraph(seedData: SeedData): void {
   assertUniqueIds('question', seedData.questions);
   assertUniqueIds('game', seedData.games);
   assertUniqueIds('experiment', seedData.experiments);
+  assertUniqueIds('simulation', seedData.simulations);
 
   const gradeIds = new Set(seedData.grades.map(({ id }) => id));
   const semesterIds = new Set(seedData.semesters.map(({ id }) => id));
@@ -164,6 +169,32 @@ export function validateSeedGraph(seedData: SeedData): void {
       if (objective && objective.lessonId !== game.lessonId) {
         throw new Error(
           `Invalid seed relationship: game ${game.id} references objective ${objectiveId} from another lesson`
+        );
+      }
+    }
+  }
+
+  for (const simulation of seedData.simulations) {
+    requireReference('simulation', simulation.id, 'lessonId', simulation.lessonId, lessonIds);
+
+    if (simulation.objectiveIds.length === 0) {
+      throw new Error(`Invalid seed relationship: simulation ${simulation.id} has no objectiveIds`);
+    }
+
+    const seenObjectiveIds = new Set<string>();
+    for (const objectiveId of simulation.objectiveIds) {
+      if (seenObjectiveIds.has(objectiveId)) {
+        throw new Error(
+          `Invalid seed relationship: simulation ${simulation.id} has duplicate objectiveId ${objectiveId}`
+        );
+      }
+      seenObjectiveIds.add(objectiveId);
+
+      requireReference('simulation', simulation.id, 'objectiveId', objectiveId, objectiveIds);
+      const objective = objectivesById.get(objectiveId);
+      if (objective && objective.lessonId !== simulation.lessonId) {
+        throw new Error(
+          `Invalid seed relationship: simulation ${simulation.id} references objective ${objectiveId} from another lesson`
         );
       }
     }
@@ -463,6 +494,38 @@ export function buildSeedSql(seedData: SeedData): string {
         'status',
         'source',
       ]
+    ),
+    '',
+    createInsertStatement(
+      'simulations',
+      ['id', 'lesson_id', 'title', 'instructions', 'engine_kind', 'config', 'status', 'source'],
+      seedData.simulations.map((simulation) => [
+        sqlText(simulation.id),
+        sqlText(simulation.lessonId),
+        sqlText(simulation.title),
+        sqlText(simulation.instructions),
+        sqlText(simulation.config.engineKind),
+        sqlJson(simulation.config),
+        sqlText(simulation.status),
+        sqlText(simulation.source),
+      ]),
+      'id',
+      ['lesson_id', 'title', 'instructions', 'engine_kind', 'config', 'status', 'source']
+    ),
+    '',
+    createInsertStatement(
+      'simulation_objectives',
+      ['simulation_id', 'objective_id', 'lesson_id', 'position'],
+      seedData.simulations.flatMap((simulation) =>
+        simulation.objectiveIds.map((objectiveId, position) => [
+          sqlText(simulation.id),
+          sqlText(objectiveId),
+          sqlText(simulation.lessonId),
+          sqlInteger(position),
+        ])
+      ),
+      'simulation_id, objective_id',
+      ['lesson_id', 'position']
     ),
     '',
     createInsertStatement(

@@ -160,6 +160,26 @@ ON CONFLICT (id) DO UPDATE SET
   status = EXCLUDED.status,
   source = EXCLUDED.source;
 
+INSERT INTO public.simulations (id, lesson_id, title, instructions, engine_kind, config, status, source)
+VALUES
+  ('g10-phy-waves-l2-sim-wave-properties', 'g10-phy-waves-l2', 'محاكاة خصائص الموجة', 'غيّر التردد والسعة ولاحظ كيف يتغير شكل الموجة والطول الموجي مع بقاء سرعة الوسط التعليمي ثابتة.', 'transverse_wave_v1', '{"engineKind":"transverse_wave_v1","mediumSpeedMps":12,"frequencyHz":{"min":0.5,"max":4,"step":0.5,"initial":1},"amplitudeM":{"min":0.2,"max":1,"step":0.1,"initial":0.5}}'::jsonb, 'draft', 'curriculum_seed')
+ON CONFLICT (id) DO UPDATE SET
+  lesson_id = EXCLUDED.lesson_id,
+  title = EXCLUDED.title,
+  instructions = EXCLUDED.instructions,
+  engine_kind = EXCLUDED.engine_kind,
+  config = EXCLUDED.config,
+  status = EXCLUDED.status,
+  source = EXCLUDED.source;
+
+INSERT INTO public.simulation_objectives (simulation_id, objective_id, lesson_id, position)
+VALUES
+  ('g10-phy-waves-l2-sim-wave-properties', 'l2-o1', 'g10-phy-waves-l2', 0),
+  ('g10-phy-waves-l2-sim-wave-properties', 'l2-o2', 'g10-phy-waves-l2', 1)
+ON CONFLICT (simulation_id, objective_id) DO UPDATE SET
+  lesson_id = EXCLUDED.lesson_id,
+  position = EXCLUDED.position;
+
 INSERT INTO public.experiment_objectives (experiment_id, objective_id, lesson_id, position)
 VALUES
   ('l1-exp', 'l1-o2', 'g10-phy-waves-l1', 0),
