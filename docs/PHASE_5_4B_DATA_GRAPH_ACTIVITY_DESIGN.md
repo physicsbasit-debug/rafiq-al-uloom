@@ -162,7 +162,7 @@ Those are separate concerns and phases.
 To avoid colliding with the existing logical wrapper name `DataActivity`, the specialized canonical content entity should be named:
 
 ```ts
-ScientificDataActivity
+ScientificDataActivity;
 ```
 
 Recommended file:
@@ -296,10 +296,7 @@ A later phase may introduce categorical x axes under a new engine version rather
 Phase 5-4B supports only:
 
 ```ts
-export type DataPresentationMode =
-  | 'table'
-  | 'line_graph'
-  | 'table_and_line_graph';
+export type DataPresentationMode = 'table' | 'line_graph' | 'table_and_line_graph';
 ```
 
 Recommended shape:
@@ -762,19 +759,13 @@ No per-row objective request.
 Add:
 
 ```ts
-toDataActivity(dataActivity)
+toDataActivity(dataActivity);
 ```
 
 Extend:
 
 ```ts
-buildLessonActivities(
-  games,
-  experiments,
-  simulations,
-  inquiries,
-  dataActivities
-)
+buildLessonActivities(games, experiments, simulations, inquiries, dataActivities);
 ```
 
 The adapter must preserve:
