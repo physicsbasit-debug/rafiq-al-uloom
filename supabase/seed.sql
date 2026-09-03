@@ -187,6 +187,18 @@ ON CONFLICT (id) DO UPDATE SET
   status = EXCLUDED.status,
   source = EXCLUDED.source;
 
+INSERT INTO public.data_activities (id, lesson_id, title, instructions, engine_kind, config, status, source)
+VALUES
+  ('g10-phy-waves-l2-data-frequency-wavelength', 'g10-phy-waves-l2', 'كيف يتغير الطول الموجي مع التردد؟', 'اقرأ الجدول والرسم ثم استخدم القيم المعروضة للإجابة عن المهام العددية.', 'data_graph_v1', '{"engineKind":"data_graph_v1","context":"تتحرك الموجة في الوسط نفسه بسرعة ثابتة مقدارها 340 م/ث. تعرض البيانات أزواجًا من التردد f والطول الموجي λ المتوافقة مع العلاقة v = f λ.","presentation":{"mode":"table_and_line_graph","xAxisLabel":"التردد f (Hz)","yAxisLabel":"الطول الموجي λ (m)"},"dataset":{"x":{"label":"التردد","unit":"Hz","values":[100,200,400]},"series":[{"id":"wavelength","label":"الطول الموجي","unit":"m","values":[3.4,1.7,0.85]}]},"tasks":[{"id":"read-wavelength-at-200","prompt":"ما الطول الموجي عند تردد 200 هرتز؟","unit":"m","rule":{"kind":"read_value","seriesId":"wavelength","pointIndex":1}},{"id":"wavelength-drop-100-to-200","prompt":"بكم ينخفض الطول الموجي عند الانتقال من 100 إلى 200 هرتز؟","unit":"m","rule":{"kind":"difference","seriesId":"wavelength","leftIndex":0,"rightIndex":1,"absolute":true}}]}'::jsonb, 'draft', 'curriculum_seed')
+ON CONFLICT (id) DO UPDATE SET
+  lesson_id = EXCLUDED.lesson_id,
+  title = EXCLUDED.title,
+  instructions = EXCLUDED.instructions,
+  engine_kind = EXCLUDED.engine_kind,
+  config = EXCLUDED.config,
+  status = EXCLUDED.status,
+  source = EXCLUDED.source;
+
 INSERT INTO public.simulation_objectives (simulation_id, objective_id, lesson_id, position)
 VALUES
   ('g10-phy-waves-l2-sim-wave-properties', 'l2-o1', 'g10-phy-waves-l2', 0),
@@ -199,6 +211,13 @@ INSERT INTO public.inquiry_objectives (inquiry_id, objective_id, lesson_id, posi
 VALUES
   ('g10-phy-waves-l3-inquiry-sound-medium', 'l3-o1', 'g10-phy-waves-l3', 0)
 ON CONFLICT (inquiry_id, objective_id) DO UPDATE SET
+  lesson_id = EXCLUDED.lesson_id,
+  position = EXCLUDED.position;
+
+INSERT INTO public.data_activity_objectives (data_activity_id, objective_id, lesson_id, position)
+VALUES
+  ('g10-phy-waves-l2-data-frequency-wavelength', 'l2-o2', 'g10-phy-waves-l2', 0)
+ON CONFLICT (data_activity_id, objective_id) DO UPDATE SET
   lesson_id = EXCLUDED.lesson_id,
   position = EXCLUDED.position;
 

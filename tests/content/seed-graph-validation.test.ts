@@ -21,6 +21,10 @@ function cloneSeed(): SeedData {
       ...inquiry,
       objectiveIds: [...inquiry.objectiveIds],
     })),
+    dataActivities: currentSeedData.dataActivities.map((activity) => ({
+      ...activity,
+      objectiveIds: [...activity.objectiveIds],
+    })),
   };
 }
 
@@ -83,6 +87,36 @@ describe('structural activity seed linkage validation', () => {
   it('يرفض Inquiry بهدف غير موجود', () => {
     const seed = cloneSeed();
     seed.inquiries[0] = { ...seed.inquiries[0]!, objectiveIds: ['missing-objective'] };
+    expect(() => validateSeedGraph(seed)).toThrow('missing objectiveId missing-objective');
+  });
+
+  it('يرفض Data Activity بلا objectiveIds', () => {
+    const seed = cloneSeed();
+    seed.dataActivities[0] = { ...seed.dataActivities[0]!, objectiveIds: [] };
+    expect(() => validateSeedGraph(seed)).toThrow('data activity');
+  });
+
+  it('يرفض Data Activity برابط مكرر', () => {
+    const seed = cloneSeed();
+    seed.dataActivities[0] = {
+      ...seed.dataActivities[0]!,
+      objectiveIds: ['l2-o2', 'l2-o2'],
+    };
+    expect(() => validateSeedGraph(seed)).toThrow('duplicate objectiveId l2-o2');
+  });
+
+  it('يرفض Data Activity بهدف من درس آخر', () => {
+    const seed = cloneSeed();
+    seed.dataActivities[0] = { ...seed.dataActivities[0]!, objectiveIds: ['l3-o1'] };
+    expect(() => validateSeedGraph(seed)).toThrow('from another lesson');
+  });
+
+  it('يرفض Data Activity بهدف غير موجود', () => {
+    const seed = cloneSeed();
+    seed.dataActivities[0] = {
+      ...seed.dataActivities[0]!,
+      objectiveIds: ['missing-objective'],
+    };
     expect(() => validateSeedGraph(seed)).toThrow('missing objectiveId missing-objective');
   });
 });

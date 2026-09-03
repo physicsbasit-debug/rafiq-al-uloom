@@ -18,6 +18,8 @@ import {
   grade10PhysicsWavesReviewQuestions,
   grade10PhysicsWavesSimulations,
 } from '../src/content/seed/grade10-physics-waves';
+import { grade10PhysicsWavesDataActivities } from '../src/content/seed/grade10-physics-waves-data';
+import type { ScientificDataActivity } from '../src/types/data-activity.types';
 import type { Experiment } from '../src/types/experiment.types';
 import type { Game } from '../src/types/game.types';
 import type { Inquiry } from '../src/types/inquiry.types';
@@ -39,6 +41,7 @@ export interface SeedData {
   experiments: Experiment[];
   simulations: Simulation[];
   inquiries: Inquiry[];
+  dataActivities: ScientificDataActivity[];
 }
 
 export const currentSeedData: SeedData = {
@@ -62,6 +65,7 @@ export const currentSeedData: SeedData = {
   experiments: grade10PhysicsWavesExperiments,
   simulations: grade10PhysicsWavesSimulations,
   inquiries: grade10PhysicsWavesInquiries,
+  dataActivities: grade10PhysicsWavesDataActivities,
 };
 
 function assertUniqueIds(entityName: string, values: Array<{ id: string }>): void {
@@ -101,6 +105,7 @@ export function validateSeedGraph(seedData: SeedData): void {
   assertUniqueIds('experiment', seedData.experiments);
   assertUniqueIds('simulation', seedData.simulations);
   assertUniqueIds('inquiry', seedData.inquiries);
+  assertUniqueIds('data activity', seedData.dataActivities);
 
   const gradeIds = new Set(seedData.grades.map(({ id }) => id));
   const semesterIds = new Set(seedData.semesters.map(({ id }) => id));
@@ -226,6 +231,32 @@ export function validateSeedGraph(seedData: SeedData): void {
       if (objective && objective.lessonId !== inquiry.lessonId) {
         throw new Error(
           `Invalid seed relationship: inquiry ${inquiry.id} references objective ${objectiveId} from another lesson`
+        );
+      }
+    }
+  }
+
+  for (const activity of seedData.dataActivities) {
+    requireReference('data activity', activity.id, 'lessonId', activity.lessonId, lessonIds);
+
+    if (activity.objectiveIds.length === 0) {
+      throw new Error(`Invalid seed relationship: data activity ${activity.id} has no objectiveIds`);
+    }
+
+    const seenObjectiveIds = new Set<string>();
+    for (const objectiveId of activity.objectiveIds) {
+      if (seenObjectiveIds.has(objectiveId)) {
+        throw new Error(
+          `Invalid seed relationship: data activity ${activity.id} has duplicate objectiveId ${objectiveId}`
+        );
+      }
+      seenObjectiveIds.add(objectiveId);
+
+      requireReference('data activity', activity.id, 'objectiveId', objectiveId, objectiveIds);
+      const objective = objectivesById.get(objectiveId);
+      if (objective && objective.lessonId !== activity.lessonId) {
+        throw new Error(
+          `Invalid seed relationship: data activity ${activity.id} references objective ${objectiveId} from another lesson`
         );
       }
     }
@@ -588,6 +619,23 @@ export function buildSeedSql(seedData: SeedData): string {
     ),
     '',
     createInsertStatement(
+      'data_activities',
+      ['id', 'lesson_id', 'title', 'instructions', 'engine_kind', 'config', 'status', 'source'],
+      seedData.dataActivities.map((activity) => [
+        sqlText(activity.id),
+        sqlText(activity.lessonId),
+        sqlText(activity.title),
+        sqlText(activity.instructions),
+        sqlText(activity.config.engineKind),
+        sqlJson(activity.config),
+        sqlText(activity.status),
+        sqlText(activity.source),
+      ]),
+      'id',
+      ['lesson_id', 'title', 'instructions', 'engine_kind', 'config', 'status', 'source']
+    ),
+    '',
+    createInsertStatement(
       'simulation_objectives',
       ['simulation_id', 'objective_id', 'lesson_id', 'position'],
       seedData.simulations.flatMap((simulation) =>
@@ -614,6 +662,21 @@ export function buildSeedSql(seedData: SeedData): string {
         ])
       ),
       'inquiry_id, objective_id',
+      ['lesson_id', 'position']
+    ),
+    '',
+    createInsertStatement(
+      'data_activity_objectives',
+      ['data_activity_id', 'objective_id', 'lesson_id', 'position'],
+      seedData.dataActivities.flatMap((activity) =>
+        activity.objectiveIds.map((objectiveId, position) => [
+          sqlText(activity.id),
+          sqlText(objectiveId),
+          sqlText(activity.lessonId),
+          sqlInteger(position),
+        ])
+      ),
+      'data_activity_id, objective_id',
       ['lesson_id', 'position']
     ),
     '',

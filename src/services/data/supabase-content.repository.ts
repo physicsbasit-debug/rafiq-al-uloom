@@ -4,6 +4,8 @@ import type { ContentRepository, RepositoryRequestOptions } from './content.repo
 import { orderEntitiesByIds, uniqueIdsInOrder } from './content-ordering';
 import { getSupabaseClient } from './supabase-client';
 import {
+  mapDataActivityObjectiveRow,
+  mapDataActivityRow,
   mapExperimentObjectiveRow,
   mapExperimentRow,
   mapGameObjectiveRow,
@@ -21,6 +23,8 @@ import {
   mapSimulationRow,
 } from './supabase-content.mappers';
 import type {
+  DataActivityObjectiveRow,
+  DataActivityRow,
   ExperimentObjectiveRow,
   ExperimentRow,
   GameObjectiveRow,
@@ -69,6 +73,8 @@ const COLUMNS = {
   inquiries:
     'id,lesson_id,title,instructions,context,driving_question,hypothesis_prompt,observation_prompt,conclusion_prompt,status,source',
   inquiryObjectives: 'inquiry_id,objective_id,lesson_id,position',
+  dataActivities: 'id,lesson_id,title,instructions,engine_kind,config,status,source',
+  dataActivityObjectives: 'data_activity_id,objective_id,lesson_id,position',
 } as const;
 
 function isAbortError(error: unknown): boolean {
@@ -153,6 +159,39 @@ function groupObjectiveIdsByGame(rows: readonly GameObjectiveRow[]): Map<string,
     const ids = grouped.get(row.game_id) ?? [];
     ids.push(row.objective_id);
     grouped.set(row.game_id, ids);
+  }
+
+  return grouped;
+}
+
+function groupObjectiveIdsByDataActivity(
+  rows: readonly DataActivityObjectiveRow[],
+  activities: readonly DataActivityRow[]
+): Map<string, string[]> {
+  const grouped = new Map<string, string[]>();
+  const activitiesById = new Map(activities.map((activity) => [activity.id, activity]));
+
+  for (const rawRow of rows) {
+    const row = mapDataActivityObjectiveRow(rawRow);
+    const activity = activitiesById.get(row.data_activity_id);
+
+    if (!activity) {
+      throw new Error(
+        `Invalid data_activity_objective row "${row.data_activity_id}:${row.objective_id}": ` +
+          'data_activity_id is outside the requested data activities'
+      );
+    }
+
+    if (row.lesson_id !== activity.lesson_id) {
+      throw new Error(
+        `Invalid data_activity_objective row "${row.data_activity_id}:${row.objective_id}": ` +
+          `lesson_id ${row.lesson_id} does not match data activity lesson ${activity.lesson_id}`
+      );
+    }
+
+    const ids = grouped.get(row.data_activity_id) ?? [];
+    ids.push(row.objective_id);
+    grouped.set(row.data_activity_id, ids);
   }
 
   return grouped;
@@ -556,6 +595,46 @@ export function createSupabaseContentRepository(
       );
     },
 
+    async getDataActivitiesByLesson(lessonId, options) {
+      const activityQuery = withAbortSignal(
+        queryFrom(client, 'data_activities')
+          .select(COLUMNS.dataActivities)
+          .eq('lesson_id', lessonId)
+          .order('id'),
+        options
+      );
+      const activities = await executeQuery<DataActivityRow[]>(
+        'getDataActivitiesByLesson:data_activities',
+        activityQuery as unknown as QueryResponse<DataActivityRow[]>
+      );
+
+      if (activities.length === 0) {
+        return [];
+      }
+
+      const activityIds = activities.map((activity) => activity.id);
+      const objectiveQuery = withAbortSignal(
+        queryFrom(client, 'data_activity_objectives')
+          .select(COLUMNS.dataActivityObjectives)
+          .in('data_activity_id', activityIds)
+          .order('data_activity_id')
+          .order('position'),
+        options
+      );
+      const objectiveRows = await executeQuery<DataActivityObjectiveRow[]>(
+        'getDataActivitiesByLesson:objectives',
+        objectiveQuery as unknown as QueryResponse<DataActivityObjectiveRow[]>
+      );
+      const objectiveIdsByActivity = groupObjectiveIdsByDataActivity(
+        objectiveRows,
+        activities
+      );
+
+      return activities.map((activity) =>
+        mapDataActivityRow(activity, objectiveIdsByActivity.get(activity.id) ?? [])
+      );
+    },
+
     async getInquiriesByLesson(lessonId, options) {
       const inquiryQuery = withAbortSignal(
         queryFrom(client, 'inquiries')
@@ -662,4 +741,6 @@ export const supabaseContentRepository: ContentRepository = {
     getDefaultRepository().getSimulationsByLesson(lessonId, options),
   getInquiriesByLesson: (lessonId, options) =>
     getDefaultRepository().getInquiriesByLesson(lessonId, options),
+  getDataActivitiesByLesson: (lessonId, options) =>
+    getDefaultRepository().getDataActivitiesByLesson(lessonId, options),
 };

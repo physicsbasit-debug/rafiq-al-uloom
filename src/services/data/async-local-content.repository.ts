@@ -88,4 +88,9 @@ export const asyncLocalContentRepository: ContentRepository = {
     throwIfRequestAborted(options?.signal);
     return localContent.getInquiriesByLesson(lessonId);
   },
+
+  async getDataActivitiesByLesson(lessonId, options) {
+    throwIfRequestAborted(options?.signal);
+    return localContent.getDataActivitiesByLesson(lessonId);
+  },
 };

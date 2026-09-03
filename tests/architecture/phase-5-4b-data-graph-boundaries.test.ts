@@ -23,6 +23,7 @@ const futureDataBoundaryFiles = [
   'supabase/migrations/20260903080000_add_data_activities.sql',
   'src/services/data/supabase-content.mappers.ts',
   'src/content/seed/grade10-physics-waves.ts',
+  'src/content/seed/grade10-physics-waves-data.ts',
 ] as const;
 
 const answerKeyPattern =
