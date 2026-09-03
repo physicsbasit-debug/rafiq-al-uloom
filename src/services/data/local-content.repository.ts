@@ -121,7 +121,5 @@ export function getInquiriesByLesson(lessonId: string): Inquiry[] {
 }
 
 export function getDataActivitiesByLesson(lessonId: string): ScientificDataActivity[] {
-  return grade10PhysicsWavesDataActivities.filter(
-    (activity) => activity.lessonId === lessonId
-  );
+  return grade10PhysicsWavesDataActivities.filter((activity) => activity.lessonId === lessonId);
 }

@@ -1,10 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
-import {
-  buildSeedSql,
-  currentSeedData,
-} from '../../scripts/generate-supabase-seed';
+import { buildSeedSql, currentSeedData } from '../../scripts/generate-supabase-seed';
 
 describe('Phase 5-4B generated Supabase seed parity', () => {
   it('يبقى supabase/seed.sql مطابقًا حرفيًا للمولد بعد إضافة Data Activity', () => {

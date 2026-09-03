@@ -625,10 +625,7 @@ export function createSupabaseContentRepository(
         'getDataActivitiesByLesson:objectives',
         objectiveQuery as unknown as QueryResponse<DataActivityObjectiveRow[]>
       );
-      const objectiveIdsByActivity = groupObjectiveIdsByDataActivity(
-        objectiveRows,
-        activities
-      );
+      const objectiveIdsByActivity = groupObjectiveIdsByDataActivity(objectiveRows, activities);
 
       return activities.map((activity) =>
         mapDataActivityRow(activity, objectiveIdsByActivity.get(activity.id) ?? [])

@@ -58,12 +58,10 @@ describe('Phase 5-4B Supabase data activity mappers', () => {
   });
 
   it('يرفض نشاط بيانات بلا objectiveIds أو بروابط مكررة', () => {
-    expect(() => mapDataActivityRow(dataActivityRow, [])).toThrow(
-      'objectiveIds must not be empty'
+    expect(() => mapDataActivityRow(dataActivityRow, [])).toThrow('objectiveIds must not be empty');
+    expect(() => mapDataActivityRow(dataActivityRow, ['objective-1', 'objective-1'])).toThrow(
+      'objectiveIds must not contain duplicates'
     );
-    expect(() =>
-      mapDataActivityRow(dataActivityRow, ['objective-1', 'objective-1'])
-    ).toThrow('objectiveIds must not contain duplicates');
   });
 
   it('يرفض engine_kind غير المدعوم أو المختلف عن config.engineKind', () => {

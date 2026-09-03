@@ -405,12 +405,7 @@ export function mapDataActivityObjectiveRow(input: unknown): DataActivityObjecti
   const id = `${String(row.data_activity_id ?? '<unknown>')}:${String(
     row.objective_id ?? '<unknown>'
   )}`;
-  const dataActivityId = requireString(
-    row,
-    'data_activity_id',
-    'data_activity_objective',
-    id
-  );
+  const dataActivityId = requireString(row, 'data_activity_id', 'data_activity_objective', id);
   const objectiveId = requireString(row, 'objective_id', 'data_activity_objective', id);
   const lessonId = requireString(row, 'lesson_id', 'data_activity_objective', id);
 

@@ -240,7 +240,9 @@ export function validateSeedGraph(seedData: SeedData): void {
     requireReference('data activity', activity.id, 'lessonId', activity.lessonId, lessonIds);
 
     if (activity.objectiveIds.length === 0) {
-      throw new Error(`Invalid seed relationship: data activity ${activity.id} has no objectiveIds`);
+      throw new Error(
+        `Invalid seed relationship: data activity ${activity.id} has no objectiveIds`
+      );
     }
 
     const seenObjectiveIds = new Set<string>();
