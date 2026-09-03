@@ -66,10 +66,12 @@ describe('data activity deterministic engine', () => {
   });
 
   it('applies the absolute tolerance boundary exactly', () => {
-    expect(evaluateNumericAnswer(10, 10 + DEFAULT_NUMERIC_TOLERANCE)).toMatchObject({
+    const tolerance = DEFAULT_NUMERIC_TOLERANCE;
+
+    expect(evaluateNumericAnswer(0, tolerance, tolerance)).toMatchObject({
       status: 'correct',
     });
-    expect(evaluateNumericAnswer(10, 10 + DEFAULT_NUMERIC_TOLERANCE * 2)).toMatchObject({
+    expect(evaluateNumericAnswer(0, tolerance * 2, tolerance)).toMatchObject({
       status: 'incorrect',
     });
   });
