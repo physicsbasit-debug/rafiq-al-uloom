@@ -15,12 +15,13 @@ describe('activity registry', () => {
     expect(orders).toEqual([...orders].sort((a, b) => a - b));
   });
 
-  it('يجعل inquiry متاحة ويبقي data مخططة', () => {
+  it('يجعل inquiry وdata متاحتين مع state تفاعلي داخل الجلسة', () => {
     expect(getAvailableActivityRegistryEntries().map((entry) => entry.kind)).toEqual([
       'matching',
       'experiment',
       'simulation',
       'inquiry',
+      'data',
     ]);
 
     expect(ACTIVITY_REGISTRY.find((entry) => entry.kind === 'inquiry')).toMatchObject({
@@ -29,7 +30,12 @@ describe('activity registry', () => {
       physical: false,
       sessionProgress: true,
     });
-    expect(ACTIVITY_REGISTRY.find((entry) => entry.kind === 'data')?.availability).toBe('planned');
+    expect(ACTIVITY_REGISTRY.find((entry) => entry.kind === 'data')).toMatchObject({
+      availability: 'available',
+      interactionMode: 'guided',
+      physical: false,
+      sessionProgress: true,
+    });
   });
 
   it('يبقي Domain Registry خاليًا من React', () => {

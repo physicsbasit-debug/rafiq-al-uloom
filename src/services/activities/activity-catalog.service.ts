@@ -24,14 +24,21 @@ export function createActivityCatalogService(
         throw new Error('lessonId must not be blank when loading activities.');
       }
 
-      const [games, experiments, simulations, inquiries] = await Promise.all([
+      const [games, experiments, simulations, inquiries, dataActivities] = await Promise.all([
         repository.getGamesByLesson(lessonId, options),
         repository.getExperimentsByLesson(lessonId, options),
         repository.getSimulationsByLesson(lessonId, options),
         repository.getInquiriesByLesson(lessonId, options),
+        repository.getDataActivitiesByLesson(lessonId, options),
       ]);
 
-      const activities = buildLessonActivities(games, experiments, simulations, inquiries);
+      const activities = buildLessonActivities(
+        games,
+        experiments,
+        simulations,
+        inquiries,
+        dataActivities
+      );
 
       if (activities.some((activity) => activity.lessonId !== lessonId)) {
         throw new Error(

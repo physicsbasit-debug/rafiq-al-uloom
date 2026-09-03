@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { AppButton } from '@design-system/components/AppButton';
+import { DataActivityRunner } from '@features/data-activities/DataActivityRunner';
 import { ExperimentCard } from '@features/experiments/experiment-card';
 import { MatchingGameRunner } from '@features/games/matching/MatchingGameRunner';
 import { InquiryRunner } from '@features/inquiries/InquiryRunner';
@@ -78,11 +79,23 @@ function renderInquiryActivity({
   return <InquiryRunner inquiry={activity.content} onBack={onBackToActivities} />;
 }
 
+function renderDataActivity({
+  activity,
+  onBackToActivities,
+}: StudentActivityRendererProps): ReactNode {
+  if (activity.kind !== 'data') {
+    throw new Error('Data activity renderer received a non-data activity.');
+  }
+
+  return <DataActivityRunner activity={activity.content} onBack={onBackToActivities} />;
+}
+
 const STUDENT_ACTIVITY_RENDERERS: Partial<Record<LearningActivityKind, StudentActivityRenderer>> = {
   matching: renderMatchingActivity,
   experiment: renderExperimentActivity,
   simulation: renderSimulationActivity,
   inquiry: renderInquiryActivity,
+  data: renderDataActivity,
 };
 
 export function getStudentActivityRenderer(
