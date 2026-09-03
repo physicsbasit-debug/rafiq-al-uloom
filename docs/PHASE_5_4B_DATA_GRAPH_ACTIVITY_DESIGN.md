@@ -2,12 +2,12 @@
 
 ## Data / Graph Activity — Pre-Implementation Contract
 
-**الحالة:** PRE-IMPLEMENTATION CONTRACT — READY FOR ARCHITECTURE REVIEW  
-**Baseline:** `main` @ `a37a7b470f85b9e0d87491bba798673408f226d1`  
-**Parent contracts:** Phase 5-0 + Phase 5-2 + Phase 5-4A clarification  
-**Scope:** Data / Graph Activity only  
-**Implementation status:** NOT STARTED in this batch  
-**Authoring / Reviewer integration:** Deferred to Phase 5-5  
+**الحالة:** PRE-IMPLEMENTATION CONTRACT — READY FOR ARCHITECTURE REVIEW
+**Baseline:** `main` @ `a37a7b470f85b9e0d87491bba798673408f226d1`
+**Parent contracts:** Phase 5-0 + Phase 5-2 + Phase 5-4A clarification
+**Scope:** Data / Graph Activity only
+**Implementation status:** NOT STARTED in this batch
+**Authoring / Reviewer integration:** Deferred to Phase 5-5
 **Durable activity result persistence:** Out of scope
 
 ---
