@@ -65,7 +65,7 @@ Remote Supabase لرفيق العلوم ما زالت مؤجلة عمدًا.
 | 2-D      | Cloud Persistence                         | حفظ نتائج الإتقان المرتبطة بالمستخدم عبر RPC وRLS مع retry وidempotency | مسار سحابي حقيقي + تكافؤ حسابي + أمر إغلاق موحد          | مكتملة / CLOSED              |
 | 3        | Teacher Dashboard                         | تأليف بشري + مراجعة + اعتماد + نشر محكوم                                | teacher يؤلف وreviewer يراجع/يعتمد عبر حماية خلفية       | مكتملة / CLOSED & FROZEN     |
 | 4        | AI-assisted Authoring                     | توليد مساعد مع قبول بشري وحواجز خادمية وحراسة تربوية                    | لا حفظ أو اعتماد أو نشر مباشر من AI                      | مكتملة / CLOSED & FROZEN     |
-| 5        | Advanced Science Activities               | توسيع الألعاب والتجارب والمحاكاة والأنشطة العلمية                       | كل نشاط مرتبط بهدف تعلم وقابل للاختبار                   | 5-2 CURRENT — 5-0/5-1 CLOSED |
+| 5        | Advanced Science Activities               | توسيع الألعاب والتجارب والمحاكاة والأنشطة العلمية                       | كل نشاط مرتبط بهدف تعلم وقابل للاختبار                   | 5-4B CLOSED — 5-5 NEXT |
 | 6        | Production Readiness                      | أمن، أداء، مراقبة أخطاء، نسخ احتياطي، نشر وتوثيق تشغيل                  | قائمة جاهزية إنتاج ناجحة                                 | مخططة                        |
 | 1.0      | الإطلاق الرسمي                            | نسخة مستقرة قابلة للاستخدام والتوسع                                     | قبول وظيفي وتشغيلي كامل                                  | الهدف النهائي                |
 
@@ -73,10 +73,23 @@ Remote Supabase لرفيق العلوم ما زالت مؤجلة عمدًا.
 ## حالة Phase 5 الحالية
 
 ```text
-5-0  Science Activities Contract & Architecture             ✅ APPROVED / CLOSED
-5-1  Experiment Objective Linkage                            ✅ CLOSED @ 5108a69867b7b94d4c54b6c26f14b4a7ed34b037
-5-2  Activity Domain + Registry + Student Activity Hub       ▶ CURRENT
+5-0   Science Activities Contract & Architecture             ✅ APPROVED / CLOSED
+5-1   Experiment Objective Linkage                            ✅ CLOSED @ 5108a69867b7b94d4c54b6c26f14b4a7ed34b037
+5-2   Activity Domain + Registry + Student Activity Hub       ✅ CLOSED @ a4c91afa36bbe377004e36cbcbd3947e2a864bd7
+5-3   Interactive Science Simulation Engine                  ✅ CLOSED @ f3992bdbae2e22813bd49032cd2c59a89c867ef6
+5-4A  Inquiry Activity                                       ✅ CLOSED @ a37a7b470f85b9e0d87491bba798673408f226d1
+5-4B  Data / Graph Activity                                  ✅ CLOSED @ 1e66cfd71545282ceeaf123fc9e5d58b13bc470f
+5-5   Teacher / Reviewer Activity Authoring Integration       ▶ NEXT
 ```
+
+**دليل إغلاق 5-4B:**
+
+- Lint وBuild: PASS
+- Core: 112/112 ملفات، 1026/1026 اختبارات
+- pgTAP: 4/4 ملفات، 152/152 اختبارات
+- Supabase غير الحي: 19 ملفًا، 148/148 اختبارًا
+- Data Activity Local ↔ Supabase parity: 1/1 PASS
+- اختبارات Gemini الحية الثلاثة متخطاة عمدًا وخارج نطاق الإغلاق
 
 `5-0R` أعاد ربط baseline المعماري رسميًا بوسم Phase 4 V2 المجمد، و`5-1` أُغلقت بعد تنفيذ Experiment Objective Linkage ودمج PR #5. هذه السطور تسجل الحالة فقط ولا تعيد فتح أو تعدل عقود المراحل السابقة.
 
