@@ -52,7 +52,9 @@ describe('Phase 5-4B data / graph boundaries', () => {
   it('يمنع جدول activities العام ومحاولات Data الدائمة عبر جميع migrations', () => {
     const migrations = migrationSources().join('\n');
 
-    expect(migrations).not.toMatch(/CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?public\.activities\b/i);
+    expect(migrations).not.toMatch(
+      /CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?public\.activities\b/i
+    );
     expect(migrations).not.toMatch(
       /data_activity_attempts|data_activity_results|activity_attempts|data_attempts/i
     );

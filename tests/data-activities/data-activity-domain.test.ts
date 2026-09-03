@@ -63,10 +63,7 @@ describe('data activity domain', () => {
 
   it.each([
     [{ ...config.dataset, x: { ...config.dataset.x, values: [] } }, 'must not be empty'],
-    [
-      { ...config.dataset, x: { ...config.dataset.x, values: [1, 1, 2] } },
-      'strictly increasing',
-    ],
+    [{ ...config.dataset, x: { ...config.dataset.x, values: [1, 1, 2] } }, 'strictly increasing'],
     [
       {
         ...config.dataset,
@@ -77,10 +74,7 @@ describe('data activity domain', () => {
     [
       {
         ...config.dataset,
-        series: [
-          config.dataset.series[0],
-          { ...config.dataset.series[0], label: 'نسخة أخرى' },
-        ],
+        series: [config.dataset.series[0], { ...config.dataset.series[0], label: 'نسخة أخرى' }],
       },
       'duplicates',
     ],

@@ -8,9 +8,7 @@ import type {
 export const DEFAULT_NUMERIC_TOLERANCE = 1e-9;
 
 export type NumericAnswerParseResult =
-  | { status: 'empty' }
-  | { status: 'invalid_number' }
-  | { status: 'valid'; value: number };
+  { status: 'empty' } | { status: 'invalid_number' } | { status: 'valid'; value: number };
 
 export type NumericAnswerEvaluation =
   | { status: 'empty' }
@@ -37,7 +35,9 @@ function requireSeries(dataset: NumericDataset, seriesId: string): NumericSeries
 
 function readSeriesValue(series: NumericSeries, pointIndex: number): number {
   if (!Number.isInteger(pointIndex) || pointIndex < 0 || pointIndex >= series.values.length) {
-    throw new Error(`Point index ${pointIndex} is out of range for series ${JSON.stringify(series.id)}.`);
+    throw new Error(
+      `Point index ${pointIndex} is out of range for series ${JSON.stringify(series.id)}.`
+    );
   }
   const value = series.values[pointIndex];
   if (value === undefined || !Number.isFinite(value)) {
