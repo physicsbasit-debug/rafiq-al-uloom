@@ -8,10 +8,7 @@ import {
   evaluateNumericTask,
   type NumericAnswerEvaluation,
 } from '@features/data-activities/engine/data-activity.engine';
-import type {
-  NumericDataTask,
-  ScientificDataActivity,
-} from '@shared-types/data-activity.types';
+import type { NumericDataTask, ScientificDataActivity } from '@shared-types/data-activity.types';
 
 interface DataActivityRunnerProps {
   activity: ScientificDataActivity;
@@ -54,7 +51,10 @@ function DataTable({ activity }: { activity: ScientificDataActivity }) {
   const { dataset } = activity.config;
 
   return (
-    <section aria-labelledby={`${activity.id}-table-title`} style={{ display: 'grid', gap: spacing.sm }}>
+    <section
+      aria-labelledby={`${activity.id}-table-title`}
+      style={{ display: 'grid', gap: spacing.sm }}
+    >
       <h3 id={`${activity.id}-table-title`} style={{ margin: 0, color: colors.textPrimary }}>
         جدول البيانات
       </h3>
@@ -179,7 +179,10 @@ function DataLineGraph({ activity }: { activity: ScientificDataActivity }) {
   const yTicks = Array.from({ length: 5 }, (_, index) => yMin + (index / 4) * ySpan);
 
   return (
-    <section aria-labelledby={`${activity.id}-graph-title`} style={{ display: 'grid', gap: spacing.sm }}>
+    <section
+      aria-labelledby={`${activity.id}-graph-title`}
+      style={{ display: 'grid', gap: spacing.sm }}
+    >
       <h3 id={`${activity.id}-graph-title`} style={{ margin: 0, color: colors.textPrimary }}>
         الرسم الخطي
       </h3>
@@ -250,13 +253,7 @@ function DataLineGraph({ activity }: { activity: ScientificDataActivity }) {
 
             return (
               <g key={`${activity.id}-y-tick-${index}`}>
-                <line
-                  x1={plotLeft - 7}
-                  y1={y}
-                  x2={plotLeft}
-                  y2={y}
-                  stroke={colors.textSecondary}
-                />
+                <line x1={plotLeft - 7} y1={y} x2={plotLeft} y2={y} stroke={colors.textSecondary} />
                 <text
                   x={plotLeft - 12}
                   y={y + 4}
@@ -489,9 +486,9 @@ function DataTaskCard({
 
 export function DataActivityRunner({ activity, onBack }: DataActivityRunnerProps) {
   const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [evaluations, setEvaluations] = useState<
-    Partial<Record<string, NumericAnswerEvaluation>>
-  >({});
+  const [evaluations, setEvaluations] = useState<Partial<Record<string, NumericAnswerEvaluation>>>(
+    {}
+  );
 
   const showTable =
     activity.config.presentation.mode === 'table' ||

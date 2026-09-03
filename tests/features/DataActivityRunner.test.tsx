@@ -78,9 +78,9 @@ describe('DataActivityRunner', () => {
     });
     expect(graph).toHaveAttribute('dir', 'ltr');
 
-    const points = Array.from(
-      container.querySelectorAll('circle[data-series-id="distance"]')
-    ).map((point) => Number(point.getAttribute('cx')));
+    const points = Array.from(container.querySelectorAll('circle[data-series-id="distance"]')).map(
+      (point) => Number(point.getAttribute('cx'))
+    );
 
     expect(points).toHaveLength(3);
     expect(points[0]).toBeLessThan(points[1] ?? Number.NEGATIVE_INFINITY);
@@ -102,7 +102,9 @@ describe('DataActivityRunner', () => {
     expect(screen.queryByText('إجابة صحيحة.')).not.toBeInTheDocument();
 
     fireEvent.click(check);
-    expect(screen.getByText('الإجابة غير صحيحة. راجع البيانات وحاول مرة أخرى.')).toBeInTheDocument();
+    expect(
+      screen.getByText('الإجابة غير صحيحة. راجع البيانات وحاول مرة أخرى.')
+    ).toBeInTheDocument();
     expect(screen.queryByText(/القيمة الصحيحة/)).not.toBeInTheDocument();
   });
 

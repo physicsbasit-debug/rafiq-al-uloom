@@ -43,8 +43,4 @@ export interface DataActivity extends LearningActivityBase {
 }
 
 export type AvailableLearningActivity =
-  | MatchingActivity
-  | ExperimentActivity
-  | SimulationActivity
-  | InquiryActivity
-  | DataActivity;
+  MatchingActivity | ExperimentActivity | SimulationActivity | InquiryActivity | DataActivity;

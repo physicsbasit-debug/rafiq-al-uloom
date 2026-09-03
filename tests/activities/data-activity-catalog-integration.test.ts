@@ -46,9 +46,12 @@ describe('Data activity catalog integration', () => {
     } as unknown as ContentRepository;
     const controller = new AbortController();
 
-    const result = await createActivityCatalogService(repository).getActivitiesByLesson('lesson-one', {
-      signal: controller.signal,
-    });
+    const result = await createActivityCatalogService(repository).getActivitiesByLesson(
+      'lesson-one',
+      {
+        signal: controller.signal,
+      }
+    );
 
     expect(getDataActivitiesByLesson).toHaveBeenCalledTimes(1);
     expect(getDataActivitiesByLesson).toHaveBeenCalledWith('lesson-one', {
