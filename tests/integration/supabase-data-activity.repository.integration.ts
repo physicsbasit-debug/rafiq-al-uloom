@@ -53,5 +53,6 @@ describeIntegration('Phase 5-4B Supabase Data Activity parity', () => {
     expect(remote).toHaveLength(1);
     expect(remote[0]?.objectiveIds).toEqual(['l2-o2']);
     expect(remote[0]?.config.engineKind).toBe('data_graph_v1');
+    expect(remote[0]?.status).toBe('approved');
   }, 30_000);
 });

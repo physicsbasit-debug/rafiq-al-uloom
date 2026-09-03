@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { grade10PhysicsWavesDataActivities } from '@content/seed/grade10-physics-waves-data';
+import { grade10PhysicsWavesLessons } from '@content/seed/grade10-physics-waves';
 import { parseDataActivityConfig } from '@shared-types/data-activity.types';
 
 describe('Phase 5-4B scientific data seed', () => {
@@ -10,9 +11,18 @@ describe('Phase 5-4B scientific data seed', () => {
       id: 'g10-phy-waves-l2-data-frequency-wavelength',
       lessonId: 'g10-phy-waves-l2',
       objectiveIds: ['l2-o2'],
-      status: 'draft',
+      status: 'approved',
       source: 'curriculum_seed',
     });
+  });
+
+  it('يربط النشاط المعتمد بدرس معتمد حتى يكون قابلاً للقراءة عبر RLS', () => {
+    const lesson = grade10PhysicsWavesLessons.find(
+      (candidate) => candidate.id === 'g10-phy-waves-l2'
+    );
+
+    expect(lesson).toBeDefined();
+    expect(lesson?.status).toBe('approved');
   });
 
   it('يمر config عبر parser المعتمد بلا استثناء', () => {

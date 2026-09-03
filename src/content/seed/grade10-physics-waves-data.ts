@@ -56,7 +56,7 @@ export const grade10PhysicsWavesDataActivities: ScientificDataActivity[] = [
         },
       ],
     },
-    status: 'draft',
+    status: 'approved',
     source: 'curriculum_seed',
   },
 ];

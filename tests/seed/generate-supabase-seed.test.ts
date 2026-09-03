@@ -58,10 +58,29 @@ describe('generate-supabase-seed', () => {
     });
   });
 
-  it('لا يغير حالات المحتوى draft أثناء التوليد', () => {
-    expect(currentSeedData.lessons.every(({ status }) => status === 'draft')).toBe(true);
-    expect(currentSeedData.questions.every(({ status }) => status === 'draft')).toBe(true);
-    expect(currentSeedData.games.every(({ status }) => status === 'draft')).toBe(true);
-    expect(currentSeedData.experiments.every(({ status }) => status === 'draft')).toBe(true);
+  it('يحافظ على حالات المحتوى المؤلفة أثناء التوليد دون تعديلها', () => {
+    const before = {
+      lessons: currentSeedData.lessons.map(({ id, status }) => ({ id, status })),
+      questions: currentSeedData.questions.map(({ id, status }) => ({ id, status })),
+      games: currentSeedData.games.map(({ id, status }) => ({ id, status })),
+      experiments: currentSeedData.experiments.map(({ id, status }) => ({ id, status })),
+      simulations: currentSeedData.simulations.map(({ id, status }) => ({ id, status })),
+      inquiries: currentSeedData.inquiries.map(({ id, status }) => ({ id, status })),
+      dataActivities: currentSeedData.dataActivities.map(({ id, status }) => ({ id, status })),
+    };
+
+    buildSeedSql(currentSeedData);
+
+    const after = {
+      lessons: currentSeedData.lessons.map(({ id, status }) => ({ id, status })),
+      questions: currentSeedData.questions.map(({ id, status }) => ({ id, status })),
+      games: currentSeedData.games.map(({ id, status }) => ({ id, status })),
+      experiments: currentSeedData.experiments.map(({ id, status }) => ({ id, status })),
+      simulations: currentSeedData.simulations.map(({ id, status }) => ({ id, status })),
+      inquiries: currentSeedData.inquiries.map(({ id, status }) => ({ id, status })),
+      dataActivities: currentSeedData.dataActivities.map(({ id, status }) => ({ id, status })),
+    };
+
+    expect(after).toEqual(before);
   });
 });
