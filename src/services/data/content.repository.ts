@@ -6,6 +6,7 @@ import type {
   Subject,
   Unit,
 } from '@shared-types/content.types';
+import type { ScientificDataActivity } from '@shared-types/data-activity.types';
 import type { Experiment } from '@shared-types/experiment.types';
 import type { Game } from '@shared-types/game.types';
 import type { Inquiry } from '@shared-types/inquiry.types';
@@ -65,4 +66,9 @@ export interface ContentRepository {
   ): Promise<Simulation[]>;
 
   getInquiriesByLesson(lessonId: string, options?: RepositoryRequestOptions): Promise<Inquiry[]>;
+
+  getDataActivitiesByLesson(
+    lessonId: string,
+    options?: RepositoryRequestOptions
+  ): Promise<ScientificDataActivity[]>;
 }

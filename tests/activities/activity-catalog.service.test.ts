@@ -79,6 +79,7 @@ function repositoryWith(
     getExperimentsByLesson,
     getSimulationsByLesson,
     getInquiriesByLesson,
+    getDataActivitiesByLesson: vi.fn().mockResolvedValue([]),
   } as ContentRepository;
 }
 

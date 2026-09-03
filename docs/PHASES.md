@@ -48,35 +48,47 @@ Remote Supabase لرفيق العلوم ما زالت مؤجلة عمدًا.
 
 ## خارطة الطريق المحدّثة
 
-| المرحلة  | الهدف                                     | المخرجات                                                                | معيار القبول                                             | الحالة                       |
-| -------- | ----------------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------- | ---------------------------- |
-| 0-A      | قرارات تأسيسية                            | وثيقة معتمدة                                                            | اعتماد كتابي                                             | مكتملة                       |
-| 0-B      | Project Skeleton                          | مشروع + مجلدات + أنواع + Theme + Docs                                   | build/lint/prettier ناجحة                                | مكتملة                       |
-| 1        | Local Prototype                           | تجربة طالب كاملة بمحتوى TypeScript محلي                                 | تصفح كامل من الصف إلى النتيجة                            | مكتملة                       |
-| 2-A      | Async Data Contract                       | ContentRepository غير متزامن + hooks مشتركة + ترحيل واجهات الطالب       | الاختبارات المحلية مستقلة عن الشبكة                      | مكتملة                       |
-| 2-B      | Supabase Content Data Layer               | Schema + RLS + Seed + Repository + Provider Selection                   | تكافؤ كامل بين local وSupabase                           | مكتملة                       |
-| 2-Freeze | Data Layer Freeze                         | توثيق المعمارية والخارطة + الوسم `v0.3-data-layer-complete`             | الوسم يشير إلى commit التجميد المعتمد                    | مكتملة                       |
-| 2-C0     | Auth & Authorization Architecture         | قرارات Supabase Auth + Profiles + Roles + Account Status + حدود RLS     | اعتماد الوثيقة المعمارية دون كود                         | مكتملة                       |
-| 2-C1     | Auth Client & Session Contract            | Auth types + service + session + sign-in/sign-up/sign-out + unit tests  | عقد Auth واختباراته ناجحة بلا Profiles أو UI             | مكتملة                       |
-| 2-C2     | Profiles + Roles + Authorization RLS      | Profiles + Trigger + AuthorizationState + RLS + اختبارات SQL وتكامل     | لا تصعيد ذاتي للصلاحيات ولا مستخدم يتيم                  | مكتملة                       |
-| 2-C3     | Login / Logout / Session UI               | واجهات Auth ورسائل الجلسة والتأكيد                                      | تجربة RTL واضحة بلا وميض واجهة محمية                     | مكتملة                       |
-| 2-C4     | Protected Operations + Access Guards      | عقد عمليات + محرك قرار + حراس React + اختبارات تجاوز الواجهة            | لا عملية محمية تعتمد على إخفاء الواجهة فقط               | مكتملة                       |
-| 2-C5     | Auth Integration Tests & Security Closure | دورة حياة Auth + تركيب حقيقي + فحص أسرار + توثيق تشغيل وتجميد           | الوسم `v0.4-auth-security-complete` على الالتزام المتحقق | مكتملة                       |
-| 2-D      | Cloud Persistence                         | حفظ نتائج الإتقان المرتبطة بالمستخدم عبر RPC وRLS مع retry وidempotency | مسار سحابي حقيقي + تكافؤ حسابي + أمر إغلاق موحد          | مكتملة / CLOSED              |
-| 3        | Teacher Dashboard                         | تأليف بشري + مراجعة + اعتماد + نشر محكوم                                | teacher يؤلف وreviewer يراجع/يعتمد عبر حماية خلفية       | مكتملة / CLOSED & FROZEN     |
-| 4        | AI-assisted Authoring                     | توليد مساعد مع قبول بشري وحواجز خادمية وحراسة تربوية                    | لا حفظ أو اعتماد أو نشر مباشر من AI                      | مكتملة / CLOSED & FROZEN     |
-| 5        | Advanced Science Activities               | توسيع الألعاب والتجارب والمحاكاة والأنشطة العلمية                       | كل نشاط مرتبط بهدف تعلم وقابل للاختبار                   | 5-2 CURRENT — 5-0/5-1 CLOSED |
-| 6        | Production Readiness                      | أمن، أداء، مراقبة أخطاء، نسخ احتياطي، نشر وتوثيق تشغيل                  | قائمة جاهزية إنتاج ناجحة                                 | مخططة                        |
-| 1.0      | الإطلاق الرسمي                            | نسخة مستقرة قابلة للاستخدام والتوسع                                     | قبول وظيفي وتشغيلي كامل                                  | الهدف النهائي                |
-
+| المرحلة  | الهدف                                     | المخرجات                                                                | معيار القبول                                             | الحالة                   |
+| -------- | ----------------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------- | ------------------------ |
+| 0-A      | قرارات تأسيسية                            | وثيقة معتمدة                                                            | اعتماد كتابي                                             | مكتملة                   |
+| 0-B      | Project Skeleton                          | مشروع + مجلدات + أنواع + Theme + Docs                                   | build/lint/prettier ناجحة                                | مكتملة                   |
+| 1        | Local Prototype                           | تجربة طالب كاملة بمحتوى TypeScript محلي                                 | تصفح كامل من الصف إلى النتيجة                            | مكتملة                   |
+| 2-A      | Async Data Contract                       | ContentRepository غير متزامن + hooks مشتركة + ترحيل واجهات الطالب       | الاختبارات المحلية مستقلة عن الشبكة                      | مكتملة                   |
+| 2-B      | Supabase Content Data Layer               | Schema + RLS + Seed + Repository + Provider Selection                   | تكافؤ كامل بين local وSupabase                           | مكتملة                   |
+| 2-Freeze | Data Layer Freeze                         | توثيق المعمارية والخارطة + الوسم `v0.3-data-layer-complete`             | الوسم يشير إلى commit التجميد المعتمد                    | مكتملة                   |
+| 2-C0     | Auth & Authorization Architecture         | قرارات Supabase Auth + Profiles + Roles + Account Status + حدود RLS     | اعتماد الوثيقة المعمارية دون كود                         | مكتملة                   |
+| 2-C1     | Auth Client & Session Contract            | Auth types + service + session + sign-in/sign-up/sign-out + unit tests  | عقد Auth واختباراته ناجحة بلا Profiles أو UI             | مكتملة                   |
+| 2-C2     | Profiles + Roles + Authorization RLS      | Profiles + Trigger + AuthorizationState + RLS + اختبارات SQL وتكامل     | لا تصعيد ذاتي للصلاحيات ولا مستخدم يتيم                  | مكتملة                   |
+| 2-C3     | Login / Logout / Session UI               | واجهات Auth ورسائل الجلسة والتأكيد                                      | تجربة RTL واضحة بلا وميض واجهة محمية                     | مكتملة                   |
+| 2-C4     | Protected Operations + Access Guards      | عقد عمليات + محرك قرار + حراس React + اختبارات تجاوز الواجهة            | لا عملية محمية تعتمد على إخفاء الواجهة فقط               | مكتملة                   |
+| 2-C5     | Auth Integration Tests & Security Closure | دورة حياة Auth + تركيب حقيقي + فحص أسرار + توثيق تشغيل وتجميد           | الوسم `v0.4-auth-security-complete` على الالتزام المتحقق | مكتملة                   |
+| 2-D      | Cloud Persistence                         | حفظ نتائج الإتقان المرتبطة بالمستخدم عبر RPC وRLS مع retry وidempotency | مسار سحابي حقيقي + تكافؤ حسابي + أمر إغلاق موحد          | مكتملة / CLOSED          |
+| 3        | Teacher Dashboard                         | تأليف بشري + مراجعة + اعتماد + نشر محكوم                                | teacher يؤلف وreviewer يراجع/يعتمد عبر حماية خلفية       | مكتملة / CLOSED & FROZEN |
+| 4        | AI-assisted Authoring                     | توليد مساعد مع قبول بشري وحواجز خادمية وحراسة تربوية                    | لا حفظ أو اعتماد أو نشر مباشر من AI                      | مكتملة / CLOSED & FROZEN |
+| 5        | Advanced Science Activities               | توسيع الألعاب والتجارب والمحاكاة والأنشطة العلمية                       | كل نشاط مرتبط بهدف تعلم وقابل للاختبار                   | 5-4B CLOSED — 5-5 NEXT   |
+| 6        | Production Readiness                      | أمن، أداء، مراقبة أخطاء، نسخ احتياطي، نشر وتوثيق تشغيل                  | قائمة جاهزية إنتاج ناجحة                                 | مخططة                    |
+| 1.0      | الإطلاق الرسمي                            | نسخة مستقرة قابلة للاستخدام والتوسع                                     | قبول وظيفي وتشغيلي كامل                                  | الهدف النهائي            |
 
 ## حالة Phase 5 الحالية
 
 ```text
-5-0  Science Activities Contract & Architecture             ✅ APPROVED / CLOSED
-5-1  Experiment Objective Linkage                            ✅ CLOSED @ 5108a69867b7b94d4c54b6c26f14b4a7ed34b037
-5-2  Activity Domain + Registry + Student Activity Hub       ▶ CURRENT
+5-0   Science Activities Contract & Architecture             ✅ APPROVED / CLOSED
+5-1   Experiment Objective Linkage                            ✅ CLOSED @ 5108a69867b7b94d4c54b6c26f14b4a7ed34b037
+5-2   Activity Domain + Registry + Student Activity Hub       ✅ CLOSED @ a4c91afa36bbe377004e36cbcbd3947e2a864bd7
+5-3   Interactive Science Simulation Engine                  ✅ CLOSED @ f3992bdbae2e22813bd49032cd2c59a89c867ef6
+5-4A  Inquiry Activity                                       ✅ CLOSED @ a37a7b470f85b9e0d87491bba798673408f226d1
+5-4B  Data / Graph Activity                                  ✅ CLOSED @ 1e66cfd71545282ceeaf123fc9e5d58b13bc470f
+5-5   Teacher / Reviewer Activity Authoring Integration       ▶ NEXT
 ```
+
+**دليل إغلاق 5-4B:**
+
+- Lint وBuild: PASS
+- Core: 112/112 ملفات، 1026/1026 اختبارات
+- pgTAP: 4/4 ملفات، 152/152 اختبارات
+- Supabase غير الحي: 19 ملفًا، 148/148 اختبارًا
+- Data Activity Local ↔ Supabase parity: 1/1 PASS
+- اختبارات Gemini الحية الثلاثة متخطاة عمدًا وخارج نطاق الإغلاق
 
 `5-0R` أعاد ربط baseline المعماري رسميًا بوسم Phase 4 V2 المجمد، و`5-1` أُغلقت بعد تنفيذ Experiment Objective Linkage ودمج PR #5. هذه السطور تسجل الحالة فقط ولا تعيد فتح أو تعدل عقود المراحل السابقة.
 

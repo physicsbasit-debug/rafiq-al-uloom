@@ -114,7 +114,7 @@ export const grade10PhysicsWavesLessons: Lesson[] = [
       'الخلط بين السعة والطول الموجي، والصحيح أن السعة رأسية (طاقة) والطول الموجي أفقي (مسافة).',
       'اعتقاد أن زيادة التردد تزيد السرعة دائمًا، والصحيح أن السرعة تحددها خصائص الوسط.',
     ],
-    status: 'draft',
+    status: 'approved',
     source: 'curriculum_seed',
   },
   {

@@ -54,10 +54,10 @@ export const ACTIVITY_REGISTRY: readonly ActivityRegistryEntry[] = [
     kind: 'data',
     label: 'بيانات ورسوم',
     displayOrder: 50,
-    availability: 'planned',
+    availability: 'available',
     interactionMode: 'guided',
     physical: false,
-    sessionProgress: false,
+    sessionProgress: true,
   },
 ];
 

@@ -293,15 +293,29 @@ describeIntegration('Phase 2-C2-A profiles and authorization RLS', () => {
     expect(suspended.data).toEqual([]);
   });
 
-  it('allows active roles to read catalog rows but not draft lessons', async () => {
+  it('allows active roles to read approved lessons while draft lessons remain hidden', async () => {
+    const approvedLessonId = 'g10-phy-waves-l2';
+    const draftLessonId = 'g10-phy-waves-l3';
+
     for (const identity of [activeStudent, activeTeacher, activeReviewer]) {
       const grades = await identity.client.from('grades').select('id');
-      const lessons = await identity.client.from('lessons').select('id');
+      const approvedLesson = await identity.client
+        .from('lessons')
+        .select('id')
+        .eq('id', approvedLessonId);
+      const draftLesson = await identity.client
+        .from('lessons')
+        .select('id')
+        .eq('id', draftLessonId);
 
       expect(grades.error).toBeNull();
       expect(grades.data?.length).toBeGreaterThan(0);
-      expect(lessons.error).toBeNull();
-      expect(lessons.data).toEqual([]);
+
+      expect(approvedLesson.error).toBeNull();
+      expect(approvedLesson.data).toEqual([{ id: approvedLessonId }]);
+
+      expect(draftLesson.error).toBeNull();
+      expect(draftLesson.data).toEqual([]);
     }
   });
 

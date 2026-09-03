@@ -1,4 +1,5 @@
 import type { ContentSource, ContentStatus } from './content.types';
+import type { ScientificDataActivity } from './data-activity.types';
 import type { Experiment } from './experiment.types';
 import type { Game } from './game.types';
 import type { Inquiry } from './inquiry.types';
@@ -36,5 +37,10 @@ export interface InquiryActivity extends LearningActivityBase {
   content: Inquiry;
 }
 
+export interface DataActivity extends LearningActivityBase {
+  kind: 'data';
+  content: ScientificDataActivity;
+}
+
 export type AvailableLearningActivity =
-  MatchingActivity | ExperimentActivity | SimulationActivity | InquiryActivity;
+  MatchingActivity | ExperimentActivity | SimulationActivity | InquiryActivity | DataActivity;
