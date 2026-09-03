@@ -202,9 +202,8 @@ function DataLineGraph({ activity }: { activity: ScientificDataActivity }) {
         <svg
           role="img"
           aria-label={`رسم خطي يوضح ${presentation.yAxisLabel} حسب ${presentation.xAxisLabel}`}
-          dir="ltr"
           viewBox={`0 0 ${GRAPH_WIDTH} ${GRAPH_HEIGHT}`}
-          style={{ display: 'block', width: '100%', height: 'auto' }}
+          style={{ display: 'block', width: '100%', height: 'auto', direction: 'ltr' }}
         >
           <line
             x1={plotLeft}

@@ -76,7 +76,7 @@ describe('DataActivityRunner', () => {
     const graph = screen.getByRole('img', {
       name: 'رسم خطي يوضح المسافة (m) حسب الزمن (s)',
     });
-    expect(graph).toHaveAttribute('dir', 'ltr');
+    expect(graph).toHaveStyle({ direction: 'ltr' });
 
     const points = Array.from(container.querySelectorAll('circle[data-series-id="distance"]')).map(
       (point) => Number(point.getAttribute('cx'))
