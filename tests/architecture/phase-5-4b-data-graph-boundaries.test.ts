@@ -26,7 +26,7 @@ const futureDataBoundaryFiles = [
 ] as const;
 
 const answerKeyPattern =
-  /expected_?value|expected_?answer|correct_?value|answer_?key|model_?answer|reference_?answer|teacher_?answer/i;
+  /(?<![a-zA-Z])(?:expected_?value|expected_?answer|correct_?value|answer_?key|model_?answer|reference_?answer|teacher_?answer)(?![a-zA-Z])/i;
 
 describe('Phase 5-4B data / graph boundaries', () => {
   it('يبقي Data ضمن Activity Domain والـRegistry العامين', () => {
@@ -56,6 +56,11 @@ describe('Phase 5-4B data / graph boundaries', () => {
     expect(migrations).not.toMatch(
       /data_activity_attempts|data_activity_results|activity_attempts|data_attempts/i
     );
+  });
+
+  it('يميز حارس answer-key بين الحقول الممنوعة وأسماء الاشتقاق البريئة', () => {
+    expect(answerKeyPattern.test('const expectedValue = 12;')).toBe(true);
+    expect(answerKeyPattern.test('deriveExpectedValue(dataset, rule)')).toBe(false);
   });
 
   it('يفعل حارس سرية answer-key تلقائيًا على ملفات Data عند ظهورها', () => {
