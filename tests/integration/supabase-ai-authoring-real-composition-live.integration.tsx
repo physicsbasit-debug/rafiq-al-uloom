@@ -59,6 +59,15 @@ function cleanupAuthoringRows(teacherId: string): void {
     const publishedList = publishedIds.map(sqlLiteral).join(', ');
 
     psqlAdmin(`
+      DELETE FROM public.experiment_objectives
+      WHERE lesson_id IN (${publishedList});
+      DELETE FROM public.simulation_objectives
+      WHERE lesson_id IN (${publishedList});
+      DELETE FROM public.inquiry_objectives
+      WHERE lesson_id IN (${publishedList});
+      DELETE FROM public.data_activity_objectives
+      WHERE lesson_id IN (${publishedList});
+
       DELETE FROM public.game_objectives
       WHERE game_id IN (
         SELECT id FROM public.games
@@ -72,6 +81,13 @@ function cleanupAuthoringRows(teacherId: string): void {
       WHERE lesson_id IN (${publishedList});
 
       DELETE FROM public.experiments
+      WHERE lesson_id IN (${publishedList});
+
+      DELETE FROM public.simulations
+      WHERE lesson_id IN (${publishedList});
+      DELETE FROM public.inquiries
+      WHERE lesson_id IN (${publishedList});
+      DELETE FROM public.data_activities
       WHERE lesson_id IN (${publishedList});
 
       DELETE FROM public.objectives

@@ -1,49 +1,6 @@
-export interface LessonRevisionPayload {
-  lesson: {
-    unitId: string;
-    title: string;
-    displayOrder: number;
-    summary: string;
-    keyConcepts: string[];
-    examples: string[];
-    misconceptions: string[];
-  };
-  objectives: Array<{
-    key: string;
-    text: string;
-  }>;
-  questions: Array<{
-    key: string;
-    purpose: 'review' | 'mastery';
-    type: 'multiple_choice';
-    prompt: string;
-    choices: string[];
-    correctAnswerIndex: number;
-    explanation: string;
-    objectiveKey: string;
-    difficulty: string;
-  }>;
-  games: Array<{
-    key: string;
-    type: 'matching';
-    title: string;
-    instructions: string;
-    items: Array<{ left: string; right: string }>;
-    objectiveKeys: string[];
-  }>;
-  experiments: Array<{
-    key: string;
-    title: string;
-    objective: string;
-    tools: string[];
-    steps: string[];
-    safetyNotes: string[];
-    safetyLevel: 'safe_home' | 'teacher_supervised' | 'lab_only' | 'not_allowed';
-    observationPrompt: string;
-    conclusionPrompt: string;
-    homeAlternative: string | null;
-  }>;
-}
+import type { LessonRevisionPayload } from '@services/authoring';
+
+export type { LessonRevisionPayload };
 
 export interface CreatedRevision {
   status: 'created';
@@ -130,6 +87,7 @@ export function buildLessonRevisionPayload(
         key: 'experiment-a',
         title: `Experiment ${runId}`,
         objective: `Observe ${runId}`,
+        objectiveKeys: ['objective-a'],
         tools: ['tool'],
         steps: ['step one'],
         safetyNotes: ['stay safe'],
@@ -139,6 +97,9 @@ export function buildLessonRevisionPayload(
         homeAlternative: null,
       },
     ],
+    simulations: [],
+    inquiries: [],
+    dataActivities: [],
   };
 }
 

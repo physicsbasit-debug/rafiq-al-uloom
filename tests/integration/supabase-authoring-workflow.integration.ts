@@ -174,12 +174,28 @@ describeIntegration('Phase 3-1 trusted lesson authoring workflow', () => {
 
     if (canonicalIds.length > 0) {
       psqlAdmin(`
-        DELETE FROM public.game_objectives
+        DELETE FROM public.experiment_objectives
+      WHERE lesson_id IN (${canonicalList});
+      DELETE FROM public.simulation_objectives
+      WHERE lesson_id IN (${canonicalList});
+      DELETE FROM public.inquiry_objectives
+      WHERE lesson_id IN (${canonicalList});
+      DELETE FROM public.data_activity_objectives
+      WHERE lesson_id IN (${canonicalList});
+
+      DELETE FROM public.game_objectives
         WHERE game_id IN (SELECT id FROM public.games WHERE lesson_id IN (${canonicalList}));
         DELETE FROM public.questions WHERE lesson_id IN (${canonicalList});
         DELETE FROM public.games WHERE lesson_id IN (${canonicalList});
         DELETE FROM public.experiments WHERE lesson_id IN (${canonicalList});
-        DELETE FROM public.objectives WHERE lesson_id IN (${canonicalList});
+        DELETE FROM public.simulations
+      WHERE lesson_id IN (${canonicalList});
+      DELETE FROM public.inquiries
+      WHERE lesson_id IN (${canonicalList});
+      DELETE FROM public.data_activities
+      WHERE lesson_id IN (${canonicalList});
+
+      DELETE FROM public.objectives WHERE lesson_id IN (${canonicalList});
       `);
     }
 
