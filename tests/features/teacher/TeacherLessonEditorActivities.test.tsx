@@ -78,8 +78,43 @@ const payload: LessonRevisionPayload = {
     },
   ],
 
-  simulations: [],
-  inquiries: [],
+  simulations: [
+    {
+      key: 'teacher-simulation-1',
+      title: 'محاكاة خصائص الموجة',
+      instructions: 'غيّر التردد والسعة ولاحظ النتيجة.',
+      objectiveKeys: ['objective-a'],
+      config: {
+        engineKind: 'transverse_wave_v1',
+        mediumSpeedMps: 12,
+        frequencyHz: {
+          min: 0.5,
+          max: 4,
+          step: 0.5,
+          initial: 1,
+        },
+        amplitudeM: {
+          min: 0.2,
+          max: 1,
+          step: 0.1,
+          initial: 0.5,
+        },
+      },
+    },
+  ],
+  inquiries: [
+    {
+      key: 'teacher-inquiry-1',
+      title: 'استقصاء انعكاس الموجة',
+      instructions: 'اقرأ الموقف وأجب.',
+      objectiveKeys: ['objective-a'],
+      context: 'تتحرك موجة على حبل نحو حاجز ثابت.',
+      drivingQuestion: 'ماذا يحدث للموجة عند الحاجز؟',
+      hypothesisPrompt: 'اكتب فرضيتك.',
+      observationPrompt: 'دوّن ما تلاحظه.',
+      conclusionPrompt: 'اكتب استنتاجك العلمي.',
+    },
+  ],
   dataActivities: [],
 };
 
@@ -177,6 +212,52 @@ describe('Phase 5-5D2 TeacherLessonEditor activities', () => {
 
     fireEvent.click(
       screen.getByRole('button', {
+        name: 'تعديل المحاكاة 1',
+      })
+    );
+
+    fireEvent.change(
+      screen.getByRole('textbox', {
+        name: 'عنوان المحاكاة',
+      }),
+      {
+        target: {
+          value: 'محاكاة خصائص الموجة المعدلة',
+        },
+      }
+    );
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'حفظ تعديل المحاكاة',
+      })
+    );
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'تعديل الاستقصاء 1',
+      })
+    );
+
+    fireEvent.change(
+      screen.getByRole('textbox', {
+        name: 'عنوان الاستقصاء',
+      }),
+      {
+        target: {
+          value: 'استقصاء انعكاس الموجة المعدل',
+        },
+      }
+    );
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'حفظ تعديل الاستقصاء',
+      })
+    );
+
+    fireEvent.click(
+      screen.getByRole('button', {
         name: 'حفظ المسودة',
       })
     );
@@ -199,6 +280,20 @@ describe('Phase 5-5D2 TeacherLessonEditor activities', () => {
       },
     ]);
 
+    expect(savedPayload?.simulations).toEqual([
+      {
+        ...payload.simulations[0],
+        title: 'محاكاة خصائص الموجة المعدلة',
+      },
+    ]);
+
+    expect(savedPayload?.inquiries).toEqual([
+      {
+        ...payload.inquiries[0],
+        title: 'استقصاء انعكاس الموجة المعدل',
+      },
+    ]);
+
     expect(savedPayload?.games[0]?.key).toBe('teacher-game-1');
 
     expect(savedPayload?.experiments[0]?.key).toBe('teacher-experiment-1');
@@ -206,6 +301,12 @@ describe('Phase 5-5D2 TeacherLessonEditor activities', () => {
     expect(savedPayload?.games[0]?.objectiveKeys).toEqual(['objective-a']);
 
     expect(savedPayload?.experiments[0]?.objectiveKeys).toEqual(['objective-a']);
+
+    expect(savedPayload?.simulations[0]?.key).toBe('teacher-simulation-1');
+    expect(savedPayload?.simulations[0]?.objectiveKeys).toEqual(['objective-a']);
+
+    expect(savedPayload?.inquiries[0]?.key).toBe('teacher-inquiry-1');
+    expect(savedPayload?.inquiries[0]?.objectiveKeys).toEqual(['objective-a']);
 
     expect(saveLessonRevision).toHaveBeenCalledWith(DRAFT_ID, expect.anything(), {
       signal: expect.any(AbortSignal),
@@ -224,6 +325,8 @@ describe('Phase 5-5D2 TeacherLessonEditor activities', () => {
     expect(screen.getByText('مطابقة الكميات')).toBeInTheDocument();
 
     expect(screen.getByText('موجة في حبل')).toBeInTheDocument();
+    expect(screen.getByText('محاكاة خصائص الموجة')).toBeInTheDocument();
+    expect(screen.getByText('استقصاء انعكاس الموجة')).toBeInTheDocument();
 
     expect(
       screen.queryByRole('button', {
@@ -246,6 +349,30 @@ describe('Phase 5-5D2 TeacherLessonEditor activities', () => {
     expect(
       screen.queryByRole('button', {
         name: 'تعديل التجربة 1',
+      })
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', {
+        name: 'إضافة محاكاة',
+      })
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', {
+        name: 'تعديل المحاكاة 1',
+      })
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', {
+        name: 'إضافة نشاط استقصاء',
+      })
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', {
+        name: 'تعديل الاستقصاء 1',
       })
     ).not.toBeInTheDocument();
   });

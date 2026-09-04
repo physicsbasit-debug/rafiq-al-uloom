@@ -10,8 +10,10 @@ import type { ContentRepository } from '@services/data/content.repository';
 import { TeacherAiSuggestionPanel } from './TeacherAiSuggestionPanel';
 import { isObjectiveReferencedByActivity } from './teacher-activity-structure';
 import { TeacherExperimentsEditor } from './TeacherExperimentsEditor';
+import { TeacherInquiriesEditor } from './TeacherInquiriesEditor';
 import { TeacherMatchingGamesEditor } from './TeacherMatchingGamesEditor';
 import { TeacherObjectivesEditor } from './TeacherObjectivesEditor';
+import { TeacherSimulationsEditor } from './TeacherSimulationsEditor';
 import { TeacherQuestionsEditor } from './TeacherQuestionsEditor';
 import { createAiDestinationSnapshot, hasAiDestinationChanged } from './teacher-ai-acceptance';
 import { getQuestionStateIssue } from './teacher-lesson-structure';
@@ -402,6 +404,32 @@ export function TeacherLessonEditor({
           }
         />
 
+        <TeacherSimulationsEditor
+          simulations={payload.simulations}
+          objectives={payload.objectives}
+          readOnly={readOnly}
+          disabled={session.isSaving || session.isSubmitting}
+          onChange={(simulations) =>
+            updatePayload({
+              ...payload,
+              simulations,
+            })
+          }
+        />
+
+        <TeacherInquiriesEditor
+          inquiries={payload.inquiries}
+          objectives={payload.objectives}
+          readOnly={readOnly}
+          disabled={session.isSaving || session.isSubmitting}
+          onChange={(inquiries) =>
+            updatePayload({
+              ...payload,
+              inquiries,
+            })
+          }
+        />
+
         <div className="teacher-structure-summary" aria-label="ملخص محتوى المسودة">
           <span>
             <strong>{payload.objectives.length}</strong> أهداف
@@ -414,6 +442,12 @@ export function TeacherLessonEditor({
           </span>
           <span>
             <strong>{payload.experiments.length}</strong> تجارب
+          </span>
+          <span>
+            <strong>{payload.simulations.length}</strong> محاكاة
+          </span>
+          <span>
+            <strong>{payload.inquiries.length}</strong> استقصاء
           </span>
         </div>
 

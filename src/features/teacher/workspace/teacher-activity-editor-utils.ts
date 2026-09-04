@@ -1,4 +1,5 @@
 import type { LessonRevisionPayload } from '@services/authoring';
+import { parseSimulationConfig } from '@shared-types/simulation.types';
 
 export type TeacherActivityKeyFamily =
   'game' | 'experiment' | 'simulation' | 'inquiry' | 'data-activity';
@@ -206,6 +207,155 @@ export function validateExperimentDraft(draft: Omit<ExperimentDraft, 'key'>): Ex
       observationPrompt,
       conclusionPrompt,
       homeAlternative,
+    },
+  };
+}
+
+export type SimulationDraft = LessonRevisionPayload['simulations'][number];
+
+export type SimulationValidation =
+  | {
+      readonly valid: true;
+      readonly simulation: Omit<SimulationDraft, 'key'>;
+    }
+  | {
+      readonly valid: false;
+      readonly reason: 'empty_title' | 'empty_instructions' | 'invalid_config';
+    };
+
+export function validateSimulationDraft(draft: Omit<SimulationDraft, 'key'>): SimulationValidation {
+  const title = draft.title.trim();
+
+  if (!title) {
+    return {
+      valid: false,
+      reason: 'empty_title',
+    };
+  }
+
+  const instructions = draft.instructions.trim();
+
+  if (!instructions) {
+    return {
+      valid: false,
+      reason: 'empty_instructions',
+    };
+  }
+
+  try {
+    const config = parseSimulationConfig(draft.config);
+
+    return {
+      valid: true,
+      simulation: {
+        title,
+        instructions,
+        objectiveKeys: [...draft.objectiveKeys],
+        config,
+      },
+    };
+  } catch {
+    return {
+      valid: false,
+      reason: 'invalid_config',
+    };
+  }
+}
+
+export type InquiryDraft = LessonRevisionPayload['inquiries'][number];
+
+export type InquiryValidation =
+  | {
+      readonly valid: true;
+      readonly inquiry: Omit<InquiryDraft, 'key'>;
+    }
+  | {
+      readonly valid: false;
+      readonly reason:
+        | 'empty_title'
+        | 'empty_instructions'
+        | 'empty_context'
+        | 'empty_driving_question'
+        | 'empty_hypothesis_prompt'
+        | 'empty_observation_prompt'
+        | 'empty_conclusion_prompt';
+    };
+
+export function validateInquiryDraft(draft: Omit<InquiryDraft, 'key'>): InquiryValidation {
+  const title = draft.title.trim();
+
+  if (!title) {
+    return {
+      valid: false,
+      reason: 'empty_title',
+    };
+  }
+
+  const instructions = draft.instructions.trim();
+
+  if (!instructions) {
+    return {
+      valid: false,
+      reason: 'empty_instructions',
+    };
+  }
+
+  const context = draft.context.trim();
+
+  if (!context) {
+    return {
+      valid: false,
+      reason: 'empty_context',
+    };
+  }
+
+  const drivingQuestion = draft.drivingQuestion.trim();
+
+  if (!drivingQuestion) {
+    return {
+      valid: false,
+      reason: 'empty_driving_question',
+    };
+  }
+
+  const hypothesisPrompt = draft.hypothesisPrompt.trim();
+
+  if (!hypothesisPrompt) {
+    return {
+      valid: false,
+      reason: 'empty_hypothesis_prompt',
+    };
+  }
+
+  const observationPrompt = draft.observationPrompt.trim();
+
+  if (!observationPrompt) {
+    return {
+      valid: false,
+      reason: 'empty_observation_prompt',
+    };
+  }
+
+  const conclusionPrompt = draft.conclusionPrompt.trim();
+
+  if (!conclusionPrompt) {
+    return {
+      valid: false,
+      reason: 'empty_conclusion_prompt',
+    };
+  }
+
+  return {
+    valid: true,
+    inquiry: {
+      title,
+      instructions,
+      objectiveKeys: [...draft.objectiveKeys],
+      context,
+      drivingQuestion,
+      hypothesisPrompt,
+      observationPrompt,
+      conclusionPrompt,
     },
   };
 }
