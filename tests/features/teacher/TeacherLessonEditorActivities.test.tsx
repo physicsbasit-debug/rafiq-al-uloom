@@ -115,7 +115,50 @@ const payload: LessonRevisionPayload = {
       conclusionPrompt: 'اكتب استنتاجك العلمي.',
     },
   ],
-  dataActivities: [],
+  dataActivities: [
+    {
+      key: 'teacher-data-activity-1',
+      title: 'تحليل بيانات الموجة',
+      instructions: 'اقرأ الجدول والرسم ثم أجب.',
+      objectiveKeys: ['objective-a'],
+      config: {
+        engineKind: 'data_graph_v1',
+        context: 'موجات تتحرك في وسط ثابت السرعة.',
+        presentation: {
+          mode: 'table_and_line_graph',
+          xAxisLabel: 'التردد (Hz)',
+          yAxisLabel: 'الطول الموجي (m)',
+        },
+        dataset: {
+          x: {
+            label: 'التردد',
+            unit: 'Hz',
+            values: [1, 2, 3],
+          },
+          series: [
+            {
+              id: 'wavelength',
+              label: 'الطول الموجي',
+              unit: 'm',
+              values: [12, 6, 4],
+            },
+          ],
+        },
+        tasks: [
+          {
+            id: 'read-1',
+            prompt: 'اقرأ القيمة الثانية.',
+            unit: 'm',
+            rule: {
+              kind: 'read_value',
+              seriesId: 'wavelength',
+              pointIndex: 1,
+            },
+          },
+        ],
+      },
+    },
+  ],
 };
 
 function revision(status: LessonRevision['status']): LessonRevision {
@@ -258,6 +301,29 @@ describe('Phase 5-5D2 TeacherLessonEditor activities', () => {
 
     fireEvent.click(
       screen.getByRole('button', {
+        name: 'تعديل نشاط البيانات 1',
+      })
+    );
+
+    fireEvent.change(
+      screen.getByRole('textbox', {
+        name: 'عنوان نشاط البيانات',
+      }),
+      {
+        target: {
+          value: 'تحليل بيانات الموجة المعدل',
+        },
+      }
+    );
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'تطبيق نشاط البيانات',
+      })
+    );
+
+    fireEvent.click(
+      screen.getByRole('button', {
         name: 'حفظ المسودة',
       })
     );
@@ -294,6 +360,13 @@ describe('Phase 5-5D2 TeacherLessonEditor activities', () => {
       },
     ]);
 
+    expect(savedPayload?.dataActivities).toEqual([
+      {
+        ...payload.dataActivities[0],
+        title: 'تحليل بيانات الموجة المعدل',
+      },
+    ]);
+
     expect(savedPayload?.games[0]?.key).toBe('teacher-game-1');
 
     expect(savedPayload?.experiments[0]?.key).toBe('teacher-experiment-1');
@@ -307,6 +380,9 @@ describe('Phase 5-5D2 TeacherLessonEditor activities', () => {
 
     expect(savedPayload?.inquiries[0]?.key).toBe('teacher-inquiry-1');
     expect(savedPayload?.inquiries[0]?.objectiveKeys).toEqual(['objective-a']);
+
+    expect(savedPayload?.dataActivities[0]?.key).toBe('teacher-data-activity-1');
+    expect(savedPayload?.dataActivities[0]?.objectiveKeys).toEqual(['objective-a']);
 
     expect(saveLessonRevision).toHaveBeenCalledWith(DRAFT_ID, expect.anything(), {
       signal: expect.any(AbortSignal),
@@ -327,6 +403,7 @@ describe('Phase 5-5D2 TeacherLessonEditor activities', () => {
     expect(screen.getByText('موجة في حبل')).toBeInTheDocument();
     expect(screen.getByText('محاكاة خصائص الموجة')).toBeInTheDocument();
     expect(screen.getByText('استقصاء انعكاس الموجة')).toBeInTheDocument();
+    expect(screen.getByText('تحليل بيانات الموجة')).toBeInTheDocument();
 
     expect(
       screen.queryByRole('button', {
@@ -373,6 +450,18 @@ describe('Phase 5-5D2 TeacherLessonEditor activities', () => {
     expect(
       screen.queryByRole('button', {
         name: 'تعديل الاستقصاء 1',
+      })
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', {
+        name: 'إضافة نشاط بيانات',
+      })
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', {
+        name: 'تعديل نشاط البيانات 1',
       })
     ).not.toBeInTheDocument();
   });

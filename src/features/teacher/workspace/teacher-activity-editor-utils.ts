@@ -1,4 +1,5 @@
 import type { LessonRevisionPayload } from '@services/authoring';
+import { parseDataActivityConfig } from '@shared-types/data-activity.types';
 import { parseSimulationConfig } from '@shared-types/simulation.types';
 
 export type TeacherActivityKeyFamily =
@@ -358,4 +359,57 @@ export function validateInquiryDraft(draft: Omit<InquiryDraft, 'key'>): InquiryV
       conclusionPrompt,
     },
   };
+}
+
+export type DataActivityDraft = LessonRevisionPayload['dataActivities'][number];
+
+export type DataActivityValidation =
+  | {
+      readonly valid: true;
+      readonly dataActivity: Omit<DataActivityDraft, 'key'>;
+    }
+  | {
+      readonly valid: false;
+      readonly reason: 'empty_title' | 'empty_instructions' | 'invalid_config';
+    };
+
+export function validateDataActivityDraft(
+  draft: Omit<DataActivityDraft, 'key'>
+): DataActivityValidation {
+  const title = draft.title.trim();
+
+  if (!title) {
+    return {
+      valid: false,
+      reason: 'empty_title',
+    };
+  }
+
+  const instructions = draft.instructions.trim();
+
+  if (!instructions) {
+    return {
+      valid: false,
+      reason: 'empty_instructions',
+    };
+  }
+
+  try {
+    const config = parseDataActivityConfig(draft.config);
+
+    return {
+      valid: true,
+      dataActivity: {
+        title,
+        instructions,
+        objectiveKeys: [...draft.objectiveKeys],
+        config,
+      },
+    };
+  } catch {
+    return {
+      valid: false,
+      reason: 'invalid_config',
+    };
+  }
 }

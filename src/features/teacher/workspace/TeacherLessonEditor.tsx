@@ -9,6 +9,7 @@ import type { ContentRepository } from '@services/data/content.repository';
 
 import { TeacherAiSuggestionPanel } from './TeacherAiSuggestionPanel';
 import { isObjectiveReferencedByActivity } from './teacher-activity-structure';
+import { TeacherDataActivitiesEditor } from './TeacherDataActivitiesEditor';
 import { TeacherExperimentsEditor } from './TeacherExperimentsEditor';
 import { TeacherInquiriesEditor } from './TeacherInquiriesEditor';
 import { TeacherMatchingGamesEditor } from './TeacherMatchingGamesEditor';
@@ -430,6 +431,19 @@ export function TeacherLessonEditor({
           }
         />
 
+        <TeacherDataActivitiesEditor
+          dataActivities={payload.dataActivities}
+          objectives={payload.objectives}
+          readOnly={readOnly}
+          disabled={session.isSaving || session.isSubmitting}
+          onChange={(dataActivities) =>
+            updatePayload({
+              ...payload,
+              dataActivities,
+            })
+          }
+        />
+
         <div className="teacher-structure-summary" aria-label="ملخص محتوى المسودة">
           <span>
             <strong>{payload.objectives.length}</strong> أهداف
@@ -448,6 +462,9 @@ export function TeacherLessonEditor({
           </span>
           <span>
             <strong>{payload.inquiries.length}</strong> استقصاء
+          </span>
+          <span>
+            <strong>{payload.dataActivities.length}</strong> أنشطة بيانات
           </span>
         </div>
 
