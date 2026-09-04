@@ -20,6 +20,9 @@ const payload: LessonRevisionPayload = {
   questions: [],
   games: [],
   experiments: [],
+  simulations: [],
+  inquiries: [],
+  dataActivities: [],
 };
 
 function revision(id: string, title: string, revisionNumber: number): LessonRevision {

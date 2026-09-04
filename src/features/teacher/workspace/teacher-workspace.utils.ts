@@ -54,6 +54,9 @@ export function createEmptyTeacherLessonPayload(): LessonRevisionPayload {
     questions: [],
     games: [],
     experiments: [],
+    simulations: [],
+    inquiries: [],
+    dataActivities: [],
   };
 }
 

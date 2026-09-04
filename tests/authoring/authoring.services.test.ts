@@ -35,6 +35,9 @@ function payload(): LessonRevisionPayload {
     ],
     games: [],
     experiments: [],
+    simulations: [],
+    inquiries: [],
+    dataActivities: [],
   };
 }
 
@@ -97,6 +100,24 @@ describe('AuthoringService', () => {
     await expect(
       service.createLessonRevision({ payload: null as unknown as LessonRevisionPayload })
     ).resolves.toEqual({ status: 'rejected', reason: 'invalid_payload' });
+    expect(repository.createLessonRevision).not.toHaveBeenCalled();
+  });
+
+  it('يرفض payload بالشكل التاريخي عند إنشاء Revision جديدة', async () => {
+    const repository = authoringRepository();
+    const service = createAuthoringService(repository);
+    const legacy = { ...payload() } as unknown as Record<string, unknown>;
+
+    delete legacy.simulations;
+    delete legacy.inquiries;
+    delete legacy.dataActivities;
+
+    await expect(
+      service.createLessonRevision({
+        payload: legacy as unknown as LessonRevisionPayload,
+      })
+    ).resolves.toEqual({ status: 'rejected', reason: 'invalid_payload' });
+
     expect(repository.createLessonRevision).not.toHaveBeenCalled();
   });
 

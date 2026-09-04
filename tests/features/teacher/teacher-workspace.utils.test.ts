@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  createEmptyTeacherLessonPayload,
   teacherAuthoringFailureMessage,
   teacherDraftsUnavailableMessage,
 } from '@features/teacher/workspace/teacher-workspace.utils';
@@ -29,6 +30,18 @@ const unavailableReasons: readonly AuthoringUnavailableReason[] = [
   'service_unavailable',
   'unknown',
 ];
+
+describe('teacher empty lesson payload', () => {
+  it('ينشئ العقد الكامل لكل عائلات الأنشطة', () => {
+    const payload = createEmptyTeacherLessonPayload();
+
+    expect(payload.games).toEqual([]);
+    expect(payload.experiments).toEqual([]);
+    expect(payload.simulations).toEqual([]);
+    expect(payload.inquiries).toEqual([]);
+    expect(payload.dataActivities).toEqual([]);
+  });
+});
 
 describe('teacher workspace error mapping', () => {
   it('يعرّف رسالة عربية لكل أسباب الرفض 15/15', () => {

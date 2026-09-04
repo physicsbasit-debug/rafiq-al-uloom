@@ -39,6 +39,9 @@ function payload(): LessonRevisionPayload {
     ],
     games: [],
     experiments: [],
+    simulations: [],
+    inquiries: [],
+    dataActivities: [],
   };
 }
 
@@ -133,6 +136,59 @@ describe('Supabase authoring repositories', () => {
     expect(mock.from).toHaveBeenCalledWith('content_revisions');
     const query = mock.queries.get('content_revisions');
     expect(query?.eq).not.toHaveBeenCalledWith('author_id', expect.anything());
+  });
+
+  it('يطبع payload التاريخية عند القراءة دون اختراع روابط أهداف', async () => {
+    const legacyPayload = { ...payload() } as unknown as Record<string, unknown>;
+
+    delete legacyPayload.simulations;
+    delete legacyPayload.inquiries;
+    delete legacyPayload.dataActivities;
+
+    legacyPayload.experiments = [
+      {
+        key: 'legacy-experiment',
+        title: 'Legacy experiment',
+        objective: 'Observe',
+        tools: ['tool'],
+        steps: ['step'],
+        safetyNotes: ['safe'],
+        safetyLevel: 'safe_home',
+        observationPrompt: 'Observe?',
+        conclusionPrompt: 'Conclude?',
+        homeAlternative: null,
+      },
+    ];
+
+    const mock = createClientMock({
+      tableResponses: {
+        content_revisions: {
+          data: [{ ...revisionRow(), payload: legacyPayload }],
+          error: null,
+        },
+      },
+    });
+
+    const { authoring } = createSupabaseAuthoringRepositories(mock.client);
+
+    await expect(authoring.listOwnRevisions()).resolves.toMatchObject({
+      status: 'success',
+      revisions: [
+        {
+          payload: {
+            simulations: [],
+            inquiries: [],
+            dataActivities: [],
+            experiments: [
+              {
+                key: 'legacy-experiment',
+                objectiveKeys: [],
+              },
+            ],
+          },
+        },
+      ],
+    });
   });
 
   it('يقرأ أحداث مراجعة المسودة المحددة فقط', async () => {

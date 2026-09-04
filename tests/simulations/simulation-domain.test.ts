@@ -21,6 +21,19 @@ describe('simulation domain', () => {
     expect(() => parseSimulationConfig(value)).toThrow(expected);
   });
 
+  it('rejects unsupported top-level config keys', () => {
+    expect(() => parseSimulationConfig({ ...config, unexpected: true })).toThrow('unsupported key');
+  });
+
+  it('rejects unsupported range config keys', () => {
+    expect(() =>
+      parseSimulationConfig({
+        ...config,
+        frequencyHz: { ...config.frequencyHz, unexpected: true },
+      })
+    ).toThrow('unsupported key');
+  });
+
   it('rejects duplicate structural objective ids', () => {
     expect(() =>
       assertSimulation({

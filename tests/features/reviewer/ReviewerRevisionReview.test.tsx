@@ -55,6 +55,9 @@ const payload: LessonRevisionPayload = {
   ],
   games: [],
   experiments: [],
+  simulations: [],
+  inquiries: [],
+  dataActivities: [],
 };
 
 const pendingRevision: LessonRevision = {
