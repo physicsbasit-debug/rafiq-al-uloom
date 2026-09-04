@@ -9,6 +9,8 @@ import type { ContentRepository } from '@services/data/content.repository';
 
 import { TeacherAiSuggestionPanel } from './TeacherAiSuggestionPanel';
 import { isObjectiveReferencedByActivity } from './teacher-activity-structure';
+import { TeacherExperimentsEditor } from './TeacherExperimentsEditor';
+import { TeacherMatchingGamesEditor } from './TeacherMatchingGamesEditor';
 import { TeacherObjectivesEditor } from './TeacherObjectivesEditor';
 import { TeacherQuestionsEditor } from './TeacherQuestionsEditor';
 import { createAiDestinationSnapshot, hasAiDestinationChanged } from './teacher-ai-acceptance';
@@ -372,6 +374,32 @@ export function TeacherLessonEditor({
               : undefined
           }
           onChange={(questions) => updatePayload({ ...payload, questions })}
+        />
+
+        <TeacherMatchingGamesEditor
+          games={payload.games}
+          objectives={payload.objectives}
+          readOnly={readOnly}
+          disabled={session.isSaving || session.isSubmitting}
+          onChange={(games) =>
+            updatePayload({
+              ...payload,
+              games,
+            })
+          }
+        />
+
+        <TeacherExperimentsEditor
+          experiments={payload.experiments}
+          objectives={payload.objectives}
+          readOnly={readOnly}
+          disabled={session.isSaving || session.isSubmitting}
+          onChange={(experiments) =>
+            updatePayload({
+              ...payload,
+              experiments,
+            })
+          }
         />
 
         <div className="teacher-structure-summary" aria-label="ملخص محتوى المسودة">
