@@ -33,6 +33,7 @@ interface TeacherObjectivesEditorProps {
   readonly questions: readonly QuestionDraft[];
   readonly readOnly: boolean;
   readonly disabled: boolean;
+  readonly isObjectiveReferencedByActivity?: (objectiveKey: string) => boolean;
   readonly ai?: {
     readonly provider: AiAuthoringProvider;
     readonly lessonContext: AiLessonContext | null;
@@ -117,6 +118,7 @@ export function TeacherObjectivesEditor({
   questions,
   readOnly,
   disabled,
+  isObjectiveReferencedByActivity = () => false,
   ai,
   onChange,
 }: TeacherObjectivesEditorProps) {
@@ -174,6 +176,13 @@ export function TeacherObjectivesEditor({
     if (isObjectiveReferenced(objective.key, questions)) {
       setMessage(
         'لا يمكن حذف هذا الهدف لأنه مرتبط بأسئلة موجودة. أعد ربط هذه الأسئلة بهدف آخر أو احذفها أولًا.'
+      );
+      return;
+    }
+
+    if (isObjectiveReferencedByActivity(objective.key)) {
+      setMessage(
+        'لا يمكن حذف هذا الهدف لأنه مرتبط بنشاط علمي موجود. أعد ربط النشاط بهدف آخر أو احذف النشاط أولًا.'
       );
       return;
     }

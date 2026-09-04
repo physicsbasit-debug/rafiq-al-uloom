@@ -8,6 +8,7 @@ import { getContentRepository } from '@services/data/content-repository.provider
 import type { ContentRepository } from '@services/data/content.repository';
 
 import { TeacherAiSuggestionPanel } from './TeacherAiSuggestionPanel';
+import { isObjectiveReferencedByActivity } from './teacher-activity-structure';
 import { TeacherObjectivesEditor } from './TeacherObjectivesEditor';
 import { TeacherQuestionsEditor } from './TeacherQuestionsEditor';
 import { createAiDestinationSnapshot, hasAiDestinationChanged } from './teacher-ai-acceptance';
@@ -117,6 +118,10 @@ const SUBMISSION_REASON_MESSAGES: Readonly<Record<SubmissionReadinessReason, str
   missing_mastery_question: 'يجب أن يتضمن الدرس سؤال إتقان واحدًا على الأقل.',
   dangling_objective: 'أصلح ارتباط السؤال بهدف تعلم موجود قبل الإرسال.',
   invalid_question_structure: 'صحّح بيانات الأسئلة الحالية قبل الإرسال.',
+  missing_activity_objective_link: 'اربط كل نشاط علمي بهدف تعلم واحد على الأقل قبل الإرسال.',
+  dangling_activity_objective:
+    'يوجد نشاط علمي مرتبط بهدف لم يعد موجودًا. أعد ربط النشاط قبل الإرسال.',
+  invalid_activity_structure: 'صحّح بيانات الأنشطة العلمية الحالية قبل الإرسال.',
 };
 
 export function TeacherLessonEditor({
@@ -335,6 +340,9 @@ export function TeacherLessonEditor({
         <TeacherObjectivesEditor
           objectives={payload.objectives}
           questions={payload.questions}
+          isObjectiveReferencedByActivity={(objectiveKey) =>
+            isObjectiveReferencedByActivity(payload, objectiveKey)
+          }
           readOnly={readOnly}
           disabled={session.isSaving || session.isSubmitting}
           ai={
