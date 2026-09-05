@@ -20,7 +20,10 @@ import {
   type ReviewService,
 } from '@services/authoring';
 
-import { buildLessonRevisionPayload, nextDisplayOrder } from './helpers/authoring-fixtures';
+import {
+  buildPhase55CompleteActivityPayload,
+  nextDisplayOrder,
+} from './helpers/authoring-fixtures';
 import {
   createAuthCompositionHarness,
   type AuthCompositionHarness,
@@ -47,6 +50,166 @@ type RealSession = {
 
 function sqlLiteral(value: string): string {
   return `'${value.replaceAll("'", "''")}'`;
+}
+
+interface PublishedActivityFamilySummary {
+  readonly count: number;
+  readonly title: string | null;
+  readonly status: string | null;
+  readonly source: string | null;
+  readonly engineKind?: string | null;
+}
+
+interface Phase55PublishedActivitySnapshot {
+  readonly games: PublishedActivityFamilySummary;
+  readonly experiments: PublishedActivityFamilySummary;
+  readonly simulations: PublishedActivityFamilySummary;
+  readonly inquiries: PublishedActivityFamilySummary;
+  readonly dataActivities: PublishedActivityFamilySummary;
+  readonly gameObjectiveIds: readonly string[];
+  readonly experimentObjectiveIds: readonly string[];
+  readonly simulationObjectiveIds: readonly string[];
+  readonly inquiryObjectiveIds: readonly string[];
+  readonly dataActivityObjectiveIds: readonly string[];
+}
+
+function readPhase55PublishedActivitySnapshot(lessonId: string): Phase55PublishedActivitySnapshot {
+  const lesson = sqlLiteral(lessonId);
+
+  const raw = psqlAdmin(`
+    SELECT jsonb_build_object(
+      'games',
+      (
+        SELECT jsonb_build_object(
+          'count', count(*),
+          'title', min(games.title),
+          'status', min(games.status::text),
+          'source', min(games.source::text)
+        )
+        FROM public.games
+        WHERE games.lesson_id = ${lesson}
+      ),
+
+      'experiments',
+      (
+        SELECT jsonb_build_object(
+          'count', count(*),
+          'title', min(experiments.title),
+          'status', min(experiments.status::text),
+          'source', min(experiments.source::text)
+        )
+        FROM public.experiments
+        WHERE experiments.lesson_id = ${lesson}
+      ),
+
+      'simulations',
+      (
+        SELECT jsonb_build_object(
+          'count', count(*),
+          'title', min(simulations.title),
+          'status', min(simulations.status::text),
+          'source', min(simulations.source::text),
+          'engineKind', min(simulations.engine_kind)
+        )
+        FROM public.simulations
+        WHERE simulations.lesson_id = ${lesson}
+      ),
+
+      'inquiries',
+      (
+        SELECT jsonb_build_object(
+          'count', count(*),
+          'title', min(inquiries.title),
+          'status', min(inquiries.status::text),
+          'source', min(inquiries.source::text)
+        )
+        FROM public.inquiries
+        WHERE inquiries.lesson_id = ${lesson}
+      ),
+
+      'dataActivities',
+      (
+        SELECT jsonb_build_object(
+          'count', count(*),
+          'title', min(data_activities.title),
+          'status', min(data_activities.status::text),
+          'source', min(data_activities.source::text),
+          'engineKind', min(data_activities.engine_kind)
+        )
+        FROM public.data_activities
+        WHERE data_activities.lesson_id = ${lesson}
+      ),
+
+      'gameObjectiveIds',
+      COALESCE(
+        (
+          SELECT jsonb_agg(
+            game_objectives.objective_id
+            ORDER BY game_objectives.position
+          )
+          FROM public.game_objectives
+          JOIN public.games
+            ON games.id = game_objectives.game_id
+          WHERE games.lesson_id = ${lesson}
+        ),
+        '[]'::jsonb
+      ),
+
+      'experimentObjectiveIds',
+      COALESCE(
+        (
+          SELECT jsonb_agg(
+            experiment_objectives.objective_id
+            ORDER BY experiment_objectives.position
+          )
+          FROM public.experiment_objectives
+          WHERE experiment_objectives.lesson_id = ${lesson}
+        ),
+        '[]'::jsonb
+      ),
+
+      'simulationObjectiveIds',
+      COALESCE(
+        (
+          SELECT jsonb_agg(
+            simulation_objectives.objective_id
+            ORDER BY simulation_objectives.position
+          )
+          FROM public.simulation_objectives
+          WHERE simulation_objectives.lesson_id = ${lesson}
+        ),
+        '[]'::jsonb
+      ),
+
+      'inquiryObjectiveIds',
+      COALESCE(
+        (
+          SELECT jsonb_agg(
+            inquiry_objectives.objective_id
+            ORDER BY inquiry_objectives.position
+          )
+          FROM public.inquiry_objectives
+          WHERE inquiry_objectives.lesson_id = ${lesson}
+        ),
+        '[]'::jsonb
+      ),
+
+      'dataActivityObjectiveIds',
+      COALESCE(
+        (
+          SELECT jsonb_agg(
+            data_activity_objectives.objective_id
+            ORDER BY data_activity_objectives.position
+          )
+          FROM public.data_activity_objectives
+          WHERE data_activity_objectives.lesson_id = ${lesson}
+        ),
+        '[]'::jsonb
+      )
+    )::text;
+  `);
+
+  return JSON.parse(raw) as Phase55PublishedActivitySnapshot;
 }
 
 async function signInRealIdentity(
@@ -344,7 +507,11 @@ describeIntegration(
       const teacherServices = servicesFor(teacherSession.client);
       const reviewerServices = servicesFor(reviewerSession.client);
       const title = `Phase 3-5A lifecycle ${runId}`;
-      const initialPayload = buildLessonRevisionPayload(runId, nextDisplayOrder(40), title);
+      const initialPayload = buildPhase55CompleteActivityPayload(
+        runId,
+        nextDisplayOrder(40),
+        title
+      );
       const confirm = vi.spyOn(window, 'confirm').mockReturnValue(true);
 
       try {
@@ -383,6 +550,12 @@ describeIntegration(
         fireEvent.click(
           await screen.findByRole('button', { name: new RegExp(title) }, { timeout: 8_000 })
         );
+        expect(await screen.findByText(`Matching ${runId}`)).toBeInTheDocument();
+        expect(screen.getByText(`Experiment ${runId}`)).toBeInTheDocument();
+        expect(screen.getByText(`Simulation ${runId}`)).toBeInTheDocument();
+        expect(screen.getByText(`Inquiry ${runId}`)).toBeInTheDocument();
+        expect(screen.getByText(`Data Activity ${runId}`)).toBeInTheDocument();
+
         fireEvent.change(screen.getByLabelText('ملاحظة الرفض'), {
           target: { value: 'وضّح التفسير قبل الاعتماد.' },
         });
@@ -479,6 +652,61 @@ describeIntegration(
           status: 'approved',
           source: 'teacher_authored',
         });
+
+        const objectiveAId = `${publishedEntityId}-objective-001`;
+        const objectiveBId = `${publishedEntityId}-objective-002`;
+
+        const publishedActivities = readPhase55PublishedActivitySnapshot(publishedEntityId);
+
+        expect(publishedActivities).toEqual({
+          games: {
+            count: 1,
+            title: `Matching ${runId}`,
+            status: 'approved',
+            source: 'teacher_authored',
+          },
+
+          experiments: {
+            count: 1,
+            title: `Experiment ${runId}`,
+            status: 'approved',
+            source: 'teacher_authored',
+          },
+
+          simulations: {
+            count: 1,
+            title: `Simulation ${runId}`,
+            status: 'approved',
+            source: 'teacher_authored',
+            engineKind: 'transverse_wave_v1',
+          },
+
+          inquiries: {
+            count: 1,
+            title: `Inquiry ${runId}`,
+            status: 'approved',
+            source: 'teacher_authored',
+          },
+
+          dataActivities: {
+            count: 1,
+            title: `Data Activity ${runId}`,
+            status: 'approved',
+            source: 'teacher_authored',
+            engineKind: 'data_graph_v1',
+          },
+
+          gameObjectiveIds: [objectiveAId, objectiveBId],
+
+          experimentObjectiveIds: [objectiveAId],
+
+          simulationObjectiveIds: [objectiveAId],
+
+          inquiryObjectiveIds: [objectiveBId],
+
+          dataActivityObjectiveIds: [objectiveAId, objectiveBId],
+        });
+
         expect(confirm).toHaveBeenCalled();
       } finally {
         await closeRealSession(reviewerSession);
