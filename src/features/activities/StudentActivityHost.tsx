@@ -3,6 +3,7 @@ import { colors } from '@design-system/theme/colors';
 import { radius } from '@design-system/theme/radius';
 import { spacing } from '@design-system/theme/spacing';
 import { getActivityRegistryEntry } from '@features/activities/activity-registry';
+import { getStudentExperimentSafetyDecision } from '@features/activities/student-experiment-safety';
 import { getStudentActivityRenderer } from '@features/activities/student-activity-renderer.registry';
 import type { AvailableLearningActivity } from '@shared-types/activity.types';
 import type { Objective } from '@shared-types/content.types';
@@ -67,6 +68,19 @@ export function StudentActivityHost({
         onBackToActivities={onBackToActivities}
       />
     );
+  }
+
+  if (activity.kind === 'experiment') {
+    const safetyDecision = getStudentExperimentSafetyDecision(activity.content.safetyLevel);
+
+    if (!safetyDecision.allowHost) {
+      return (
+        <HostError
+          message="هذه التجربة غير متاحة للتنفيذ للطالب بسبب متطلبات السلامة."
+          onBackToActivities={onBackToActivities}
+        />
+      );
+    }
   }
 
   const renderer = getStudentActivityRenderer(activity.kind);

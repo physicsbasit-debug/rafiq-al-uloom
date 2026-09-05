@@ -7,11 +7,11 @@ import { spacing } from '@design-system/theme/spacing';
 import { typography } from '@design-system/theme/typography';
 import { getActivityRegistryEntry } from '@features/activities/activity-registry';
 import { StudentActivityHost } from '@features/activities/StudentActivityHost';
+import { getStudentExperimentSafetyDecision } from '@features/activities/student-experiment-safety';
 import { useActivitiesByLesson } from '@services/queries/activity-query.hooks';
 import { useObjectivesByIds } from '@services/queries/content-query.hooks';
 import type { AvailableLearningActivity } from '@shared-types/activity.types';
 import type { Objective } from '@shared-types/content.types';
-import type { SafetyLevel } from '@shared-types/experiment.types';
 
 interface StudentActivityHubProps {
   lessonId: string;
@@ -22,13 +22,6 @@ interface ActivityHubObjectivesLoaderProps {
   activities: AvailableLearningActivity[];
   onBackToLesson: () => void;
 }
-
-const safetyLabels: Record<SafetyLevel, string> = {
-  safe_home: 'يمكن تنفيذها في المنزل',
-  teacher_supervised: 'بإشراف المعلم',
-  lab_only: 'في المختبر فقط',
-  not_allowed: 'للعرض فقط',
-};
 
 function EmptyActivityState({ onBackToLesson }: { onBackToLesson: () => void }) {
   return (
@@ -137,6 +130,10 @@ function ActivityHubContent({
           const linkedObjectives = activity.objectiveIds.map(
             (objectiveId) => objectivesById.get(objectiveId) as Objective
           );
+          const experimentSafety =
+            activity.kind === 'experiment'
+              ? getStudentExperimentSafetyDecision(activity.content.safetyLevel)
+              : null;
 
           return (
             <article
@@ -180,7 +177,7 @@ function ActivityHubContent({
                 ))}
               </ul>
 
-              {activity.kind === 'experiment' ? (
+              {experimentSafety ? (
                 <p
                   style={{
                     margin: `0 0 ${spacing.md}`,
@@ -192,13 +189,25 @@ function ActivityHubContent({
                     fontWeight: 800,
                   }}
                 >
-                  السلامة: {safetyLabels[activity.content.safetyLevel]}
+                  السلامة: {experimentSafety.safetyLabel}
                 </p>
               ) : null}
 
-              <div style={{ maxWidth: '220px' }}>
-                <AppButton label="فتح النشاط" onClick={() => setSelectedActivityId(activity.id)} />
-              </div>
+              {experimentSafety?.mode === 'blocked' ? (
+                <p
+                  role="status"
+                  style={{ margin: 0, color: colors.textSecondary, fontWeight: 900 }}
+                >
+                  غير متاح للتنفيذ
+                </p>
+              ) : (
+                <div style={{ maxWidth: '220px' }}>
+                  <AppButton
+                    label={experimentSafety?.hubActionLabel ?? 'فتح النشاط'}
+                    onClick={() => setSelectedActivityId(activity.id)}
+                  />
+                </div>
+              )}
             </article>
           );
         })}
