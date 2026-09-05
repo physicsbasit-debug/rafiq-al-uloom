@@ -1,5 +1,7 @@
+import type { DataActivityConfig } from '@shared-types/data-activity.types';
 import type { SafetyLevel } from '@shared-types/experiment.types';
 import type { Difficulty } from '@shared-types/quiz.types';
+import type { SimulationConfig } from '@shared-types/simulation.types';
 
 export type LessonRevisionStatus = 'draft' | 'pending_review' | 'rejected' | 'approved';
 export type ReviewDecision = 'approve' | 'reject';
@@ -63,6 +65,7 @@ export interface LessonRevisionPayload {
     readonly key: string;
     readonly title: string;
     readonly objective: string;
+    readonly objectiveKeys: readonly string[];
     readonly tools: readonly string[];
     readonly steps: readonly string[];
     readonly safetyNotes: readonly string[];
@@ -70,6 +73,31 @@ export interface LessonRevisionPayload {
     readonly observationPrompt: string;
     readonly conclusionPrompt: string;
     readonly homeAlternative: string | null;
+  }[];
+  readonly simulations: readonly {
+    readonly key: string;
+    readonly title: string;
+    readonly instructions: string;
+    readonly objectiveKeys: readonly string[];
+    readonly config: SimulationConfig;
+  }[];
+  readonly inquiries: readonly {
+    readonly key: string;
+    readonly title: string;
+    readonly instructions: string;
+    readonly objectiveKeys: readonly string[];
+    readonly context: string;
+    readonly drivingQuestion: string;
+    readonly hypothesisPrompt: string;
+    readonly observationPrompt: string;
+    readonly conclusionPrompt: string;
+  }[];
+  readonly dataActivities: readonly {
+    readonly key: string;
+    readonly title: string;
+    readonly instructions: string;
+    readonly objectiveKeys: readonly string[];
+    readonly config: DataActivityConfig;
   }[];
 }
 

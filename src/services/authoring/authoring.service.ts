@@ -48,7 +48,10 @@ function validPayload(payload: LessonRevisionPayload): boolean {
     Array.isArray(value.objectives) &&
     Array.isArray(value.questions) &&
     Array.isArray(value.games) &&
-    Array.isArray(value.experiments)
+    Array.isArray(value.experiments) &&
+    Array.isArray(value.simulations) &&
+    Array.isArray(value.inquiries) &&
+    Array.isArray(value.dataActivities)
   );
 }
 

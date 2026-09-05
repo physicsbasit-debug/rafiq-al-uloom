@@ -1,49 +1,6 @@
-export interface LessonRevisionPayload {
-  lesson: {
-    unitId: string;
-    title: string;
-    displayOrder: number;
-    summary: string;
-    keyConcepts: string[];
-    examples: string[];
-    misconceptions: string[];
-  };
-  objectives: Array<{
-    key: string;
-    text: string;
-  }>;
-  questions: Array<{
-    key: string;
-    purpose: 'review' | 'mastery';
-    type: 'multiple_choice';
-    prompt: string;
-    choices: string[];
-    correctAnswerIndex: number;
-    explanation: string;
-    objectiveKey: string;
-    difficulty: string;
-  }>;
-  games: Array<{
-    key: string;
-    type: 'matching';
-    title: string;
-    instructions: string;
-    items: Array<{ left: string; right: string }>;
-    objectiveKeys: string[];
-  }>;
-  experiments: Array<{
-    key: string;
-    title: string;
-    objective: string;
-    tools: string[];
-    steps: string[];
-    safetyNotes: string[];
-    safetyLevel: 'safe_home' | 'teacher_supervised' | 'lab_only' | 'not_allowed';
-    observationPrompt: string;
-    conclusionPrompt: string;
-    homeAlternative: string | null;
-  }>;
-}
+import type { LessonRevisionPayload } from '@services/authoring';
+
+export type { LessonRevisionPayload };
 
 export interface CreatedRevision {
   status: 'created';
@@ -130,6 +87,7 @@ export function buildLessonRevisionPayload(
         key: 'experiment-a',
         title: `Experiment ${runId}`,
         objective: `Observe ${runId}`,
+        objectiveKeys: ['objective-a'],
         tools: ['tool'],
         steps: ['step one'],
         safetyNotes: ['stay safe'],
@@ -137,6 +95,105 @@ export function buildLessonRevisionPayload(
         observationPrompt: 'What did you observe?',
         conclusionPrompt: 'What do you conclude?',
         homeAlternative: null,
+      },
+    ],
+    simulations: [],
+    inquiries: [],
+    dataActivities: [],
+  };
+}
+
+export function buildPhase55CompleteActivityPayload(
+  runId: string,
+  displayOrder: number,
+  title = `Phase 5-5 lesson ${runId}`
+): LessonRevisionPayload {
+  const base = buildLessonRevisionPayload(runId, displayOrder, title);
+
+  return {
+    ...base,
+
+    simulations: [
+      {
+        key: 'simulation-a',
+        title: `Simulation ${runId}`,
+        instructions: 'Change frequency and amplitude.',
+        objectiveKeys: ['objective-a'],
+        config: {
+          engineKind: 'transverse_wave_v1',
+          mediumSpeedMps: 12,
+          frequencyHz: {
+            min: 0.5,
+            max: 4,
+            step: 0.5,
+            initial: 1,
+          },
+          amplitudeM: {
+            min: 0.2,
+            max: 1,
+            step: 0.1,
+            initial: 0.5,
+          },
+        },
+      },
+    ],
+
+    inquiries: [
+      {
+        key: 'inquiry-a',
+        title: `Inquiry ${runId}`,
+        instructions: 'Investigate the wave behavior.',
+        objectiveKeys: ['objective-b'],
+        context: `Wave inquiry context ${runId}`,
+        drivingQuestion: 'What happens when the wave reaches the boundary?',
+        hypothesisPrompt: 'Write your hypothesis.',
+        observationPrompt: 'Record your observation.',
+        conclusionPrompt: 'Write your conclusion.',
+      },
+    ],
+
+    dataActivities: [
+      {
+        key: 'data-a',
+        title: `Data Activity ${runId}`,
+        instructions: 'Read the data and answer the task.',
+        objectiveKeys: ['objective-a', 'objective-b'],
+        config: {
+          engineKind: 'data_graph_v1',
+          context: `Wave data context ${runId}`,
+          presentation: {
+            mode: 'table_and_line_graph',
+            xAxisLabel: 'Frequency (Hz)',
+            yAxisLabel: 'Wavelength (m)',
+          },
+          dataset: {
+            x: {
+              label: 'Frequency',
+              unit: 'Hz',
+              values: [1, 2, 3],
+            },
+            series: [
+              {
+                id: 'wavelength',
+                label: 'Wavelength',
+                unit: 'm',
+                values: [12, 6, 4],
+              },
+            ],
+          },
+          tasks: [
+            {
+              id: 'read-a',
+              prompt: 'Read the second wavelength value.',
+              unit: 'm',
+              rule: {
+                kind: 'read_value',
+                seriesId: 'wavelength',
+                pointIndex: 1,
+              },
+            },
+          ],
+        },
       },
     ],
   };

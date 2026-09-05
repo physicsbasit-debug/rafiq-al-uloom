@@ -40,6 +40,19 @@ function asRecord(value: unknown, field: string): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 
+function exactKeys(
+  record: Record<string, unknown>,
+  allowedKeys: readonly string[],
+  field: string
+): void {
+  const allowed = new Set(allowedKeys);
+  for (const key of Object.keys(record)) {
+    if (!allowed.has(key)) {
+      invalid(`${field} contains unsupported key ${JSON.stringify(key)}`);
+    }
+  }
+}
+
 function finiteNumber(value: unknown, field: string): number {
   if (typeof value !== 'number' || !Number.isFinite(value)) {
     invalid(`${field} must be a finite number`);
@@ -53,6 +66,8 @@ function parseRange(
   options?: { minInclusive?: number }
 ): NumericRangeConfig {
   const record = asRecord(value, field);
+  exactKeys(record, ['min', 'max', 'step', 'initial'], field);
+
   const min = finiteNumber(record.min, `${field}.min`);
   const max = finiteNumber(record.max, `${field}.max`);
   const step = finiteNumber(record.step, `${field}.step`);
@@ -76,6 +91,8 @@ function parseRange(
 
 export function parseSimulationConfig(value: unknown): SimulationConfig {
   const record = asRecord(value, 'config');
+  exactKeys(record, ['engineKind', 'mediumSpeedMps', 'frequencyHz', 'amplitudeM'], 'config');
+
   if (record.engineKind !== 'transverse_wave_v1') {
     invalid(`unsupported engineKind ${JSON.stringify(record.engineKind)}`);
   }

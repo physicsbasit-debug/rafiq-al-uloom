@@ -22,6 +22,9 @@ const payload: LessonRevisionPayload = {
   questions: [],
   games: [],
   experiments: [],
+  simulations: [],
+  inquiries: [],
+  dataActivities: [],
 };
 
 const revision: LessonRevision = {

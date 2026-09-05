@@ -37,6 +37,9 @@ function makePayload(overrides: Partial<LessonRevisionPayload> = {}): LessonRevi
     questions: [],
     games: [],
     experiments: [],
+    simulations: [],
+    inquiries: [],
+    dataActivities: [],
     ...overrides,
   };
 }

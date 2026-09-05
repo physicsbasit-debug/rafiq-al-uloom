@@ -36,6 +36,9 @@ const payload: LessonRevisionPayload = {
   ],
   games: [],
   experiments: [],
+  simulations: [],
+  inquiries: [],
+  dataActivities: [],
 };
 
 function revision(id: string, status: LessonRevision['status']): LessonRevision {

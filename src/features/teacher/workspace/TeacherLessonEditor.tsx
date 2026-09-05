@@ -8,7 +8,13 @@ import { getContentRepository } from '@services/data/content-repository.provider
 import type { ContentRepository } from '@services/data/content.repository';
 
 import { TeacherAiSuggestionPanel } from './TeacherAiSuggestionPanel';
+import { isObjectiveReferencedByActivity } from './teacher-activity-structure';
+import { TeacherDataActivitiesEditor } from './TeacherDataActivitiesEditor';
+import { TeacherExperimentsEditor } from './TeacherExperimentsEditor';
+import { TeacherInquiriesEditor } from './TeacherInquiriesEditor';
+import { TeacherMatchingGamesEditor } from './TeacherMatchingGamesEditor';
 import { TeacherObjectivesEditor } from './TeacherObjectivesEditor';
+import { TeacherSimulationsEditor } from './TeacherSimulationsEditor';
 import { TeacherQuestionsEditor } from './TeacherQuestionsEditor';
 import { createAiDestinationSnapshot, hasAiDestinationChanged } from './teacher-ai-acceptance';
 import { getQuestionStateIssue } from './teacher-lesson-structure';
@@ -117,6 +123,10 @@ const SUBMISSION_REASON_MESSAGES: Readonly<Record<SubmissionReadinessReason, str
   missing_mastery_question: 'يجب أن يتضمن الدرس سؤال إتقان واحدًا على الأقل.',
   dangling_objective: 'أصلح ارتباط السؤال بهدف تعلم موجود قبل الإرسال.',
   invalid_question_structure: 'صحّح بيانات الأسئلة الحالية قبل الإرسال.',
+  missing_activity_objective_link: 'اربط كل نشاط علمي بهدف تعلم واحد على الأقل قبل الإرسال.',
+  dangling_activity_objective:
+    'يوجد نشاط علمي مرتبط بهدف لم يعد موجودًا. أعد ربط النشاط قبل الإرسال.',
+  invalid_activity_structure: 'صحّح بيانات الأنشطة العلمية الحالية قبل الإرسال.',
 };
 
 export function TeacherLessonEditor({
@@ -335,6 +345,9 @@ export function TeacherLessonEditor({
         <TeacherObjectivesEditor
           objectives={payload.objectives}
           questions={payload.questions}
+          isObjectiveReferencedByActivity={(objectiveKey) =>
+            isObjectiveReferencedByActivity(payload, objectiveKey)
+          }
           readOnly={readOnly}
           disabled={session.isSaving || session.isSubmitting}
           ai={
@@ -366,6 +379,71 @@ export function TeacherLessonEditor({
           onChange={(questions) => updatePayload({ ...payload, questions })}
         />
 
+        <TeacherMatchingGamesEditor
+          games={payload.games}
+          objectives={payload.objectives}
+          readOnly={readOnly}
+          disabled={session.isSaving || session.isSubmitting}
+          onChange={(games) =>
+            updatePayload({
+              ...payload,
+              games,
+            })
+          }
+        />
+
+        <TeacherExperimentsEditor
+          experiments={payload.experiments}
+          objectives={payload.objectives}
+          readOnly={readOnly}
+          disabled={session.isSaving || session.isSubmitting}
+          onChange={(experiments) =>
+            updatePayload({
+              ...payload,
+              experiments,
+            })
+          }
+        />
+
+        <TeacherSimulationsEditor
+          simulations={payload.simulations}
+          objectives={payload.objectives}
+          readOnly={readOnly}
+          disabled={session.isSaving || session.isSubmitting}
+          onChange={(simulations) =>
+            updatePayload({
+              ...payload,
+              simulations,
+            })
+          }
+        />
+
+        <TeacherInquiriesEditor
+          inquiries={payload.inquiries}
+          objectives={payload.objectives}
+          readOnly={readOnly}
+          disabled={session.isSaving || session.isSubmitting}
+          onChange={(inquiries) =>
+            updatePayload({
+              ...payload,
+              inquiries,
+            })
+          }
+        />
+
+        <TeacherDataActivitiesEditor
+          dataActivities={payload.dataActivities}
+          objectives={payload.objectives}
+          readOnly={readOnly}
+          disabled={session.isSaving || session.isSubmitting}
+          onChange={(dataActivities) =>
+            updatePayload({
+              ...payload,
+              dataActivities,
+            })
+          }
+        />
+
         <div className="teacher-structure-summary" aria-label="ملخص محتوى المسودة">
           <span>
             <strong>{payload.objectives.length}</strong> أهداف
@@ -378,6 +456,15 @@ export function TeacherLessonEditor({
           </span>
           <span>
             <strong>{payload.experiments.length}</strong> تجارب
+          </span>
+          <span>
+            <strong>{payload.simulations.length}</strong> محاكاة
+          </span>
+          <span>
+            <strong>{payload.inquiries.length}</strong> استقصاء
+          </span>
+          <span>
+            <strong>{payload.dataActivities.length}</strong> أنشطة بيانات
           </span>
         </div>
 

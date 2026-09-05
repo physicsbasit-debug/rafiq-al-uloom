@@ -132,8 +132,47 @@ function requireLessonRevisionPayload(value: unknown): LessonRevisionPayload {
   requireArray(payload.objectives, 'revision.payload.objectives');
   requireArray(payload.questions, 'revision.payload.questions');
   requireArray(payload.games, 'revision.payload.games');
-  requireArray(payload.experiments, 'revision.payload.experiments');
-  return value as LessonRevisionPayload;
+
+  const experiments = requireArray(payload.experiments, 'revision.payload.experiments').map(
+    (value, index) => {
+      const experiment = requireObject(value, `revision.payload.experiments[${index}]`);
+      const objectiveKeys =
+        experiment.objectiveKeys === undefined
+          ? []
+          : requireArray(
+              experiment.objectiveKeys,
+              `revision.payload.experiments[${index}].objectiveKeys`
+            );
+
+      return {
+        ...experiment,
+        objectiveKeys,
+      };
+    }
+  );
+
+  const simulations =
+    payload.simulations === undefined
+      ? []
+      : requireArray(payload.simulations, 'revision.payload.simulations');
+
+  const inquiries =
+    payload.inquiries === undefined
+      ? []
+      : requireArray(payload.inquiries, 'revision.payload.inquiries');
+
+  const dataActivities =
+    payload.dataActivities === undefined
+      ? []
+      : requireArray(payload.dataActivities, 'revision.payload.dataActivities');
+
+  return {
+    ...payload,
+    experiments,
+    simulations,
+    inquiries,
+    dataActivities,
+  } as unknown as LessonRevisionPayload;
 }
 
 function mapRevisionRow(value: unknown): LessonRevision {

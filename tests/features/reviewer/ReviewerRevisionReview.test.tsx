@@ -53,8 +53,125 @@ const payload: LessonRevisionPayload = {
       difficulty: 'medium',
     },
   ],
-  games: [],
-  experiments: [],
+  games: [
+    {
+      key: 'game-wave',
+      type: 'matching',
+      title: 'مطابقة خصائص الموجة',
+      instructions: 'طابق الكمية بوحدتها.',
+      objectiveKeys: ['objective-wave'],
+      items: [
+        {
+          left: 'التردد',
+          right: 'Hz',
+        },
+        {
+          left: 'الطول الموجي',
+          right: 'm',
+        },
+      ],
+    },
+  ],
+
+  experiments: [
+    {
+      key: 'experiment-wave',
+      title: 'موجة في حبل',
+      objective: 'ملاحظة انتقال الموجة',
+      objectiveKeys: ['objective-wave'],
+      tools: ['حبل'],
+      steps: ['حرّك طرف الحبل'],
+      safetyNotes: ['اترك مساحة كافية'],
+      safetyLevel: 'teacher_supervised',
+      observationPrompt: 'ماذا تلاحظ؟',
+      conclusionPrompt: 'ماذا تستنتج؟',
+      homeAlternative: null,
+    },
+  ],
+
+  simulations: [
+    {
+      key: 'simulation-wave',
+      title: 'محاكاة خصائص الموجة',
+      instructions: 'غيّر التردد والسعة.',
+      objectiveKeys: ['objective-wave'],
+      config: {
+        engineKind: 'transverse_wave_v1',
+        mediumSpeedMps: 12,
+        frequencyHz: {
+          min: 0.5,
+          max: 4,
+          step: 0.5,
+          initial: 1,
+        },
+        amplitudeM: {
+          min: 0.2,
+          max: 1,
+          step: 0.1,
+          initial: 0.5,
+        },
+      },
+    },
+  ],
+
+  inquiries: [
+    {
+      key: 'inquiry-wave',
+      title: 'استقصاء انعكاس الموجة',
+      instructions: 'اقرأ الموقف وأجب.',
+      objectiveKeys: ['objective-wave'],
+      context: 'موجة تتجه نحو حاجز ثابت.',
+      drivingQuestion: 'ماذا يحدث للموجة عند الحاجز؟',
+      hypothesisPrompt: 'اكتب فرضيتك.',
+      observationPrompt: 'دوّن ملاحظتك.',
+      conclusionPrompt: 'اكتب استنتاجك.',
+    },
+  ],
+
+  dataActivities: [
+    {
+      key: 'data-wave',
+      title: 'تحليل بيانات الموجة',
+      instructions: 'اقرأ البيانات وأجب.',
+      objectiveKeys: ['objective-wave'],
+      config: {
+        engineKind: 'data_graph_v1',
+        context: 'موجات تتحرك في وسط ثابت.',
+        presentation: {
+          mode: 'table_and_line_graph',
+          xAxisLabel: 'التردد (Hz)',
+          yAxisLabel: 'الطول الموجي (m)',
+        },
+        dataset: {
+          x: {
+            label: 'التردد',
+            unit: 'Hz',
+            values: [1, 2, 3],
+          },
+          series: [
+            {
+              id: 'wavelength',
+              label: 'الطول الموجي',
+              unit: 'm',
+              values: [12, 6, 4],
+            },
+          ],
+        },
+        tasks: [
+          {
+            id: 'read-wave',
+            prompt: 'اقرأ القيمة الثانية.',
+            unit: 'm',
+            rule: {
+              kind: 'read_value',
+              seriesId: 'wavelength',
+              pointIndex: 1,
+            },
+          },
+        ],
+      },
+    },
+  ],
 };
 
 const pendingRevision: LessonRevision = {
@@ -147,6 +264,24 @@ describe('ReviewerRevisionReview', () => {
     expect(within(question).getByText('مفتاح الهدف المرتبط:').parentElement).toHaveTextContent(
       'مفتاح الهدف المرتبط: objective-wave'
     );
+
+    const activitiesRegion = screen.getByRole('region', {
+      name: 'الأنشطة العلمية',
+    });
+
+    expect(within(activitiesRegion).getByText('مطابقة خصائص الموجة')).toBeInTheDocument();
+
+    expect(within(activitiesRegion).getByText('موجة في حبل')).toBeInTheDocument();
+
+    expect(within(activitiesRegion).getByText('محاكاة خصائص الموجة')).toBeInTheDocument();
+
+    expect(within(activitiesRegion).getByText('استقصاء انعكاس الموجة')).toBeInTheDocument();
+
+    expect(within(activitiesRegion).getByText('تحليل بيانات الموجة')).toBeInTheDocument();
+
+    expect(within(activitiesRegion).queryByRole('button')).not.toBeInTheDocument();
+
+    expect(within(activitiesRegion).queryByRole('textbox')).not.toBeInTheDocument();
   });
 
   it('يعتمد reviewRevisionId نفسه ويرسل note:null ثم يلتزم محليًا فقط بعد نجاح الخادم', async () => {

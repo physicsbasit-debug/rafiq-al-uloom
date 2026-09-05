@@ -3,6 +3,7 @@ import type { ChangeEvent } from 'react';
 import { AppButton } from '@design-system/components/AppButton';
 import type { LessonRevision, ReviewService } from '@services/authoring';
 
+import { ReviewerActivitiesReview } from './ReviewerActivitiesReview';
 import type { ReviewerDecisionCommitted } from './reviewer-workspace.types';
 import { useReviewerRevisionReview } from './useReviewerRevisionReview';
 
@@ -206,6 +207,8 @@ export function ReviewerRevisionReview({
           </div>
         )}
       </section>
+
+      <ReviewerActivitiesReview payload={revision.payload} />
 
       <label style={{ display: 'grid', gap: '0.35rem', marginTop: '1rem' }}>
         ملاحظة الرفض

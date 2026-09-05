@@ -78,14 +78,30 @@ describeIntegration('Phase 3-2 authoring client layer composition', () => {
 
     if (publishedEntityId) {
       psqlAdmin(`
-        DELETE FROM public.game_objectives
+        DELETE FROM public.experiment_objectives
+      WHERE lesson_id = ${sqlLiteral(publishedEntityId)};
+      DELETE FROM public.simulation_objectives
+      WHERE lesson_id = ${sqlLiteral(publishedEntityId)};
+      DELETE FROM public.inquiry_objectives
+      WHERE lesson_id = ${sqlLiteral(publishedEntityId)};
+      DELETE FROM public.data_activity_objectives
+      WHERE lesson_id = ${sqlLiteral(publishedEntityId)};
+
+      DELETE FROM public.game_objectives
         WHERE game_id IN (
           SELECT id FROM public.games WHERE lesson_id = ${sqlLiteral(publishedEntityId)}
         );
         DELETE FROM public.questions WHERE lesson_id = ${sqlLiteral(publishedEntityId)};
         DELETE FROM public.games WHERE lesson_id = ${sqlLiteral(publishedEntityId)};
         DELETE FROM public.experiments WHERE lesson_id = ${sqlLiteral(publishedEntityId)};
-        DELETE FROM public.objectives WHERE lesson_id = ${sqlLiteral(publishedEntityId)};
+        DELETE FROM public.simulations
+      WHERE lesson_id = ${sqlLiteral(publishedEntityId)};
+      DELETE FROM public.inquiries
+      WHERE lesson_id = ${sqlLiteral(publishedEntityId)};
+      DELETE FROM public.data_activities
+      WHERE lesson_id = ${sqlLiteral(publishedEntityId)};
+
+      DELETE FROM public.objectives WHERE lesson_id = ${sqlLiteral(publishedEntityId)};
       `);
     }
 
