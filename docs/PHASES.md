@@ -65,7 +65,7 @@ Remote Supabase لرفيق العلوم ما زالت مؤجلة عمدًا.
 | 2-D      | Cloud Persistence                         | حفظ نتائج الإتقان المرتبطة بالمستخدم عبر RPC وRLS مع retry وidempotency | مسار سحابي حقيقي + تكافؤ حسابي + أمر إغلاق موحد          | مكتملة / CLOSED          |
 | 3        | Teacher Dashboard                         | تأليف بشري + مراجعة + اعتماد + نشر محكوم                                | teacher يؤلف وreviewer يراجع/يعتمد عبر حماية خلفية       | مكتملة / CLOSED & FROZEN |
 | 4        | AI-assisted Authoring                     | توليد مساعد مع قبول بشري وحواجز خادمية وحراسة تربوية                    | لا حفظ أو اعتماد أو نشر مباشر من AI                      | مكتملة / CLOSED & FROZEN |
-| 5        | Advanced Science Activities               | توسيع الألعاب والتجارب والمحاكاة والأنشطة العلمية                       | كل نشاط مرتبط بهدف تعلم وقابل للاختبار                   | 5-4B CLOSED — 5-5 NEXT   |
+| 5        | Advanced Science Activities               | توسيع الألعاب والتجارب والمحاكاة والأنشطة العلمية                       | كل نشاط مرتبط بهدف تعلم وقابل للاختبار                   | 5-Freeze IN PROGRESS     |
 | 6        | Production Readiness                      | أمن، أداء، مراقبة أخطاء، نسخ احتياطي، نشر وتوثيق تشغيل                  | قائمة جاهزية إنتاج ناجحة                                 | مخططة                    |
 | 1.0      | الإطلاق الرسمي                            | نسخة مستقرة قابلة للاستخدام والتوسع                                     | قبول وظيفي وتشغيلي كامل                                  | الهدف النهائي            |
 
@@ -78,17 +78,37 @@ Remote Supabase لرفيق العلوم ما زالت مؤجلة عمدًا.
 5-3   Interactive Science Simulation Engine                  ✅ CLOSED @ f3992bdbae2e22813bd49032cd2c59a89c867ef6
 5-4A  Inquiry Activity                                       ✅ CLOSED @ a37a7b470f85b9e0d87491bba798673408f226d1
 5-4B  Data / Graph Activity                                  ✅ CLOSED @ 1e66cfd71545282ceeaf123fc9e5d58b13bc470f
-5-5   Teacher / Reviewer Activity Authoring Integration       ▶ NEXT
+5-5   Teacher / Reviewer Activity Authoring Integration       ✅ CLOSED / MERGED @ 45877f039796731a624dee3b74f9288e0c4e4aba
+5-6A  Real Composition / Safety / Mobile-RTL Contract          ✅ APPROVED @ 2033afb4c93edb391496a1cdf40719796efd24a9
+5-6B  Student Canonical → Student Real Composition             ✅ PASS @ 0074558775e31c00319c67400939ccac593c7eb3
+5-6C  Behavioral Safety Enforcement                            ✅ PASS @ 458f94d9980e20fd9d92b039b48980ac560c9a4b
+5-6D  Arabic Root + RTL Hardening                              ✅ PASS @ f519a6c8c5d78ce7eed9c70785e27aa88626ded9
+5-6E  Mobile / RTL Visual Acceptance                           ✅ PASS @ f519a6c8c5d78ce7eed9c70785e27aa88626ded9
+5-6F  Full Phase 5 Functional Acceptance                       ✅ PASS @ f519a6c8c5d78ce7eed9c70785e27aa88626ded9
+5-Freeze  Final Documentation + Closure + Tag                  ▶ IN PROGRESS
 ```
 
-**دليل إغلاق 5-4B:**
+**دليل القبول الوظيفي لـPhase 5-6F:**
 
-- Lint وBuild: PASS
-- Core: 112/112 ملفات، 1026/1026 اختبارات
-- pgTAP: 4/4 ملفات، 152/152 اختبارات
-- Supabase غير الحي: 19 ملفًا، 148/148 اختبارًا
-- Data Activity Local ↔ Supabase parity: 1/1 PASS
-- اختبارات Gemini الحية الثلاثة متخطاة عمدًا وخارج نطاق الإغلاق
+- المرشح: `f519a6c8c5d78ce7eed9c70785e27aa88626ded9`
+- baseline الخاص بـPhase 5-5: `45877f039796731a624dee3b74f9288e0c4e4aba`
+- Safety + RTL targeted: 3/3 ملفات، 18/18 اختبارًا — PASS
+- Core: 132/132 ملفات اختبار، 1132/1132 اختبارًا — PASS
+- Lint: PASS
+- Build: PASS
+- Student Real Composition: 1/1 ملف، 2/2 اختبار — PASS
+- Supabase non-live: 25 ملفًا ناجحًا، 171 اختبارًا ناجحًا — PASS
+- 3 اختبارات Gemini الحية متخطاة عمدًا وخارج نطاق إغلاق Phase 5 غير الحي
+- ثبت مسار الاستهلاك الحقيقي: Approved Canonical Lesson → Student Lesson → Student Activity Hub → Activity Registry → Student Activity Host → الأنواع الخمسة
+- الأنواع الخمسة المثبتة: matching، experiment، simulation، inquiry، data
+- ثبتت سياسة Safety للتجارب عبر الحالات: `safe_home` و`teacher_supervised` و`lab_only` و`not_allowed`
+- ثبت جذر التطبيق العربي: `lang="ar"` و`dir="rtl"`
+- اجتازت بوابة Mobile / RTL البشرية على المرشح نفسه: 360×800 و390×844 و768×1024
+- قبول Mobile / RTL أعلاه بوابة قبول بشرية بصرية، وليس نتيجة اختبار jsdom آلي
+- النطاق الوظيفي لـPhase 5: ACCEPTED
+- حالة `5-Freeze`: IN PROGRESS
+- الوسم النهائي لـPhase 5: لم يُنشأ بعد
+- لا تُعلن Phase 5 بوصفها `CLOSED & FROZEN` قبل نجاح أمر الإغلاق الموحد والمراجعة المستقلة والدمج إلى `main` وإنشاء الوسم النهائي والتحقق منه
 
 `5-0R` أعاد ربط baseline المعماري رسميًا بوسم Phase 4 V2 المجمد، و`5-1` أُغلقت بعد تنفيذ Experiment Objective Linkage ودمج PR #5. هذه السطور تسجل الحالة فقط ولا تعيد فتح أو تعدل عقود المراحل السابقة.
 
