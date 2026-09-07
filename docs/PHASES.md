@@ -65,7 +65,7 @@ Remote Supabase لرفيق العلوم ما زالت مؤجلة عمدًا.
 | 2-D      | Cloud Persistence                         | حفظ نتائج الإتقان المرتبطة بالمستخدم عبر RPC وRLS مع retry وidempotency | مسار سحابي حقيقي + تكافؤ حسابي + أمر إغلاق موحد          | مكتملة / CLOSED          |
 | 3        | Teacher Dashboard                         | تأليف بشري + مراجعة + اعتماد + نشر محكوم                                | teacher يؤلف وreviewer يراجع/يعتمد عبر حماية خلفية       | مكتملة / CLOSED & FROZEN |
 | 4        | AI-assisted Authoring                     | توليد مساعد مع قبول بشري وحواجز خادمية وحراسة تربوية                    | لا حفظ أو اعتماد أو نشر مباشر من AI                      | مكتملة / CLOSED & FROZEN |
-| 5        | Advanced Science Activities               | توسيع الألعاب والتجارب والمحاكاة والأنشطة العلمية                       | كل نشاط مرتبط بهدف تعلم وقابل للاختبار                   | 5-Freeze IN PROGRESS     |
+| 5        | Advanced Science Activities               | توسيع الألعاب والتجارب والمحاكاة والأنشطة العلمية                       | كل نشاط مرتبط بهدف تعلم وقابل للاختبار                   | مكتملة / CLOSED & FROZEN |
 | 6        | Production Readiness                      | أمن، أداء، مراقبة أخطاء، نسخ احتياطي، نشر وتوثيق تشغيل                  | قائمة جاهزية إنتاج ناجحة                                 | مخططة                    |
 | 1.0      | الإطلاق الرسمي                            | نسخة مستقرة قابلة للاستخدام والتوسع                                     | قبول وظيفي وتشغيلي كامل                                  | الهدف النهائي            |
 
@@ -85,7 +85,7 @@ Remote Supabase لرفيق العلوم ما زالت مؤجلة عمدًا.
 5-6D  Arabic Root + RTL Hardening                              ✅ PASS @ f519a6c8c5d78ce7eed9c70785e27aa88626ded9
 5-6E  Mobile / RTL Visual Acceptance                           ✅ PASS @ f519a6c8c5d78ce7eed9c70785e27aa88626ded9
 5-6F  Full Phase 5 Functional Acceptance                       ✅ PASS @ f519a6c8c5d78ce7eed9c70785e27aa88626ded9
-5-Freeze  Final Documentation + Closure + Tag                  ▶ IN PROGRESS
+5-Freeze  Final Documentation + Closure + Tag                  ✅ CLOSED
 ```
 
 **دليل القبول الوظيفي لـPhase 5-6F:**
@@ -106,9 +106,13 @@ Remote Supabase لرفيق العلوم ما زالت مؤجلة عمدًا.
 - اجتازت بوابة Mobile / RTL البشرية على المرشح نفسه: 360×800 و390×844 و768×1024
 - قبول Mobile / RTL أعلاه بوابة قبول بشرية بصرية، وليس نتيجة اختبار jsdom آلي
 - النطاق الوظيفي لـPhase 5: ACCEPTED
-- حالة `5-Freeze`: IN PROGRESS
-- الوسم النهائي لـPhase 5: لم يُنشأ بعد
-- لا تُعلن Phase 5 بوصفها `CLOSED & FROZEN` قبل نجاح أمر الإغلاق الموحد والمراجعة المستقلة والدمج إلى `main` وإنشاء الوسم النهائي والتحقق منه
+- حالة `5-Freeze`: CLOSED & FROZEN
+- مرشح الإغلاق الآلي النهائي على `main` قبل commit توثيق التجميد: `28e51cf3566f45ade4d6635e60ffb4398691e566`
+- `verify:phase-5-closure` على `main`: PASS
+- المراجعة المستقلة: PASS
+- الدمج إلى `main`: FAST-FORWARD PASS
+- Git clean + synchronized: PASS
+- الوسم النهائي المعتمد: `v0.8-advanced-science-activities-complete`
 
 `5-0R` أعاد ربط baseline المعماري رسميًا بوسم Phase 4 V2 المجمد، و`5-1` أُغلقت بعد تنفيذ Experiment Objective Linkage ودمج PR #5. هذه السطور تسجل الحالة فقط ولا تعيد فتح أو تعدل عقود المراحل السابقة.
 
