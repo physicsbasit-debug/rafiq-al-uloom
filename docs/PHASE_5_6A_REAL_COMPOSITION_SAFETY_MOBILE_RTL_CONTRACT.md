@@ -109,7 +109,7 @@ Phase 5-6C مخصصة لتحويل Safety من metadata معروضة إلى poli
 Phase 5-6D تجعل:
 
 ```html
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl"></html>
 ```
 
 هو الجذر الافتراضي للتطبيق.
@@ -189,12 +189,12 @@ SafetyLevel
 
 ## 5.3 مصفوفة السلوك المعتمدة
 
-| safetyLevel | الظهور في Activity Hub | الدخول | الأدوات | الخطوات الإجرائية | prompts | السلوك |
-|---|---|---|---|---|---|---|
-| `safe_home` | نعم | تنفيذ كامل | تظهر | تظهر | تظهر | `execute` |
-| `teacher_supervised` | نعم | عرض مقيّد | تظهر | لا تظهر في self-service | تظهر كتحضير/مناقشة | `supervised_preview` |
-| `lab_only` | نعم | عرض تعريفي | لا تعرض كقائمة تنفيذ | لا تظهر | لا تظهر كتعليمات تنفيذ | `lab_preview` |
-| `not_allowed` | نعم كحالة محجوبة أو غير قابلة للتنفيذ | ممنوع | لا | لا | لا | `blocked` |
+| safetyLevel          | الظهور في Activity Hub                | الدخول     | الأدوات              | الخطوات الإجرائية       | prompts                | السلوك               |
+| -------------------- | ------------------------------------- | ---------- | -------------------- | ----------------------- | ---------------------- | -------------------- |
+| `safe_home`          | نعم                                   | تنفيذ كامل | تظهر                 | تظهر                    | تظهر                   | `execute`            |
+| `teacher_supervised` | نعم                                   | عرض مقيّد  | تظهر                 | لا تظهر في self-service | تظهر كتحضير/مناقشة     | `supervised_preview` |
+| `lab_only`           | نعم                                   | عرض تعريفي | لا تعرض كقائمة تنفيذ | لا تظهر                 | لا تظهر كتعليمات تنفيذ | `lab_preview`        |
+| `not_allowed`        | نعم كحالة محجوبة أو غير قابلة للتنفيذ | ممنوع      | لا                   | لا                      | لا                     | `blocked`            |
 
 ---
 
@@ -592,7 +592,7 @@ no tools/steps/prompts leaked to student
 يصبح الجذر:
 
 ```html
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl"></html>
 ```
 
 ويظل React RTL-compatible.
