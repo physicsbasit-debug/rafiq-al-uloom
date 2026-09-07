@@ -17,7 +17,8 @@
     "verify:phase-3-closure": "bash scripts/verify-phase-3-closure.sh",
     "verify:phase-4-closure": "bash scripts/verify-phase-4-closure.sh",
     "verify:phase-5-closure": "bash scripts/verify-phase-5-closure.sh",
-    "verify:production-env": "node scripts/check-production-environment.mjs"
+    "verify:production-env": "node scripts/check-production-environment.mjs",
+    "verify:ci-static": "bash scripts/verify-ci-static.sh"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.111.0",
