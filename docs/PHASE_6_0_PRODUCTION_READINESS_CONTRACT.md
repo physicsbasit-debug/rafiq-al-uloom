@@ -2,9 +2,9 @@
 
 ## Production Readiness Contract + Gap Audit
 
-**الحالة:** PRE-IMPLEMENTATION CONTRACT  
-**Baseline frozen:** `v0.8-advanced-science-activities-complete`  
-**Baseline commit:** `5f46fca6ee4617720d0770b2139c9a844aaa08b6`  
+**الحالة:** PRE-IMPLEMENTATION CONTRACT
+**Baseline frozen:** `v0.8-advanced-science-activities-complete`
+**Baseline commit:** `5f46fca6ee4617720d0770b2139c9a844aaa08b6`
 **Target branch:** `phase-6-production-readiness`
 
 ---
@@ -327,5 +327,5 @@ CI يجب أن تكون deterministic قدر الإمكان، non-live افتر�
 
 Phase 6 تبدأ رسميًا كمرحلة تشغيل وإنتاج، لا كمرحلة ميزات.
 
-**NEXT بعد إغلاق 6-0:**  
+**NEXT بعد إغلاق 6-0:**
 `6-1 — Production Environment + Secret Boundary`
