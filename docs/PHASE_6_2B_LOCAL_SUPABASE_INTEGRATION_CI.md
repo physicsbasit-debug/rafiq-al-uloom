@@ -2,7 +2,8 @@
 
 **Baseline:** `2214236f3e95ef129dda4741f6d137e1a993a730`
 **Branch:** `phase-6-production-readiness`
-**Fix:** `6-2B Fix 1 — Minimal Supabase Stack`
+**Fix 1:** `Minimal Supabase Stack`
+**Fix 2:** `Post-suite Auth/Profile Orphan Guard`
 
 ## الحالة
 
@@ -50,6 +51,30 @@ supabase start   -x vector,logflare,storage-api,imgproxy,studio,mailpit,realtime
 
 لا يتم تعديل `supabase/config.toml`.
 
+## Fix 2 — إزالة race من حارس orphan
+
+في GitHub Actions نجح:
+
+- تشغيل Minimal Supabase Stack.
+- migrations وseed.
+- `supabase db reset`.
+- Edge JWT readiness.
+- 170 اختبار تكامل.
+
+وفشل اختبار واحد لأن اختبار rollback كان يفحص كل `auth.users` بحثًا عن أي Profile مفقودة
+بينما ملف تكامل آخر يحذف Profile مؤقتًا عمدًا لاختبار `missing_profile` ثم يعيدها في `finally`.
+
+Vitest يشغّل ملفات التكامل بالتوازي، لذلك كان الفحص العالمي داخل أحد الملفات قابلًا لالتقاط
+الحالة المؤقتة لملف آخر.
+
+Fix 2:
+
+- يبقي اختبار rollback محصورًا في sentinel الخاص به.
+- ينقل invariant العالمي `auth.users → public.profiles` إلى `verify-ci-supabase.sh`.
+- ينفذ invariant بعد اكتمال `npm run test:supabase` بالكامل، عندما تنتهي حالات الاختبار المؤقتة.
+- يفشل CI إذا بقي أي orphan حقيقي بعد suite.
+- لا يتم تسلسل جميع اختبارات Supabase ولا تخفيض التوازي لمعالجة العارض.
+
 ## سبب عدم استخدام ignore-health-check
 
 لا تستخدم البوابة:
@@ -82,9 +107,10 @@ stop --no-backup
 - لا `RUN_LIVE_GEMINI_TESTS=true`.
 - لا `--no-verify-jwt`.
 - Edge readiness عبر HTTP 401.
+- لا auth/profile orphans بعد اكتمال integration suite.
 - cleanup حتمي عبر `trap cleanup EXIT`.
 
-## بوابة قبول Fix 1
+## بوابة قبول Fix 2
 
 ```bash
 npx --no-install prettier --check .

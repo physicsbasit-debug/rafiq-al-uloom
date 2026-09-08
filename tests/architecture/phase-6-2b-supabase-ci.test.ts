@@ -58,6 +58,22 @@ describe('Phase 6-2B local Supabase CI contract', () => {
     expect(verifier).toContain('PASS: minimal Supabase stack recovered after reset');
   });
 
+  it('checks the global auth/profile orphan invariant only after the parallel integration suite', () => {
+    const verifier = read('scripts/verify-ci-supabase.sh');
+    const profileIntegration = read(
+      'tests/integration/supabase-profiles-authorization.integration.ts'
+    );
+
+    expect(verifier).toContain('check_zero_auth_profile_orphans');
+    expect(verifier).toContain(
+      'run_step "Post-suite auth/profile orphan invariant" check_zero_auth_profile_orphans'
+    );
+    expect(verifier.indexOf('npm run test:supabase')).toBeLessThan(
+      verifier.indexOf('Post-suite auth/profile orphan invariant')
+    );
+    expect(profileIntegration).not.toContain('LEFT JOIN public.profiles p ON p.id = au.id');
+  });
+
   it('serves the AI gateway without enabling live Gemini', () => {
     const verifier = read('scripts/verify-ci-supabase.sh');
 

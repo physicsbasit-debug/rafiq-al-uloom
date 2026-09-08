@@ -51,6 +51,41 @@ wait_for_supabase_environment() {
   return 1
 }
 
+check_zero_auth_profile_orphans() {
+  local db_container
+  local orphan_count
+
+  db_container="$(
+    docker ps \
+      --filter 'name=supabase_db_' \
+      --format '{{.Names}}' |
+      head -n 1
+  )"
+
+  if [[ -z "$db_container" ]]; then
+    echo "Supabase database container is not running." >&2
+    return 1
+  fi
+
+  orphan_count="$(
+    docker exec -i "$db_container" \
+      psql -U postgres -d postgres -At \
+      -c '
+        SELECT count(*)
+        FROM auth.users au
+        LEFT JOIN public.profiles p ON p.id = au.id
+        WHERE p.id IS NULL;
+      '
+  )"
+
+  if [[ "$orphan_count" != "0" ]]; then
+    echo "Found auth.users rows without matching public.profiles rows: $orphan_count" >&2
+    return 1
+  fi
+
+  echo "PASS: no auth users without profiles after integration suite"
+}
+
 restart_supabase_after_reset() {
   local recovery_log="${TMPDIR:-/tmp}/rafiq-ci-supabase-recovery-$$.log"
   rm -f "$recovery_log"
@@ -166,6 +201,8 @@ run_step \
   -u GEMINI_API_KEY \
   -u RUN_LIVE_GEMINI_TESTS \
   npm run test:supabase
+
+run_step "Post-suite auth/profile orphan invariant" check_zero_auth_profile_orphans
 
 run_step "Git diff check" git diff --check
 
