@@ -165,7 +165,9 @@ async function acceptSummarySuggestion(title: string): Promise<string> {
   await waitFor(() => expect(requestButton).toBeEnabled(), { timeout: 8_000 });
 
   fireEvent.click(requestButton);
-  fireEvent.click(await screen.findByRole('button', { name: 'استخدام الاقتراح' }));
+  fireEvent.click(
+    await screen.findByRole('button', { name: 'استخدام الاقتراح' }, { timeout: 8_000 })
+  );
 
   const expected = `ملخص مقترح لدرس ${title}.`;
 
@@ -183,7 +185,9 @@ async function acceptObjectiveSuggestion(title: string): Promise<string> {
   await waitFor(() => expect(requestButton).toBeEnabled(), { timeout: 8_000 });
 
   fireEvent.click(requestButton);
-  fireEvent.click(await screen.findByRole('button', { name: 'استخدام الاقتراح' }));
+  fireEvent.click(
+    await screen.findByRole('button', { name: 'استخدام الاقتراح' }, { timeout: 8_000 })
+  );
 
   const expected = `أن يشرح المتعلم الفكرة الأساسية في درس ${title}.`;
 
@@ -208,7 +212,9 @@ async function acceptMasteryQuestionSuggestion(objectiveText: string) {
   await waitFor(() => expect(requestButton).toBeEnabled(), { timeout: 8_000 });
 
   fireEvent.click(requestButton);
-  fireEvent.click(await screen.findByRole('button', { name: 'استخدام الاقتراح' }));
+  fireEvent.click(
+    await screen.findByRole('button', { name: 'استخدام الاقتراح' }, { timeout: 8_000 })
+  );
 
   const expected = {
     prompt: `أي العبارات الآتية ترتبط بالهدف: ${objectiveText}؟`,

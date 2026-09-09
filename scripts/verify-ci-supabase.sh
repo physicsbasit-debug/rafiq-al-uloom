@@ -6,8 +6,9 @@ cd "$ROOT_DIR"
 
 EDGE_PID=""
 EDGE_LOG=""
-SUPABASE_STARTED=0
+SUPABASE_CLEANUP_REQUIRED=0
 SUPABASE_EXCLUDE_SERVICES="vector,logflare,storage-api,imgproxy,studio,mailpit,realtime,postgres-meta,supavisor"
+EXPECTED_SUPABASE_CLI_VERSION="2.110.0"
 
 run_step() {
   local title="$1"
@@ -16,8 +17,46 @@ run_step() {
   "$@"
 }
 
-start_minimal_supabase() {
+verify_supabase_cli_version() {
+  local actual_version
+
+  actual_version="$(npx --no-install supabase --version)"
+
+  if [[ "$actual_version" != "$EXPECTED_SUPABASE_CLI_VERSION" ]]; then
+    echo \
+      "Unexpected Supabase CLI version: expected $EXPECTED_SUPABASE_CLI_VERSION, got $actual_version" \
+      >&2
+    return 1
+  fi
+
+  echo "PASS: Supabase CLI $actual_version"
+}
+
+start_minimal_supabase_once() {
   npx --no-install supabase start -x "$SUPABASE_EXCLUDE_SERVICES"
+}
+
+start_minimal_supabase() {
+  local max_attempts=2
+  local retry_delay_seconds=5
+  local attempt
+
+  for ((attempt = 1; attempt <= max_attempts; attempt++)); do
+    if start_minimal_supabase_once; then
+      return 0
+    fi
+
+    if ((attempt < max_attempts)); then
+      echo \
+        "Supabase minimal start attempt $attempt failed; stopping partial stack before one retry." \
+        >&2
+      npx --no-install supabase stop --no-backup >/dev/null 2>&1 || true
+      sleep "$retry_delay_seconds"
+    fi
+  done
+
+  echo "Supabase minimal local start failed after $max_attempts attempts." >&2
+  return 1
 }
 
 supabase_environment_ready() {
@@ -123,7 +162,7 @@ cleanup_edge_runtime() {
 cleanup() {
   cleanup_edge_runtime
 
-  if ((SUPABASE_STARTED == 1)); then
+  if ((SUPABASE_CLEANUP_REQUIRED == 1)); then
     npx --no-install supabase stop --no-backup >/dev/null 2>&1 || true
   fi
 }
@@ -176,9 +215,11 @@ trap cleanup EXIT
 
 unset GEMINI_API_KEY RUN_LIVE_GEMINI_TESTS || true
 
+run_step "Supabase CLI version" verify_supabase_cli_version
 run_step "Docker availability" docker version
+
+SUPABASE_CLEANUP_REQUIRED=1
 run_step "Supabase minimal local start" start_minimal_supabase
-SUPABASE_STARTED=1
 
 run_step "Supabase database reset" npx --no-install supabase db reset
 

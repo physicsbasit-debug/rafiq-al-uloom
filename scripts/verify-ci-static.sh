@@ -20,7 +20,8 @@ run_step \
   npx --no-install vitest run \
   tests/architecture/phase-6-1-production-environment.test.ts \
   tests/architecture/phase-6-2-ci-supply-chain.test.ts \
-  tests/architecture/phase-6-2b-supabase-ci.test.ts
+  tests/architecture/phase-6-2b-supabase-ci.test.ts \
+  tests/architecture/phase-6-2c-ci-runtime.test.ts
 run_step "Auth client boundary scan" node scripts/check-auth-client-boundaries.mjs
 run_step "Mastery-results client boundary scan" node scripts/check-mastery-results-client-boundaries.mjs
 run_step "Tracked secret scan" node scripts/check-tracked-secrets.mjs

@@ -20,7 +20,8 @@ describe('Phase 6-2A CI and supply-chain contract', () => {
     expect(workflow).toContain('actions/checkout@v6');
     expect(workflow).toContain('fetch-depth: 0');
     expect(workflow).toContain('actions/setup-node@v7');
-    expect(workflow).toContain("node-version: '22.x'");
+    expect(workflow).toContain("node-version: '22.23.2'");
+    expect(workflow).not.toContain("node-version: '22.x'");
     expect(workflow).toContain('cache: npm');
     expect(workflow).toContain('run: npm ci');
     expect(workflow).toContain('run: npm run verify:ci-static');

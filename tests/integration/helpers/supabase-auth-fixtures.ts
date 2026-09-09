@@ -31,6 +31,13 @@ export interface ProfileRecord {
   updated_at: string;
 }
 
+let isolatedAuthClientSequence = 0;
+
+function nextIsolatedAuthStorageKey(): string {
+  isolatedAuthClientSequence += 1;
+  return `rafiq-integration-auth-${process.pid}-${isolatedAuthClientSequence}`;
+}
+
 function parseSupabaseEnvironment(output: string): Record<string, string> {
   return Object.fromEntries(
     output
@@ -51,7 +58,7 @@ function parseSupabaseEnvironment(output: string): Record<string, string> {
 }
 
 export function readLocalSupabaseEnvironment(): LocalSupabaseEnvironment {
-  const output = execFileSync('npx', ['supabase', 'status', '-o', 'env'], {
+  const output = execFileSync('npx', ['--no-install', 'supabase', 'status', '-o', 'env'], {
     cwd: process.cwd(),
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
@@ -75,6 +82,7 @@ export function readLocalSupabaseEnvironment(): LocalSupabaseEnvironment {
 export function createIsolatedSupabaseClient(apiUrl: string, key: string): SupabaseClient {
   return createClient(apiUrl, key, {
     auth: {
+      storageKey: nextIsolatedAuthStorageKey(),
       persistSession: false,
       autoRefreshToken: false,
       detectSessionInUrl: false,
