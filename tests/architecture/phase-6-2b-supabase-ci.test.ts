@@ -88,7 +88,9 @@ describe('Phase 6-2B local Supabase CI contract', () => {
     const verifier = read('scripts/verify-ci-supabase.sh');
 
     expect(verifier).toContain('if [[ "$http_code" == "401" ]]');
-    expect(verifier).toContain('PASS: non-live AI Edge gateway ready with JWT protection');
+    expect(verifier).toContain(
+      'PASS: non-live AI Edge runtime marker observed and JWT protection ready'
+    );
   });
 
   it('always cleans Edge and the local Supabase stack', () => {

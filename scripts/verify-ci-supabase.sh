@@ -167,6 +167,12 @@ cleanup() {
   fi
 }
 
+edge_runtime_ready_marker() {
+  [[ -n "$EDGE_LOG" ]] &&
+    [[ -f "$EDGE_LOG" ]] &&
+    grep -Fq 'Serving functions on http://127.0.0.1:54321/functions/v1/' "$EDGE_LOG"
+}
+
 start_nonlive_edge_runtime() {
   local attempt
   local http_code
@@ -189,18 +195,20 @@ start_nonlive_edge_runtime() {
       return 1
     fi
 
-    http_code="$(
-      curl \
-        --silent \
-        --output /dev/null \
-        --write-out '%{http_code}' \
-        http://127.0.0.1:54321/functions/v1/ai-authoring-gateway ||
-        true
-    )"
+    if edge_runtime_ready_marker; then
+      http_code="$(
+        curl \
+          --silent \
+          --output /dev/null \
+          --write-out '%{http_code}' \
+          http://127.0.0.1:54321/functions/v1/ai-authoring-gateway ||
+          true
+      )"
 
-    if [[ "$http_code" == "401" ]]; then
-      echo "PASS: non-live AI Edge gateway ready with JWT protection"
-      return 0
+      if [[ "$http_code" == "401" ]]; then
+        echo "PASS: non-live AI Edge runtime marker observed and JWT protection ready"
+        return 0
+      fi
     fi
 
     sleep 1
@@ -208,6 +216,30 @@ start_nonlive_edge_runtime() {
 
   echo "Non-live AI Edge gateway did not become ready." >&2
   tail -80 "$EDGE_LOG" >&2 || true
+  return 1
+}
+
+run_supabase_integration_suite() {
+  if [[ -z "$EDGE_PID" ]] || ! kill -0 "$EDGE_PID" >/dev/null 2>&1; then
+    echo "Non-live AI Edge process is not running before the integration suite." >&2
+    tail -120 "$EDGE_LOG" >&2 || true
+    return 1
+  fi
+
+  if env \
+    -u GEMINI_API_KEY \
+    -u RUN_LIVE_GEMINI_TESTS \
+    npm run test:supabase; then
+    return 0
+  fi
+
+  echo "Supabase integration suite failed; non-live Edge diagnostics follow." >&2
+  if kill -0 "$EDGE_PID" >/dev/null 2>&1; then
+    echo "Non-live AI Edge process is still running after the failed suite." >&2
+  else
+    echo "Non-live AI Edge process exited during the integration suite." >&2
+  fi
+  tail -120 "$EDGE_LOG" >&2 || true
   return 1
 }
 
@@ -238,10 +270,7 @@ run_step "Start non-live AI Edge gateway" start_nonlive_edge_runtime
 
 run_step \
   "Supabase non-live integration suite" \
-  env \
-  -u GEMINI_API_KEY \
-  -u RUN_LIVE_GEMINI_TESTS \
-  npm run test:supabase
+  run_supabase_integration_suite
 
 run_step "Post-suite auth/profile orphan invariant" check_zero_auth_profile_orphans
 

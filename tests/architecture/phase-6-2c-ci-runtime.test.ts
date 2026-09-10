@@ -87,6 +87,29 @@ describe('Phase 6-2C CI runtime closure contract', () => {
     expect(composition).not.toContain("screen.findByRole('button', { name: 'استخدام الاقتراح' })");
   });
 
+  it('requires the pinned Edge runtime serve marker before accepting the JWT-protected 401 probe', () => {
+    const verifier = read('scripts/verify-ci-supabase.sh');
+
+    expect(verifier).toContain('edge_runtime_ready_marker()');
+    expect(verifier).toContain(
+      'grep -Fq \'Serving functions on http://127.0.0.1:54321/functions/v1/\' "$EDGE_LOG"'
+    );
+    expect(verifier.indexOf('if edge_runtime_ready_marker; then')).toBeLessThan(
+      verifier.indexOf('if [[ "$http_code" == "401" ]]')
+    );
+  });
+
+  it('prints Edge diagnostics on integration failure without retrying the test suite', () => {
+    const verifier = read('scripts/verify-ci-supabase.sh');
+
+    expect(verifier).toContain('run_supabase_integration_suite()');
+    expect(verifier).toContain(
+      'Supabase integration suite failed; non-live Edge diagnostics follow.'
+    );
+    expect(verifier).toContain('tail -120 "$EDGE_LOG"');
+    expect(verifier.match(/npm run test:supabase/g)).toHaveLength(1);
+  });
+
   it('keeps 6-2C inside CI/runtime scope without enabling live providers', () => {
     const verifier = read('scripts/verify-ci-supabase.sh');
     const workflow = read('.github/workflows/ci.yml');

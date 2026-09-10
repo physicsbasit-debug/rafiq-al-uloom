@@ -111,6 +111,58 @@ The same run also no longer emitted the repeated GoTrueClient same-storage-key w
 
 No whole-suite retry or per-test retry was introduced.
 
+### 7. Fix 3 — Edge runtime readiness false positive exposed by GitHub Run #4
+
+GitHub Actions Run `34384063440` on commit
+`49219571e51227fbb070716a3868322d243954f0` produced:
+
+- `Static / Core / Supply Chain` — SUCCESS.
+- `Local Supabase Integration` — FAILURE.
+- the non-live readiness probe had already reported PASS from an unauthenticated `401`;
+- later, `supabase-ai-authoring-gateway.integration.ts` failed all 8 tests;
+- the first authenticated boundary request received `502` instead of `403`;
+- the remaining gateway requests timed out at the 5-second test timeout.
+
+This sequence proved that the old readiness probe could accept a platform/Kong
+`verify_jwt` response before the Edge Function runtime was demonstrably serving.
+An unauthenticated `401` therefore verified JWT protection, but not the worker itself.
+
+**Decision:**
+
+1. keep JWT verification enabled;
+2. wait for the pinned Supabase CLI runtime marker
+   `Serving functions on http://127.0.0.1:54321/functions/v1/`;
+3. only after that marker is present, accept the gateway `401` protection probe;
+4. if the integration suite fails, print Edge process liveness and the last 120 lines
+   of the Edge log before cleanup;
+5. do not retry the integration suite or any failed test.
+
+This change remains operational-only. It does not modify product behavior, migrations,
+provider logic, production Auth, or live Gemini execution.
+
+### 8. Supply-chain patch discovered during Fix 3 closure
+
+Final static verification exposed the Vitest / `@vitest/mocker` security advisory
+affecting the installed `4.1.10` release.
+
+**Decision:**
+
+1. update Vitest only from `4.1.10` to the patched `4.1.11` release;
+2. allow the lockfile to update the matching Vitest package family and its resolved
+   transitive dependency versions;
+3. do not run broad `npm audit fix`;
+4. require `npm audit` to return zero known vulnerabilities before closure;
+5. rerun both the static and local Supabase CI gates under Vitest `4.1.11`.
+
+Final local acceptance under Vitest `4.1.11`:
+
+- targeted 6-2B + 6-2C architecture contracts: 20/20 PASS;
+- core/unit suite: 1167/1167 PASS;
+- Phase 6 architecture suite: 35/35 PASS;
+- dependency audit: 0 vulnerabilities;
+- local Supabase integration: 171 PASS + 3 intentionally skipped;
+- post-suite auth/profile orphan invariant: PASS.
+
 ## Explicit deferrals
 
 These are intentionally not changed in 6-2C:
