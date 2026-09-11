@@ -51,4 +51,40 @@ describe('Phase 6-3 runtime resilience contract', () => {
 
     expect(packageJson).not.toMatch(/sentry|datadog|newrelic|rollbar/i);
   });
+
+  it('defines one bounded client deadline policy for reads and AI transport', () => {
+    const boundary = read('src/services/runtime/client-async-boundary.ts');
+
+    expect(boundary).toContain('contentQuery: 15_000');
+    expect(boundary).toContain('aiGatewayTransport: 30_000');
+    expect(boundary).toContain('source: ClientAsyncAbortSource');
+    expect(boundary).toContain("'caller' | 'timeout'");
+  });
+
+  it('routes content reads through the bounded deadline without replacing stale-write guards', () => {
+    const query = read('src/services/queries/use-async-query.ts');
+
+    expect(query).toContain('runWithClientDeadline');
+    expect(query).toContain('requestVersionRef');
+    expect(query).toContain('controller.abort();');
+    expect(query).toContain('timeoutMs = CLIENT_ASYNC_TIMEOUT_MS.contentQuery');
+  });
+
+  it('keeps technical query causes away from the public query message', () => {
+    const boundary = read('src/design-system/components/QueryBoundary.tsx');
+
+    expect(boundary).toContain('if (!error.cause)');
+    expect(boundary).toContain('تعذر تحميل البيانات. حاول مرة أخرى.');
+    expect(boundary).toContain('استغرق تحميل البيانات وقتًا أطول من المتوقع. حاول مرة أخرى.');
+    expect(boundary).not.toContain('>{error.message}</p>');
+  });
+
+  it('bounds browser AI transport above the existing 25-second Edge provider timeout', () => {
+    const provider = read('src/services/ai-authoring/gateway-ai-authoring.provider.ts');
+
+    expect(provider).toContain('runWithClientDeadline');
+    expect(provider).toContain('CLIENT_ASYNC_TIMEOUT_MS.aiGatewayTransport');
+    expect(provider).toContain('transportTimeoutMs');
+    expect(provider).not.toMatch(/while\s*\(|for\s*\(.*fetch/);
+  });
 });

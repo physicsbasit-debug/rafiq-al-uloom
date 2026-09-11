@@ -1,3 +1,8 @@
+import {
+  CLIENT_ASYNC_TIMEOUT_MS,
+  isClientAsyncAbortError,
+  runWithClientDeadline,
+} from '@services/runtime/client-async-boundary';
 import { validateAiGenerationRequest } from './ai-authoring.contract';
 import type { AiAuthoringProvider } from './ai-authoring.provider';
 import { validateGatewayAiGenerationResult } from './gateway-ai-authoring.response';
@@ -12,6 +17,7 @@ export interface GatewayAiAuthoringProviderDependencies {
   readonly publicApiKey: string;
   readonly getAccessToken: () => Promise<string | null>;
   readonly fetchImpl?: typeof fetch;
+  readonly transportTimeoutMs?: number;
 }
 
 function unavailable(target: AiGenerationRequest['target']): AiGenerationResult {
@@ -27,12 +33,15 @@ export class GatewayAiAuthoringProvider implements AiAuthoringProvider {
   readonly #publicApiKey: string;
   readonly #getAccessToken: () => Promise<string | null>;
   readonly #fetchImpl?: typeof fetch;
+  readonly #transportTimeoutMs: number;
 
   constructor(dependencies: GatewayAiAuthoringProviderDependencies) {
     this.#gatewayUrl = dependencies.gatewayUrl.trim();
     this.#publicApiKey = dependencies.publicApiKey.trim();
     this.#getAccessToken = dependencies.getAccessToken;
     this.#fetchImpl = dependencies.fetchImpl;
+    this.#transportTimeoutMs =
+      dependencies.transportTimeoutMs ?? CLIENT_ASYNC_TIMEOUT_MS.aiGatewayTransport;
   }
 
   async generate(
@@ -80,21 +89,32 @@ export class GatewayAiAuthoringProvider implements AiAuthoringProvider {
 
     let response: Response;
     try {
-      response = await fetchImpl(this.#gatewayUrl, {
-        method: 'POST',
-        headers: {
-          authorization: `Bearer ${normalizedAccessToken}`,
-          apikey: this.#publicApiKey,
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify(request),
-        signal: options.signal,
-        cache: 'no-store',
-        credentials: 'omit',
-        redirect: 'error',
-      });
-    } catch {
-      return options.signal?.aborted ? aborted(request.target) : unavailable(request.target);
+      response = await runWithClientDeadline(
+        (signal) =>
+          fetchImpl(this.#gatewayUrl, {
+            method: 'POST',
+            headers: {
+              authorization: `Bearer ${normalizedAccessToken}`,
+              apikey: this.#publicApiKey,
+              'content-type': 'application/json',
+            },
+            body: JSON.stringify(request),
+            signal,
+            cache: 'no-store',
+            credentials: 'omit',
+            redirect: 'error',
+          }),
+        {
+          signal: options.signal,
+          timeoutMs: this.#transportTimeoutMs,
+        }
+      );
+    } catch (error) {
+      if (isClientAsyncAbortError(error) && error.source === 'caller') {
+        return aborted(request.target);
+      }
+
+      return unavailable(request.target);
     }
 
     if (options.signal?.aborted) {

@@ -52,7 +52,8 @@ describe('architecture: Phase 4-3D browser AI gateway boundary', () => {
 
   it('ينفذ fetch واحدة بنيويًا ولا يحتوي retry loop', () => {
     const provider = read(PROVIDER_PATH);
-    expect(provider.match(/await fetchImpl\(/g) ?? []).toHaveLength(1);
+    expect(provider.match(/\bfetchImpl\s*\(/g) ?? []).toHaveLength(1);
+    expect(provider).toContain('runWithClientDeadline(');
     expect(provider).not.toMatch(/\bwhile\s*\(/);
     expect(provider).not.toMatch(/\bfor\s*\(/);
     expect(provider).not.toContain('setTimeout(');

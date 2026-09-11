@@ -1,10 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  CLIENT_ASYNC_TIMEOUT_MS,
+  runWithClientDeadline,
+} from '@services/runtime/client-async-boundary';
 import type { ContentQueryError, QueryState } from './query.types';
 
 export interface UseAsyncQueryOptions<T> {
   queryKey: string;
   initialData: T;
   queryFn: (signal: AbortSignal) => Promise<T>;
+  timeoutMs?: number;
 }
 
 function normalizeContentQueryError(error: unknown): ContentQueryError {
@@ -25,6 +30,7 @@ export function useAsyncQuery<T>({
   queryKey,
   initialData,
   queryFn,
+  timeoutMs = CLIENT_ASYNC_TIMEOUT_MS.contentQuery,
 }: UseAsyncQueryOptions<T>): QueryState<T> {
   const [data, setData] = useState<T>(initialData);
   const [isLoading, setIsLoading] = useState(true);
@@ -55,7 +61,10 @@ export function useAsyncQuery<T>({
     Promise.resolve()
       .then(() => {
         controller.signal.throwIfAborted();
-        return queryFn(controller.signal);
+        return runWithClientDeadline((signal) => queryFn(signal), {
+          signal: controller.signal,
+          timeoutMs,
+        });
       })
       .then(
         (nextData) => {
@@ -81,7 +90,7 @@ export function useAsyncQuery<T>({
       isMounted = false;
       controller.abort();
     };
-  }, [initialData, queryFn, queryKey, reloadVersion]);
+  }, [initialData, queryFn, queryKey, reloadVersion, timeoutMs]);
 
   return {
     data,

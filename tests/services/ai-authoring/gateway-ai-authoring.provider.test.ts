@@ -199,7 +199,7 @@ describe('GatewayAiAuthoringProvider', () => {
     expect(init.redirect).toBe('error');
   });
 
-  it('يمرر AbortSignal نفسها حرفيًا إلى fetch', async () => {
+  it('يمرر AbortSignal مركبة إلى fetch لعزل caller عن مهلة النقل', async () => {
     const fetchImpl = vi.fn(async () => jsonResponse(200, validSuccess));
     const controller = new AbortController();
     await provider({ fetchImpl: fetchImpl as typeof fetch }).generate(request, {
@@ -207,7 +207,8 @@ describe('GatewayAiAuthoringProvider', () => {
     });
 
     const [, init] = fetchImpl.mock.calls[0] as [string, RequestInit];
-    expect(init.signal).toBe(controller.signal);
+    expect(init.signal).toBeInstanceOf(AbortSignal);
+    expect(init.signal).not.toBe(controller.signal);
   });
 
   it('يطوي فشل الشبكة إلى unavailable', async () => {
