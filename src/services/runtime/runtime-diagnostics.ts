@@ -1,6 +1,10 @@
-export type RuntimeDiagnosticKind = 'react_render_error' | 'window_error' | 'unhandled_rejection';
+export type RuntimeDiagnosticKind =
+  'react_render_error' | 'window_error' | 'unhandled_rejection' | 'service_error';
 
-export type RuntimeDiagnosticSource = 'react' | 'browser';
+export type RuntimeDiagnosticSource = 'react' | 'browser' | 'service';
+
+export type RuntimeServiceName =
+  'auth' | 'profile' | 'authorization' | 'authoring' | 'mastery_results';
 
 export type RuntimeErrorType =
   | 'Error'
@@ -11,19 +15,42 @@ export type RuntimeErrorType =
   | 'DOMException'
   | 'UnknownError';
 
-export interface RuntimeDiagnosticInput {
-  readonly kind: RuntimeDiagnosticKind;
-  readonly source: RuntimeDiagnosticSource;
+type RuntimeFailureDiagnosticInput = {
+  readonly kind: 'react_render_error' | 'window_error' | 'unhandled_rejection';
+  readonly source: 'react' | 'browser';
   readonly error: unknown;
+};
+
+type RuntimeServiceDiagnosticInput = {
+  readonly kind: 'service_error';
+  readonly source: 'service';
+  readonly service: RuntimeServiceName;
+  readonly operation: string;
+  readonly reason: string;
+};
+
+export type RuntimeDiagnosticInput = RuntimeFailureDiagnosticInput | RuntimeServiceDiagnosticInput;
+
+interface RuntimeDiagnosticEventBase {
+  readonly referenceId: string;
+  readonly occurredAt: string;
 }
 
-export interface RuntimeDiagnosticEvent {
-  readonly referenceId: string;
-  readonly kind: RuntimeDiagnosticKind;
-  readonly source: RuntimeDiagnosticSource;
-  readonly occurredAt: string;
-  readonly errorType: RuntimeErrorType;
-}
+export type RuntimeDiagnosticEvent = RuntimeDiagnosticEventBase &
+  (
+    | {
+        readonly kind: 'react_render_error' | 'window_error' | 'unhandled_rejection';
+        readonly source: 'react' | 'browser';
+        readonly errorType: RuntimeErrorType;
+      }
+    | {
+        readonly kind: 'service_error';
+        readonly source: 'service';
+        readonly service: RuntimeServiceName;
+        readonly operation: string;
+        readonly reason: string;
+      }
+  );
 
 export type RuntimeDiagnosticSink = (event: RuntimeDiagnosticEvent) => void;
 export type RuntimeDiagnosticReporter = (input: RuntimeDiagnosticInput) => string;
@@ -79,13 +106,27 @@ export function createRuntimeDiagnosticReporter(
   const nowIso = dependencies.nowIso ?? (() => new Date().toISOString());
 
   return (input) => {
-    const event: RuntimeDiagnosticEvent = {
+    const baseEvent: RuntimeDiagnosticEventBase = {
       referenceId: randomUUID(),
-      kind: input.kind,
-      source: input.source,
       occurredAt: nowIso(),
-      errorType: classifyErrorType(input.error),
     };
+
+    const event: RuntimeDiagnosticEvent =
+      input.kind === 'service_error'
+        ? {
+            ...baseEvent,
+            kind: input.kind,
+            source: input.source,
+            service: input.service,
+            operation: input.operation,
+            reason: input.reason,
+          }
+        : {
+            ...baseEvent,
+            kind: input.kind,
+            source: input.source,
+            errorType: classifyErrorType(input.error),
+          };
 
     try {
       sink(event);

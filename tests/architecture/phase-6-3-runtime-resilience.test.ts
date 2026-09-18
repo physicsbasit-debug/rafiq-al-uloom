@@ -87,4 +87,57 @@ describe('Phase 6-3 runtime resilience contract', () => {
     expect(provider).toContain('transportTimeoutMs');
     expect(provider).not.toMatch(/while\s*\(|for\s*\(.*fetch/);
   });
+  it('keeps service diagnostics allowlisted and never forwards the original cause', () => {
+    const bridge = read('src/services/runtime/service-diagnostic-bridge.ts');
+
+    expect(bridge).toContain('SERVICE_DIAGNOSTIC_ALLOWLIST');
+    expect(bridge).toContain("kind: 'service_error'");
+    expect(bridge).toContain("source: 'service'");
+    expect(bridge).toContain("operation: 'unknown'");
+    expect(bridge).toContain("reason: 'unknown'");
+    expect(bridge).not.toContain('error.cause');
+    expect(bridge).not.toContain('error.stack');
+    expect(bridge).not.toContain('JSON.stringify(error)');
+  });
+
+  it('wires the five default service boundaries into the central diagnostic bridge', () => {
+    const targets = [
+      ['src/services/auth/auth.service.ts', "createServiceDiagnosticReporter('auth')"],
+      ['src/services/auth/profile.service.ts', "createServiceDiagnosticReporter('profile')"],
+      [
+        'src/services/auth/authorization.service.ts',
+        "createServiceDiagnosticReporter('authorization')",
+      ],
+      [
+        'src/services/authoring/supabase-authoring.repositories.ts',
+        "createServiceDiagnosticReporter('authoring')",
+      ],
+      [
+        'src/services/mastery-results/supabase-mastery-results.repository.ts',
+        "createServiceDiagnosticReporter('mastery_results')",
+      ],
+    ] as const;
+
+    for (const [target, expectedBridge] of targets) {
+      const source = read(target);
+      expect(source).toContain(
+        "import { createServiceDiagnosticReporter } from '@services/runtime/service-diagnostic-bridge';"
+      );
+      expect(source).toContain(`reportDiagnostic: ${expectedBridge}`);
+    }
+  });
+
+  it('extends runtime diagnostics with service metadata without adding raw message fields', () => {
+    const diagnostics = read('src/services/runtime/runtime-diagnostics.ts');
+
+    expect(diagnostics).toContain("| 'service_error';");
+    expect(diagnostics).toContain(
+      "export type RuntimeDiagnosticSource = 'react' | 'browser' | 'service';"
+    );
+    expect(diagnostics).toContain('readonly service: RuntimeServiceName;');
+    expect(diagnostics).toContain('readonly operation: string;');
+    expect(diagnostics).toContain('readonly reason: string;');
+    expect(diagnostics).not.toContain('readonly message: string;');
+    expect(diagnostics).not.toContain('readonly cause:');
+  });
 });

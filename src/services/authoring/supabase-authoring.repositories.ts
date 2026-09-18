@@ -2,6 +2,8 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { getSupabaseClient } from '@services/data/supabase-client';
 
+import { createServiceDiagnosticReporter } from '@services/runtime/service-diagnostic-bridge';
+
 import {
   authoringUnavailableResult,
   createAuthoringDiagnosticError,
@@ -274,7 +276,9 @@ let defaultRepositories:
   | undefined;
 
 function getDefaultRepositories() {
-  defaultRepositories ??= createSupabaseAuthoringRepositories(getSupabaseClient());
+  defaultRepositories ??= createSupabaseAuthoringRepositories(getSupabaseClient(), {
+    reportDiagnostic: createServiceDiagnosticReporter('authoring'),
+  });
   return defaultRepositories;
 }
 

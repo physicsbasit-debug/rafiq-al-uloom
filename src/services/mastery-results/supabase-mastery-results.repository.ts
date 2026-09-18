@@ -2,6 +2,8 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { getSupabaseClient } from '@services/data/supabase-client';
 
+import { createServiceDiagnosticReporter } from '@services/runtime/service-diagnostic-bridge';
+
 import {
   createMasteryResultsDiagnosticError,
   isAbortError,
@@ -232,7 +234,9 @@ export function createSupabaseMasteryResultsRepository(
 let defaultRepository: MasteryResultsRepository | undefined;
 
 function getDefaultRepository(): MasteryResultsRepository {
-  defaultRepository ??= createSupabaseMasteryResultsRepository(getSupabaseClient());
+  defaultRepository ??= createSupabaseMasteryResultsRepository(getSupabaseClient(), {
+    reportDiagnostic: createServiceDiagnosticReporter('mastery_results'),
+  });
   return defaultRepository;
 }
 

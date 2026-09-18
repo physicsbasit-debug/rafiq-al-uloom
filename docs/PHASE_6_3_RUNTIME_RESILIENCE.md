@@ -85,12 +85,18 @@ behavior, the live Gemini server timeout, or provider retry policy.
 
 ### 6-3C — Diagnostic wiring
 
-Planned after 6-3B acceptance:
+This slice wires the existing service diagnostic hooks into the central runtime reporter:
 
-- route existing Auth/Profile/Authorization/Authoring diagnostic hooks into the runtime
-  reporter;
-- preserve public-safe error contracts;
-- avoid user identifiers, tokens, bodies, lesson text, and provider payloads in logs.
+- Auth, Profile, Authorization, Authoring, and Mastery Results default singletons use one
+  service diagnostic bridge;
+- the bridge accepts only explicit service/operation/reason allowlists and folds malformed
+  or unknown values to `unknown`;
+- the original diagnostic `Error`, its `cause`, stack, user identifiers, tokens, bodies,
+  lesson text, review notes, and mastery answers never enter the runtime event;
+- injected service factories keep their existing optional diagnostic hook contract;
+- public error contracts and authorization behavior remain unchanged;
+- no telemetry vendor, migration, Edge Function, retry, timeout, or educational behavior
+  is added by this slice.
 
 ### 6-3D — Edge correlation + safe logging
 
@@ -115,7 +121,15 @@ Completed:
 
 ## 6-3B acceptance
 
-Required before commit:
+Closed on commit:
+
+`4119c4af35fc599de5b052093ae717f5ea9be217`
+
+GitHub Actions run:
+
+`34627294495`
+
+Completed:
 
 - client async-boundary unit tests PASS;
 - query timeout and safe-public-message tests PASS;
@@ -127,3 +141,17 @@ Required before commit:
 - `git diff --check` clean;
 - no migrations, Edge Functions, Auth mutations, educational behavior, or live Gemini
   execution changed.
+
+## 6-3C acceptance
+
+Required before commit:
+
+- service diagnostic bridge unit tests PASS, including adversarial secret/cause redaction;
+- runtime diagnostic service-event test PASS;
+- Phase 6-3 architecture contract proves all five default service boundaries are wired;
+- existing Auth/Profile/Authorization/Authoring/Mastery Results tests remain PASS;
+- full static CI gate PASS;
+- `npm audit` remains at zero known vulnerabilities;
+- `git diff --check` clean;
+- no migrations, Edge Functions, public error contracts, authorization semantics,
+  educational behavior, or live Gemini execution changed.

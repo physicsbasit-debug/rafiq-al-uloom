@@ -2,6 +2,8 @@ import type { AuthChangeEvent, Session, SupabaseClient, User } from '@supabase/s
 
 import { getSupabaseClient } from '@services/data/supabase-client';
 
+import { createServiceDiagnosticReporter } from '@services/runtime/service-diagnostic-bridge';
+
 import {
   createAuthDiagnosticError,
   isAbortError,
@@ -313,7 +315,9 @@ export function createAuthService(
 let defaultAuthService: AuthService | undefined;
 
 function getDefaultAuthService(): AuthService {
-  defaultAuthService ??= createAuthService(getSupabaseClient());
+  defaultAuthService ??= createAuthService(getSupabaseClient(), {
+    reportDiagnostic: createServiceDiagnosticReporter('auth'),
+  });
   return defaultAuthService;
 }
 

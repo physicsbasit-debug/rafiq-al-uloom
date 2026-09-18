@@ -2,6 +2,8 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { getSupabaseClient } from '@services/data/supabase-client';
 
+import { createServiceDiagnosticReporter } from '@services/runtime/service-diagnostic-bridge';
+
 import { isAbortError } from './auth.errors';
 import type {
   ProfileReadResult,
@@ -232,7 +234,9 @@ export function createProfileService(
 let defaultProfileService: ProfileService | undefined;
 
 function getDefaultProfileService(): ProfileService {
-  defaultProfileService ??= createProfileService(getSupabaseClient());
+  defaultProfileService ??= createProfileService(getSupabaseClient(), {
+    reportDiagnostic: createServiceDiagnosticReporter('profile'),
+  });
   return defaultProfileService;
 }
 

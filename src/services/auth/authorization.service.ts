@@ -1,3 +1,5 @@
+import { createServiceDiagnosticReporter } from '@services/runtime/service-diagnostic-bridge';
+
 import { authService, type AuthService } from './auth.service';
 import { isAbortError } from './auth.errors';
 import type { AuthStateChange } from './auth.types';
@@ -225,7 +227,9 @@ export function createAuthorizationService(
 let defaultAuthorizationService: AuthorizationService | undefined;
 
 function getDefaultAuthorizationService(): AuthorizationService {
-  defaultAuthorizationService ??= createAuthorizationService(authService, profileService);
+  defaultAuthorizationService ??= createAuthorizationService(authService, profileService, {
+    reportDiagnostic: createServiceDiagnosticReporter('authorization'),
+  });
   return defaultAuthorizationService;
 }
 

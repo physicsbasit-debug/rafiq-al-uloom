@@ -89,4 +89,35 @@ describe('runtime diagnostics', () => {
       })
     ).not.toThrow();
   });
+  it('emits bounded service metadata without an error object or raw content', () => {
+    const sink = vi.fn();
+    const report = createRuntimeDiagnosticReporter(sink, {
+      randomUUID: () => 'diag-service-1',
+      nowIso: () => '2026-09-18T18:00:00.000Z',
+    });
+
+    const referenceId = report({
+      kind: 'service_error',
+      source: 'service',
+      service: 'auth',
+      operation: 'signInWithPassword',
+      reason: 'invalid_credentials',
+    });
+
+    expect(referenceId).toBe('diag-service-1');
+    expect(sink).toHaveBeenCalledWith({
+      referenceId: 'diag-service-1',
+      kind: 'service_error',
+      source: 'service',
+      service: 'auth',
+      operation: 'signInWithPassword',
+      reason: 'invalid_credentials',
+      occurredAt: '2026-09-18T18:00:00.000Z',
+    });
+
+    const serialized = JSON.stringify(sink.mock.calls[0]?.[0]);
+    expect(serialized).not.toContain('errorType');
+    expect(serialized).not.toContain('cause');
+    expect(serialized).not.toContain('stack');
+  });
 });
