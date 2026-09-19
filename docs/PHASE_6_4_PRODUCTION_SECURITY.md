@@ -44,11 +44,20 @@ Reviewed pins on 2026-09-19:
 
 ### 6-4B — Repository security contract + automated guard
 
-Planned after 6-4A acceptance:
+This slice hardens ordinary CI without duplicating the existing secret, migration, Auth,
+mastery-result, production-environment, dependency, or immutable-action guards:
 
-- consolidate repository-level production security invariants;
-- extend automated checks only where they prove a real boundary;
-- avoid duplicating existing secret, migration, Auth, and mastery boundary scanners.
+- every `actions/checkout` step sets `persist-credentials: false`;
+- ordinary CI rejects `pull_request_target`;
+- ordinary CI rejects `permissions: write-all`;
+- ordinary CI rejects `contents: write` and `id-token: write`;
+- ordinary CI rejects `${{ secrets.* }}` consumption;
+- `scripts/check-repository-security.mjs` runs inside the static CI gate;
+- the 6-4 architecture test proves the repository-security wiring remains present.
+
+This contract intentionally applies to `.github/workflows/ci.yml`, not to future deployment
+workflows that may legitimately require narrowly scoped deployment permissions. Any future
+deployment workflow must receive its own explicit security contract before production use.
 
 ### 6-4C — Database/RLS privilege audit
 
@@ -93,3 +102,15 @@ Required before commit:
 - `git diff --check` clean;
 - no package dependency, migration, Supabase runtime, Auth, authorization, educational,
   Edge, or live Gemini behavior change.
+
+## 6-4B acceptance
+
+Required before commit:
+
+- both ordinary CI checkout steps set `persist-credentials: false`;
+- repository security guard PASS;
+- Phase 6-4 architecture tests PASS;
+- full static CI gate PASS;
+- local Supabase integration behavior remains unchanged;
+- no dependency, migration, Auth, authorization, Edge, educational, or live-provider change;
+- `git diff --check` clean.

@@ -65,4 +65,33 @@ describe('Phase 6-4A production security: GitHub Actions pinning', () => {
     expect(workflow).not.toContain('id-token: write');
     expect(workflow).not.toContain('${{ secrets.');
   });
+
+  it('disables persisted checkout credentials in every ordinary CI job', () => {
+    const workflow = read('.github/workflows/ci.yml');
+
+    expect(workflow.match(/persist-credentials: false/g)).toHaveLength(2);
+    expect(workflow.match(/fetch-depth: 0/g)).toHaveLength(2);
+  });
+
+  it('keeps ordinary CI away from privileged trigger and permission patterns', () => {
+    const workflow = read('.github/workflows/ci.yml');
+
+    expect(workflow).not.toMatch(/^\s*pull_request_target\s*:/m);
+    expect(workflow).not.toMatch(/^\s*permissions\s*:\s*write-all\s*$/m);
+    expect(workflow).not.toMatch(/^\s*contents\s*:\s*write\s*$/m);
+    expect(workflow).not.toMatch(/^\s*id-token\s*:\s*write\s*$/m);
+  });
+
+  it('runs the dedicated repository security guard inside the static CI gate', () => {
+    const verifier = read('scripts/verify-ci-static.sh');
+    const guard = read('scripts/check-repository-security.mjs');
+
+    expect(verifier).toContain(
+      'run_step "Repository security contract" node scripts/check-repository-security.mjs'
+    );
+    expect(guard).toContain('pull_request_target');
+    expect(guard).toContain('permissions: write-all');
+    expect(guard).toContain('persist-credentials: false');
+    expect(guard).toContain('${{ secrets.');
+  });
 });
