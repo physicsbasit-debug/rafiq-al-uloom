@@ -17,9 +17,9 @@ describe('Phase 6-2A CI and supply-chain contract', () => {
     expect(workflow).toContain('phase-6-production-readiness');
     expect(workflow).toContain('permissions:');
     expect(workflow).toContain('contents: read');
-    expect(workflow).toContain('actions/checkout@v6');
+    expect(workflow).toContain('actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803');
     expect(workflow).toContain('fetch-depth: 0');
-    expect(workflow).toContain('actions/setup-node@v7');
+    expect(workflow).toContain('actions/setup-node@820762786026740c76f36085b0efc47a31fe5020');
     expect(workflow).toContain("node-version: '22.23.2'");
     expect(workflow).not.toContain("node-version: '22.x'");
     expect(workflow).toContain('cache: npm');
