@@ -7,6 +7,13 @@ import {
 
 import { authorizeActiveTeacher } from './gateway-auth.ts';
 import { consumeAiAuthoringQuota } from './gateway-quota.ts';
+import {
+  EDGE_REQUEST_ID_HEADER,
+  resolveEdgeRequestId,
+  writeEdgeDiagnostic,
+  type EdgeDiagnosticOutcome,
+  type EdgeDiagnosticTarget,
+} from './edge-request-observability.ts';
 import { generateLiveServerResult } from './live-server-provider.ts';
 
 const MAX_BODY_BYTES = 32 * 1024;
@@ -30,39 +37,55 @@ function isTarget(value: unknown): value is RuntimeAiAuthoringTarget {
   );
 }
 
-function responseHeaders(request: Request): Headers {
+function responseHeaders(request: Request, requestId: string): Headers {
   const headers = new Headers({
     'content-type': 'application/json; charset=utf-8',
     'cache-control': 'no-store',
     vary: 'Origin',
+    [EDGE_REQUEST_ID_HEADER]: requestId,
   });
 
   const origin = request.headers.get('origin');
   if (origin && ALLOWED_ORIGINS.has(origin)) {
     headers.set('access-control-allow-origin', origin);
-    headers.set('access-control-allow-headers', 'authorization, apikey, content-type');
+    headers.set(
+      'access-control-allow-headers',
+      `authorization, apikey, content-type, ${EDGE_REQUEST_ID_HEADER}`
+    );
+    headers.set('access-control-expose-headers', EDGE_REQUEST_ID_HEADER);
     headers.set('access-control-allow-methods', 'POST, OPTIONS');
   }
 
   return headers;
 }
 
-function jsonResponse(request: Request, status: number, body: unknown): Response {
+function jsonResponse(
+  request: Request,
+  requestId: string,
+  status: number,
+  body: unknown
+): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: responseHeaders(request),
+    headers: responseHeaders(request, requestId),
   });
 }
 
-function genericError(request: Request, status: number, error: string): Response {
-  return jsonResponse(request, status, { error });
+function genericError(
+  request: Request,
+  requestId: string,
+  status: number,
+  error: string
+): Response {
+  return jsonResponse(request, requestId, status, { error });
 }
 
 function rateLimitedResponse(
   request: Request,
+  requestId: string,
   quota: Extract<Awaited<ReturnType<typeof consumeAiAuthoringQuota>>, { status: 'rate_limited' }>
 ): Response {
-  const headers = responseHeaders(request);
+  const headers = responseHeaders(request, requestId);
   headers.set('retry-after', String(quota.retryAfterSeconds));
 
   return new Response(
@@ -154,96 +177,111 @@ function rejectedResult(
 }
 
 export async function handleAiAuthoringGatewayRequest(request: Request): Promise<Response> {
+  const requestId = resolveEdgeRequestId(request);
+  let diagnosticTarget: EdgeDiagnosticTarget = 'unknown';
+  const finish = (response: Response, outcome: EdgeDiagnosticOutcome): Response => {
+    writeEdgeDiagnostic({
+      requestId,
+      outcome,
+      target: diagnosticTarget,
+      statusCode: response.status,
+    });
+    return response;
+  };
+
   const origin = request.headers.get('origin');
-  if (origin && !ALLOWED_ORIGINS.has(origin)) {
-    return genericError(request, 403, 'origin_not_allowed');
-  }
-
-  if (request.method === 'OPTIONS') {
-    return new Response(null, { status: 204, headers: responseHeaders(request) });
-  }
-
-  if (request.method !== 'POST') {
-    return genericError(request, 405, 'method_not_allowed');
-  }
+  if (origin && !ALLOWED_ORIGINS.has(origin))
+    return finish(
+      genericError(request, requestId, 403, 'origin_not_allowed'),
+      'origin_not_allowed'
+    );
+  if (request.method === 'OPTIONS')
+    return finish(
+      new Response(null, { status: 204, headers: responseHeaders(request, requestId) }),
+      'preflight'
+    );
+  if (request.method !== 'POST')
+    return finish(
+      genericError(request, requestId, 405, 'method_not_allowed'),
+      'method_not_allowed'
+    );
 
   const declaredLength = readDeclaredLength(request);
-  if (declaredLength !== null && declaredLength > MAX_BODY_BYTES) {
-    return genericError(request, 413, 'request_too_large');
-  }
-
+  if (declaredLength !== null && declaredLength > MAX_BODY_BYTES)
+    return finish(genericError(request, requestId, 413, 'request_too_large'), 'request_too_large');
   const contentType = request.headers.get('content-type')?.toLowerCase() ?? '';
-  if (!contentType.startsWith('application/json')) {
-    return genericError(request, 415, 'unsupported_media_type');
-  }
+  if (!contentType.startsWith('application/json'))
+    return finish(
+      genericError(request, requestId, 415, 'unsupported_media_type'),
+      'unsupported_media_type'
+    );
 
-  // Enforce the real byte ceiling before any Auth/Profile/provider work. Platform
-  // verify_jwt still occurs before the function is entered in the normal deployed path.
   const boundedBody = await readBoundedBody(request);
-  if (boundedBody.status === 'too_large') {
-    return genericError(request, 413, 'request_too_large');
-  }
+  if (boundedBody.status === 'too_large')
+    return finish(genericError(request, requestId, 413, 'request_too_large'), 'request_too_large');
 
   const authorization = await authorizeActiveTeacher(request);
-  if (authorization.status === 'unauthenticated') {
-    return genericError(request, 401, 'unauthenticated');
-  }
-  if (authorization.status === 'forbidden') {
-    return genericError(request, 403, 'forbidden');
-  }
-  if (authorization.status === 'unavailable') {
-    return genericError(request, 503, 'authorization_unavailable');
-  }
+  if (authorization.status === 'unauthenticated')
+    return finish(genericError(request, requestId, 401, 'unauthenticated'), 'unauthenticated');
+  if (authorization.status === 'forbidden')
+    return finish(genericError(request, requestId, 403, 'forbidden'), 'forbidden');
+  if (authorization.status === 'unavailable')
+    return finish(
+      genericError(request, requestId, 503, 'authorization_unavailable'),
+      'authorization_unavailable'
+    );
 
   const parsed = parseJsonBody(boundedBody.bytes);
-  if (!parsed.valid) {
-    return genericError(request, 400, 'invalid_json');
-  }
-
+  if (!parsed.valid)
+    return finish(genericError(request, requestId, 400, 'invalid_json'), 'invalid_json');
   const validation = validateAiGenerationRequestRuntime(parsed.body);
   if (!validation.valid) {
     const target =
       isRecord(parsed.body) && isTarget(parsed.body.target) ? parsed.body.target : null;
-
-    if (!target) {
-      return genericError(request, 400, 'invalid_request');
-    }
-
-    return jsonResponse(request, 400, rejectedResult(target, validation.reason));
+    if (!target)
+      return finish(genericError(request, requestId, 400, 'invalid_request'), 'invalid_request');
+    diagnosticTarget = target;
+    return finish(
+      jsonResponse(request, requestId, 400, rejectedResult(target, validation.reason)),
+      'invalid_request'
+    );
   }
 
   const generationRequest = parsed.body as RuntimeAiGenerationRequest;
-
-  // Phase 4-3B invariant: reserve quota only after strict validation and immediately
-  // before provider invocation. A committed reservation is never refunded.
+  diagnosticTarget = generationRequest.target;
   const quota = await consumeAiAuthoringQuota(request);
-  if (quota.status === 'forbidden') {
-    return genericError(request, 403, 'forbidden');
-  }
-  if (quota.status === 'unavailable') {
-    return genericError(request, 503, 'quota_unavailable');
-  }
-  if (quota.status === 'rate_limited') {
-    return rateLimitedResponse(request, quota);
-  }
+  if (quota.status === 'forbidden')
+    return finish(genericError(request, requestId, 403, 'forbidden'), 'forbidden');
+  if (quota.status === 'unavailable')
+    return finish(genericError(request, requestId, 503, 'quota_unavailable'), 'quota_unavailable');
+  if (quota.status === 'rate_limited')
+    return finish(rateLimitedResponse(request, requestId, quota), 'rate_limited');
 
   const provider = await generateLiveServerResult(generationRequest, { signal: request.signal });
-
   if (provider.status === 'domain_result') {
-    return jsonResponse(request, 200, provider.result);
+    const outcome: EdgeDiagnosticOutcome =
+      provider.result.status === 'success' ? 'success' : 'provider_invalid_output';
+    return finish(jsonResponse(request, requestId, 200, provider.result), outcome);
   }
-  if (provider.status === 'caller_aborted') {
-    return jsonResponse(request, 200, { status: 'aborted', target: generationRequest.target });
-  }
-  if (provider.status === 'provider_timeout') {
-    return genericError(request, 504, 'provider_timeout');
-  }
-  if (provider.status === 'provider_unavailable') {
-    return genericError(request, 503, 'provider_unavailable');
-  }
-  if (provider.status === 'provider_rejected') {
-    return genericError(request, 502, 'provider_rejected');
-  }
-
-  return genericError(request, 502, 'provider_invalid_response');
+  if (provider.status === 'caller_aborted')
+    return finish(
+      jsonResponse(request, requestId, 200, {
+        status: 'aborted',
+        target: generationRequest.target,
+      }),
+      'caller_aborted'
+    );
+  if (provider.status === 'provider_timeout')
+    return finish(genericError(request, requestId, 504, 'provider_timeout'), 'provider_timeout');
+  if (provider.status === 'provider_unavailable')
+    return finish(
+      genericError(request, requestId, 503, 'provider_unavailable'),
+      'provider_unavailable'
+    );
+  if (provider.status === 'provider_rejected')
+    return finish(genericError(request, requestId, 502, 'provider_rejected'), 'provider_rejected');
+  return finish(
+    genericError(request, requestId, 502, 'provider_invalid_response'),
+    'provider_invalid_response'
+  );
 }

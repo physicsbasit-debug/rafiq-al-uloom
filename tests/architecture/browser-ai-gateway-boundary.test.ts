@@ -45,6 +45,8 @@ describe('architecture: Phase 4-3D browser AI gateway boundary', () => {
   it('يسلسل AiGenerationRequest نفسها فقط كجسم الطلب ولا يضيف تحكمات مزود', () => {
     const provider = read(PROVIDER_PATH);
     expect(provider).toContain('body: JSON.stringify(request)');
+    expect(provider).toContain("'x-rafiq-request-id': requestId");
+    expect(provider).toContain('safeRequestId(this.#createRequestId)');
     for (const forbidden of ['modelLabel:', 'prompt:', 'timeout:', 'schema:', 'providerFamily:']) {
       expect(provider).not.toContain(forbidden);
     }

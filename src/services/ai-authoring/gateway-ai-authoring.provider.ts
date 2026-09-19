@@ -18,6 +18,7 @@ export interface GatewayAiAuthoringProviderDependencies {
   readonly getAccessToken: () => Promise<string | null>;
   readonly fetchImpl?: typeof fetch;
   readonly transportTimeoutMs?: number;
+  readonly createRequestId?: () => string;
 }
 
 function unavailable(target: AiGenerationRequest['target']): AiGenerationResult {
@@ -28,12 +29,48 @@ function aborted(target: AiGenerationRequest['target']): AiGenerationResult {
   return { status: 'aborted', target };
 }
 
+const REQUEST_ID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function fallbackRequestId(): string {
+  const seed = `${Date.now().toString(16)}${Math.random().toString(16).slice(2)}`.padEnd(32, '0');
+  const hex = seed
+    .slice(0, 32)
+    .replace(/[^0-9a-f]/gi, '0')
+    .padEnd(32, '0')
+    .split('');
+  hex[12] = '4';
+  hex[16] = '8';
+  return `${hex.slice(0, 8).join('')}-${hex.slice(8, 12).join('')}-${hex
+    .slice(12, 16)
+    .join('')}-${hex.slice(16, 20).join('')}-${hex.slice(20, 32).join('')}`;
+}
+
+function defaultCreateRequestId(): string {
+  try {
+    const generated = globalThis.crypto?.randomUUID?.() ?? '';
+    return REQUEST_ID_PATTERN.test(generated) ? generated.toLowerCase() : fallbackRequestId();
+  } catch {
+    return fallbackRequestId();
+  }
+}
+
+function safeRequestId(createRequestId: () => string): string {
+  try {
+    const value = createRequestId().trim();
+    return REQUEST_ID_PATTERN.test(value) ? value.toLowerCase() : fallbackRequestId();
+  } catch {
+    return fallbackRequestId();
+  }
+}
+
 export class GatewayAiAuthoringProvider implements AiAuthoringProvider {
   readonly #gatewayUrl: string;
   readonly #publicApiKey: string;
   readonly #getAccessToken: () => Promise<string | null>;
   readonly #fetchImpl?: typeof fetch;
   readonly #transportTimeoutMs: number;
+  readonly #createRequestId: () => string;
 
   constructor(dependencies: GatewayAiAuthoringProviderDependencies) {
     this.#gatewayUrl = dependencies.gatewayUrl.trim();
@@ -42,6 +79,7 @@ export class GatewayAiAuthoringProvider implements AiAuthoringProvider {
     this.#fetchImpl = dependencies.fetchImpl;
     this.#transportTimeoutMs =
       dependencies.transportTimeoutMs ?? CLIENT_ASYNC_TIMEOUT_MS.aiGatewayTransport;
+    this.#createRequestId = dependencies.createRequestId ?? defaultCreateRequestId;
   }
 
   async generate(
@@ -87,6 +125,8 @@ export class GatewayAiAuthoringProvider implements AiAuthoringProvider {
       return unavailable(request.target);
     }
 
+    const requestId = safeRequestId(this.#createRequestId);
+
     let response: Response;
     try {
       response = await runWithClientDeadline(
@@ -97,6 +137,7 @@ export class GatewayAiAuthoringProvider implements AiAuthoringProvider {
               authorization: `Bearer ${normalizedAccessToken}`,
               apikey: this.#publicApiKey,
               'content-type': 'application/json',
+              'x-rafiq-request-id': requestId,
             },
             body: JSON.stringify(request),
             signal,

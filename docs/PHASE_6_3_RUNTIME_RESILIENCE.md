@@ -100,11 +100,16 @@ This slice wires the existing service diagnostic hooks into the central runtime 
 
 ### 6-3D — Edge correlation + safe logging
 
-Planned after 6-3C acceptance:
+This slice carries one opaque request identifier across the browser-to-Edge transport and adds bounded Edge operational logging:
 
-- add request/reference correlation across browser and Edge gateway;
-- log bounded operational categories only;
-- retain the existing provider timeout and no-retry policy.
+- the browser creates one opaque UUID only when an actual Gateway transport attempt is about to start and sends it in `x-rafiq-request-id`;
+- the Edge validates the incoming identifier, generates a safe replacement when missing or malformed, and echoes the accepted identifier on every Gateway response;
+- CORS explicitly allows and exposes the correlation header in addition to the existing transport headers;
+- the Edge emits one terminal `ai_gateway_request` diagnostic per handled request using only request id, bounded outcome, bounded target, and HTTP status;
+- raw request bodies, auth tokens, user identifiers, lesson text, provider payloads, exception messages, and stacks never enter the Edge diagnostic event;
+- free-form `console.log`, `console.error`, `console.debug`, and `console.warn` remain forbidden; the single `console.info` sink is isolated in the observability module;
+- the Gemini provider remains unchanged at a 25-second timeout and one transport attempt;
+- no retry, migration, authorization-policy, quota-policy, educational, or provider contract change is introduced.
 
 ## 6-3A acceptance
 
@@ -144,14 +149,37 @@ Completed:
 
 ## 6-3C acceptance
 
-Required before commit:
+Closed on commit:
+
+`408f93f1a05f196520bd08df26eed54208f4ed53`
+
+GitHub Actions run:
+
+`35383181442`
+
+Completed:
 
 - service diagnostic bridge unit tests PASS, including adversarial secret/cause redaction;
 - runtime diagnostic service-event test PASS;
 - Phase 6-3 architecture contract proves all five default service boundaries are wired;
 - existing Auth/Profile/Authorization/Authoring/Mastery Results tests remain PASS;
+- full static CI gate PASS with 1202/1202 core tests;
+- GitHub Actions static and local Supabase integration jobs PASS;
+- `npm audit` remains at zero known vulnerabilities;
+- no migrations, Edge Functions, public error contracts, authorization semantics,
+  educational behavior, or live Gemini execution changed.
+
+## 6-3D acceptance
+
+Required before commit:
+
+- browser Gateway tests prove one safe correlation header and unchanged request body;
+- Edge observability tests prove malformed ids and adversarial extra properties cannot leak;
+- Gateway architecture tests keep free-form console logging forbidden outside the dedicated sink;
+- Phase 6-3 architecture proves request-id propagation and bounded Edge metadata;
+- existing Gateway quota and live-provider tests remain PASS;
+- the live provider remains at `PROVIDER_TIMEOUT_MS = 25_000` with one fetch attempt;
 - full static CI gate PASS;
 - `npm audit` remains at zero known vulnerabilities;
 - `git diff --check` clean;
-- no migrations, Edge Functions, public error contracts, authorization semantics,
-  educational behavior, or live Gemini execution changed.
+- no migrations, Auth/authorization policy, quota policy, educational behavior, provider retry policy, or live Gemini execution changed.

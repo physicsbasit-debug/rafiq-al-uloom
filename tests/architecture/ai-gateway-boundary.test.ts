@@ -192,6 +192,7 @@ describe('architecture: Phase 4-3A/4-3B/4-3C AI gateway boundary', () => {
       'console.log',
       'console.error',
       'console.debug',
+      'console.warn',
     ];
 
     const violations = readGatewayFiles().flatMap(({ path, content }) =>
@@ -199,6 +200,33 @@ describe('architecture: Phase 4-3A/4-3B/4-3C AI gateway boundary', () => {
     );
 
     expect(violations).toEqual([]);
+  });
+
+  it('يحصر correlation والتسجيل في عقد metadata آمن واحد', () => {
+    const handler = readFileSync(resolve(GATEWAY_DIR, 'gateway-handler.ts'), 'utf8');
+    const observability = readFileSync(
+      resolve(GATEWAY_DIR, 'edge-request-observability.ts'),
+      'utf8'
+    );
+    const otherGatewayFiles = readGatewayFiles().filter(
+      ({ path }) => !path.endsWith('edge-request-observability.ts')
+    );
+    expect(handler).toContain('resolveEdgeRequestId(request)');
+    expect(handler).toContain('[EDGE_REQUEST_ID_HEADER]: requestId');
+    expect(handler).toContain('writeEdgeDiagnostic({');
+    expect(observability).toContain("event: 'ai_gateway_request'");
+    expect(observability).toContain("console.info('[rafiq-edge]', event)");
+    expect(otherGatewayFiles.some(({ content }) => content.includes('console.info'))).toBe(false);
+    for (const forbidden of [
+      'request.body',
+      'access_token',
+      'authorization:',
+      'apikey:',
+      'GEMINI_API_KEY',
+      'context: request.context',
+      'candidateText',
+    ])
+      expect(observability).not.toContain(forbidden);
   });
 
   it('لا يعيد المحاولة تلقائيًا داخل مزود 4-3C', () => {

@@ -64,12 +64,14 @@ function provider(
     fetchImpl?: typeof fetch;
     gatewayUrl?: string;
     publicApiKey?: string;
+    createRequestId?: () => string;
   } = {}
 ) {
   return new GatewayAiAuthoringProvider({
     gatewayUrl: overrides.gatewayUrl ?? 'http://127.0.0.1:54321/functions/v1/ai-authoring-gateway',
     publicApiKey: overrides.publicApiKey ?? 'public-anon-key',
     getAccessToken: overrides.getAccessToken ?? (async () => 'access-token'),
+    createRequestId: overrides.createRequestId ?? (() => '11111111-1111-4111-8111-111111111111'),
     fetchImpl:
       overrides.fetchImpl ?? (vi.fn(async () => jsonResponse(200, validSuccess)) as typeof fetch),
   });
@@ -193,10 +195,27 @@ describe('GatewayAiAuthoringProvider', () => {
       authorization: 'Bearer access-token',
       apikey: 'public-anon-key',
       'content-type': 'application/json',
+      'x-rafiq-request-id': '11111111-1111-4111-8111-111111111111',
     });
     expect(init.credentials).toBe('omit');
     expect(init.cache).toBe('no-store');
     expect(init.redirect).toBe('error');
+  });
+
+  it('يرسل request id آمنًا ولا يسمح لمصنع معرّف عدائي بتسريب نص خام', async () => {
+    const fetchImpl = vi.fn(async () => jsonResponse(200, validSuccess));
+    await provider({
+      fetchImpl: fetchImpl as typeof fetch,
+      createRequestId: () => 'Bearer private-token user@example.com',
+    }).generate(request);
+
+    const [, init] = fetchImpl.mock.calls[0] as [string, RequestInit];
+    const headers = new Headers(init.headers);
+    const requestId = headers.get('x-rafiq-request-id') ?? '';
+
+    expect(requestId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-8[0-9a-f]{3}-[0-9a-f]{12}$/i);
+    expect(requestId).not.toContain('private-token');
+    expect(requestId).not.toContain('user@example.com');
   });
 
   it('يمرر AbortSignal مركبة إلى fetch لعزل caller عن مهلة النقل', async () => {

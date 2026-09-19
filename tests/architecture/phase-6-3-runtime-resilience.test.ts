@@ -140,4 +140,26 @@ describe('Phase 6-3 runtime resilience contract', () => {
     expect(diagnostics).not.toContain('readonly message: string;');
     expect(diagnostics).not.toContain('readonly cause:');
   });
+  it('carries one opaque request id from browser transport into the Edge boundary', () => {
+    const browserProvider = read('src/services/ai-authoring/gateway-ai-authoring.provider.ts');
+    const edgeHandler = read('supabase/functions/ai-authoring-gateway/gateway-handler.ts');
+    expect(browserProvider).toContain("'x-rafiq-request-id': requestId");
+    expect(browserProvider).toContain('safeRequestId(this.#createRequestId)');
+    expect(edgeHandler).toContain('resolveEdgeRequestId(request)');
+    expect(edgeHandler).toContain('[EDGE_REQUEST_ID_HEADER]: requestId');
+  });
+
+  it('keeps Edge logging bounded to operational metadata', () => {
+    const observability = read(
+      'supabase/functions/ai-authoring-gateway/edge-request-observability.ts'
+    );
+    expect(observability).toContain("event: 'ai_gateway_request'");
+    expect(observability).toContain('requestId: sanitizeRequestId(input.requestId)');
+    expect(observability).toContain('outcome: sanitizeOutcome(input.outcome)');
+    expect(observability).toContain('target: sanitizeTarget(input.target)');
+    expect(observability).toContain('statusCode: sanitizeStatusCode(input.statusCode)');
+    expect(observability).not.toContain('request.body');
+    expect(observability).not.toContain('GEMINI_API_KEY');
+    expect(observability).not.toContain('access_token');
+  });
 });
