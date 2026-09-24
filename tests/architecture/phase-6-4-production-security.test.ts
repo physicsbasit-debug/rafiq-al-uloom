@@ -95,3 +95,38 @@ describe('Phase 6-4A production security: GitHub Actions pinning', () => {
     expect(guard).toContain('${{ secrets.');
   });
 });
+
+describe('Phase 6-4C database security audit contract', () => {
+  it('keeps the database privilege audit inside the automatically discovered Supabase integration suite', () => {
+    const config = read('vitest.supabase.config.ts');
+    const audit = read('tests/integration/supabase-database-security.integration.ts');
+
+    expect(config).toContain('tests/integration/**/*.integration.ts');
+    expect(config).toContain('tests/integration/**/*.integration.tsx');
+    expect(audit).toContain("describeIntegration('Phase 6-4C database / RLS privilege audit'");
+  });
+
+  it('audits final PostgreSQL catalog state rather than historical migration text', () => {
+    const audit = read('tests/integration/supabase-database-security.integration.ts');
+
+    expect(audit).toContain('pg_class');
+    expect(audit).toContain('pg_proc');
+    expect(audit).toContain('pg_policies');
+    expect(audit).toContain('has_table_privilege');
+    expect(audit).toContain('has_function_privilege');
+    expect(audit).toContain('aclexplode');
+    expect(audit).toContain('search_path=""');
+  });
+
+  it('freezes the reviewed authenticated RPC surface and private-schema boundary', () => {
+    const audit = read('tests/integration/supabase-database-security.integration.ts');
+
+    expect(audit).toContain('authenticatedExecuteAllowlist');
+    expect(audit).toContain('submit_mastery_attempt');
+    expect(audit).toContain('create_lesson_revision');
+    expect(audit).toContain('review_lesson_revision');
+    expect(audit).toContain('consume_ai_authoring_quota');
+    expect(audit).toContain('private.ai_authoring_quota_state');
+    expect(audit).toContain("has_schema_privilege('service_role', 'private', 'USAGE')");
+  });
+});

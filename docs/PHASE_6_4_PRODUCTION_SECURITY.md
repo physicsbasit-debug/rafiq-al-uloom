@@ -61,12 +61,32 @@ deployment workflow must receive its own explicit security contract before produ
 
 ### 6-4C — Database/RLS privilege audit
 
-Planned after 6-4B acceptance:
+This slice audits the final PostgreSQL catalog state after all migrations are applied.
+It deliberately avoids inferring current security from historical migration text.
 
-- audit current forward-only migrations, RLS, grants, `SECURITY DEFINER`, and
-  `search_path` contracts;
-- prefer tests and documentation when the current database contract is already correct;
-- add a new migration only if a concrete privilege defect is proven.
+The integration audit verifies:
+
+- every application table in `public` and `private` has RLS enabled;
+- `anon` has no application-table privileges;
+- `authenticated` has no direct application-table write privileges;
+- `service_role` direct DML is limited to the reviewed `public.profiles UPDATE` exception;
+- the `private` schema and AI quota state remain inaccessible to application roles;
+- every `SECURITY DEFINER` function has an explicit empty `search_path`;
+- externally callable `SECURITY DEFINER` functions are not executable by `PUBLIC`;
+- the callable `authenticated` function surface matches the reviewed RPC allowlist;
+- `anon` and `service_role` cannot execute callable application functions;
+- no application RLS policy targets `anon` or `PUBLIC`.
+
+Trigger-returning functions are excluded only from the callable RPC-surface checks because
+they are not application RPC endpoints. They remain covered by the `SECURITY DEFINER`
+`search_path` audit when applicable.
+
+The audit is read-only and is automatically included by `vitest.supabase.config.ts`.
+No package script, workflow, local Supabase verifier, historical migration, Auth, Edge,
+educational, or live-provider change is required.
+
+A forward-only security migration is added only if this audit proves a concrete privilege
+defect in the final database state.
 
 ### 6-4D — Remote production security baseline
 
@@ -114,3 +134,19 @@ Required before commit:
 - local Supabase integration behavior remains unchanged;
 - no dependency, migration, Auth, authorization, Edge, educational, or live-provider change;
 - `git diff --check` clean.
+
+## 6-4C acceptance
+
+Required before commit:
+
+- database security integration audit PASS against a fresh local Supabase reset;
+- every application table in `public` and `private` has RLS enabled;
+- no unexpected `anon`, `authenticated`, or `service_role` table privilege is present;
+- every `SECURITY DEFINER` function has an explicit empty `search_path`;
+- callable function privileges match the reviewed RPC surface;
+- no application RLS policy targets `anon` or `PUBLIC`;
+- full static CI gate PASS;
+- full local Supabase CI gate PASS;
+- `git diff --check` clean;
+- no historical migration is modified;
+- no forward-only migration is added unless the audit proves a concrete privilege defect.
