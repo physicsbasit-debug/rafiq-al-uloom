@@ -96,6 +96,62 @@ describe('Phase 6-4A production security: GitHub Actions pinning', () => {
   });
 });
 
+describe('Phase 6-4D remote production security audit contract', () => {
+  it('keeps the remote production audit read-only and outside ordinary CI', () => {
+    const audit = read('scripts/audit-remote-production-security.mjs');
+    const workflow = read('.github/workflows/ci.yml');
+    const staticVerifier = read('scripts/verify-ci-static.sh');
+
+    expect(audit).toContain("method: 'GET'");
+    expect(audit).not.toContain("'secrets', 'list'");
+    expect(audit).not.toContain("'secrets', 'set'");
+    expect(audit).not.toContain("'secrets', 'unset'");
+    expect(audit).not.toMatch(/method:\s*['"](POST|PUT|PATCH|DELETE)['"]/);
+    expect(audit).not.toContain('network-restrictions update');
+    expect(audit).not.toContain('ssl-enforcement update');
+    expect(workflow).not.toContain('SUPABASE_ACCESS_TOKEN');
+    expect(staticVerifier).not.toContain('SUPABASE_ACCESS_TOKEN');
+    expect(staticVerifier).not.toContain('audit-remote-production-security.mjs');
+  });
+
+  it('reads the real hosted Auth, SSL, network, Edge, and secret-name surfaces', () => {
+    const audit = read('scripts/audit-remote-production-security.mjs');
+
+    expect(audit).toContain('/config/auth');
+    expect(audit).toContain('/ssl-enforcement');
+    expect(audit).toContain('/network-restrictions');
+    expect(audit).toContain('/functions');
+    expect(audit).toContain('GEMINI_API_KEY');
+    expect(audit).toContain('intentionally not granted');
+    expect(audit).toContain('EXPECTED_PRODUCTION_SITE_URL');
+    expect(audit).toContain('production frontend URL is not finalized');
+    expect(audit).toContain('hasExpectedProductionSite');
+    expect(audit).toContain(
+      'configured hosted Site URL is local, credentialed, missing, or non-HTTPS'
+    );
+  });
+
+  it('writes only a bounded redacted report outside the repository by default', () => {
+    const audit = read('scripts/audit-remote-production-security.mjs');
+
+    expect(audit).toContain('/tmp/rafiq-phase-6-4d-remote-security-report.json');
+    expect(audit).toContain('projectFingerprint');
+    expect(audit).toContain('readOnly: true');
+    const reportStart = audit.indexOf('const report = {');
+    const reportEnd = audit.indexOf('\n\n  writeFileSync(', reportStart);
+
+    expect(reportStart).toBeGreaterThanOrEqual(0);
+    expect(reportEnd).toBeGreaterThan(reportStart);
+
+    const reportBody = audit.slice(reportStart, reportEnd);
+    expect(reportBody).not.toContain('authConfig');
+    expect(reportBody).not.toContain('sslConfig');
+    expect(reportBody).not.toContain('networkConfig');
+    expect(reportBody).not.toContain('functions');
+    expect(reportBody).not.toContain('secretNames');
+  });
+});
+
 describe('Phase 6-4C database security audit contract', () => {
   it('keeps the database privilege audit inside the automatically discovered Supabase integration suite', () => {
     const config = read('vitest.supabase.config.ts');

@@ -90,14 +90,50 @@ defect in the final database state.
 
 ### 6-4D — Remote production security baseline
 
-Planned before real production deployment:
+This slice verifies the real hosted Supabase project with a read-only audit. Local
+`supabase/config.toml` remains a development fixture and is never accepted as production
+evidence.
 
-- verify the hosted Supabase Auth and password policy;
-- verify HTTPS/SSL and remote database access controls;
-- verify redirect URLs and email-confirmation/password-change policy;
-- verify production secrets exist only in their server-side boundaries;
-- record evidence from the real production project rather than inferring it from local
-  configuration.
+`scripts/audit-remote-production-security.mjs` reads only:
+
+- hosted Auth configuration;
+- Postgres SSL-enforcement status;
+- database network-restriction status;
+- deployed Edge Function metadata;
+- no Edge Function secret values or secret names; secret-read permission is intentionally withheld.
+
+The audit never prints Management API payloads, secret values, raw CIDRs, or the project
+reference. Its persisted report contains only a SHA-256 project fingerprint, PASS/WARN/PENDING/FAIL
+results, and bounded human-readable findings. The default report path is outside the
+repository under `/tmp`.
+
+Hard failures cover insecure hosted state that already exists once the production
+frontend URL is bound, including:
+
+- a missing, local, credentialed, non-HTTPS, or mismatched Site URL after
+  `EXPECTED_PRODUCTION_SITE_URL` is supplied;
+- unsafe redirect allow-list entries;
+- anonymous Auth or manual identity linking enabled;
+- email autoconfirm or insecure email-change handling;
+- password minimum below eight characters;
+- password-change reauthentication disabled;
+- refresh-token rotation disabled;
+- Postgres SSL enforcement disabled;
+- a deployed `ai-authoring-gateway` without JWT verification.
+
+Plan- or deployment-dependent controls are reported without inventing closure:
+
+- leaked-password protection and custom SMTP may be warnings depending on plan/policy;
+- network restrictions are recorded as PASS or WARN because Supabase treats them as an
+  additional platform control;
+- production Site URL readiness and exact matching, Edge deployment, and
+  `GEMINI_API_KEY` verification may remain PENDING until Phase 6-7;
+  `GEMINI_API_KEY` is intentionally not inspected during 6-4D.
+
+The script requires `SUPABASE_ACCESS_TOKEN` and either `SUPABASE_PROJECT_REF` or a hosted
+`VITE_SUPABASE_URL`. `EXPECTED_PRODUCTION_SITE_URL` is optional until the production
+frontend URL is finalized. These values stay in the Codespace environment and are never
+added to ordinary CI.
 
 ### 6-4E — Security closure + deep review
 
@@ -150,3 +186,22 @@ Required before commit:
 - `git diff --check` clean;
 - no historical migration is modified;
 - no forward-only migration is added unless the audit proves a concrete privilege defect.
+
+## 6-4D acceptance
+
+Required before the slice is considered audited:
+
+- remote audit executes against the real hosted Supabase project;
+- no `FAIL` findings remain;
+- Postgres SSL enforcement is enabled and applied;
+- hosted Auth uses an HTTPS non-local Site URL;
+- email autoconfirm, anonymous users, and manual identity linking are disabled;
+- minimum password length is at least eight characters;
+- password-change reauthentication and refresh-token rotation are enabled;
+- redirect allow-list contains no local or non-HTTPS entries;
+- remote audit report contains no secret values or raw Management API payloads;
+- ordinary CI remains free of Supabase Management API credentials;
+- deployment-only `PENDING` items are explicitly carried to Phase 6-7;
+- full static CI gate remains PASS;
+- `git diff --check` clean;
+- no migration, Auth application behavior, educational code, or live-provider behavior is changed.
