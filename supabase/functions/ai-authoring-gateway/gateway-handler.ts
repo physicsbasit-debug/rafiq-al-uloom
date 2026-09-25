@@ -14,15 +14,11 @@ import {
   type EdgeDiagnosticOutcome,
   type EdgeDiagnosticTarget,
 } from './edge-request-observability.ts';
+import { resolveAllowedOrigins } from './gateway-origin-policy.ts';
 import { generateLiveServerResult } from './live-server-provider.ts';
 
 const MAX_BODY_BYTES = 32 * 1024;
-const ALLOWED_ORIGINS = new Set([
-  'http://127.0.0.1:3000',
-  'http://localhost:3000',
-  'http://127.0.0.1:5173',
-  'http://localhost:5173',
-]);
+const ALLOWED_ORIGINS = resolveAllowedOrigins(Deno.env.get('AI_GATEWAY_ALLOWED_ORIGINS'));
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);

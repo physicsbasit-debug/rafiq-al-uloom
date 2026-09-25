@@ -27,6 +27,9 @@ run_step "Auth client boundary scan" node scripts/check-auth-client-boundaries.m
 run_step "Mastery-results client boundary scan" node scripts/check-mastery-results-client-boundaries.mjs
 run_step "Tracked secret scan" node scripts/check-tracked-secrets.mjs
 run_step "Repository security contract" node scripts/check-repository-security.mjs
+run_step \
+  "Production HTTP security contract self-check" \
+  node scripts/audit-production-http-security.mjs --self-test
 run_step "Forward-only migration guard" node scripts/check-forward-only-migrations.mjs
 run_step \
   "Production environment contract self-check" \

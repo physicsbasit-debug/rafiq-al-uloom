@@ -144,6 +144,54 @@ Before Phase 6-4 closes:
 - reconcile any review findings with the repository and remote-production checklist;
 - document unresolved deployment-only checks for Phase 6-7.
 
+The deep review identified a concrete production blocker in the AI gateway: its origin
+allow-list was local-development-only. Phase 6-4E therefore adds a server-owned production
+origin contract before closure.
+
+#### 6-4E1 — Production AI gateway origin policy
+
+- local development keeps the existing localhost/127.0.0.1 origins when no production
+  origin configuration is supplied;
+- production may supply `AI_GATEWAY_ALLOWED_ORIGINS` as a comma-separated exact allow-list;
+- configured production origins must be HTTPS, non-local, origin-only URLs with no
+  credentials, wildcard, path, query, or fragment;
+- any invalid configured entry fails the configured allow-list closed;
+- once production configuration is supplied, local origins are no longer implicitly allowed;
+- Phase 6-7 must set the exact deployed frontend origin before deploying
+  `ai-authoring-gateway`.
+
+HTTP response security headers remain deployment-bound because no production frontend host
+has been finalized yet. Phase 6-4E must define a provider-neutral verification contract and
+carry its live verification to Phase 6-7 rather than inventing host-specific evidence.
+
+#### 6-4E2 — Production HTTP security closure contract
+
+The deep review also confirmed that the repository cannot truthfully configure hosting-layer
+security headers before a production frontend provider exists. Instead of baking assumptions
+about GitHub Pages, Vercel, Netlify, or another provider into application code, Phase 6-4E2
+adds a provider-neutral live audit plus a deterministic CI self-test.
+
+The deployed frontend must provide:
+
+- `Content-Security-Policy` with `default-src 'self'`, `object-src 'none'`, and
+  `frame-ancestors 'none'`;
+- no `unsafe-eval` or `unsafe-inline` in the effective script policy;
+- exact production Supabase origin coverage in `connect-src`;
+- `X-Content-Type-Options: nosniff`;
+- `X-Frame-Options: DENY`;
+- a privacy-preserving `Referrer-Policy`;
+- `Permissions-Policy` disabling camera, microphone, and geolocation unless a future
+  reviewed product requirement explicitly needs one of them;
+- `Strict-Transport-Security` with at least one year of `max-age`.
+
+Ordinary CI runs only the synthetic self-test. Phase 6-7 must configure these headers on the
+chosen hosting provider and run the same audit against the real `PRODUCTION_APP_URL`, with
+`EXPECTED_SUPABASE_ORIGIN` supplied for exact CSP verification.
+
+This also creates a hosting requirement for Phase 6-7: the selected frontend host must allow
+the required response-header policy. A host that cannot supply the policy does not satisfy
+the production security contract merely because it can serve the static bundle.
+
 ## 6-4A acceptance
 
 Required before commit:
@@ -187,6 +235,25 @@ Required before commit:
 - no historical migration is modified;
 - no forward-only migration is added unless the audit proves a concrete privilege defect.
 
+## 6-4E acceptance
+
+Required before Phase 6-4 may close:
+
+- 6-4E1 production CORS contract PASS;
+- 6-4E2 deterministic HTTP-security self-test PASS;
+- full static CI gate PASS;
+- full local Supabase CI gate PASS;
+- no tracked secret or dependency vulnerability regression;
+- production-only header verification remains explicitly deferred to Phase 6-7 because no
+  production frontend host exists yet;
+- Phase 6-7 must supply the exact frontend origin to `AI_GATEWAY_ALLOWED_ORIGINS`;
+- Phase 6-7 must run the live HTTP header audit with `PRODUCTION_APP_URL` and
+  `EXPECTED_SUPABASE_ORIGIN`;
+- Phase 6-7 must re-run the remote Supabase security audit after Site URL, Edge deployment,
+  and Gemini secret configuration are finalized;
+- no educational behavior, authorization semantics, migration history, or Gemini prompt/model
+  contract changes in Phase 6-4E.
+
 ## 6-4D acceptance
 
 Required before the slice is considered audited:
@@ -194,7 +261,7 @@ Required before the slice is considered audited:
 - remote audit executes against the real hosted Supabase project;
 - no `FAIL` findings remain;
 - Postgres SSL enforcement is enabled and applied;
-- hosted Auth uses an HTTPS non-local Site URL;
+- hosted Auth Site URL is either already HTTPS/non-local or explicitly PENDING until the real production frontend URL is bound in Phase 6-7;
 - email autoconfirm, anonymous users, and manual identity linking are disabled;
 - minimum password length is at least eight characters;
 - password-change reauthentication and refresh-token rotation are enabled;

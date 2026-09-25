@@ -152,6 +152,62 @@ describe('Phase 6-4D remote production security audit contract', () => {
   });
 });
 
+describe('Phase 6-4E production gateway origin policy', () => {
+  it('moves production CORS to an exact server-side allow-list and fails unsafe config closed', () => {
+    const handler = read('supabase/functions/ai-authoring-gateway/gateway-handler.ts');
+    const policy = read('supabase/functions/ai-authoring-gateway/gateway-origin-policy.ts');
+
+    expect(handler).toContain("Deno.env.get('AI_GATEWAY_ALLOWED_ORIGINS')");
+    expect(handler).toContain('resolveAllowedOrigins');
+    expect(policy).toContain("url.protocol !== 'https:'");
+    expect(policy).toContain("candidate.includes('*')");
+    expect(policy).toContain("url.pathname !== '/'");
+    expect(policy).toContain('return new Set()');
+    expect(policy).toContain('http://localhost:5173');
+  });
+});
+
+describe('Phase 6-4E2 production HTTP security closure contract', () => {
+  it('keeps the live header audit provider-neutral and out of ordinary CI while self-testing deterministically', () => {
+    const audit = read('scripts/audit-production-http-security.mjs');
+    const verifier = read('scripts/verify-ci-static.sh');
+    const workflow = read('.github/workflows/ci.yml');
+
+    expect(audit).toContain('PRODUCTION_APP_URL');
+    expect(audit).toContain('EXPECTED_SUPABASE_ORIGIN');
+    expect(audit).toContain("process.argv.includes('--self-test')");
+    expect(verifier).toContain('audit-production-http-security.mjs --self-test');
+    expect(workflow).not.toContain('PRODUCTION_APP_URL');
+    expect(workflow).not.toContain('EXPECTED_SUPABASE_ORIGIN');
+  });
+
+  it('requires CSP, clickjacking, MIME, referrer, permissions, and HSTS controls for the deployed frontend', () => {
+    const audit = read('scripts/audit-production-http-security.mjs');
+
+    expect(audit).toContain('content-security-policy');
+    expect(audit).toContain("object-src must equal 'none'");
+    expect(audit).toContain("frame-ancestors must equal 'none'");
+    expect(audit).toContain("script-src must not allow 'unsafe-eval'");
+    expect(audit).toContain("script-src must not allow 'unsafe-inline'");
+    expect(audit).toContain('x-content-type-options');
+    expect(audit).toContain('x-frame-options');
+    expect(audit).toContain('referrer-policy');
+    expect(audit).toContain('permissions-policy');
+    expect(audit).toContain('strict-transport-security');
+    expect(audit).toContain('31536000');
+  });
+
+  it('binds production CSP connect-src to the exact Supabase origin without exposing secrets', () => {
+    const audit = read('scripts/audit-production-http-security.mjs');
+
+    expect(audit).toContain('EXPECTED_SUPABASE_ORIGIN');
+    expect(audit).toContain('CSP connect-src includes the exact production Supabase origin');
+    expect(audit).not.toContain('SUPABASE_ACCESS_TOKEN');
+    expect(audit).not.toContain('SUPABASE_SERVICE_ROLE_KEY');
+    expect(audit).not.toContain('GEMINI_API_KEY');
+  });
+});
+
 describe('Phase 6-4C database security audit contract', () => {
   it('keeps the database privilege audit inside the automatically discovered Supabase integration suite', () => {
     const config = read('vitest.supabase.config.ts');
