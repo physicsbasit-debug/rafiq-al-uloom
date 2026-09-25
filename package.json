@@ -19,7 +19,8 @@
     "verify:phase-5-closure": "bash scripts/verify-phase-5-closure.sh",
     "verify:production-env": "node scripts/check-production-environment.mjs",
     "verify:ci-static": "bash scripts/verify-ci-static.sh",
-    "verify:ci-supabase": "bash scripts/verify-ci-supabase.sh"
+    "verify:ci-supabase": "bash scripts/verify-ci-supabase.sh",
+    "verify:backup-recovery": "bash scripts/verify-backup-restore-recovery.sh"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.111.0",
