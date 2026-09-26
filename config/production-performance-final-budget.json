@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "phase": "6-6C",
+  "sourceCommit": "04ea14edaf8e1717b65de107e04a468b6a0d7adc",
+  "measurement": {
+    "method": "node-zlib-gzip-level-9",
+    "source": "Phase 6-6B accepted production build"
+  },
+  "acceptedMetrics": {
+    "initialJsGzipBytes": 154587,
+    "totalJsGzipBytes": 184833,
+    "jsChunks": 4
+  },
+  "policy": {
+    "growthHeadroomPercent": 5,
+    "maximumInitialJsGzipBytes": 162317,
+    "maximumTotalJsGzipBytes": 194075
+  }
+}

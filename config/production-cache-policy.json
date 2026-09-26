@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "phase": "6-6C",
+  "implementationPhase": "6-7",
+  "policy": {
+    "indexHtml": {
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "reason": "HTML must revalidate so new hashed asset references are discovered promptly."
+    },
+    "hashedAssets": {
+      "path": "/assets/*",
+      "cacheControl": "public, max-age=31536000, immutable",
+      "reason": "Vite content-hashed assets are safe for long immutable caching."
+    },
+    "sensitiveDynamicResponses": {
+      "scope": "Auth, Supabase writes, Edge Functions, user-specific responses",
+      "cacheControl": "no-store",
+      "reason": "Sensitive or user-specific dynamic responses must not be cached by the static host."
+    }
+  }
+}

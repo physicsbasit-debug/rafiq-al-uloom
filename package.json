@@ -23,7 +23,9 @@
     "verify:backup-recovery": "bash scripts/verify-backup-restore-recovery.sh",
     "performance:baseline": "node scripts/check-production-performance.mjs --write-baseline",
     "verify:performance": "node scripts/check-production-performance.mjs",
-    "verify:code-split": "node scripts/check-production-performance.mjs --code-split-decision"
+    "verify:code-split": "node scripts/check-production-performance.mjs --code-split-decision",
+    "verify:performance-final": "node scripts/check-final-performance-budget.mjs",
+    "verify:cache-policy": "node scripts/check-production-cache-policy.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.111.0",

@@ -16,6 +16,8 @@ run_step "Lint" npm run lint
 run_step "Build" npm run build
 run_step "Production performance budget" npm run verify:performance
 run_step "Code-split acceptance gate" npm run verify:code-split
+run_step "Final performance budget" npm run verify:performance-final
+run_step "Production cache policy contract" npm run verify:cache-policy
 run_step "Core/unit tests" npm run test
 run_step \
   "Phase 6 architecture tests" \
@@ -27,7 +29,8 @@ run_step \
   tests/architecture/phase-6-4-production-security.test.ts \
   tests/architecture/phase-6-5-backup-recovery.test.ts \
   tests/architecture/phase-6-6-performance-delivery.test.ts \
-  tests/architecture/phase-6-6b-code-splitting.test.ts
+  tests/architecture/phase-6-6b-code-splitting.test.ts \
+  tests/architecture/phase-6-6c-performance-delivery.test.ts
 run_step "Auth client boundary scan" node scripts/check-auth-client-boundaries.mjs
 run_step "Mastery-results client boundary scan" node scripts/check-mastery-results-client-boundaries.mjs
 run_step "Tracked secret scan" node scripts/check-tracked-secrets.mjs
