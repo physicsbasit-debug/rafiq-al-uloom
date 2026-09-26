@@ -2,8 +2,8 @@
 
 ## Performance Baseline + Bundle Audit
 
-**الحالة:** IMPLEMENTATION / REVIEW  
-**Phase 6 branch baseline:** `0271bb6e7c087fe4411f814a1c140a452c1e79bd`  
+**الحالة:** IMPLEMENTATION / REVIEW
+**Phase 6 branch baseline:** `0271bb6e7c087fe4411f814a1c140a452c1e79bd`
 **النطاق:** قياس فقط + baseline متتبع + budget guard مؤقت. لا code splitting ولا تغيير UI في 6-6A.
 
 ---
@@ -49,7 +49,7 @@ commit message → docs: freeze phase 5 advanced science activities
 dist/assets/index-Bu8KMlFp.js   724.05 kB │ gzip: 183.94 kB
 ```
 
-هذا **Pre-6-6 observed value** فقط، وهو دافع لفتح مرحلة الأداء.  
+هذا **Pre-6-6 observed value** فقط، وهو دافع لفتح مرحلة الأداء.
 هو **ليس baseline الرسمي** لـ6-6A ولا تستخدم قيمته بوصفها budget في CI.
 
 الـbaseline الرسمي الوحيد هو الملف المتتبع:
