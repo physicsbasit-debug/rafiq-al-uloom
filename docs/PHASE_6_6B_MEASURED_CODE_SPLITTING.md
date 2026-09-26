@@ -2,9 +2,9 @@
 
 ## Measured Code-Splitting Decision
 
-**الحالة:** IMPLEMENTATION / REVIEW  
-**قاعدة القياس:** `config/production-performance-baseline.json`  
-**Baseline الرسمي:** `metrics.initialJs.gzipBytes = 182127`  
+**الحالة:** IMPLEMENTATION / REVIEW
+**قاعدة القياس:** `config/production-performance-baseline.json`
+**Baseline الرسمي:** `metrics.initialJs.gzipBytes = 182127`
 **عتبة القبول:** `18213 bytes` على الأقل (10%)
 
 ---
