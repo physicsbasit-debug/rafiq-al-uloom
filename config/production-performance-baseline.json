@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "phase": "6-6A",
+  "sourceCommit": "0271bb6e7c087fe4411f814a1c140a452c1e79bd",
+  "measurement": {
+    "method": "node-zlib-gzip-level-9",
+    "scope": "production dist after npm run build"
+  },
+  "policy": {
+    "temporaryInitialJsGzipGrowthPercent": 5,
+    "codeSplitCandidateThresholdPercent": 10,
+    "codeSplitAcceptanceReductionPercent": 10
+  },
+  "metrics": {
+    "initialJs": {
+      "fileCount": 1,
+      "rawBytes": 724057,
+      "gzipBytes": 182127,
+      "files": [
+        {
+          "file": "assets/index-Bu8KMlFp.js",
+          "rawBytes": 724057,
+          "gzipBytes": 182127
+        }
+      ]
+    },
+    "totalJs": {
+      "fileCount": 1,
+      "rawBytes": 724057,
+      "gzipBytes": 182127,
+      "files": [
+        {
+          "file": "assets/index-Bu8KMlFp.js",
+          "rawBytes": 724057,
+          "gzipBytes": 182127
+        }
+      ]
+    },
+    "totalCss": {
+      "fileCount": 1,
+      "rawBytes": 25575,
+      "gzipBytes": 5413,
+      "files": [
+        {
+          "file": "assets/index-DGhacLP9.css",
+          "rawBytes": 25575,
+          "gzipBytes": 5413
+        }
+      ]
+    },
+    "dist": {
+      "fileCount": 5,
+      "rawBytes": 764666,
+      "gzipBytes": 191457
+    },
+    "largestJs": {
+      "file": "assets/index-Bu8KMlFp.js",
+      "rawBytes": 724057,
+      "gzipBytes": 182127
+    }
+  }
+}
