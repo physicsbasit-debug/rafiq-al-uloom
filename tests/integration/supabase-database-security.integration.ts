@@ -181,7 +181,7 @@ describeIntegration('Phase 6-4C database / RLS privilege audit', () => {
     expect(violations).toEqual([]);
   });
 
-  it('does not leave externally callable SECURITY DEFINER functions executable by PUBLIC', () => {
+  it('does not leave any SECURITY DEFINER function executable by PUBLIC', () => {
     const violations = queryJson<string[]>(`
       SELECT COALESCE(json_agg(signature ORDER BY signature), '[]'::json)::text
       FROM (
@@ -195,11 +195,40 @@ describeIntegration('Phase 6-4C database / RLS privilege audit', () => {
         ) AS acl
         WHERE n.nspname IN ('public', 'private')
           AND p.prosecdef
-          AND p.prorettype <> 'trigger'::regtype
           AND acl.grantee = 0
           AND acl.privilege_type = 'EXECUTE'
       ) AS exposed;
     `);
+    expect(violations).toEqual([]);
+  });
+
+  it('does not expose internal SECURITY DEFINER trigger functions to application roles', () => {
+    const violations = queryJson<string[]>(`
+      WITH roles(role_name) AS (
+        VALUES ('anon'), ('authenticated'), ('service_role')
+      )
+      SELECT COALESCE(
+        json_agg(
+          format(
+            '%s:%I.%I(%s)',
+            role_name,
+            n.nspname,
+            p.proname,
+            oidvectortypes(p.proargtypes)
+          )
+          ORDER BY role_name, n.nspname, p.proname, oidvectortypes(p.proargtypes)
+        ),
+        '[]'::json
+      )::text
+      FROM roles
+      CROSS JOIN pg_proc AS p
+      JOIN pg_namespace AS n ON n.oid = p.pronamespace
+      WHERE n.nspname IN ('public', 'private')
+        AND p.prosecdef
+        AND p.prorettype IN ('trigger'::regtype, 'event_trigger'::regtype)
+        AND has_function_privilege(role_name, p.oid, 'EXECUTE');
+    `);
+
     expect(violations).toEqual([]);
   });
 
