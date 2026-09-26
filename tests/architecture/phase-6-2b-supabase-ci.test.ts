@@ -51,6 +51,15 @@ describe('Phase 6-2B local Supabase CI contract', () => {
     expect(verifier).toContain('npm run test:supabase');
   });
 
+  it('serializes integration test files because they mutate one shared local database', () => {
+    const config = read('vitest.supabase.config.ts');
+
+    expect(config).toContain('fileParallelism: false');
+    expect(config).toContain(
+      "include: ['tests/integration/**/*.integration.ts', 'tests/integration/**/*.integration.tsx']"
+    );
+  });
+
   it('uses the same minimal stack during controlled recovery', () => {
     const verifier = read('scripts/verify-ci-supabase.sh');
 
@@ -58,7 +67,7 @@ describe('Phase 6-2B local Supabase CI contract', () => {
     expect(verifier).toContain('PASS: minimal Supabase stack recovered after reset');
   });
 
-  it('checks the global auth/profile orphan invariant only after the parallel integration suite', () => {
+  it('checks the global auth/profile orphan invariant only after the integration suite', () => {
     const verifier = read('scripts/verify-ci-supabase.sh');
     const profileIntegration = read(
       'tests/integration/supabase-profiles-authorization.integration.ts'

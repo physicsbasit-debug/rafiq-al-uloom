@@ -6,6 +6,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['tests/integration/**/*.integration.ts', 'tests/integration/**/*.integration.tsx'],
+    fileParallelism: false,
   },
   resolve: {
     alias: {
