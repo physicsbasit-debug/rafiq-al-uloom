@@ -55,7 +55,7 @@ afterEach(() => {
   }
 });
 
-describe('Phase 6-6A performance baseline and delivery contract', () => {
+describe('Phase 6-6 performance baseline and delivery contract', () => {
   it('stores one tracked numeric baseline with the frozen temporary budget policy', () => {
     const baseline = JSON.parse(readFileSync(BASELINE, 'utf8')) as {
       schemaVersion?: number;
@@ -73,7 +73,7 @@ describe('Phase 6-6A performance baseline and delivery contract', () => {
       codeSplitCandidateThresholdPercent: 10,
       codeSplitAcceptanceReductionPercent: 10,
     });
-    expect(baseline.metrics?.initialJs?.gzipBytes).toBeGreaterThan(0);
+    expect(baseline.metrics?.initialJs?.gzipBytes).toBe(182127);
     expect(baseline.metrics?.totalJs?.fileCount).toBeGreaterThan(0);
   });
 
@@ -140,23 +140,99 @@ describe('Phase 6-6A performance baseline and delivery contract', () => {
     expect(second.stderr).toContain('Refusing silent refresh');
   });
 
-  it('runs the real performance gate after build and before the core test suite', () => {
+  it('accepts code splitting only when the measured gzip reduction reaches 10%', () => {
+    const dist = createSyntheticDist(deterministicBytes(50_000, 51));
+    const baseline = join(dist, 'baseline.json');
+    const report = join(dist, 'report.json');
+
+    expect(
+      runPerformance([
+        '--write-baseline',
+        '--dist',
+        dist,
+        '--baseline',
+        baseline,
+        '--report',
+        report,
+      ]).status
+    ).toBe(0);
+
+    writeFileSync(join(dist, 'assets/index-test.js'), deterministicBytes(44_000, 51));
+
+    const decision = runPerformance([
+      '--code-split-decision',
+      '--dist',
+      dist,
+      '--baseline',
+      baseline,
+      '--report',
+      report,
+    ]);
+
+    expect(decision.status).toBe(0);
+    expect(decision.stdout).toContain('CODE_SPLIT_DECISION=GO');
+    expect(decision.stdout).toContain('CODE_SPLIT_ACCEPTANCE=PASS');
+  });
+
+  it('returns NO_GO when measured gzip reduction remains below 10%', () => {
+    const dist = createSyntheticDist(deterministicBytes(50_000, 61));
+    const baseline = join(dist, 'baseline.json');
+    const report = join(dist, 'report.json');
+
+    expect(
+      runPerformance([
+        '--write-baseline',
+        '--dist',
+        dist,
+        '--baseline',
+        baseline,
+        '--report',
+        report,
+      ]).status
+    ).toBe(0);
+
+    writeFileSync(join(dist, 'assets/index-test.js'), deterministicBytes(48_000, 61));
+
+    const decision = runPerformance([
+      '--code-split-decision',
+      '--dist',
+      dist,
+      '--baseline',
+      baseline,
+      '--report',
+      report,
+    ]);
+
+    expect(decision.status).not.toBe(0);
+    expect(decision.stdout).toContain('CODE_SPLIT_DECISION=NO_GO');
+    expect(decision.stderr).toContain('Phase 6-6B requires at least');
+  });
+
+  it('runs performance and code-split gates after build and before the core test suite', () => {
     const ci = read('scripts/verify-ci-static.sh');
     const buildIndex = ci.indexOf('run_step "Build" npm run build');
     const performanceIndex = ci.indexOf(
       'run_step "Production performance budget" npm run verify:performance'
     );
+    const codeSplitIndex = ci.indexOf(
+      'run_step "Code-split acceptance gate" npm run verify:code-split'
+    );
     const coreIndex = ci.indexOf('run_step "Core/unit tests" npm run test');
 
     expect(buildIndex).toBeGreaterThanOrEqual(0);
     expect(performanceIndex).toBeGreaterThan(buildIndex);
-    expect(coreIndex).toBeGreaterThan(performanceIndex);
+    expect(codeSplitIndex).toBeGreaterThan(performanceIndex);
+    expect(coreIndex).toBeGreaterThan(codeSplitIndex);
   });
 
-  it('keeps 6-6A measurement-only and does not introduce production UI splitting', () => {
-    const app = read('src/App.tsx');
-    expect(app).not.toContain('lazy(() => import(');
-    expect(app).not.toContain('<Suspense');
+  it('keeps the tracked Phase 6-6A baseline unchanged while 6-6B measures against it', () => {
+    const baseline = JSON.parse(readFileSync(BASELINE, 'utf8')) as {
+      phase?: string;
+      metrics?: { initialJs?: { gzipBytes?: number } };
+    };
+
+    expect(baseline.phase).toBe('6-6A');
+    expect(baseline.metrics?.initialJs?.gzipBytes).toBe(182127);
   });
 
   it('records Phase 5 freeze evidence and labels 724/184 only as pre-6-6 observation', () => {
@@ -170,8 +246,9 @@ describe('Phase 6-6A performance baseline and delivery contract', () => {
     expect(doc).toContain('ليس baseline الرسمي');
   });
 
-  it('keeps the Phase 6 architecture gate permanently aware of the performance contract', () => {
+  it('keeps the Phase 6 architecture gate permanently aware of both 6-6 contracts', () => {
     const ci = read('scripts/verify-ci-static.sh');
     expect(ci).toContain('tests/architecture/phase-6-6-performance-delivery.test.ts');
+    expect(ci).toContain('tests/architecture/phase-6-6b-code-splitting.test.ts');
   });
 });

@@ -62,11 +62,23 @@ describe('architecture: App workspace composition contract', () => {
     for (const pattern of forbidden) expect(source).not.toContain(pattern);
   });
 
-  it('يربط App مساحتي العمل عبر حدود feature فقط', () => {
-    expect(source).toContain("import { TeacherWorkspace } from '@features/teacher/workspace';");
-    expect(source).toContain("import { ReviewerWorkspace } from '@features/reviewer/workspace';");
-    expect(source).toContain('<TeacherWorkspace aiProvider={aiProvider} />');
-    expect(source).toContain('<ReviewerWorkspace />');
+  it('يربط App مساحتي العمل عبر حدود feature مؤجلة فقط', () => {
+    expect(source).toContain(
+      "import { DeferredWorkspace } from '@features/workspace/DeferredWorkspace';"
+    );
+
+    expect(source).toContain("import('@features/teacher/workspace/TeacherWorkspaceSurface')");
+    expect(source).toContain("import('@features/reviewer/workspace/ReviewerWorkspace')");
+
+    expect(source).toContain('workspaceLabel="مساحة المعلم"');
+    expect(source).toContain('load={loadTeacherWorkspaceSurface}');
+    expect(source).toContain('workspaceLabel="مساحة المراجع"');
+    expect(source).toContain('load={loadReviewerWorkspace}');
+
+    expect(source).not.toContain("import { TeacherWorkspace } from '@features/teacher/workspace';");
+    expect(source).not.toContain(
+      "import { ReviewerWorkspace } from '@features/reviewer/workspace';"
+    );
   });
 
   it('زر العودة يغير AppSurface فقط ولا يربط العودة بـ setStep أو خدمات الجلسة', () => {

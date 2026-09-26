@@ -15,15 +15,13 @@ const workspaceSpies = vi.hoisted(() => ({
 
 vi.mock('@features/auth/useAuthSession', () => ({ useAuthSession: vi.fn() }));
 
-vi.mock('@features/teacher/workspace', () => ({
-  TeacherWorkspace: () => {
-    workspaceSpies.teacher();
-    return <div>لوحة المعلم التجريبية</div>;
-  },
-}));
+vi.mock('@features/workspace/DeferredWorkspace', () => ({
+  DeferredWorkspace: ({ workspaceLabel }: { workspaceLabel: string }) => {
+    if (workspaceLabel === 'مساحة المعلم') {
+      workspaceSpies.teacher();
+      return <div>لوحة المعلم التجريبية</div>;
+    }
 
-vi.mock('@features/reviewer/workspace', () => ({
-  ReviewerWorkspace: () => {
     workspaceSpies.reviewer();
     return <div>لوحة المراجع التجريبية</div>;
   },

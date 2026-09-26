@@ -11,10 +11,13 @@ const PROVIDER_PATH = 'src/services/ai-authoring/gateway-ai-authoring.provider.t
 const RESPONSE_PATH = 'src/services/ai-authoring/gateway-ai-authoring.response.ts';
 const APP_PATH = 'src/App.tsx';
 const WORKSPACE_PATH = 'src/features/teacher/workspace/TeacherWorkspace.tsx';
+const TEACHER_SURFACE_PATH = 'src/features/teacher/workspace/TeacherWorkspaceSurface.tsx';
 
 describe('architecture: Phase 4-3D browser AI gateway boundary', () => {
   it('لا يدخل Gemini secret أو endpoint أو Service Role إلى browser AI', () => {
-    const browserAi = `${read(PROVIDER_PATH)}\n${read(RESPONSE_PATH)}\n${read(APP_PATH)}`;
+    const browserAi =
+      `${read(PROVIDER_PATH)}\n${read(RESPONSE_PATH)}\n${read(APP_PATH)}\n` +
+      read(TEACHER_SURFACE_PATH);
     for (const forbidden of [
       'GEMINI_API_KEY',
       'generativelanguage.googleapis.com',
@@ -62,16 +65,23 @@ describe('architecture: Phase 4-3D browser AI gateway boundary', () => {
     expect(provider).not.toContain('new AbortController(');
   });
 
-  it('يركب App مزود Gateway ثابتًا ويمرره صراحة إلى TeacherWorkspace', () => {
+  it('يعزل تركيب Gateway داخل TeacherWorkspaceSurface المؤجلة خارج App', () => {
     const app = read(APP_PATH);
-    expect(app).toContain('useMemo(');
-    expect(app).toContain('new GatewayAiAuthoringProvider({');
-    expect(app).toContain('getAccessToken: getCurrentAccessToken');
+    const surface = read(TEACHER_SURFACE_PATH);
+
+    expect(app).toContain("import('@features/teacher/workspace/TeacherWorkspaceSurface')");
+    expect(app).not.toContain('new GatewayAiAuthoringProvider({');
+    expect(app).not.toContain('getAccessToken: getCurrentAccessToken');
     expect(app).not.toContain('getSupabaseClient');
     expect(app).not.toContain('.auth.getSession()');
-    expect(app).toContain('publicApiKey: import.meta.env.VITE_SUPABASE_ANON_KEY');
-    expect(app).toContain('<TeacherWorkspace aiProvider={aiProvider} />');
-    expect(app).not.toContain('<TeacherWorkspace aiProvider={new GatewayAiAuthoringProvider');
+
+    expect(surface).toContain('useMemo(');
+    expect(surface).toContain('new GatewayAiAuthoringProvider({');
+    expect(surface).toContain('getAccessToken: getCurrentAccessToken');
+    expect(surface).toContain('publicApiKey: import.meta.env.VITE_SUPABASE_ANON_KEY');
+    expect(surface).toContain('<TeacherWorkspace aiProvider={aiProvider} />');
+    expect(surface).not.toContain('getSupabaseClient');
+    expect(surface).not.toContain('.auth.getSession()');
   });
 
   it('يزيل deterministic silent fallback من TeacherWorkspace', () => {

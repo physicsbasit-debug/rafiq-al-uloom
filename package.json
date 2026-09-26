@@ -22,7 +22,8 @@
     "verify:ci-supabase": "bash scripts/verify-ci-supabase.sh",
     "verify:backup-recovery": "bash scripts/verify-backup-restore-recovery.sh",
     "performance:baseline": "node scripts/check-production-performance.mjs --write-baseline",
-    "verify:performance": "node scripts/check-production-performance.mjs"
+    "verify:performance": "node scripts/check-production-performance.mjs",
+    "verify:code-split": "node scripts/check-production-performance.mjs --code-split-decision"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.111.0",

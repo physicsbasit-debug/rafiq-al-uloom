@@ -1,4 +1,4 @@
-import { type Dispatch, type SetStateAction, useMemo, useState } from 'react';
+import { type Dispatch, type SetStateAction, useState } from 'react';
 
 import { AppButton } from '@design-system/components/AppButton';
 import { colors } from '@design-system/theme/colors';
@@ -11,7 +11,6 @@ import { RequireCapability } from '@features/auth/RequireCapability';
 import { useAuthSession } from '@features/auth/useAuthSession';
 import { MatchingGameView } from '@features/games/matching/MatchingGameView';
 import { MasteryTestView } from '@features/mastery/MasteryTestView';
-import { ReviewerWorkspace } from '@features/reviewer/workspace';
 import { GradeSelection } from '@features/student/grade-selection/GradeSelection';
 import { LessonList } from '@features/student/lesson-list/LessonList';
 import { LessonView } from '@features/student/lesson-view/LessonView';
@@ -19,9 +18,7 @@ import { ReviewQuestionsView } from '@features/student/review-questions/ReviewQu
 import { SemesterSelection } from '@features/student/semester-selection/SemesterSelection';
 import { SubjectSelection } from '@features/student/subject-selection/SubjectSelection';
 import { UnitSelection } from '@features/student/unit-selection/UnitSelection';
-import { TeacherWorkspace } from '@features/teacher/workspace';
-import { GatewayAiAuthoringProvider } from '@services/ai-authoring';
-import { getCurrentAccessToken } from '@services/auth/auth.service';
+import { DeferredWorkspace } from '@features/workspace/DeferredWorkspace';
 
 type AppSurface = 'student' | 'teacher' | 'reviewer';
 
@@ -41,6 +38,14 @@ interface StudentExperienceProps {
   readonly step: Step;
   readonly setStep: Dispatch<SetStateAction<Step>>;
 }
+
+const loadTeacherWorkspaceSurface = () =>
+  import('@features/teacher/workspace/TeacherWorkspaceSurface');
+
+const loadReviewerWorkspace = () =>
+  import('@features/reviewer/workspace/ReviewerWorkspace').then(({ ReviewerWorkspace }) => ({
+    default: ReviewerWorkspace,
+  }));
 
 function StudentExperience({ step, setStep }: StudentExperienceProps) {
   return (
@@ -148,24 +153,10 @@ function StudentExperience({ step, setStep }: StudentExperienceProps) {
   );
 }
 
-function resolveAiGatewayUrl(baseUrl: string | undefined): string {
-  const normalized = baseUrl?.trim().replace(/\/+$/, '') ?? '';
-  return normalized ? `${normalized}/functions/v1/ai-authoring-gateway` : '';
-}
-
 export function AppContent() {
   const [step, setStep] = useState<Step>({ name: 'grade' });
   const [appSurface, setAppSurface] = useState<AppSurface>('student');
   const session = useAuthSession();
-  const aiProvider = useMemo(
-    () =>
-      new GatewayAiAuthoringProvider({
-        gatewayUrl: resolveAiGatewayUrl(import.meta.env.VITE_SUPABASE_URL),
-        publicApiKey: import.meta.env.VITE_SUPABASE_ANON_KEY ?? '',
-        getAccessToken: getCurrentAccessToken,
-      }),
-    []
-  );
 
   const authenticated = session.authState.status === 'authenticated';
   const showGuestExperience =
@@ -310,13 +301,19 @@ export function AppContent() {
 
                 {appSurface === 'teacher' ? (
                   <RequireCapability operation="access_teacher_workspace">
-                    <TeacherWorkspace aiProvider={aiProvider} />
+                    <DeferredWorkspace
+                      workspaceLabel="مساحة المعلم"
+                      load={loadTeacherWorkspaceSurface}
+                    />
                   </RequireCapability>
                 ) : null}
 
                 {appSurface === 'reviewer' ? (
                   <RequireCapability operation="access_reviewer_workspace">
-                    <ReviewerWorkspace />
+                    <DeferredWorkspace
+                      workspaceLabel="مساحة المراجع"
+                      load={loadReviewerWorkspace}
+                    />
                   </RequireCapability>
                 ) : null}
               </>

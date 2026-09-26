@@ -24,6 +24,7 @@ function fail(message) {
 function parseArgs(argv) {
   const args = {
     writeBaseline: false,
+    codeSplitDecision: false,
     force: false,
     dist: DEFAULT_DIST,
     baseline: DEFAULT_BASELINE,
@@ -33,11 +34,16 @@ function parseArgs(argv) {
   for (let index = 0; index < argv.length; index += 1) {
     const value = argv[index];
     if (value === '--write-baseline') args.writeBaseline = true;
+    else if (value === '--code-split-decision') args.codeSplitDecision = true;
     else if (value === '--force') args.force = true;
     else if (value === '--dist') args.dist = argv[++index];
     else if (value === '--baseline') args.baseline = argv[++index];
     else if (value === '--report') args.report = argv[++index];
     else throw new Error(`Unknown argument: ${value}`);
+  }
+
+  if (args.writeBaseline && args.codeSplitDecision) {
+    throw new Error('--write-baseline and --code-split-decision cannot be combined.');
   }
 
   return args;
@@ -198,6 +204,26 @@ function verifyAgainstBaseline(metrics, baseline) {
   };
 }
 
+function evaluateCodeSplit(metrics, baseline) {
+  const baselineBytes = baseline.metrics.initialJs.gzipBytes;
+  const currentBytes = metrics.initialJs.gzipBytes;
+  const requiredReductionBytes = Math.ceil(
+    baselineBytes * (baseline.policy.codeSplitAcceptanceReductionPercent / 100)
+  );
+  const reductionBytes = baselineBytes - currentBytes;
+  const reductionPercent = (reductionBytes / baselineBytes) * 100;
+
+  return {
+    passed: reductionBytes >= requiredReductionBytes,
+    baselineInitialJsGzipBytes: baselineBytes,
+    currentInitialJsGzipBytes: currentBytes,
+    reductionBytes,
+    reductionPercent,
+    requiredReductionBytes,
+    requiredReductionPercent: baseline.policy.codeSplitAcceptanceReductionPercent,
+  };
+}
+
 function main() {
   try {
     const args = parseArgs(process.argv.slice(2));
@@ -245,12 +271,15 @@ function main() {
       JSON.parse(readFileSync(resolve(ROOT, args.baseline), 'utf8'))
     );
     const verification = verifyAgainstBaseline(metrics, baseline);
+    const codeSplit = args.codeSplitDecision ? evaluateCodeSplit(metrics, baseline) : null;
+
     writeJson(args.report, {
-      phase: '6-6A',
-      mode: 'verify',
+      phase: args.codeSplitDecision ? '6-6B' : '6-6A',
+      mode: args.codeSplitDecision ? 'code-split-decision' : 'verify',
       baselinePath: resolve(ROOT, args.baseline),
       metrics,
       verification,
+      ...(codeSplit ? { codeSplit } : {}),
     });
 
     console.log(`BASELINE_INITIAL_JS_GZIP=${verification.baselineInitialJsGzipBytes}`);
@@ -267,6 +296,27 @@ function main() {
       );
       return;
     }
+
+    if (codeSplit) {
+      console.log(`CODE_SPLIT_BASELINE_INITIAL_JS_GZIP=${codeSplit.baselineInitialJsGzipBytes}`);
+      console.log(`CODE_SPLIT_CURRENT_INITIAL_JS_GZIP=${codeSplit.currentInitialJsGzipBytes}`);
+      console.log(`CODE_SPLIT_REDUCTION_BYTES=${codeSplit.reductionBytes}`);
+      console.log(`CODE_SPLIT_REDUCTION_PERCENT=${codeSplit.reductionPercent.toFixed(2)}`);
+      console.log(`CODE_SPLIT_REQUIRED_REDUCTION_BYTES=${codeSplit.requiredReductionBytes}`);
+      console.log(`CODE_SPLIT_REQUIRED_REDUCTION_PERCENT=${codeSplit.requiredReductionPercent}`);
+      console.log(`CODE_SPLIT_DECISION=${codeSplit.passed ? 'GO' : 'NO_GO'}`);
+
+      if (!codeSplit.passed) {
+        fail(
+          `code split reduced initial JS gzip by ${codeSplit.reductionBytes} bytes; Phase 6-6B requires at least ${codeSplit.requiredReductionBytes} bytes`
+        );
+        return;
+      }
+
+      console.log('CODE_SPLIT_ACCEPTANCE=PASS');
+      return;
+    }
+
     console.log('PERFORMANCE_BUDGET=PASS');
   } catch (error) {
     fail(error instanceof Error ? error.message : String(error));
