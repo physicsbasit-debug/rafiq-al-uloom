@@ -1,0 +1,317 @@
+.rafiq-auth-page {
+  --auth-green: #004d40;
+  --auth-green-2: #00695c;
+  --auth-gold: #ffca28;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: clamp(1.25rem, 4vw, 3.2rem) 1rem;
+  background: radial-gradient(circle at 50% 0%, rgba(0, 105, 92, 0.08), transparent 35rem), #f7f8fa;
+}
+
+.rafiq-auth-card {
+  width: min(100%, 540px);
+  padding: 1.2rem 1.05rem 1rem;
+  background: #fff;
+  border-top: 8px solid var(--auth-green);
+  border-bottom: 8px solid var(--auth-gold);
+  border-radius: 24px;
+  box-shadow: 0 18px 45px rgba(31, 41, 55, 0.16);
+}
+
+.rafiq-auth-brand-panel {
+  position: relative;
+  overflow: hidden;
+  min-height: 365px;
+  padding: 1.7rem 1.25rem 3rem;
+  text-align: center;
+  color: #fff;
+  background: linear-gradient(145deg, var(--auth-green), var(--auth-green-2));
+  border-radius: 20px 20px 14px 14px;
+  box-shadow: inset 0 0 36px rgba(255, 202, 40, 0.08);
+}
+
+.rafiq-auth-brand-panel::before {
+  content: '';
+  position: absolute;
+  inset: -30% -20% auto;
+  height: 270px;
+  background: radial-gradient(circle, rgba(255, 202, 40, 0.15), transparent 62%);
+  pointer-events: none;
+}
+
+.rafiq-auth-emblem {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 122px;
+  height: 122px;
+  margin: 0 auto 0.9rem;
+  color: var(--auth-green);
+  background: #fff;
+  border: 7px solid var(--auth-gold);
+  border-radius: 50%;
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.28),
+    0 0 0 8px rgba(255, 255, 255, 0.13);
+}
+
+.rafiq-auth-emblem svg {
+  width: 72px;
+  height: 72px;
+}
+
+.rafiq-auth-brand-panel h1 {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: var(--auth-gold);
+  font-size: clamp(2rem, 8vw, 2.8rem);
+  line-height: 1.2;
+  text-shadow: 0 3px 9px rgba(0, 0, 0, 0.28);
+}
+
+.rafiq-auth-scope {
+  position: relative;
+  z-index: 1;
+  margin: 0.75rem 0 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.8;
+}
+
+.rafiq-auth-portal-label {
+  position: relative;
+  z-index: 1;
+  margin: 0.18rem 0 0;
+  color: var(--auth-gold);
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.rafiq-auth-wave {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 48px;
+  color: var(--auth-gold);
+}
+
+.rafiq-auth-wave svg {
+  width: 100%;
+  height: 100%;
+}
+
+.rafiq-auth-form-shell {
+  margin-top: 1rem;
+  padding: 1.05rem;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 6px #fafafa;
+}
+
+.rafiq-student-entry {
+  text-align: center;
+}
+
+.rafiq-student-entry h2,
+.rafiq-auth-form h2,
+.rafiq-auth-confirmation h2 {
+  margin: 0;
+  color: #111827;
+  font-size: 1.35rem;
+  text-align: center;
+}
+
+.rafiq-student-entry > p,
+.rafiq-auth-form-description,
+.rafiq-auth-confirmation > p {
+  margin: 0.45rem 0 1rem;
+  color: #6b7280;
+  line-height: 1.75;
+  text-align: center;
+}
+
+.rafiq-staff-eyebrow {
+  margin: 0 0 0.4rem;
+  color: var(--auth-green);
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.rafiq-auth-fields {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.rafiq-auth-fields label {
+  display: grid;
+  gap: 0.4rem;
+  color: #1f2937;
+  font-weight: 700;
+}
+
+.rafiq-auth-fields input {
+  width: 100%;
+  min-height: 50px;
+  padding: 0.7rem 0.9rem;
+  color: #111827;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font: inherit;
+  text-align: left;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.rafiq-auth-fields input:focus {
+  outline: none;
+  border-color: var(--auth-green-2);
+  box-shadow: 0 0 0 3px rgba(0, 105, 92, 0.15);
+}
+
+.rafiq-auth-error-slot {
+  min-height: 3rem;
+  padding-top: 0.5rem;
+  color: #b91c1c;
+  line-height: 1.6;
+}
+
+.rafiq-auth-error-slot p {
+  margin: 0;
+}
+
+.rafiq-auth-actions {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.rafiq-auth-button {
+  width: 100%;
+  min-height: 50px;
+  padding: 0.7rem 1rem;
+  border-radius: 9px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    opacity 160ms ease;
+}
+
+.rafiq-auth-button:not(:disabled):hover {
+  transform: translateY(-2px);
+}
+
+.rafiq-auth-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.rafiq-auth-button-primary {
+  color: var(--auth-gold);
+  background: linear-gradient(135deg, var(--auth-green), var(--auth-green-2));
+  border: 0;
+  box-shadow: 0 5px 12px rgba(0, 77, 64, 0.22);
+}
+
+.rafiq-start-learning {
+  min-height: 58px;
+  font-size: 1.08rem;
+}
+
+.rafiq-auth-button-secondary {
+  color: var(--auth-green);
+  background: #fff;
+  border: 2px solid var(--auth-green);
+}
+
+.rafiq-auth-button-staff {
+  min-height: 44px;
+  color: #4b5563;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  font-size: 0.92rem;
+}
+
+.rafiq-auth-button-muted {
+  color: #6b7280;
+  background: #fff;
+  border: 1px solid #d1d5db;
+}
+
+.rafiq-auth-confirmation {
+  text-align: center;
+}
+
+.rafiq-auth-confirmation-email {
+  margin: 0 0 1.1rem !important;
+  color: var(--auth-green) !important;
+  font-weight: 800;
+  text-align: center !important;
+}
+
+.rafiq-auth-credit {
+  display: grid;
+  gap: 0.12rem;
+  margin: 1.6rem auto 0;
+  padding: 0.75rem 1rem;
+  color: var(--auth-gold);
+  background: var(--auth-green);
+  border: 2px dashed var(--auth-gold);
+  border-radius: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.rafiq-auth-copyright {
+  font-size: 0.86rem;
+  opacity: 0.9;
+}
+
+.rafiq-auth-access-note {
+  margin: 0.75rem 0 0;
+  color: #6b7280;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+@media (max-width: 520px) {
+  .rafiq-auth-page {
+    padding: 0.8rem 0.6rem 1.25rem;
+  }
+
+  .rafiq-auth-card {
+    padding: 0.8rem 0.7rem;
+    border-radius: 20px;
+  }
+
+  .rafiq-auth-brand-panel {
+    min-height: 330px;
+    padding-top: 1.35rem;
+  }
+
+  .rafiq-auth-emblem {
+    width: 104px;
+    height: 104px;
+  }
+
+  .rafiq-auth-emblem svg {
+    width: 62px;
+    height: 62px;
+  }
+
+  .rafiq-auth-form-shell {
+    padding: 0.85rem;
+  }
+}

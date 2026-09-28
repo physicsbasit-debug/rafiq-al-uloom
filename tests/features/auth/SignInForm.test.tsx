@@ -57,7 +57,7 @@ describe('SignInForm', () => {
     fireEvent.click(screen.getByRole('button', { name: 'تسجيل الدخول' }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent(
-      'تعذر تسجيل الدخول. تحقق من البريد الإلكتروني وكلمة المرور، وإن كنت قد أنشأت حسابك مؤخرًا فتأكد من إكمال تأكيد البريد الإلكتروني.'
+      'تعذر تسجيل الدخول. تحقق من البريد الإلكتروني وكلمة المرور، وإن كان الحساب جديدًا فتأكد من إكمال تأكيد البريد الإلكتروني.'
     );
     expect(screen.queryByText(/email_not_confirmed/i)).not.toBeInTheDocument();
   });

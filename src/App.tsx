@@ -156,32 +156,71 @@ function StudentExperience({ step, setStep }: StudentExperienceProps) {
 export function AppContent() {
   const [step, setStep] = useState<Step>({ name: 'grade' });
   const [appSurface, setAppSurface] = useState<AppSurface>('student');
+  const [guestLearningStarted, setGuestLearningStarted] = useState(false);
   const session = useAuthSession();
 
   const authenticated = session.authState.status === 'authenticated';
-  const showGuestExperience =
-    session.authState.status === 'guest' && session.entryMode === 'closed';
+  const isGuest = session.authState.status === 'guest';
+
+  if (isGuest && (!guestLearningStarted || session.entryMode !== 'closed')) {
+    return (
+      <div dir="rtl" style={{ minHeight: '100vh' }}>
+        <AuthEntryView
+          session={session}
+          onStartLearning={() => {
+            session.closeAuthEntry();
+            setGuestLearningStarted(true);
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div dir="rtl" style={{ minHeight: '100vh', backgroundColor: colors.background }}>
       <header
         style={{
-          backgroundColor: colors.primary,
-          color: colors.surface,
-          padding: '1.1rem 1rem',
-          boxShadow: '0 10px 30px rgba(31, 41, 55, 0.12)',
+          background: 'linear-gradient(135deg, #004d40, #00695c)',
+          color: '#ffffff',
+          padding: '1rem',
+          boxShadow: '0 10px 30px rgba(0, 77, 64, 0.16)',
+          borderBottom: '4px solid #ffca28',
         }}
       >
-        <div style={{ maxWidth: '760px', margin: '0 auto' }}>
-          <h1 style={{ margin: 0, fontSize: '1.55rem' }}>رفيق العلوم</h1>
-          <p style={{ margin: '0.25rem 0 0', lineHeight: 1.6 }}>اكتشف • تعلّم • أتقن</p>
+        <div
+          style={{
+            maxWidth: '760px',
+            margin: '0 auto',
+            display: 'flex',
+            gap: '1rem',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+          }}
+        >
+          <div>
+            <h1 style={{ margin: 0, color: '#ffca28', fontSize: '1.55rem' }}>رفيق العلوم</h1>
+            <p style={{ margin: '0.2rem 0 0', lineHeight: 1.6 }}>
+              الفيزياء • الصفان التاسع والعاشر
+            </p>
+          </div>
 
-          {showGuestExperience ? (
-            <AccountControls
-              mode="guest"
-              onSignIn={session.openSignIn}
-              onSignUp={session.openSignUp}
-            />
+          {isGuest ? (
+            <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setStep({ name: 'grade' });
+                  setGuestLearningStarted(false);
+                }}
+                style={headerButtonStyle}
+              >
+                بوابة رفيق العلوم
+              </button>
+              <button type="button" onClick={session.openSignIn} style={headerButtonStyle}>
+                دخول الكادر التعليمي
+              </button>
+            </div>
           ) : null}
 
           {authenticated && session.authorizationState?.status === 'authorized' ? (
@@ -202,10 +241,6 @@ export function AppContent() {
           color: colors.textPrimary,
         }}
       >
-        {session.authState.status === 'guest' && session.entryMode !== 'closed' ? (
-          <AuthEntryView session={session} />
-        ) : null}
-
         {session.authState.status === 'loading' ? (
           <AccountStatusView
             state={{ status: 'session_loading' }}
@@ -249,7 +284,9 @@ export function AppContent() {
           />
         ) : null}
 
-        {showGuestExperience ? <StudentExperience step={step} setStep={setStep} /> : null}
+        {isGuest && guestLearningStarted ? (
+          <StudentExperience step={step} setStep={setStep} />
+        ) : null}
 
         {authenticated && session.authorizationState?.status === 'authorized' ? (
           <>
@@ -324,6 +361,18 @@ export function AppContent() {
     </div>
   );
 }
+
+const headerButtonStyle = {
+  minHeight: '42px',
+  padding: '0.55rem 0.8rem',
+  border: '1px solid rgba(255, 202, 40, 0.85)',
+  borderRadius: '9px',
+  background: 'rgba(255, 255, 255, 0.08)',
+  color: '#ffca28',
+  fontFamily: 'inherit',
+  fontWeight: 800,
+  cursor: 'pointer',
+} as const;
 
 export default function App() {
   return (

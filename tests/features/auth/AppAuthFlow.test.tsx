@@ -67,195 +67,63 @@ function baseSession(overrides: Partial<AuthSessionContextValue> = {}): AuthSess
   };
 }
 
-function reachLesson() {
-  fireEvent.click(screen.getByRole('button', { name: 'الصف التجريبي' }));
-  fireEvent.click(screen.getByRole('button', { name: 'الفصل التجريبي' }));
-  fireEvent.click(screen.getByRole('button', { name: 'المادة التجريبية' }));
-  fireEvent.click(screen.getByRole('button', { name: 'الوحدة التجريبية' }));
-  fireEvent.click(screen.getByRole('button', { name: 'الدرس الثالث' }));
-  expect(screen.getByText('صفحة الدرس lesson-3')).toBeInTheDocument();
-}
-
 beforeEach(() => mockedUseAuthSession.mockReset());
 
-describe('App auth flow', () => {
+describe('App accountless student flow', () => {
   it('يحافظ على اتجاه RTL على غلاف التطبيق', () => {
     mockedUseAuthSession.mockReturnValue(baseSession());
     const view = render(<AppContent />);
-
     expect(view.container.firstElementChild).toHaveAttribute('dir', 'rtl');
+  });
+
+  it('يعرض بوابة الطالب بلا بريد أو كلمة مرور', () => {
+    mockedUseAuthSession.mockReturnValue(baseSession());
+    render(<AppContent />);
+
+    expect(screen.getByRole('heading', { name: 'رفيق العلوم' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'ابدأ التعلّم' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'دخول الكادر التعليمي' })).toBeInTheDocument();
+    expect(screen.queryByLabelText('البريد الإلكتروني')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('كلمة المرور')).not.toBeInTheDocument();
+    expect(screen.queryByText('الصف التجريبي')).not.toBeInTheDocument();
+  });
+
+  it('يبدأ تجربة الطالب مباشرة بلا مصادقة', () => {
+    mockedUseAuthSession.mockReturnValue(baseSession());
+    render(<AppContent />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'ابدأ التعلّم' }));
+
+    expect(screen.getByRole('button', { name: 'الصف التجريبي' })).toBeInTheDocument();
+  });
+
+  it('يفتح تسجيل دخول الكادر التعليمي فقط عند الطلب', () => {
+    let session = baseSession();
+    mockedUseAuthSession.mockImplementation(() => session);
+    const view = render(<AppContent />);
+
+    const openSignIn = vi.mocked(session.openSignIn);
+    fireEvent.click(screen.getByRole('button', { name: 'دخول الكادر التعليمي' }));
+    expect(openSignIn).toHaveBeenCalledTimes(1);
+
+    session = baseSession({ entryMode: 'sign_in' });
+    view.rerender(<AppContent />);
+
+    expect(screen.getByRole('heading', { name: 'تسجيل دخول الكادر التعليمي' })).toBeInTheDocument();
+    expect(screen.getByLabelText('البريد الإلكتروني')).toBeInTheDocument();
+    expect(screen.getByLabelText('كلمة المرور')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'إنشاء حساب جديد' })).not.toBeInTheDocument();
   });
 
   it('لا يعرض تجربة الطالب أثناء booting', () => {
     mockedUseAuthSession.mockReturnValue(baseSession({ authState: { status: 'loading' } }));
     render(<AppContent />);
+
     expect(screen.getByRole('status')).toHaveTextContent('جارٍ تجهيز حسابك');
     expect(screen.queryByText('الصف التجريبي')).not.toBeInTheDocument();
   });
 
-  it('لا يعرض تجربة الطالب أثناء loading_profile', () => {
-    mockedUseAuthSession.mockReturnValue(
-      baseSession({
-        authState: {
-          status: 'authenticated',
-          user: { id: 'u', email: null, emailConfirmedAt: null },
-          session: { expiresAt: null, user: { id: 'u', email: null, emailConfirmedAt: null } },
-        },
-        authorizationState: { status: 'loading_profile', userId: 'u' },
-      })
-    );
-    render(<AppContent />);
-    expect(screen.queryByText('الصف التجريبي')).not.toBeInTheDocument();
-  });
-
-  it('يحفظ Step عند فتح تسجيل الدخول ثم الإلغاء', () => {
-    let session = baseSession();
-    mockedUseAuthSession.mockImplementation(() => session);
-    const view = render(<AppContent />);
-    reachLesson();
-
-    session = baseSession({ entryMode: 'sign_in' });
-    view.rerender(<AppContent />);
-    expect(screen.getByRole('heading', { name: 'تسجيل الدخول' })).toBeInTheDocument();
-    expect(screen.queryByText('صفحة الدرس lesson-3')).not.toBeInTheDocument();
-
-    session = baseSession();
-    view.rerender(<AppContent />);
-    expect(screen.getByText('صفحة الدرس lesson-3')).toBeInTheDocument();
-  });
-
-  it('لا يغير Step عند الانتقال بين تسجيل الدخول وإنشاء الحساب', () => {
-    let session = baseSession();
-    mockedUseAuthSession.mockImplementation(() => session);
-    const view = render(<AppContent />);
-    reachLesson();
-
-    session = baseSession({ entryMode: 'sign_in' });
-    view.rerender(<AppContent />);
-    session = baseSession({ entryMode: 'sign_up' });
-    view.rerender(<AppContent />);
-    expect(screen.getByRole('heading', { name: 'إنشاء حساب' })).toBeInTheDocument();
-
-    session = baseSession();
-    view.rerender(<AppContent />);
-    expect(screen.getByText('صفحة الدرس lesson-3')).toBeInTheDocument();
-  });
-
-  it('يستأنف الموضع نفسه بعد دخول حساب active', () => {
-    let session = baseSession();
-    mockedUseAuthSession.mockImplementation(() => session);
-    const view = render(<AppContent />);
-    reachLesson();
-
-    session = baseSession({ entryMode: 'sign_in' });
-    view.rerender(<AppContent />);
-    session = baseSession({
-      authState: {
-        status: 'authenticated',
-        user: { id: 'u', email: 'u@example.com', emailConfirmedAt: null },
-        session: {
-          expiresAt: null,
-          user: { id: 'u', email: 'u@example.com', emailConfirmedAt: null },
-        },
-      },
-      authorizationState: {
-        status: 'authorized',
-        profile: {
-          id: 'u',
-          displayName: null,
-          role: 'student',
-          status: 'active',
-          createdAt: 'x',
-          updatedAt: 'x',
-        },
-      },
-    });
-    view.rerender(<AppContent />);
-    expect(screen.getByText('صفحة الدرس lesson-3')).toBeInTheDocument();
-  });
-
-  it('يعيد المستخدم إلى وضع الزائر مع الموضع نفسه بعد تسجيل الخروج', () => {
-    let session = baseSession();
-    mockedUseAuthSession.mockImplementation(() => session);
-    const view = render(<AppContent />);
-    reachLesson();
-
-    session = baseSession({
-      authState: {
-        status: 'authenticated',
-        user: { id: 'u', email: 'u@example.com', emailConfirmedAt: null },
-        session: {
-          expiresAt: null,
-          user: { id: 'u', email: 'u@example.com', emailConfirmedAt: null },
-        },
-      },
-      authorizationState: {
-        status: 'authorized',
-        profile: {
-          id: 'u',
-          displayName: null,
-          role: 'student',
-          status: 'active',
-          createdAt: 'x',
-          updatedAt: 'x',
-        },
-      },
-    });
-    view.rerender(<AppContent />);
-    expect(screen.getByText('صفحة الدرس lesson-3')).toBeInTheDocument();
-
-    session = baseSession();
-    view.rerender(<AppContent />);
-    expect(screen.getByText('صفحة الدرس lesson-3')).toBeInTheDocument();
-  });
-
-  it('يخفي تجربة الطالب في pending دون مسح Step', () => {
-    let session = baseSession();
-    mockedUseAuthSession.mockImplementation(() => session);
-    const view = render(<AppContent />);
-    reachLesson();
-
-    session = baseSession({
-      authState: {
-        status: 'authenticated',
-        user: { id: 'u', email: null, emailConfirmedAt: null },
-        session: { expiresAt: null, user: { id: 'u', email: null, emailConfirmedAt: null } },
-      },
-      authorizationState: {
-        status: 'pending',
-        profile: {
-          id: 'u',
-          displayName: null,
-          role: 'student',
-          status: 'pending',
-          createdAt: 'x',
-          updatedAt: 'x',
-        },
-      },
-    });
-    view.rerender(<AppContent />);
-    expect(screen.getByText('الحساب في انتظار التفعيل')).toBeInTheDocument();
-
-    session = baseSession();
-    view.rerender(<AppContent />);
-    expect(screen.getByText('صفحة الدرس lesson-3')).toBeInTheDocument();
-  });
-
-  it('يعرض شاشة تأكيد البريد دون إظهار تجربة الطالب', () => {
-    mockedUseAuthSession.mockReturnValue(
-      baseSession({
-        entryMode: 'confirmation_required',
-        confirmationEmail: 'new@example.com',
-      })
-    );
-    render(<AppContent />);
-
-    expect(screen.getByText('راجع بريدك الإلكتروني')).toBeInTheDocument();
-    expect(screen.getByText('new@example.com')).toBeInTheDocument();
-    expect(screen.queryByText('الصف التجريبي')).not.toBeInTheDocument();
-  });
-
-  it('لا يضيف حالات Auth إلى آلة Step التعليمية', async () => {
+  it('لا يضيف حالات Auth إلى آلة Step التعليمية', () => {
     const source = readFileSync(resolve(process.cwd(), 'src/App.tsx'), 'utf8');
     expect(source).not.toMatch(/name:\s*['"]sign_in['"]/);
     expect(source).not.toMatch(/name:\s*['"]pending['"]/);
