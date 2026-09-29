@@ -70,16 +70,17 @@ describe('Phase 5-2 lesson activities entry', () => {
         onOpenReviewQuestions={vi.fn()}
         onOpenActivities={onOpenActivities}
         onOpenMatchingGame={onOpenMatchingGame}
+        onOpenVirtualLabs={vi.fn()}
         onOpenMasteryTest={vi.fn()}
       />
     );
 
     expect(screen.getByRole('button', { name: 'الأنشطة العلمية' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'لعبة تعليمية' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'الألعاب التعليمية' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'الأنشطة العلمية' }));
     expect(onOpenActivities).toHaveBeenCalledTimes(1);
 
-    fireEvent.click(screen.getByRole('button', { name: 'لعبة تعليمية' }));
+    fireEvent.click(screen.getByRole('button', { name: 'الألعاب التعليمية' }));
     expect(onOpenMatchingGame).toHaveBeenCalledTimes(1);
   });
 });

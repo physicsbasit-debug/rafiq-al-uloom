@@ -1,7 +1,5 @@
 import { AppButton } from '@design-system/components/AppButton';
 import { QueryBoundary } from '@design-system/components/QueryBoundary';
-import { colors } from '@design-system/theme/colors';
-import { spacing } from '@design-system/theme/spacing';
 import { LessonConcepts } from '@features/lesson/concepts/LessonConcepts';
 import { LessonExamples } from '@features/lesson/examples/LessonExamples';
 import { LessonExperiments } from '@features/lesson/experiments/LessonExperiments';
@@ -16,12 +14,15 @@ import {
   useLessonObjectives,
 } from '@services/queries/content-query.hooks';
 
+import { LessonActionGrid } from './LessonActionGrid';
+
 interface LessonViewProps {
   lessonId: string;
   onBackToLessons: () => void;
   onOpenReviewQuestions: () => void;
   onOpenActivities: () => void;
   onOpenMatchingGame: () => void;
+  onOpenVirtualLabs: () => void;
   onOpenMasteryTest: () => void;
 }
 
@@ -39,6 +40,7 @@ function LessonViewContent({
   onOpenReviewQuestions,
   onOpenActivities,
   onOpenMatchingGame,
+  onOpenVirtualLabs,
   onOpenMasteryTest,
 }: LessonViewContentProps) {
   if (!lesson) {
@@ -51,40 +53,30 @@ function LessonViewContent({
   }
 
   return (
-    <article style={{ display: 'grid', gap: spacing.lg }}>
-      <header>
-        <p
-          style={{
-            margin: `0 0 ${spacing.xs}`,
-            color: colors.textSecondary,
-            fontWeight: 800,
-          }}
-        >
-          درس قراءة
-        </p>
-        <h2 style={{ margin: 0, color: colors.textPrimary }}>{lesson.title}</h2>
+    <article className="rafiq-lesson-view">
+      <header className="rafiq-lesson-hero">
+        <p>درس الفيزياء</p>
+        <h2>{lesson.title}</h2>
+        <span>اقرأ المفاهيم، شاهد الأمثلة، ثم اختر طريقة التدريب المناسبة لك.</span>
       </header>
 
-      <LessonObjectives objectives={objectives} />
-      <LessonSummary summary={lesson.summary} />
-      <LessonConcepts concepts={lesson.keyConcepts} />
-      <LessonExamples examples={lesson.examples} />
-      <LessonMisconceptions misconceptions={lesson.misconceptions} />
-      <LessonExperiments experiments={experiments} />
-
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-          gap: spacing.md,
-        }}
-      >
-        <AppButton label="أسئلة المراجعة" onClick={onOpenReviewQuestions} />
-        <AppButton label="الأنشطة العلمية" onClick={onOpenActivities} />
-        <AppButton label="لعبة تعليمية" onClick={onOpenMatchingGame} />
-        <AppButton label="اختبار الإتقان" onClick={onOpenMasteryTest} />
-        <AppButton label="العودة إلى الدروس" variant="secondary" onClick={onBackToLessons} />
+      <div className="rafiq-lesson-content-stack">
+        <LessonObjectives objectives={objectives} />
+        <LessonSummary summary={lesson.summary} />
+        <LessonConcepts concepts={lesson.keyConcepts} />
+        <LessonExamples examples={lesson.examples} />
+        <LessonMisconceptions misconceptions={lesson.misconceptions} />
+        <LessonExperiments experiments={experiments} />
       </div>
+
+      <LessonActionGrid
+        onOpenReviewQuestions={onOpenReviewQuestions}
+        onOpenActivities={onOpenActivities}
+        onOpenMatchingGame={onOpenMatchingGame}
+        onOpenVirtualLabs={onOpenVirtualLabs}
+        onOpenMasteryTest={onOpenMasteryTest}
+        onBackToLessons={onBackToLessons}
+      />
     </article>
   );
 }
@@ -95,6 +87,7 @@ export function LessonView({
   onOpenReviewQuestions,
   onOpenActivities,
   onOpenMatchingGame,
+  onOpenVirtualLabs,
   onOpenMasteryTest,
 }: LessonViewProps) {
   const lessonQuery = useLesson(lessonId);
@@ -121,6 +114,7 @@ export function LessonView({
         onOpenReviewQuestions={onOpenReviewQuestions}
         onOpenActivities={onOpenActivities}
         onOpenMatchingGame={onOpenMatchingGame}
+        onOpenVirtualLabs={onOpenVirtualLabs}
         onOpenMasteryTest={onOpenMasteryTest}
       />
     </QueryBoundary>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { AppButton } from '@design-system/components/AppButton';
 import { ChoiceButton } from '@design-system/components/ChoiceButton';
 import { MasteryBadge } from '@design-system/components/MasteryBadge';
+import { StudentBackAction } from '@features/student/navigation/StudentBackAction';
 import { QueryBoundary } from '@design-system/components/QueryBoundary';
 import { colors } from '@design-system/theme/colors';
 import { radius } from '@design-system/theme/radius';
@@ -244,8 +245,8 @@ function MasteryTestContent({ questions, lessonId, onBackToLesson }: MasteryTest
           </div>
         </section>
       )}
-      <div style={{ maxWidth: '220px', marginTop: spacing.lg }}>
-        <AppButton label="العودة إلى الدرس" variant="secondary" onClick={onBackToLesson} />
+      <div style={{ marginTop: spacing.lg }}>
+        <StudentBackAction label="العودة إلى الدرس" onClick={onBackToLesson} />
       </div>
     </section>
   );

@@ -1,6 +1,6 @@
-import { AppCard } from '@design-system/components/AppCard';
 import { QueryBoundary } from '@design-system/components/QueryBoundary';
-import { colors } from '@design-system/theme/colors';
+import { StudentChoiceCard } from '@features/student/navigation/StudentChoiceCard';
+import { StudentSelectionLayout } from '@features/student/navigation/StudentSelectionLayout';
 import { useSemestersByGrade } from '@services/queries/content-query.hooks';
 
 interface SemesterSelectionProps {
@@ -13,18 +13,21 @@ export function SemesterSelection({ gradeId, onSelectSemester }: SemesterSelecti
 
   return (
     <QueryBoundary isLoading={isLoading} error={error} onRetry={reload}>
-      <section>
-        <h2 style={{ margin: '0 0 0.9rem', color: colors.textPrimary }}>اختر الفصل الدراسي</h2>
-        <div style={{ display: 'grid', gap: '0.8rem' }}>
-          {semesters.map((semester) => (
-            <AppCard
-              key={semester.id}
-              title={semester.name}
-              onClick={() => onSelectSemester(semester.id)}
-            />
-          ))}
-        </div>
-      </section>
+      <StudentSelectionLayout
+        title="اختر الفصل الدراسي"
+        description="ستظهر لك الفصول المتاحة للطالب فقط وفق إعدادات النشر الحالية."
+        icon="semester"
+      >
+        {semesters.map((semester) => (
+          <StudentChoiceCard
+            key={semester.id}
+            title={semester.name}
+            subtitle={`الفصل ${semester.order}`}
+            icon="semester"
+            onClick={() => onSelectSemester(semester.id)}
+          />
+        ))}
+      </StudentSelectionLayout>
     </QueryBoundary>
   );
 }

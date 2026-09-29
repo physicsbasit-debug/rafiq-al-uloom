@@ -1,6 +1,6 @@
-import { AppCard } from '@design-system/components/AppCard';
 import { QueryBoundary } from '@design-system/components/QueryBoundary';
-import { colors } from '@design-system/theme/colors';
+import { StudentChoiceCard } from '@features/student/navigation/StudentChoiceCard';
+import { StudentSelectionLayout } from '@features/student/navigation/StudentSelectionLayout';
 import { useLessonsByUnit } from '@services/queries/content-query.hooks';
 
 interface LessonListProps {
@@ -13,19 +13,21 @@ export function LessonList({ unitId, onSelectLesson }: LessonListProps) {
 
   return (
     <QueryBoundary isLoading={isLoading} error={error} onRetry={reload}>
-      <section>
-        <h2 style={{ margin: '0 0 0.9rem', color: colors.textPrimary }}>الدروس</h2>
-        <div style={{ display: 'grid', gap: '0.8rem' }}>
-          {lessons.map((lesson) => (
-            <AppCard
-              key={lesson.id}
-              title={lesson.title}
-              subtitle={`الدرس ${lesson.order}`}
-              onClick={() => onSelectLesson(lesson.id)}
-            />
-          ))}
-        </div>
-      </section>
+      <StudentSelectionLayout
+        title="الدروس"
+        description="اختر الدرس للانتقال إلى الشرح والأنشطة والأسئلة المرتبطة به."
+        icon="lesson"
+      >
+        {lessons.map((lesson) => (
+          <StudentChoiceCard
+            key={lesson.id}
+            title={lesson.title}
+            subtitle={`الدرس ${lesson.order}`}
+            icon="lesson"
+            onClick={() => onSelectLesson(lesson.id)}
+          />
+        ))}
+      </StudentSelectionLayout>
     </QueryBoundary>
   );
 }

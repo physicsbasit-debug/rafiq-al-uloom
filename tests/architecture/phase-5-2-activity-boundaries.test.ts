@@ -27,12 +27,15 @@ describe('Phase 5-2 activity boundaries', () => {
     expect(app).not.toContain("{ name: 'data';");
   });
 
-  it('يبقي LessonExperiments inline ويضيف Hub بصورة additive', () => {
+  it('يبقي LessonExperiments inline ويضيف Hub بصورة additive عبر LessonActionGrid', () => {
     const lessonView = read('src/features/student/lesson-view/LessonView.tsx');
+    const lessonActionGrid = read('src/features/student/lesson-view/LessonActionGrid.tsx');
 
     expect(lessonView).toContain('<LessonExperiments experiments={experiments} />');
-    expect(lessonView).toContain('label="لعبة تعليمية"');
-    expect(lessonView).toContain('label="الأنشطة العلمية"');
+    expect(lessonView).toContain('<LessonActionGrid');
+    expect(lessonActionGrid).toContain("label: 'الألعاب التعليمية'");
+    expect(lessonActionGrid).toContain("label: 'الأنشطة العلمية'");
+    expect(lessonActionGrid).toContain("label: 'المختبرات الافتراضية'");
   });
 
   it('يبقي Domain Registry بلا React بينما renderer registry في React layer', () => {

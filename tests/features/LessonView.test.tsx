@@ -107,7 +107,9 @@ const defaultProps = {
   lessonId: 'lesson-one',
   onBackToLessons: vi.fn(),
   onOpenReviewQuestions: vi.fn(),
+  onOpenActivities: vi.fn(),
   onOpenMatchingGame: vi.fn(),
+  onOpenVirtualLabs: vi.fn(),
   onOpenMasteryTest: vi.fn(),
 };
 
@@ -362,12 +364,28 @@ describe('LessonView', () => {
     expect(onOpenReviewQuestions).toHaveBeenCalledTimes(1);
   });
 
-  it('زر لعبة تعليمية يستدعي onOpenMatchingGame', () => {
+  it('زر الألعاب التعليمية يستدعي onOpenMatchingGame', () => {
     const onOpenMatchingGame = vi.fn();
     mockQueriesSuccess();
     render(<LessonView {...defaultProps} onOpenMatchingGame={onOpenMatchingGame} />);
-    fireEvent.click(screen.getByRole('button', { name: 'لعبة تعليمية' }));
+    fireEvent.click(screen.getByRole('button', { name: 'الألعاب التعليمية' }));
     expect(onOpenMatchingGame).toHaveBeenCalledTimes(1);
+  });
+
+  it('زر الأنشطة العلمية يستدعي onOpenActivities', () => {
+    const onOpenActivities = vi.fn();
+    mockQueriesSuccess();
+    render(<LessonView {...defaultProps} onOpenActivities={onOpenActivities} />);
+    fireEvent.click(screen.getByRole('button', { name: 'الأنشطة العلمية' }));
+    expect(onOpenActivities).toHaveBeenCalledTimes(1);
+  });
+
+  it('زر المختبرات الافتراضية يستدعي onOpenVirtualLabs', () => {
+    const onOpenVirtualLabs = vi.fn();
+    mockQueriesSuccess();
+    render(<LessonView {...defaultProps} onOpenVirtualLabs={onOpenVirtualLabs} />);
+    fireEvent.click(screen.getByRole('button', { name: 'المختبرات الافتراضية' }));
+    expect(onOpenVirtualLabs).toHaveBeenCalledTimes(1);
   });
 
   it('زر اختبار الإتقان يستدعي onOpenMasteryTest', () => {

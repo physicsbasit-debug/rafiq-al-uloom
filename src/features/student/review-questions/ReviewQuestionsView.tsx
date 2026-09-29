@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AppButton } from '@design-system/components/AppButton';
+import { StudentBackAction } from '@features/student/navigation/StudentBackAction';
 import { QueryBoundary } from '@design-system/components/QueryBoundary';
 import { colors } from '@design-system/theme/colors';
 import { spacing } from '@design-system/theme/spacing';
@@ -67,8 +67,8 @@ function ReviewQuestionsContent({ questions, onBackToLesson }: ReviewQuestionsCo
         ))}
       </div>
 
-      <div style={{ maxWidth: '220px', marginTop: spacing.lg }}>
-        <AppButton label="العودة إلى الدرس" variant="secondary" onClick={onBackToLesson} />
+      <div style={{ marginTop: spacing.lg }}>
+        <StudentBackAction label="العودة إلى الدرس" onClick={onBackToLesson} />
       </div>
     </section>
   );

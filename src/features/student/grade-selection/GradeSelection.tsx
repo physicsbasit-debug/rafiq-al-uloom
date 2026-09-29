@@ -1,6 +1,6 @@
-import { AppCard } from '@design-system/components/AppCard';
 import { QueryBoundary } from '@design-system/components/QueryBoundary';
-import { colors } from '@design-system/theme/colors';
+import { StudentChoiceCard } from '@features/student/navigation/StudentChoiceCard';
+import { StudentSelectionLayout } from '@features/student/navigation/StudentSelectionLayout';
 import { useGrades } from '@services/queries/content-query.hooks';
 
 interface GradeSelectionProps {
@@ -12,14 +12,21 @@ export function GradeSelection({ onSelectGrade }: GradeSelectionProps) {
 
   return (
     <QueryBoundary isLoading={isLoading} error={error} onRetry={reload}>
-      <section>
-        <h2 style={{ margin: '0 0 0.9rem', color: colors.textPrimary }}>اختر الصف</h2>
-        <div style={{ display: 'grid', gap: '0.8rem' }}>
-          {grades.map((grade) => (
-            <AppCard key={grade.id} title={grade.name} onClick={() => onSelectGrade(grade.id)} />
-          ))}
-        </div>
-      </section>
+      <StudentSelectionLayout
+        title="اختر الصف"
+        description="ابدأ بتحديد صفك لتظهر لك الفصول والمحتوى المناسب فقط."
+        icon="grade"
+      >
+        {grades.map((grade) => (
+          <StudentChoiceCard
+            key={grade.id}
+            title={grade.name}
+            subtitle="محتوى الفيزياء المخصص لهذا الصف"
+            icon="grade"
+            onClick={() => onSelectGrade(grade.id)}
+          />
+        ))}
+      </StudentSelectionLayout>
     </QueryBoundary>
   );
 }

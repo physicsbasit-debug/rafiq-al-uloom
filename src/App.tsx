@@ -14,11 +14,17 @@ import { MasteryTestView } from '@features/mastery/MasteryTestView';
 import { GradeSelection } from '@features/student/grade-selection/GradeSelection';
 import { LessonList } from '@features/student/lesson-list/LessonList';
 import { LessonView } from '@features/student/lesson-view/LessonView';
+import { StudentBackAction } from '@features/student/navigation/StudentBackAction';
+import { StudentJourneyAccordion } from '@features/student/navigation/StudentJourneyAccordion';
 import { ReviewQuestionsView } from '@features/student/review-questions/ReviewQuestionsView';
 import { SemesterSelection } from '@features/student/semester-selection/SemesterSelection';
 import { SubjectSelection } from '@features/student/subject-selection/SubjectSelection';
 import { UnitSelection } from '@features/student/unit-selection/UnitSelection';
+import { VirtualLabHub } from '@features/virtual-labs/VirtualLabHub';
 import { DeferredWorkspace } from '@features/workspace/DeferredWorkspace';
+
+import './features/student/student-experience.css';
+import './features/student/learning-experience.css';
 
 type AppSurface = 'student' | 'teacher' | 'reviewer';
 
@@ -32,6 +38,7 @@ type Step =
   | { name: 'review'; lessonId: string; unitId: string }
   | { name: 'activities'; lessonId: string; unitId: string }
   | { name: 'game'; lessonId: string; unitId: string }
+  | { name: 'labs'; lessonId: string; unitId: string }
   | { name: 'mastery'; lessonId: string; unitId: string };
 
 interface StudentExperienceProps {
@@ -49,15 +56,15 @@ const loadReviewerWorkspace = () =>
 
 function StudentExperience({ step, setStep }: StudentExperienceProps) {
   return (
-    <>
+    <section className="rafiq-student-shell">
+      <StudentJourneyAccordion currentStep={step.name} />
+
       {step.name !== 'grade' ? (
-        <div style={{ maxWidth: '210px', marginBottom: '1rem' }}>
-          <AppButton
-            label="رجوع للبداية"
-            variant="secondary"
-            onClick={() => setStep({ name: 'grade' })}
-          />
-        </div>
+        <StudentBackAction
+          label="الرجوع إلى البداية"
+          kind="home"
+          onClick={() => setStep({ name: 'grade' })}
+        />
       ) : null}
 
       {step.name === 'grade' ? (
@@ -108,6 +115,9 @@ function StudentExperience({ step, setStep }: StudentExperienceProps) {
           onOpenMatchingGame={() =>
             setStep({ name: 'game', lessonId: step.lessonId, unitId: step.unitId })
           }
+          onOpenVirtualLabs={() =>
+            setStep({ name: 'labs', lessonId: step.lessonId, unitId: step.unitId })
+          }
           onOpenMasteryTest={() =>
             setStep({ name: 'mastery', lessonId: step.lessonId, unitId: step.unitId })
           }
@@ -141,6 +151,15 @@ function StudentExperience({ step, setStep }: StudentExperienceProps) {
         />
       ) : null}
 
+      {step.name === 'labs' ? (
+        <VirtualLabHub
+          lessonId={step.lessonId}
+          onBackToLesson={() =>
+            setStep({ name: 'lesson', lessonId: step.lessonId, unitId: step.unitId })
+          }
+        />
+      ) : null}
+
       {step.name === 'mastery' ? (
         <MasteryTestView
           lessonId={step.lessonId}
@@ -149,7 +168,7 @@ function StudentExperience({ step, setStep }: StudentExperienceProps) {
           }
         />
       ) : null}
-    </>
+    </section>
   );
 }
 

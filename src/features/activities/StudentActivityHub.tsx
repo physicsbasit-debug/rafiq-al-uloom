@@ -4,13 +4,14 @@ import { QueryBoundary } from '@design-system/components/QueryBoundary';
 import { colors } from '@design-system/theme/colors';
 import { radius } from '@design-system/theme/radius';
 import { spacing } from '@design-system/theme/spacing';
-import { typography } from '@design-system/theme/typography';
 import { getActivityRegistryEntry } from '@features/activities/activity-registry';
 import { StudentActivityHost } from '@features/activities/StudentActivityHost';
 import { getStudentExperimentSafetyDecision } from '@features/activities/student-experiment-safety';
+import { StudentBackAction } from '@features/student/navigation/StudentBackAction';
+import { StudentIcon, type StudentIconName } from '@features/student/navigation/StudentIcon';
 import { useActivitiesByLesson } from '@services/queries/activity-query.hooks';
 import { useObjectivesByIds } from '@services/queries/content-query.hooks';
-import type { AvailableLearningActivity } from '@shared-types/activity.types';
+import type { AvailableLearningActivity, LearningActivityKind } from '@shared-types/activity.types';
 import type { Objective } from '@shared-types/content.types';
 
 interface StudentActivityHubProps {
@@ -23,14 +24,23 @@ interface ActivityHubObjectivesLoaderProps {
   onBackToLesson: () => void;
 }
 
+const activityIcon: Record<LearningActivityKind, StudentIconName> = {
+  matching: 'game',
+  experiment: 'experiment',
+  simulation: 'simulation',
+  inquiry: 'inquiry',
+  data: 'data',
+};
+
 function EmptyActivityState({ onBackToLesson }: { onBackToLesson: () => void }) {
   return (
-    <section>
-      <h2 style={{ color: colors.textPrimary }}>الأنشطة العلمية</h2>
-      <p style={{ color: colors.textSecondary }}>لا توجد أنشطة علمية متاحة لهذا الدرس حاليًا.</p>
-      <div style={{ maxWidth: '220px', marginTop: spacing.lg }}>
-        <AppButton label="العودة إلى الدرس" variant="secondary" onClick={onBackToLesson} />
-      </div>
+    <section className="rafiq-empty-learning-state">
+      <span aria-hidden="true">
+        <StudentIcon name="activities" width="38" height="38" />
+      </span>
+      <h2>الأنشطة العلمية</h2>
+      <p>لا توجد أنشطة علمية متاحة لهذا الدرس حاليًا.</p>
+      <StudentBackAction label="العودة إلى الدرس" onClick={onBackToLesson} />
     </section>
   );
 }
@@ -110,21 +120,19 @@ function ActivityHubContent({
   }
 
   return (
-    <section>
-      <header style={{ marginBottom: spacing.lg }}>
-        <p
-          style={{
-            margin: `0 0 ${spacing.xs}`,
-            color: colors.textSecondary,
-            fontWeight: 800,
-          }}
-        >
-          تعلّم بالتجربة والتفاعل
-        </p>
-        <h2 style={{ margin: 0, color: colors.textPrimary }}>الأنشطة العلمية</h2>
+    <section className="rafiq-activity-hub">
+      <header className="rafiq-learning-hub-hero">
+        <span className="rafiq-learning-hub-hero-icon" aria-hidden="true">
+          <StudentIcon name="activities" width="34" height="34" />
+        </span>
+        <div>
+          <p>تعلّم بالتجربة والتفاعل</p>
+          <h2>الأنشطة العلمية</h2>
+          <span>اختر نشاطًا، نفّذه، ثم اربط ما لاحظته بهدف التعلم.</span>
+        </div>
       </header>
 
-      <div style={{ display: 'grid', gap: spacing.md }}>
+      <div className="rafiq-activity-grid">
         {activities.map((activity) => {
           const registryEntry = getActivityRegistryEntry(activity.kind);
           const linkedObjectives = activity.objectiveIds.map(
@@ -136,86 +144,52 @@ function ActivityHubContent({
               : null;
 
           return (
-            <article
-              key={activity.id}
-              style={{
-                border: `1px solid ${colors.border}`,
-                borderRadius: radius.lg,
-                padding: spacing.lg,
-                backgroundColor: colors.surface,
-              }}
-            >
-              <p
-                style={{
-                  margin: `0 0 ${spacing.xs}`,
-                  color: colors.textSecondary,
-                  fontWeight: 800,
-                }}
-              >
-                {registryEntry?.label ?? activity.kind}
-              </p>
+            <article key={activity.id} className="rafiq-activity-card">
+              <div className="rafiq-activity-card-head">
+                <span className="rafiq-activity-kind-icon" aria-hidden="true">
+                  <StudentIcon name={activityIcon[activity.kind]} width="28" height="28" />
+                </span>
+                <div>
+                  <span className="rafiq-activity-kind-chip">
+                    {registryEntry?.label ?? activity.kind}
+                  </span>
+                  <h3>{activity.title}</h3>
+                </div>
+              </div>
 
-              <h3 style={{ margin: `0 0 ${spacing.sm}`, color: colors.textPrimary }}>
-                {activity.title}
-              </h3>
-
-              <p
-                style={{ margin: `0 0 ${spacing.xs}`, color: colors.textPrimary, fontWeight: 900 }}
-              >
-                أهداف التعلم:
-              </p>
-              <ul
-                style={{
-                  margin: `0 0 ${spacing.md}`,
-                  paddingInlineStart: spacing.lg,
-                  color: colors.textPrimary,
-                  lineHeight: typography.lineHeight.xl,
-                }}
-              >
-                {linkedObjectives.map((objective) => (
-                  <li key={objective.id}>{objective.text}</li>
-                ))}
-              </ul>
+              <div className="rafiq-activity-objectives">
+                <strong>ما الذي ستتعلّمه؟</strong>
+                <ul>
+                  {linkedObjectives.map((objective) => (
+                    <li key={objective.id}>{objective.text}</li>
+                  ))}
+                </ul>
+              </div>
 
               {experimentSafety ? (
-                <p
-                  style={{
-                    margin: `0 0 ${spacing.md}`,
-                    padding: spacing.sm,
-                    border: `1px solid ${colors.border}`,
-                    borderRadius: radius.md,
-                    backgroundColor: colors.surfaceMuted,
-                    color: colors.textPrimary,
-                    fontWeight: 800,
-                  }}
-                >
-                  السلامة: {experimentSafety.safetyLabel}
-                </p>
+                <p className="rafiq-activity-safety">السلامة: {experimentSafety.safetyLabel}</p>
               ) : null}
 
               {experimentSafety?.mode === 'blocked' ? (
-                <p
-                  role="status"
-                  style={{ margin: 0, color: colors.textSecondary, fontWeight: 900 }}
-                >
+                <p role="status" className="rafiq-activity-blocked">
                   غير متاح للتنفيذ
                 </p>
               ) : (
-                <div style={{ maxWidth: '220px' }}>
-                  <AppButton
-                    label={experimentSafety?.hubActionLabel ?? 'فتح النشاط'}
-                    onClick={() => setSelectedActivityId(activity.id)}
-                  />
-                </div>
+                <button
+                  type="button"
+                  className="rafiq-activity-open"
+                  onClick={() => setSelectedActivityId(activity.id)}
+                >
+                  {experimentSafety?.hubActionLabel ?? 'فتح النشاط'}
+                  <StudentIcon name="chevron-left" width="20" height="20" />
+                </button>
               )}
             </article>
           );
         })}
       </div>
 
-      <div style={{ maxWidth: '220px', marginTop: spacing.lg }}>
-        <AppButton label="العودة إلى الدرس" variant="secondary" onClick={onBackToLesson} />
-      </div>
+      <StudentBackAction label="العودة إلى الدرس" onClick={onBackToLesson} />
     </section>
   );
 }
