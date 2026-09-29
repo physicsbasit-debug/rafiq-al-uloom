@@ -74,6 +74,21 @@ anon_rest_status() {
   printf '%s' "$status"
 }
 
+anon_rest_count() {
+  local table="$1"
+
+  curl -sS \
+    -H "apikey: ${PUBLISHABLE_KEY}" \
+    "${REST_URL}/${table}?select=id" \
+  | python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+print(len(data) if isinstance(data, list) else -1)
+'
+}
+
 rest_count() {
   local table="$1"
   local column="$2"
@@ -223,9 +238,23 @@ check_sql_value \
 
 anon_grades_status="$(anon_rest_status grades)"
 if [[ "$anon_grades_status" =~ ^2 ]]; then
-  fail "anon استطاع قراءة grades عبر Data API (HTTP $anon_grades_status)"
+  pass "anon يستطيع قراءة سطح الطالب العام للـ grades (HTTP $anon_grades_status)"
 else
-  pass "anon محجوب عن grades عبر Data API (HTTP $anon_grades_status)"
+  fail "anon لم يستطع قراءة سطح الطالب العام للـ grades (HTTP $anon_grades_status)"
+fi
+
+anon_grade_count="$(anon_rest_count grades)"
+if [[ "$anon_grade_count" -eq 1 ]]; then
+  pass "anon يرى صفًا واحدًا مفعّلًا فقط"
+else
+  fail "anon يرى عدد صفوف غير متوقع (العدد=$anon_grade_count)"
+fi
+
+anon_semester_count="$(anon_rest_count semesters)"
+if [[ "$anon_semester_count" -eq 1 ]]; then
+  pass "anon يرى الفصل الدراسي الأول فقط"
+else
+  fail "anon يرى عدد فصول غير متوقع (العدد=$anon_semester_count)"
 fi
 
 anon_profiles_status="$(anon_rest_status profiles)"

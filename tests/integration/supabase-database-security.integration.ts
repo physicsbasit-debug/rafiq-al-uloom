@@ -14,6 +14,46 @@ const authenticatedExecuteAllowlist = [
   'public.submit_mastery_attempt(uuid, text, timestamp with time zone, text, jsonb)',
 ].sort();
 
+const anonContentSelectAllowlist = [
+  'public.data_activities:SELECT',
+  'public.data_activity_objectives:SELECT',
+  'public.experiment_objectives:SELECT',
+  'public.experiments:SELECT',
+  'public.game_objectives:SELECT',
+  'public.games:SELECT',
+  'public.grades:SELECT',
+  'public.inquiries:SELECT',
+  'public.inquiry_objectives:SELECT',
+  'public.lessons:SELECT',
+  'public.objectives:SELECT',
+  'public.questions:SELECT',
+  'public.semesters:SELECT',
+  'public.simulation_objectives:SELECT',
+  'public.simulations:SELECT',
+  'public.subjects:SELECT',
+  'public.units:SELECT',
+].sort();
+
+const anonPolicyAllowlist = [
+  'public.data_activities:public anon read visible data activities',
+  'public.data_activity_objectives:public anon read visible data activity objectives',
+  'public.experiment_objectives:public anon read visible experiment objectives',
+  'public.experiments:public anon read visible experiments',
+  'public.game_objectives:public anon read visible game objectives',
+  'public.games:public anon read visible games',
+  'public.grades:public anon read visible grades',
+  'public.inquiries:public anon read visible inquiries',
+  'public.inquiry_objectives:public anon read visible inquiry objectives',
+  'public.lessons:public anon read visible lessons',
+  'public.objectives:public anon read visible objectives',
+  'public.questions:public anon read visible questions',
+  'public.semesters:public anon read visible semesters',
+  'public.simulation_objectives:public anon read visible simulation objectives',
+  'public.simulations:public anon read visible simulations',
+  'public.subjects:public anon read visible subjects',
+  'public.units:public anon read visible units',
+].sort();
+
 function queryJson<T>(sql: string): T {
   return JSON.parse(psqlAdmin(sql)) as T;
 }
@@ -34,8 +74,8 @@ describeIntegration('Phase 6-4C database / RLS privilege audit', () => {
     expect(withoutRls).toEqual([]);
   });
 
-  it('does not expose application tables to anon at the table privilege layer', () => {
-    const violations = queryJson<string[]>(`
+  it('limits anon table privileges to the reviewed read-only student content allowlist', () => {
+    const privileges = queryJson<string[]>(`
       WITH app_tables AS (
         SELECT n.nspname AS schema_name, c.relname AS table_name
         FROM pg_class AS c
@@ -56,7 +96,7 @@ describeIntegration('Phase 6-4C database / RLS privilege audit', () => {
         'anon', format('%I.%I', schema_name, table_name), privilege_name
       );
     `);
-    expect(violations).toEqual([]);
+    expect(privileges).toEqual(anonContentSelectAllowlist);
   });
 
   it('prevents authenticated from direct application-table writes', () => {
@@ -270,8 +310,8 @@ describeIntegration('Phase 6-4C database / RLS privilege audit', () => {
     expect(violations).toEqual([]);
   });
 
-  it('does not target anon or PUBLIC from application RLS policies', () => {
-    const violations = queryJson<string[]>(`
+  it('limits anon RLS policies to the reviewed student-read allowlist and keeps PUBLIC excluded', () => {
+    const anonPolicies = queryJson<string[]>(`
       SELECT COALESCE(
         json_agg(format('%I.%I:%s', schemaname, tablename, policyname)
           ORDER BY schemaname, tablename, policyname),
@@ -279,11 +319,20 @@ describeIntegration('Phase 6-4C database / RLS privilege audit', () => {
       )::text
       FROM pg_policies
       WHERE schemaname IN ('public', 'private')
-        AND (
-          roles @> ARRAY['anon']::name[]
-          OR roles @> ARRAY['public']::name[]
-        );
+        AND roles @> ARRAY['anon']::name[];
     `);
-    expect(violations).toEqual([]);
+    expect(anonPolicies).toEqual(anonPolicyAllowlist);
+
+    const publicPolicies = queryJson<string[]>(`
+      SELECT COALESCE(
+        json_agg(format('%I.%I:%s', schemaname, tablename, policyname)
+          ORDER BY schemaname, tablename, policyname),
+        '[]'::json
+      )::text
+      FROM pg_policies
+      WHERE schemaname IN ('public', 'private')
+        AND roles @> ARRAY['public']::name[];
+    `);
+    expect(publicPolicies).toEqual([]);
   });
 });

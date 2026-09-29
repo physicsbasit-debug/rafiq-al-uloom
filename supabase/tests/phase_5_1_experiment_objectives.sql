@@ -48,7 +48,7 @@ SELECT ok(
   'RLS is enabled on experiment_objectives'
 );
 
-SELECT ok(NOT has_table_privilege('anon', 'public.experiment_objectives', 'SELECT'), 'anon has no SELECT');
+SELECT ok(has_table_privilege('anon', 'public.experiment_objectives', 'SELECT'), 'anon has read-only SELECT');
 SELECT ok(NOT has_table_privilege('anon', 'public.experiment_objectives', 'INSERT'), 'anon has no INSERT');
 SELECT ok(NOT has_table_privilege('anon', 'public.experiment_objectives', 'UPDATE'), 'anon has no UPDATE');
 SELECT ok(NOT has_table_privilege('anon', 'public.experiment_objectives', 'DELETE'), 'anon has no DELETE');
@@ -86,8 +86,8 @@ SELECT is(
       AND cmd = 'SELECT'
       AND roles @> ARRAY['anon']::name[]
   ),
-  0::bigint,
-  'experiment_objectives has no anon SELECT policy'
+  1::bigint,
+  'experiment_objectives has one anon SELECT policy'
 );
 
 DELETE FROM public.experiment_objectives

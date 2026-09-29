@@ -120,10 +120,32 @@ describeIntegration('Phase 2-C4-B direct PostgREST authorization bypass', () => 
     expect(result.data).toEqual([]);
   });
 
-  it('denies anonymous cloud catalog reads at the table privilege layer', async () => {
-    const { error } = await fixtures.anonymousClient.from('grades').select('id').eq('id', 'g10');
+  it('allows anonymous students to read the visible grade without an account', async () => {
+    const result = await fixtures.anonymousClient.from('grades').select('id').eq('id', 'g10');
 
-    expectTablePermissionDenied(error, 'grades');
+    expect(result.error).toBeNull();
+    expect(result.data).toEqual([{ id: 'g10' }]);
+  });
+
+  it('shows semester 1 and hides semester 2 from anonymous students', async () => {
+    const result = await fixtures.anonymousClient
+      .from('semesters')
+      .select('id')
+      .eq('grade_id', 'g10')
+      .order('id');
+
+    expect(result.error).toBeNull();
+    expect(result.data).toEqual([{ id: 'g10-sem1' }]);
+  });
+
+  it('keeps the approved waves lesson hidden while its parent semester is hidden', async () => {
+    const result = await fixtures.anonymousClient
+      .from('lessons')
+      .select('id, status')
+      .eq('id', 'g10-phy-waves-l2');
+
+    expect(result.error).toBeNull();
+    expect(result.data).toEqual([]);
   });
 
   it('hides draft lessons from every active application role through RLS', async () => {

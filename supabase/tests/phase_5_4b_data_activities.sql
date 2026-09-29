@@ -104,12 +104,12 @@ SELECT ok(
 );
 
 SELECT ok(
-  NOT has_table_privilege('anon', 'public.data_activities', 'SELECT'),
-  'anon cannot SELECT data_activities'
+  has_table_privilege('anon', 'public.data_activities', 'SELECT'),
+  'anon can SELECT data_activities through RLS'
 );
 SELECT ok(
-  NOT has_table_privilege('anon', 'public.data_activity_objectives', 'SELECT'),
-  'anon cannot SELECT data_activity_objectives'
+  has_table_privilege('anon', 'public.data_activity_objectives', 'SELECT'),
+  'anon can SELECT data_activity_objectives through RLS'
 );
 SELECT ok(
   has_table_privilege('authenticated', 'public.data_activities', 'SELECT'),
@@ -188,8 +188,8 @@ SELECT is(
       AND cmd = 'SELECT'
       AND roles @> ARRAY['anon']::name[]
   ),
-  0::bigint,
-  'data_activities has no anon SELECT policy'
+  1::bigint,
+  'data_activities has one anon SELECT policy'
 );
 SELECT is(
   (
@@ -200,8 +200,8 @@ SELECT is(
       AND cmd = 'SELECT'
       AND roles @> ARRAY['anon']::name[]
   ),
-  0::bigint,
-  'data_activity_objectives has no anon SELECT policy'
+  1::bigint,
+  'data_activity_objectives has one anon SELECT policy'
 );
 
 SELECT is(

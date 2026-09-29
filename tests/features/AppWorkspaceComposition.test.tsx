@@ -262,10 +262,15 @@ describe('App workspace authorization composition', () => {
     }
   );
 
-  it('يبقي مسار الزائر محليًا بلا نقاط دخول لمساحات العمل', () => {
+  it('يبقي مسار الزائر محليًا ويبدأ التعلم صراحة دون نقاط دخول لمساحات العمل', () => {
     mockedUseAuthSession.mockReturnValue(baseSession());
 
     render(<AppContent />);
+
+    expect(screen.getByRole('button', { name: 'ابدأ التعلّم' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'الصف التجريبي' })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'ابدأ التعلّم' }));
 
     expect(screen.getByRole('button', { name: 'الصف التجريبي' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'مساحة المعلم' })).not.toBeInTheDocument();

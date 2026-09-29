@@ -270,14 +270,17 @@ describeIntegration('Phase 2-C2-A profiles and authorization RLS', () => {
     }
   });
 
-  it('denies cloud content to anon, pending, and suspended identities', async () => {
+  it('allows the accountless student catalog while pending and suspended accounts remain blocked', async () => {
     const anon = await fixtures.anonymousClient.from('grades').select('id');
     const pending = await pendingStudent.client.from('grades').select('id');
     const suspended = await suspendedStudent.client.from('grades').select('id');
 
-    expectPermissionDenied(anon.error);
+    expect(anon.error).toBeNull();
+    expect(anon.data).toEqual([{ id: 'g10' }]);
+
     expect(pending.error).toBeNull();
     expect(pending.data).toEqual([]);
+
     expect(suspended.error).toBeNull();
     expect(suspended.data).toEqual([]);
   });

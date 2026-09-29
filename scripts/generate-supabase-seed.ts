@@ -8,6 +8,7 @@ import {
   learningCatalogSubjects,
   learningCatalogUnits,
 } from '../src/content/seed/learning-catalog.seed';
+import { publicContentVisibility } from '../src/content/seed/public-content-visibility.seed';
 import {
   grade10PhysicsWavesExperiments,
   grade10PhysicsWavesGames,
@@ -317,6 +318,10 @@ export function sqlInteger(value: number): string {
   return String(value);
 }
 
+export function sqlBoolean(value: boolean): string {
+  return value ? 'true' : 'false';
+}
+
 function createInsertStatement(
   table: string,
   columns: string[],
@@ -346,27 +351,29 @@ export function buildSeedSql(seedData: SeedData): string {
     '',
     createInsertStatement(
       'grades',
-      ['id', 'name', 'display_order'],
+      ['id', 'name', 'display_order', 'is_visible'],
       seedData.grades.map((grade) => [
         sqlText(grade.id),
         sqlText(grade.name),
         sqlInteger(grade.order),
+        sqlBoolean(publicContentVisibility.gradeIds.includes(grade.id)),
       ]),
       'id',
-      ['name', 'display_order']
+      ['name', 'display_order', 'is_visible']
     ),
     '',
     createInsertStatement(
       'semesters',
-      ['id', 'grade_id', 'name', 'display_order'],
+      ['id', 'grade_id', 'name', 'display_order', 'is_visible'],
       seedData.semesters.map((semester) => [
         sqlText(semester.id),
         sqlText(semester.gradeId),
         sqlText(semester.name),
         sqlInteger(semester.order),
+        sqlBoolean(publicContentVisibility.semesterIds.includes(semester.id)),
       ]),
       'id',
-      ['grade_id', 'name', 'display_order']
+      ['grade_id', 'name', 'display_order', 'is_visible']
     ),
     '',
     createInsertStatement(
@@ -384,16 +391,17 @@ export function buildSeedSql(seedData: SeedData): string {
     '',
     createInsertStatement(
       'units',
-      ['id', 'subject_id', 'semester_id', 'title', 'display_order'],
+      ['id', 'subject_id', 'semester_id', 'title', 'display_order', 'is_visible'],
       seedData.units.map((unit) => [
         sqlText(unit.id),
         sqlText(unit.subjectId),
         sqlText(unit.semesterId),
         sqlText(unit.title),
         sqlInteger(unit.order),
+        sqlBoolean(publicContentVisibility.unitIds.includes(unit.id)),
       ]),
       'id',
-      ['subject_id', 'semester_id', 'title', 'display_order']
+      ['subject_id', 'semester_id', 'title', 'display_order', 'is_visible']
     ),
     '',
     createInsertStatement(
@@ -409,6 +417,7 @@ export function buildSeedSql(seedData: SeedData): string {
         'misconceptions',
         'status',
         'source',
+        'is_visible',
       ],
       seedData.lessons.map((lesson) => [
         sqlText(lesson.id),
@@ -421,6 +430,7 @@ export function buildSeedSql(seedData: SeedData): string {
         sqlTextArray(lesson.misconceptions),
         sqlText(lesson.status),
         sqlText(lesson.source),
+        sqlBoolean(publicContentVisibility.lessonIds.includes(lesson.id)),
       ]),
       'id',
       [
@@ -433,6 +443,7 @@ export function buildSeedSql(seedData: SeedData): string {
         'misconceptions',
         'status',
         'source',
+        'is_visible',
       ]
     ),
     '',

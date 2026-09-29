@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -108,13 +108,18 @@ beforeEach(() => {
 });
 
 describe('App authorization guard', () => {
-  it('يعرض تجربة الزائر المحلية دون استدعاء محرك الصلاحيات', () => {
+  it('يعرض بوابة الزائر ثم تجربة الطالب المحلية دون استدعاء محرك الصلاحيات', () => {
     mockedUseAuthSession.mockReturnValue(baseSession());
     mockedAuthorizeOperation.mockImplementation(() => {
       throw new Error('لا يجب استدعاء المحرك لمسار الزائر');
     });
 
     render(<AppContent />);
+
+    expect(screen.getByRole('button', { name: 'ابدأ التعلّم' })).toBeInTheDocument();
+    expect(screen.queryByText('تجربة الطالب المحلية')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'ابدأ التعلّم' }));
 
     expect(screen.getByText('تجربة الطالب المحلية')).toBeInTheDocument();
     expect(mockedAuthorizeOperation).not.toHaveBeenCalled();
@@ -231,12 +236,13 @@ describe('App authorization guard', () => {
     ).toHaveLength(1);
   });
 
-  it('يبقي مسار Guest خارج RequireCapability في المصدر الفعلي', () => {
+  it('يبقي مسار Guest بعد بدء التعلم خارج RequireCapability في المصدر الفعلي', () => {
     const source = readFileSync(resolve(process.cwd(), 'src/App.tsx'), 'utf8');
 
-    expect(source).toContain('showGuestExperience');
-    expect(source).toContain(
-      'showGuestExperience ? <StudentExperience step={step} setStep={setStep} /> : null'
+    expect(source).toContain('isGuest && guestLearningStarted ? (');
+    expect(source).toContain('<StudentExperience step={step} setStep={setStep} />');
+    expect(source.indexOf('isGuest && guestLearningStarted ? (')).toBeLessThan(
+      source.indexOf('<RequireCapability operation="access_student_experience">')
     );
   });
 

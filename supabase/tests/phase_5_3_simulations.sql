@@ -13,10 +13,10 @@ SELECT col_type_is('public', 'simulation_objectives', 'lesson_id', 'text', 'link
 SELECT has_pk('public', 'simulations', 'simulations has primary key');
 SELECT has_pk('public', 'simulation_objectives', 'simulation_objectives has primary key');
 
-SELECT ok(NOT has_table_privilege('anon', 'public.simulations', 'SELECT'), 'anon cannot SELECT simulations');
+SELECT ok(has_table_privilege('anon', 'public.simulations', 'SELECT'), 'anon can SELECT simulations through RLS');
 SELECT ok(
-  NOT has_table_privilege('anon', 'public.simulation_objectives', 'SELECT'),
-  'anon cannot SELECT simulation_objectives'
+  has_table_privilege('anon', 'public.simulation_objectives', 'SELECT'),
+  'anon can SELECT simulation_objectives through RLS'
 );
 SELECT ok(has_table_privilege('authenticated', 'public.simulations', 'SELECT'), 'authenticated has SELECT');
 SELECT ok(

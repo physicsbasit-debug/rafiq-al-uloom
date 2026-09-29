@@ -65,10 +65,10 @@ SELECT ok(
   'RLS is enabled on inquiry_objectives'
 );
 
-SELECT ok(NOT has_table_privilege('anon', 'public.inquiries', 'SELECT'), 'anon cannot SELECT inquiries');
+SELECT ok(has_table_privilege('anon', 'public.inquiries', 'SELECT'), 'anon can SELECT inquiries through RLS');
 SELECT ok(
-  NOT has_table_privilege('anon', 'public.inquiry_objectives', 'SELECT'),
-  'anon cannot SELECT inquiry_objectives'
+  has_table_privilege('anon', 'public.inquiry_objectives', 'SELECT'),
+  'anon can SELECT inquiry_objectives through RLS'
 );
 SELECT ok(has_table_privilege('authenticated', 'public.inquiries', 'SELECT'), 'authenticated has SELECT');
 SELECT ok(
@@ -141,8 +141,8 @@ SELECT is(
       AND cmd = 'SELECT'
       AND roles @> ARRAY['anon']::name[]
   ),
-  0::bigint,
-  'inquiries has no anon SELECT policy'
+  1::bigint,
+  'inquiries has one anon SELECT policy'
 );
 SELECT is(
   (
@@ -153,8 +153,8 @@ SELECT is(
       AND cmd = 'SELECT'
       AND roles @> ARRAY['anon']::name[]
   ),
-  0::bigint,
-  'inquiry_objectives has no anon SELECT policy'
+  1::bigint,
+  'inquiry_objectives has one anon SELECT policy'
 );
 
 SELECT is(
