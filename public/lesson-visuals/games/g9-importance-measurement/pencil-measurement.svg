@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 380" role="img" aria-labelledby="title desc">
+  <title id="title">قلم مع تدريج قياس</title>
+  <desc id="desc">قلم أحمر بجوار تدريج بسيط دون كتابة قيمة القياس.</desc>
+  <defs>
+    <linearGradient id="paper" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#fffaf0"/><stop offset="1" stop-color="#f8efd8"/></linearGradient>
+    <linearGradient id="pen" x1="0" x2="1"><stop stop-color="#b8172d"/><stop offset=".55" stop-color="#ed334b"/><stop offset="1" stop-color="#8b1222"/></linearGradient>
+    <filter id="s"><feDropShadow dx="0" dy="14" stdDeviation="12" flood-color="#4e3518" flood-opacity=".16"/></filter>
+  </defs>
+  <rect width="760" height="380" rx="36" fill="url(#paper)"/>
+  <g transform="translate(90 255)">
+    <rect width="560" height="54" rx="13" fill="#fff" stroke="#d4b46d" stroke-width="3"/>
+    <path d="M30 0v26M75 0v16M120 0v26M165 0v16M210 0v26M255 0v16M300 0v26M345 0v16M390 0v26M435 0v16M480 0v26M525 0v16" stroke="#725c35" stroke-width="5"/>
+  </g>
+  <g transform="translate(105 88) rotate(-7 280 70)" filter="url(#s)">
+    <path d="M38 74 86 30h428c27 0 49 20 49 44s-22 44-49 44H86Z" fill="url(#pen)"/>
+    <path d="M38 74 0 118l86 0Z" fill="#d8b289"/>
+    <path d="M0 118 18 88 38 74Z" fill="#242424"/>
+    <rect x="468" y="38" width="58" height="72" rx="14" fill="#c9ced3"/>
+    <rect x="510" y="42" width="42" height="64" rx="12" fill="#e4e8eb"/>
+    <path d="M145 44h250" stroke="#ff8b99" stroke-width="8" stroke-linecap="round" opacity=".55"/>
+  </g>
+</svg>

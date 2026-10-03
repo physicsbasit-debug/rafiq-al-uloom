@@ -1,0 +1,1201 @@
+.rafiq-measurement-lesson {
+  --mv-green: #0d4f49;
+  --mv-green-2: #0b6f64;
+  --mv-gold: #d8a735;
+  --mv-ink: #173a37;
+  --mv-muted: #607471;
+  --mv-line: #dce8e5;
+  --mv-bg: #f3f7f6;
+  direction: rtl;
+  display: grid;
+  gap: 22px;
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  color: var(--mv-ink);
+}
+
+.rafiq-measurement-hero {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.25fr);
+  gap: 28px;
+  padding: clamp(24px, 4vw, 44px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(218, 175, 71, 0.22), transparent 34%),
+    linear-gradient(135deg, #083c38 0%, #0c5851 62%, #0a403c 100%);
+  color: white;
+  box-shadow: 0 20px 55px rgba(17, 66, 61, 0.17);
+}
+
+.rafiq-measurement-hero::after {
+  content: '';
+  position: absolute;
+  inset: auto -8% -42% auto;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  border: 46px solid rgba(255, 255, 255, 0.045);
+}
+
+.rafiq-measurement-hero-copy,
+.rafiq-measurement-workbench {
+  position: relative;
+  z-index: 1;
+}
+
+.rafiq-measurement-hero-copy p,
+.rafiq-measurement-section-header p,
+.rafiq-measurement-objectives p,
+.rafiq-measurement-finale p {
+  margin: 0 0 8px;
+  color: #e8c869;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.rafiq-measurement-hero h2 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3.8rem);
+  line-height: 1.08;
+}
+
+.rafiq-measurement-hero-copy > span {
+  display: block;
+  max-width: 590px;
+  margin-top: 16px;
+  color: #d8e8e5;
+  font-size: clamp(1rem, 2vw, 1.22rem);
+  line-height: 1.9;
+}
+
+.rafiq-measurement-hero-question {
+  margin-top: 24px;
+  padding: 14px 17px;
+  border: 1px solid rgba(238, 208, 118, 0.32);
+  border-radius: 17px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff4d1;
+  font-weight: 800;
+}
+
+.rafiq-measurement-workbench {
+  align-self: center;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 24px;
+  background: rgba(4, 40, 37, 0.38);
+  backdrop-filter: blur(6px);
+}
+
+.rafiq-measurement-workbench article {
+  min-height: 130px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 14px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fff, #edf5f3);
+  color: var(--mv-ink);
+  text-align: center;
+  box-shadow:
+    inset 0 0 0 1px rgba(17, 84, 78, 0.08),
+    0 10px 22px rgba(0, 0, 0, 0.12);
+}
+
+.rafiq-measurement-workbench article span {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 17px;
+  background: #e7f2ef;
+  color: #0f6f65;
+  font-size: 2rem;
+}
+
+.rafiq-measurement-workbench article b {
+  font-size: 0.98rem;
+}
+.rafiq-measurement-workbench article small {
+  color: var(--mv-muted);
+  line-height: 1.45;
+}
+
+.rafiq-measurement-objectives {
+  display: grid;
+  grid-template-columns: minmax(230px, 0.75fr) minmax(0, 1.6fr);
+  gap: 22px;
+  align-items: stretch;
+  padding: 24px;
+  border: 1px solid #eadcad;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #fff9e8, #fff 62%);
+  box-shadow: 0 13px 30px rgba(77, 66, 31, 0.07);
+}
+
+.rafiq-measurement-objectives h3,
+.rafiq-measurement-section-header h3,
+.rafiq-measurement-finale h3 {
+  margin: 0;
+  color: var(--mv-ink);
+}
+
+.rafiq-measurement-objectives > div > span {
+  display: block;
+  margin-top: 10px;
+  color: var(--mv-muted);
+  line-height: 1.7;
+}
+
+.rafiq-measurement-objectives ol {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+  list-style: none;
+  counter-reset: mv-objective;
+}
+
+.rafiq-measurement-objectives li {
+  position: relative;
+  padding: 15px 52px 15px 16px;
+  border: 1px solid #e3ece9;
+  border-radius: 16px;
+  background: #fff;
+  line-height: 1.8;
+  counter-increment: mv-objective;
+}
+
+.rafiq-measurement-objectives li::before {
+  content: counter(mv-objective);
+  position: absolute;
+  right: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--mv-green);
+  color: white;
+  font-weight: 800;
+}
+
+.rafiq-measurement-card,
+.rafiq-measurement-compass {
+  padding: clamp(20px, 3vw, 32px);
+  border: 1px solid var(--mv-line);
+  border-radius: 26px;
+  background: #fff;
+  box-shadow: 0 12px 32px rgba(16, 76, 70, 0.07);
+}
+
+.rafiq-measurement-card.is-warm {
+  background: linear-gradient(135deg, #fffaf0, #fff);
+  border-color: #efe2b7;
+}
+.rafiq-measurement-card.is-aqua {
+  background: linear-gradient(135deg, #f1fbfa, #fff);
+}
+.rafiq-measurement-card.is-deep {
+  background: linear-gradient(145deg, #f3f8f7, #fff);
+}
+.rafiq-measurement-card.is-decision {
+  border-color: #d7c078;
+  background: linear-gradient(135deg, #fffdf6, #fff);
+}
+
+.rafiq-measurement-section-header {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 22px;
+}
+
+.rafiq-measurement-section-header p {
+  color: var(--mv-green-2);
+  font-size: 0.9rem;
+}
+.rafiq-measurement-section-header h3 {
+  font-size: clamp(1.35rem, 3vw, 2rem);
+}
+.rafiq-measurement-section-header span {
+  display: block;
+  margin-top: 8px;
+  color: var(--mv-muted);
+  line-height: 1.8;
+}
+
+.rafiq-measurement-step {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--mv-green);
+  color: #fff;
+  font-weight: 900;
+  box-shadow: 0 8px 18px rgba(13, 79, 73, 0.2);
+}
+
+.rafiq-measurement-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(240px, 0.65fr);
+  gap: 20px;
+  align-items: center;
+}
+
+.rafiq-measurement-svg {
+  width: 100%;
+  min-height: 220px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #f5f9f8, #edf4f2);
+}
+
+.rafiq-measurement-svg.is-micrometer {
+  min-height: 290px;
+}
+
+.rafiq-micrometer-visual {
+  display: grid;
+  gap: 16px;
+}
+.rafiq-micrometer-scale-readouts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.rafiq-micrometer-scale-panel {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #cfddda;
+  border-radius: 18px;
+  background: #fbfdfc;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+}
+.rafiq-micrometer-scale-panel.is-highlighted {
+  border-color: #d8a735;
+  background: #fffaf0;
+  box-shadow: 0 10px 24px rgba(132, 101, 26, 0.09);
+}
+.rafiq-micrometer-scale-panel header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rafiq-micrometer-scale-panel header > span {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--mv-green);
+  color: #fff;
+  font-weight: 900;
+}
+.rafiq-micrometer-scale-panel header div {
+  display: grid;
+  gap: 2px;
+}
+.rafiq-micrometer-scale-panel header small {
+  color: var(--mv-green-2);
+  font-weight: 900;
+}
+.rafiq-micrometer-scale-panel header strong {
+  color: var(--mv-ink);
+  line-height: 1.55;
+}
+.rafiq-micrometer-scale-panel p {
+  margin: 0;
+  color: var(--mv-muted);
+  line-height: 1.7;
+}
+.rafiq-micrometer-main-scale {
+  position: relative;
+  height: 92px;
+  border: 1px solid #d7e2df;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fff, #edf4f2);
+  overflow: hidden;
+}
+.rafiq-micrometer-main-scale .datum-line {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 48%;
+  height: 4px;
+  border-radius: 999px;
+  background: #233b3d;
+}
+.rafiq-micrometer-main-scale i {
+  position: absolute;
+  left: var(--scale-x);
+  top: 19%;
+  width: 4px;
+  height: 31px;
+  border-radius: 999px;
+  background: #425d5f;
+  transform: translateX(-2px);
+}
+.rafiq-micrometer-main-scale i:nth-of-type(even) {
+  top: 48%;
+  height: 24px;
+}
+.rafiq-micrometer-main-scale i.is-reading {
+  width: 6px;
+  height: 42px;
+  background: #b8780e;
+  box-shadow: 0 0 0 5px rgba(184, 120, 14, 0.1);
+}
+.rafiq-micrometer-main-scale .thimble-edge {
+  position: absolute;
+  top: 8%;
+  bottom: 8%;
+  left: 90%;
+  width: 8px;
+  border-radius: 6px;
+  background: #819395;
+  box-shadow: -7px 0 0 rgba(255, 255, 255, 0.8);
+}
+.rafiq-micrometer-scale-labels {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  font-size: 0.86rem;
+  text-align: center;
+  color: #385553;
+}
+.rafiq-micrometer-scale-labels > :last-child {
+  color: #8a5b0e;
+  font-weight: 900;
+}
+.rafiq-micrometer-fraction-scale {
+  position: relative;
+  height: 150px;
+  border: 1px solid #d7e2df;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #edf4f2, #fff 58%);
+  overflow: hidden;
+}
+.rafiq-micrometer-fraction-scale .fraction-datum {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 50%;
+  height: 4px;
+  border-radius: 999px;
+  background: #b8780e;
+  z-index: 1;
+}
+.rafiq-micrometer-fraction-scale i {
+  position: absolute;
+  top: var(--fraction-y);
+  right: 17%;
+  width: 48%;
+  height: 3px;
+  background: #405e60;
+  transform: translateY(-1px);
+}
+.rafiq-micrometer-fraction-scale i::before {
+  content: attr(data-value);
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  color: #345452;
+  font-style: normal;
+  font-weight: 800;
+  font-size: 0.8rem;
+}
+.rafiq-micrometer-fraction-scale i.is-reading {
+  width: 66%;
+  height: 5px;
+  background: #08796c;
+  box-shadow: 0 0 0 5px rgba(8, 121, 108, 0.09);
+}
+.rafiq-micrometer-division-note {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  color: var(--mv-muted);
+  font-size: 0.92rem;
+}
+
+.rafiq-measurement-controls,
+.rafiq-paper-controls,
+.rafiq-tool-decision {
+  display: grid;
+  gap: 14px;
+}
+
+.rafiq-measurement-controls > p,
+.rafiq-measurement-prompt {
+  margin: 0;
+  font-weight: 800;
+  line-height: 1.8;
+}
+
+.rafiq-measurement-chip-grid {
+  display: grid;
+  gap: 9px;
+}
+
+.rafiq-measurement-chip-grid button,
+.rafiq-paper-controls button,
+.rafiq-micrometer-steps button,
+.rafiq-eye-options button,
+.rafiq-displacement-lab > button,
+.rafiq-cylinder-choices button,
+.rafiq-tool-options button {
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid #cfe0dc;
+  border-radius: 14px;
+  background: #fff;
+  color: var(--mv-ink);
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.rafiq-measurement-chip-grid button {
+  padding: 12px 14px;
+  text-align: right;
+}
+.rafiq-measurement-chip-grid button:hover,
+.rafiq-paper-controls button:hover,
+.rafiq-micrometer-steps button:hover,
+.rafiq-eye-options button:hover,
+.rafiq-displacement-lab > button:hover,
+.rafiq-cylinder-choices button:hover,
+.rafiq-tool-options button:hover {
+  transform: translateY(-2px);
+  border-color: #8fbcb5;
+}
+
+.rafiq-measurement-chip-grid button.is-active,
+.rafiq-eye-options button.is-active,
+.rafiq-cylinder-choices button.is-active,
+.rafiq-tool-options button.is-active {
+  border-color: var(--mv-green-2);
+  background: #e9f7f4;
+  box-shadow: 0 8px 18px rgba(11, 111, 100, 0.1);
+}
+
+.rafiq-measurement-insight {
+  padding: 14px 16px;
+  border-right: 4px solid #d0a13a;
+  border-radius: 12px;
+  background: #fff8e7;
+  color: #654f1e;
+  line-height: 1.75;
+}
+.rafiq-measurement-insight.is-success {
+  border-right-color: #0c766b;
+  background: #eaf8f5;
+  color: #174b46;
+}
+
+.rafiq-cylinder-choices button.is-active,
+.rafiq-tool-options button.is-active {
+  border-color: #78999a;
+  background: #eef5f5;
+  box-shadow: 0 8px 18px rgba(61, 94, 95, 0.09);
+}
+
+.rafiq-paper-lab {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.8fr) minmax(0, 1.2fr);
+  gap: 24px;
+  align-items: center;
+}
+
+.rafiq-paper-stack {
+  position: relative;
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  padding-top: 30px;
+}
+.rafiq-paper-stack span {
+  position: absolute;
+  width: min(300px, 72%);
+  height: 150px;
+  border: 1px solid #d5d8d3;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #fff, #f5f1e7);
+  box-shadow: 0 11px 22px rgba(66, 58, 39, 0.09);
+}
+.rafiq-paper-stack strong {
+  position: relative;
+  z-index: 6;
+  margin-top: 160px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--mv-ink);
+  box-shadow: 0 5px 16px rgba(40, 50, 45, 0.1);
+}
+.rafiq-paper-controls button {
+  padding: 12px 16px;
+  background: var(--mv-green);
+  color: #fff;
+  border-color: var(--mv-green);
+  font-weight: 800;
+}
+.rafiq-paper-controls button:disabled {
+  opacity: 0.45;
+  cursor: default;
+  transform: none;
+}
+
+.rafiq-equation-box {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid #e6d397;
+  border-radius: 16px;
+  background: #fffdf7;
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+.rafiq-equation-box bdi,
+.rafiq-equation-box .rafiq-scientific-quantity {
+  font-weight: 900;
+  color: var(--mv-green);
+}
+.rafiq-equation-box.is-large {
+  min-width: 220px;
+}
+
+.rafiq-micrometer-steps {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 16px;
+}
+.rafiq-micrometer-steps button {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  min-height: 54px;
+  padding: 9px 10px;
+}
+.rafiq-micrometer-steps button span {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #edf3f1;
+  color: var(--mv-green);
+  font-weight: 900;
+}
+.rafiq-micrometer-steps button.is-active {
+  border-color: var(--mv-gold);
+  background: #fff8e8;
+}
+.rafiq-micrometer-steps button.is-done {
+  border-color: #9fcfc8;
+  background: #eef9f7;
+}
+
+.rafiq-measurement-result {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  padding: 15px 17px;
+  border-radius: 15px;
+  background: #0d4f49;
+  color: white;
+}
+.rafiq-measurement-result > * {
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.09);
+}
+.rafiq-measurement-result strong {
+  background: #d5a43c;
+  color: #173a37;
+}
+
+.rafiq-volume-types {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.rafiq-volume-types article {
+  min-height: 330px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid #dce9e6;
+  border-radius: 20px;
+  background: #f9fcfb;
+  text-align: center;
+}
+.rafiq-volume-types h4 {
+  margin: 6px 0 0;
+  font-size: 1.2rem;
+}
+.rafiq-volume-types p {
+  margin: 0;
+  color: var(--mv-muted);
+  line-height: 1.65;
+}
+.rafiq-volume-types strong {
+  color: var(--mv-green);
+  line-height: 1.6;
+}
+
+.rafiq-prism-diagram {
+  position: relative;
+  width: min(250px, 100%);
+  min-height: 205px;
+  margin-bottom: 8px;
+}
+.rafiq-prism-diagram svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 12px 18px rgba(37, 94, 97, 0.12));
+}
+.rafiq-prism-dimension {
+  position: absolute;
+  z-index: 2;
+  padding: 4px 7px;
+  border: 1px solid #d8e5e2;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.96);
+  color: #244947;
+  font-size: 0.82rem;
+  font-weight: 900;
+  box-shadow: 0 4px 12px rgba(29, 74, 73, 0.08);
+}
+.rafiq-prism-dimension.is-length {
+  right: 43%;
+  bottom: 2px;
+  transform: translateX(50%);
+}
+.rafiq-prism-dimension.is-height {
+  left: -2px;
+  top: 49%;
+  transform: translateY(-50%);
+}
+.rafiq-prism-dimension.is-depth {
+  right: 2px;
+  top: 2px;
+}
+
+.rafiq-rock-art {
+  width: 150px;
+  height: 125px;
+  clip-path: polygon(14% 25%, 38% 6%, 79% 12%, 97% 43%, 80% 87%, 45% 100%, 10% 79%, 0 48%);
+  background: radial-gradient(circle at 32% 30%, #b4aea3, #817a6e 58%, #5d594f);
+  box-shadow: inset -20px -18px 28px rgba(0, 0, 0, 0.15);
+}
+
+.rafiq-cylinder-figure {
+  display: grid;
+  place-items: center;
+  gap: 4px;
+}
+.rafiq-cylinder-svg {
+  width: 125px;
+  height: 196px;
+}
+.rafiq-cylinder-caption {
+  min-height: 1.5em;
+  text-align: center;
+  color: #274744;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.rafiq-meniscus-lab {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.7fr) minmax(220px, 0.7fr) minmax(260px, 1fr);
+  gap: 20px;
+  align-items: center;
+}
+.rafiq-meniscus-cylinder {
+  position: relative;
+  width: 150px;
+  height: 270px;
+  margin: 0 auto;
+  overflow: visible;
+  border: 4px solid #688286;
+  border-top-width: 2px;
+  border-radius: 12px 12px 28px 28px;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 18px,
+    rgba(67, 91, 93, 0.23) 19px 20px
+  );
+}
+.rafiq-meniscus-water {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 10px;
+  height: 128px;
+  background: linear-gradient(180deg, #a7dce6, #69baca);
+  border-radius: 0 0 18px 18px;
+}
+.rafiq-meniscus-water::before {
+  content: '';
+  position: absolute;
+  top: -7px;
+  left: 0;
+  right: 0;
+  height: 15px;
+  border-radius: 0 0 50% 50%;
+  border-bottom: 4px solid #2d7f8c;
+  background: rgba(226, 248, 250, 0.78);
+}
+.rafiq-meniscus-reading {
+  position: absolute;
+  right: -78px;
+  bottom: 126px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #b6d5d5;
+  font-weight: 900;
+  color: #1d5b58;
+}
+.rafiq-eye-line {
+  position: absolute;
+  left: -120px;
+  width: 250px;
+  border-top: 3px dashed #cf5555;
+  transform-origin: right center;
+}
+.rafiq-eye-line.is-above {
+  bottom: 155px;
+  transform: rotate(-9deg);
+}
+.rafiq-eye-line.is-level {
+  bottom: 132px;
+  transform: rotate(0);
+  border-color: #0a766a;
+}
+.rafiq-eye-line.is-below {
+  bottom: 98px;
+  transform: rotate(9deg);
+}
+.rafiq-eye-options {
+  display: grid;
+  gap: 9px;
+}
+.rafiq-eye-options button {
+  min-height: 50px;
+  padding: 10px 13px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.rafiq-eye-options button span {
+  color: #0b6f64;
+  font-size: 1.2rem;
+}
+
+.rafiq-displacement-lab {
+  display: grid;
+  grid-template-columns: minmax(140px, 0.7fr) auto minmax(140px, 0.7fr) minmax(220px, 1fr);
+  gap: 16px;
+  align-items: center;
+}
+.rafiq-displacement-lab > div {
+  display: grid;
+  place-items: center;
+}
+.rafiq-displacement-lab > button {
+  padding: 12px 18px;
+  background: var(--mv-green);
+  border-color: var(--mv-green);
+  color: #fff;
+  font-weight: 900;
+}
+.rafiq-displacement-lab > button:disabled {
+  opacity: 0.55;
+  cursor: default;
+  transform: none;
+}
+
+.rafiq-cylinder-choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0;
+}
+.rafiq-cylinder-choices button {
+  min-height: 190px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+}
+.rafiq-scientific-choice-value {
+  font-weight: 900;
+  font-size: 1.15rem;
+}
+.rafiq-cylinder-choices small {
+  color: var(--mv-muted);
+  line-height: 1.5;
+  text-align: center;
+}
+.rafiq-cylinder-choice-visual {
+  width: 78px;
+  height: 128px;
+  overflow: visible;
+  filter: drop-shadow(0 8px 12px rgba(51, 83, 83, 0.08));
+}
+
+.rafiq-cylinder-zoom {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.2fr);
+  gap: 18px;
+  align-items: center;
+  margin-top: 16px;
+  padding: 18px;
+  border: 1px solid #d5e3df;
+  border-radius: 18px;
+  background: #fbfdfc;
+}
+.rafiq-cylinder-zoom-visual {
+  position: relative;
+  min-height: 190px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid #d7e5e1;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #f5fbfa, #edf6f4);
+}
+.rafiq-cylinder-zoom-scale {
+  position: relative;
+  width: 92px;
+  height: 156px;
+  border-right: 4px solid #607778;
+}
+.rafiq-cylinder-zoom-scale i {
+  position: absolute;
+  right: 0;
+  width: 46px;
+  height: 2px;
+  background: #6d8081;
+  transform: translateY(-1px);
+}
+.rafiq-cylinder-target-line {
+  position: absolute;
+  right: -14px;
+  left: -44px;
+  bottom: var(--target-position);
+  height: 3px;
+  border-radius: 999px;
+  background: #b77a12;
+  box-shadow: 0 0 0 4px rgba(183, 122, 18, 0.12);
+}
+.rafiq-cylinder-zoom-label {
+  position: absolute;
+  left: 18px;
+  bottom: 18px;
+  padding: 6px 10px;
+  border: 1px solid #d6c089;
+  border-radius: 999px;
+  background: #fff9e8;
+  font-weight: 900;
+}
+.rafiq-cylinder-zoom-copy {
+  display: grid;
+  gap: 6px;
+}
+.rafiq-cylinder-zoom-copy small {
+  color: var(--mv-muted);
+  font-weight: 800;
+}
+.rafiq-cylinder-zoom-copy strong {
+  font-size: 1.15rem;
+  color: var(--mv-green);
+}
+.rafiq-cylinder-zoom-copy p {
+  margin: 0;
+  line-height: 1.8;
+  color: var(--mv-text);
+}
+.rafiq-cylinder-zoom-copy span {
+  color: var(--mv-muted);
+  line-height: 1.7;
+}
+
+.rafiq-tool-decision {
+  grid-template-columns: 0.75fr 1.25fr;
+  align-items: center;
+}
+.rafiq-thin-plate {
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px;
+  border-radius: 20px;
+  background: #eff8f7;
+}
+.rafiq-thin-plate > span {
+  display: block;
+  width: 190px;
+  height: 58px;
+  border-radius: 8px;
+  border: 2px solid #7d9192;
+  background: linear-gradient(160deg, #e8eeef 0%, #aebbbc 52%, #f7fbfb 100%);
+  box-shadow:
+    0 10px 18px rgba(41, 72, 73, 0.14),
+    inset 0 0 0 5px rgba(255, 255, 255, 0.28);
+}
+.rafiq-thin-plate small {
+  color: var(--mv-muted);
+}
+.rafiq-tool-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.rafiq-tool-options button {
+  min-height: 115px;
+  padding: 14px 10px;
+  display: grid;
+  place-items: center;
+  gap: 6px;
+}
+.rafiq-tool-options button > span {
+  font-size: 2rem;
+}
+.rafiq-tool-decision > .rafiq-measurement-insight {
+  grid-column: 1 / -1;
+}
+
+.rafiq-measurement-compass {
+  background: linear-gradient(145deg, #0d4f49, #0c6259);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.rafiq-measurement-compass .rafiq-measurement-section-header h3,
+.rafiq-measurement-compass .rafiq-measurement-section-header span {
+  color: white;
+}
+.rafiq-measurement-compass .rafiq-measurement-section-header p {
+  color: #f0d27a;
+}
+.rafiq-measurement-compass .rafiq-measurement-step {
+  background: #d7a83b;
+  color: #173a37;
+}
+.rafiq-compass-map {
+  display: grid;
+  grid-template-columns: 1fr 180px 1fr;
+  gap: 16px;
+  align-items: center;
+}
+.rafiq-compass-center {
+  grid-column: 2;
+  grid-row: 1;
+  display: grid;
+  place-items: center;
+  width: 150px;
+  height: 150px;
+  margin: auto;
+  border-radius: 50%;
+  border: 8px solid rgba(238, 205, 108, 0.35);
+  background: #f0c759;
+  color: #173a37;
+  text-align: center;
+  font-weight: 900;
+  line-height: 1.45;
+  box-shadow: 0 0 0 12px rgba(255, 255, 255, 0.07);
+}
+.rafiq-compass-branch {
+  display: grid;
+  gap: 9px;
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+.rafiq-compass-branch.is-length {
+  grid-column: 1;
+  grid-row: 1;
+}
+.rafiq-compass-branch.is-volume {
+  grid-column: 3;
+  grid-row: 1;
+}
+.rafiq-compass-branch h4 {
+  margin: 0 0 4px;
+  color: #f4d679;
+  font-size: 1.2rem;
+}
+.rafiq-compass-branch span {
+  padding: 9px 11px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.08);
+  line-height: 1.55;
+}
+.rafiq-compass-rules {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 18px;
+}
+.rafiq-compass-rules span {
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  text-align: center;
+  color: #eef8f6;
+}
+
+.rafiq-measurement-finale {
+  padding: 28px;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #fff9e6, #f7fbfa);
+  border: 1px solid #e5d297;
+  text-align: center;
+}
+.rafiq-measurement-finale p {
+  color: var(--mv-green-2);
+}
+.rafiq-measurement-finale h3 {
+  font-size: clamp(1.35rem, 3vw, 2rem);
+}
+.rafiq-measurement-finale span {
+  display: block;
+  max-width: 760px;
+  margin: 11px auto 0;
+  color: var(--mv-muted);
+  line-height: 1.8;
+}
+
+@media (max-width: 860px) {
+  .rafiq-measurement-hero,
+  .rafiq-measurement-objectives,
+  .rafiq-measurement-split,
+  .rafiq-paper-lab,
+  .rafiq-meniscus-lab,
+  .rafiq-displacement-lab,
+  .rafiq-tool-decision,
+  .rafiq-cylinder-zoom {
+    grid-template-columns: 1fr;
+  }
+  .rafiq-volume-types {
+    grid-template-columns: 1fr;
+  }
+  .rafiq-micrometer-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .rafiq-micrometer-scale-readouts {
+    grid-template-columns: 1fr;
+  }
+  .rafiq-displacement-lab > button {
+    width: 100%;
+  }
+  .rafiq-tool-decision > .rafiq-measurement-insight {
+    grid-column: auto;
+  }
+  .rafiq-compass-map {
+    grid-template-columns: 1fr;
+  }
+  .rafiq-compass-center,
+  .rafiq-compass-branch.is-length,
+  .rafiq-compass-branch.is-volume {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  .rafiq-compass-rules {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 580px) {
+  .rafiq-measurement-lesson {
+    gap: 15px;
+  }
+  .rafiq-measurement-hero,
+  .rafiq-measurement-card,
+  .rafiq-measurement-compass,
+  .rafiq-measurement-objectives {
+    border-radius: 20px;
+    padding: 18px;
+  }
+  .rafiq-measurement-workbench {
+    grid-template-columns: 1fr 1fr;
+    padding: 10px;
+  }
+  .rafiq-measurement-workbench article {
+    min-height: 112px;
+    padding: 10px;
+  }
+  .rafiq-measurement-workbench article span {
+    width: 48px;
+    height: 48px;
+    font-size: 1.6rem;
+  }
+  .rafiq-measurement-section-header {
+    gap: 11px;
+  }
+  .rafiq-measurement-step {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+  }
+  .rafiq-micrometer-steps {
+    grid-template-columns: 1fr;
+  }
+  .rafiq-cylinder-choices,
+  .rafiq-tool-options {
+    grid-template-columns: 1fr;
+  }
+  .rafiq-cylinder-choices button {
+    min-height: 140px;
+  }
+  .rafiq-measurement-svg.is-micrometer {
+    min-height: 220px;
+  }
+  .rafiq-prism-diagram {
+    width: min(230px, 100%);
+  }
+  .rafiq-micrometer-scale-panel {
+    padding: 13px;
+  }
+  .rafiq-meniscus-cylinder {
+    transform: scale(0.9);
+  }
+}

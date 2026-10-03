@@ -276,7 +276,8 @@ describeIntegration('Phase 2-C2-A profiles and authorization RLS', () => {
     const suspended = await suspendedStudent.client.from('grades').select('id');
 
     expect(anon.error).toBeNull();
-    expect(anon.data).toEqual([{ id: 'g10' }]);
+    expect(anon.data).toHaveLength(2);
+    expect(anon.data).toEqual(expect.arrayContaining([{ id: 'g9' }, { id: 'g10' }]));
 
     expect(pending.error).toBeNull();
     expect(pending.data).toEqual([]);
@@ -368,8 +369,9 @@ describeIntegration('Phase 2-C2-A profiles and authorization RLS', () => {
     const lessons = await fixtures.adminClient.from('lessons').select('id');
 
     expect(grades.error).toBeNull();
-    expect(grades.data).toHaveLength(1);
+    expect(grades.data).toHaveLength(2);
+    expect(grades.data).toEqual(expect.arrayContaining([{ id: 'g9' }, { id: 'g10' }]));
     expect(lessons.error).toBeNull();
-    expect(lessons.data).toHaveLength(4);
+    expect(lessons.data?.length).toBeGreaterThanOrEqual(59);
   });
 });

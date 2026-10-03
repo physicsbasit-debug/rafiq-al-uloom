@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-label="Navigation map showing true and calculated positions">
+  <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#062c46"/><stop offset="1" stop-color="#0b5367"/></linearGradient></defs>
+  <rect width="1200" height="675" rx="36" fill="url(#sky)"/>
+  <circle cx="140" cy="110" r="3" fill="#fff"/><circle cx="330" cy="70" r="4" fill="#fff"/><circle cx="1020" cy="95" r="3" fill="#fff"/>
+  <g transform="translate(170 150)">
+    <rect x="80" y="0" width="100" height="72" rx="14" fill="#d9e7e3" stroke="#83c8d7" stroke-width="6"/>
+    <rect x="0" y="10" width="75" height="52" fill="#2e87b7" stroke="#76d3ff" stroke-width="5"/>
+    <rect x="185" y="10" width="75" height="52" fill="#2e87b7" stroke="#76d3ff" stroke-width="5"/>
+    <path d="M130 72v75" stroke="#d9e7e3" stroke-width="12"/>
+  </g>
+  <path d="M395 205c180 30 260 70 390 185M395 225c175 45 250 85 375 190" fill="none" stroke="#6df3e9" stroke-width="8" stroke-linecap="round" opacity=".8"/>
+  <rect x="760" y="245" width="300" height="330" rx="38" fill="#132d35"/>
+  <rect x="785" y="280" width="250" height="240" rx="24" fill="#eaf6f2"/>
+  <path d="M805 390c55-80 120-50 185-120" fill="none" stroke="#6bb28e" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="915" cy="350" r="20" fill="#2e7d32"/><circle cx="965" cy="395" r="20" fill="#ffca28" stroke="#8a6500" stroke-width="4"/>
+  <path d="M927 361l25 24" stroke="#b3261e" stroke-width="6" stroke-dasharray="8 7"/>
+  <circle cx="910" cy="548" r="12" fill="#9fb8be"/>
+</svg>

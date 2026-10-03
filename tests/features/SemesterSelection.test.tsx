@@ -12,8 +12,8 @@ vi.mock('@services/queries/content-query.hooks', () => ({
 const mockedUseSemestersByGrade = vi.mocked(useSemestersByGrade);
 
 const semesters = [
-  { id: 'semester-1', name: 'الفصل الدراسي الأول', gradeId: 'grade-10', order: 1 },
-  { id: 'semester-2', name: 'الفصل الدراسي الثاني', gradeId: 'grade-10', order: 2 },
+  { id: 'g10-sem1', name: 'الفصل الدراسي الأول', gradeId: 'g10', order: 1 },
+  { id: 'g10-sem2', name: 'الفصل الدراسي الثاني', gradeId: 'g10', order: 2 },
 ] as ReturnType<typeof useSemestersByGrade>['data'];
 
 beforeEach(() => {
@@ -29,9 +29,9 @@ describe('SemesterSelection', () => {
       reload: vi.fn(),
     });
 
-    render(<SemesterSelection gradeId="grade-10" onSelectSemester={vi.fn()} />);
+    render(<SemesterSelection gradeId="g10" onSelectSemester={vi.fn()} />);
 
-    expect(mockedUseSemestersByGrade).toHaveBeenCalledWith('grade-10');
+    expect(mockedUseSemestersByGrade).toHaveBeenCalledWith('g10');
   });
 
   it('يعرض حالة التحميل', () => {
@@ -42,7 +42,7 @@ describe('SemesterSelection', () => {
       reload: vi.fn(),
     });
 
-    render(<SemesterSelection gradeId="grade-10" onSelectSemester={vi.fn()} />);
+    render(<SemesterSelection gradeId="g10" onSelectSemester={vi.fn()} />);
 
     expect(screen.getByRole('status')).toHaveTextContent('جارٍ تحميل البيانات...');
   });
@@ -55,7 +55,7 @@ describe('SemesterSelection', () => {
       reload: vi.fn(),
     });
 
-    render(<SemesterSelection gradeId="grade-10" onSelectSemester={vi.fn()} />);
+    render(<SemesterSelection gradeId="g10" onSelectSemester={vi.fn()} />);
 
     expect(screen.getByRole('alert')).toHaveTextContent('تعذر تحميل الفصول.');
   });
@@ -70,13 +70,13 @@ describe('SemesterSelection', () => {
       reload,
     });
 
-    render(<SemesterSelection gradeId="grade-10" onSelectSemester={vi.fn()} />);
+    render(<SemesterSelection gradeId="g10" onSelectSemester={vi.fn()} />);
     fireEvent.click(screen.getByRole('button', { name: 'إعادة المحاولة' }));
 
     expect(reload).toHaveBeenCalledTimes(1);
   });
 
-  it('يعرض الفصول بالترتيب الذي يعيده hook', () => {
+  it('يعرض الفصل الأول الحالي ويخفي الفصل الثاني من تجربة الطالب', () => {
     mockedUseSemestersByGrade.mockReturnValue({
       data: semesters,
       isLoading: false,
@@ -84,15 +84,14 @@ describe('SemesterSelection', () => {
       reload: vi.fn(),
     });
 
-    render(<SemesterSelection gradeId="grade-10" onSelectSemester={vi.fn()} />);
+    render(<SemesterSelection gradeId="g10" onSelectSemester={vi.fn()} />);
 
-    const cards = screen.getAllByRole('button');
-    expect(cards).toHaveLength(2);
-    expect(cards[0]).toHaveTextContent('الفصل الدراسي الأول');
-    expect(cards[1]).toHaveTextContent('الفصل الدراسي الثاني');
+    expect(screen.getByRole('button', { name: 'الفصل الدراسي الأول' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'الفصل الدراسي الثاني' })).not.toBeInTheDocument();
+    expect(screen.getByText('الفصل الحالي • متاح الآن')).toBeInTheDocument();
   });
 
-  it('يمرر semester.id نفسه عند اختيار البطاقة', () => {
+  it('يمرر معرف الفصل الأول نفسه عند اختياره', () => {
     const onSelectSemester = vi.fn();
 
     mockedUseSemestersByGrade.mockReturnValue({
@@ -102,10 +101,10 @@ describe('SemesterSelection', () => {
       reload: vi.fn(),
     });
 
-    render(<SemesterSelection gradeId="grade-10" onSelectSemester={onSelectSemester} />);
-    fireEvent.click(screen.getByRole('button', { name: 'الفصل الدراسي الثاني' }));
+    render(<SemesterSelection gradeId="g10" onSelectSemester={onSelectSemester} />);
+    fireEvent.click(screen.getByRole('button', { name: 'الفصل الدراسي الأول' }));
 
     expect(onSelectSemester).toHaveBeenCalledTimes(1);
-    expect(onSelectSemester).toHaveBeenCalledWith('semester-2');
+    expect(onSelectSemester).toHaveBeenCalledWith('g10-sem1');
   });
 });

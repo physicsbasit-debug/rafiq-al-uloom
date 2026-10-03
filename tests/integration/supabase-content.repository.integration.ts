@@ -66,31 +66,27 @@ describeIntegration('SupabaseContentRepository parity', () => {
     const supabase = createSupabaseContentRepository(client);
     const local = asyncLocalContentRepository;
 
-    const grades = await local.getGrades();
-    const gradeId = grades[0]?.id;
-    if (!gradeId) throw new Error('Local seed has no grade.');
+    const gradeId = 'g10';
+    const semesterId = 'g10-sem2';
+    const subjectId = 'g10-physics';
+    const unitId = 'g10-phy-waves-unit';
+    const lessonId = 'g10-phy-waves-l1';
 
-    const semesters = await local.getSemestersByGrade(gradeId);
-    const semesterCandidates = await Promise.all(
-      semesters.map(async (semester) => ({
-        semester,
-        subjects: await local.getSubjectsBySemester(semester.id),
-      }))
-    );
-    const semesterWithSubjects = semesterCandidates.find(({ subjects }) => subjects.length > 0);
-    if (!semesterWithSubjects) throw new Error('Local seed has no semester with subjects.');
+    const [grade, semester, subject, unit, lesson] = await Promise.all([
+      local.getGrades().then((rows) => rows.find(({ id }) => id === gradeId)),
+      local.getSemestersByGrade(gradeId).then((rows) => rows.find(({ id }) => id === semesterId)),
+      local
+        .getSubjectsBySemester(semesterId)
+        .then((rows) => rows.find(({ id }) => id === subjectId)),
+      local
+        .getUnitsBySubjectAndSemester(subjectId, semesterId)
+        .then((rows) => rows.find(({ id }) => id === unitId)),
+      local.getLessonById(lessonId),
+    ]);
 
-    const semesterId = semesterWithSubjects.semester.id;
-    const subjectId = semesterWithSubjects.subjects[0]?.id;
-    if (!subjectId) throw new Error('Local seed has no subject.');
-
-    const units = await local.getUnitsBySubjectAndSemester(subjectId, semesterId);
-    const unitId = units[0]?.id;
-    if (!unitId) throw new Error('Local seed has no unit.');
-
-    const lessons = await local.getLessonsByUnit(unitId);
-    const lessonId = lessons[0]?.id;
-    if (!lessonId) throw new Error('Local seed has no lesson.');
+    if (!grade || !semester || !subject || !unit || !lesson) {
+      throw new Error('Local rich wave parity fixture is incomplete.');
+    }
 
     const objectives = await local.getObjectivesByLesson(lessonId);
 

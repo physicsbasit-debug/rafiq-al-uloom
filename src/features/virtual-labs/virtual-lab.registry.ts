@@ -21,7 +21,7 @@ export const VIRTUAL_LABS: readonly VirtualLabDefinition[] = [
     semesterLabel: 'الفصل الدراسي الأول',
     unitLabel: 'الوحدة الأولى: الطول والزمن',
     lessonLabel: '1-1 أهمية القياس • 1-2 قياس الطول والحجم • 1-3 قياس الزمن',
-    relatedLessonIds: [],
+    relatedLessonIds: ['g9-phy-s1-u1-l1', 'g9-phy-s1-u1-l2', 'g9-phy-s1-u1-l3'],
     url: 'https://measurement-lab-grade9.physicsbasit.chatgpt.site',
   },
   {
@@ -33,7 +33,7 @@ export const VIRTUAL_LABS: readonly VirtualLabDefinition[] = [
     semesterLabel: 'الفصل الدراسي الأول',
     unitLabel: 'الوحدة الأولى: الشحنة الكهربائية',
     lessonLabel: '1-1 الكهرباء الساكنة',
-    relatedLessonIds: [],
+    relatedLessonIds: ['g10-phy-s1-u1-l1'],
     url: 'https://static-electricity-lab-g10.physicsbasit.chatgpt.site',
   },
   {
@@ -45,7 +45,7 @@ export const VIRTUAL_LABS: readonly VirtualLabDefinition[] = [
     semesterLabel: 'الفصل الدراسي الأول',
     unitLabel: 'الوحدة الثانية: مخططات الدوائر الكهربائية',
     lessonLabel: '2-1 مكونات الدائرة الكهربائية',
-    relatedLessonIds: [],
+    relatedLessonIds: ['g10-phy-s1-u2-l1'],
     url: 'https://circuit-components-lab-grade10.physicsbasit.chatgpt.site',
   },
 ];

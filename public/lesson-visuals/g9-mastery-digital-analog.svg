@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-label="Digital and analog measuring devices">
+  <defs><linearGradient id="bg" x1="0" x2="1"><stop stop-color="#f5fbf9"/><stop offset="1" stop-color="#eef3f8"/></linearGradient><filter id="s"><feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#001f1a" flood-opacity=".12"/></filter></defs>
+  <rect width="1200" height="675" rx="36" fill="url(#bg)"/>
+  <g filter="url(#s)">
+    <rect x="110" y="135" width="430" height="395" rx="30" fill="#fff" stroke="#bdd8d1" stroke-width="3"/>
+    <rect x="660" y="135" width="430" height="395" rx="30" fill="#fff" stroke="#bdd8d1" stroke-width="3"/>
+  </g>
+  <g transform="translate(180 220)">
+    <rect width="290" height="150" rx="28" fill="#18312d"/>
+    <rect x="35" y="36" width="220" height="78" rx="12" fill="#dff4d8"/>
+    <text x="145" y="90" text-anchor="middle" font-family="monospace" font-size="46" fill="#153229">8.426 cm</text>
+  </g>
+  <g transform="translate(715 215)">
+    <path d="M0 110h300" stroke="#435f5a" stroke-width="16" stroke-linecap="round"/>
+    <g stroke="#435f5a" stroke-width="6">
+      <path d="M15 45v65M55 65v45M95 45v65M135 65v45M175 45v65M215 65v45M255 45v65M295 65v45"/>
+    </g>
+    <circle cx="205" cy="110" r="18" fill="#ffca28" stroke="#004d40" stroke-width="5"/>
+  </g>
+  <rect x="765" y="390" width="200" height="74" rx="18" fill="#eaf6f2"/>
+  <text x="865" y="440" text-anchor="middle" font-family="Arial,sans-serif" font-size="38" font-weight="700" fill="#004d40">8.4 cm</text>
+  <circle cx="600" cy="335" r="54" fill="#ffca28"/><text x="600" y="352" text-anchor="middle" font-family="Arial,sans-serif" font-size="48" font-weight="700" fill="#003e36">?</text>
+</svg>

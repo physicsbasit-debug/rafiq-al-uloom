@@ -16,11 +16,12 @@ describe('Phase 5-2 activity boundaries', () => {
     expect(catalog).toContain('getExperimentsByLesson');
   });
 
-  it('يبقي App على Step أنشطة واحد مع المسار القديم للعبة', () => {
+  it('يبقي App على Step أنشطة واحد ومسار لعبة واحد مع سياق رحلة الفيزياء الموسع', () => {
     const app = read('src/App.tsx');
 
-    expect(app).toContain("{ name: 'activities'; lessonId: string; unitId: string }");
-    expect(app).toContain("{ name: 'game'; lessonId: string; unitId: string }");
+    expect(app).toContain("name: 'review' | 'activities' | 'game' | 'labs' | 'mastery';");
+    expect(app).toContain("name: 'activities',");
+    expect(app).toContain("name: 'game',");
     expect(app).not.toContain("{ name: 'experiment';");
     expect(app).not.toContain("{ name: 'simulation';");
     expect(app).not.toContain("{ name: 'inquiry';");

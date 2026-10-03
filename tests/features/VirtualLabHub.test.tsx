@@ -14,6 +14,19 @@ describe('VirtualLabHub', () => {
     expect(screen.getByText(/لا يوجد مختبر مربوط مباشرة بهذا الدرس حتى الآن/)).toBeInTheDocument();
   });
 
+  it('يعرض للدرس المرتبط مختبره فقط بدل مكتبة الصفين', () => {
+    render(<VirtualLabHub lessonId="g10-phy-s1-u1-l1" onBackToLesson={vi.fn()} />);
+
+    expect(screen.getByRole('heading', { name: 'الكهرباء الساكنة' })).toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: 'قياس الطول والحجم والزمن' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: 'مكونات الدائرة الكهربائية' })
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('مرتبطة بالدرس الحالي')).toBeInTheDocument();
+  });
+
   it('يعرض الصف والوحدة والدرس على بطاقة المختبر بدل دمج الكتالوج بلا سياق', () => {
     render(<VirtualLabHub lessonId="g10-phy-waves-l2" onBackToLesson={vi.fn()} />);
 

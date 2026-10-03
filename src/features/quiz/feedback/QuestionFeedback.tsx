@@ -1,3 +1,4 @@
+import { ScientificText } from '@design-system/components/ScientificText';
 import { colors } from '@design-system/theme/colors';
 import { radius } from '@design-system/theme/radius';
 import { spacing } from '@design-system/theme/spacing';
@@ -39,7 +40,7 @@ export function QuestionFeedback({ feedback }: QuestionFeedbackProps) {
           }}
         >
           <strong>الإجابة الصحيحة: </strong>
-          {feedback.correctChoice}
+          <ScientificText text={feedback.correctChoice} />
         </p>
       ) : null}
 
@@ -51,7 +52,7 @@ export function QuestionFeedback({ feedback }: QuestionFeedbackProps) {
         }}
       >
         <strong>الشرح: </strong>
-        {feedback.explanation}
+        <ScientificText text={feedback.explanation} />
       </p>
     </div>
   );

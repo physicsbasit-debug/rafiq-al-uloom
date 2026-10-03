@@ -13,8 +13,10 @@ import {
   useLessonExperiments,
   useLessonObjectives,
 } from '@services/queries/content-query.hooks';
-
+import { Grade9ImportanceMeasurementLesson } from './Grade9ImportanceMeasurementLesson';
+import { Grade9LengthVolumeLesson } from './Grade9LengthVolumeLesson';
 import { LessonActionGrid } from './LessonActionGrid';
+import { LessonVisualStory } from './LessonVisualStory';
 
 interface LessonViewProps {
   lessonId: string;
@@ -25,7 +27,6 @@ interface LessonViewProps {
   onOpenVirtualLabs: () => void;
   onOpenMasteryTest: () => void;
 }
-
 interface LessonViewContentProps extends Omit<LessonViewProps, 'lessonId'> {
   lesson: Lesson | undefined;
   objectives: Objective[];
@@ -43,15 +44,37 @@ function LessonViewContent({
   onOpenVirtualLabs,
   onOpenMasteryTest,
 }: LessonViewContentProps) {
-  if (!lesson) {
+  if (!lesson)
     return (
       <section>
         <h2>لم يتم العثور على الدرس</h2>
         <AppButton label="العودة إلى الدروس" onClick={onBackToLessons} />
       </section>
     );
-  }
-
+  if (lesson.id === 'g9-phy-s1-u1-l1')
+    return (
+      <Grade9ImportanceMeasurementLesson
+        objectives={objectives}
+        onBackToLessons={onBackToLessons}
+        onOpenReviewQuestions={onOpenReviewQuestions}
+        onOpenActivities={onOpenActivities}
+        onOpenMatchingGame={onOpenMatchingGame}
+        onOpenVirtualLabs={onOpenVirtualLabs}
+        onOpenMasteryTest={onOpenMasteryTest}
+      />
+    );
+  if (lesson.id === 'g9-phy-s1-u1-l2')
+    return (
+      <Grade9LengthVolumeLesson
+        objectives={objectives}
+        onBackToLessons={onBackToLessons}
+        onOpenReviewQuestions={onOpenReviewQuestions}
+        onOpenActivities={onOpenActivities}
+        onOpenMatchingGame={onOpenMatchingGame}
+        onOpenVirtualLabs={onOpenVirtualLabs}
+        onOpenMasteryTest={onOpenMasteryTest}
+      />
+    );
   return (
     <article className="rafiq-lesson-view">
       <header className="rafiq-lesson-hero">
@@ -59,16 +82,15 @@ function LessonViewContent({
         <h2>{lesson.title}</h2>
         <span>اقرأ المفاهيم، شاهد الأمثلة، ثم اختر طريقة التدريب المناسبة لك.</span>
       </header>
-
       <div className="rafiq-lesson-content-stack">
         <LessonObjectives objectives={objectives} />
         <LessonSummary summary={lesson.summary} />
+        <LessonVisualStory lessonId={lesson.id} />
         <LessonConcepts concepts={lesson.keyConcepts} />
         <LessonExamples examples={lesson.examples} />
         <LessonMisconceptions misconceptions={lesson.misconceptions} />
         <LessonExperiments experiments={experiments} />
       </div>
-
       <LessonActionGrid
         onOpenReviewQuestions={onOpenReviewQuestions}
         onOpenActivities={onOpenActivities}
@@ -93,17 +115,14 @@ export function LessonView({
   const lessonQuery = useLesson(lessonId);
   const objectivesQuery = useLessonObjectives(lessonId);
   const experimentsQuery = useLessonExperiments(lessonId);
-
   const isLoading =
     lessonQuery.isLoading || objectivesQuery.isLoading || experimentsQuery.isLoading;
   const error = lessonQuery.error || objectivesQuery.error || experimentsQuery.error;
-
   function handleRetry() {
     lessonQuery.reload();
     objectivesQuery.reload();
     experimentsQuery.reload();
   }
-
   return (
     <QueryBoundary isLoading={isLoading} error={error} onRetry={handleRetry}>
       <LessonViewContent

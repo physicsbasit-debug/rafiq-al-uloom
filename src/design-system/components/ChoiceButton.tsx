@@ -1,3 +1,4 @@
+import { ScientificText } from '@design-system/components/ScientificText';
 import { colors } from '@design-system/theme/colors';
 import { radius } from '@design-system/theme/radius';
 import { spacing } from '@design-system/theme/spacing';
@@ -23,6 +24,7 @@ export function ChoiceButton({
   return (
     <button
       type="button"
+      aria-label={choice}
       disabled={disabled}
       onClick={onClick}
       aria-pressed={selected}
@@ -63,7 +65,7 @@ export function ChoiceButton({
         {label}
       </span>
       <span>
-        {choice}
+        <ScientificText text={choice} />
         {selected && selectedHint ? (
           <span style={{ marginInlineStart: spacing.sm, color: colors.textSecondary }}>
             {selectedHint}

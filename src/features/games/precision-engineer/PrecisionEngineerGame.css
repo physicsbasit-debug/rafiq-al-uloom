@@ -1,0 +1,272 @@
+.rafiq-precision-game {
+  display: grid;
+  gap: 1rem;
+  direction: rtl;
+}
+.rafiq-precision-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.15rem;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #064f45, #0c6a5d);
+  color: #fff;
+  box-shadow: 0 16px 36px rgba(0, 70, 62, 0.16);
+}
+.rafiq-precision-hero p,
+.rafiq-precision-hero h2,
+.rafiq-precision-hero span {
+  margin: 0;
+}
+.rafiq-precision-hero p {
+  color: #f6d77a;
+  font-weight: 900;
+}
+.rafiq-precision-hero h2 {
+  margin: 0.25rem 0;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+}
+.rafiq-precision-hero > strong {
+  display: grid;
+  place-items: center;
+  min-width: 68px;
+  min-height: 54px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.14);
+  font-size: 1.2rem;
+}
+.rafiq-precision-progress {
+  height: 10px;
+  border-radius: 999px;
+  background: #e5efec;
+  overflow: hidden;
+}
+.rafiq-precision-progress span {
+  display: block;
+  height: 100%;
+  background: #d8ad38;
+  border-radius: inherit;
+  transition: width 0.25s ease;
+}
+.rafiq-precision-mission {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(320px, 1.15fr);
+  gap: 1rem;
+  align-items: stretch;
+}
+.rafiq-precision-copy,
+.rafiq-precision-visual {
+  border: 1px solid #c8ddd7;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(0, 77, 64, 0.06);
+}
+.rafiq-precision-copy {
+  padding: 1.1rem;
+  display: grid;
+  align-content: center;
+  gap: 0.45rem;
+}
+.rafiq-precision-copy p,
+.rafiq-precision-copy h3,
+.rafiq-precision-copy span {
+  margin: 0;
+}
+.rafiq-precision-copy p {
+  color: #8a6c18;
+  font-weight: 900;
+}
+.rafiq-precision-copy h3 {
+  color: #064f45;
+  font-size: 1.35rem;
+}
+.rafiq-precision-copy span {
+  color: #425a58;
+  line-height: 1.8;
+}
+.rafiq-precision-visual {
+  padding: 0.6rem;
+  overflow: hidden;
+}
+.rafiq-precision-visual svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.rafiq-precision-builder {
+  display: grid;
+  gap: 0.8rem;
+}
+.rafiq-precision-step {
+  padding: 1rem;
+  border: 1px solid #d3e1dd;
+  border-radius: 18px;
+  background: #fff;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+.rafiq-precision-step.is-correct {
+  border-color: #6bad92;
+  box-shadow: 0 0 0 3px rgba(77, 145, 111, 0.08);
+}
+.rafiq-precision-step.is-wrong {
+  border-color: #d79580;
+  box-shadow: 0 0 0 3px rgba(183, 94, 66, 0.08);
+}
+.rafiq-precision-step-heading {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+.rafiq-precision-step-heading > span {
+  display: grid;
+  place-items: center;
+  min-width: 34px;
+  min-height: 34px;
+  border-radius: 50%;
+  background: #e9f4f1;
+  color: #075e52;
+  font-weight: 900;
+}
+.rafiq-precision-step-heading p {
+  margin: 0.2rem 0 0;
+  color: #566b68;
+}
+.rafiq-precision-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+.rafiq-precision-options button {
+  min-height: 64px;
+  padding: 0.7rem;
+  border: 1px solid #c9dbd6;
+  border-radius: 14px;
+  background: #f9fcfb;
+  color: #2f4e49;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+.rafiq-precision-options button.is-selected {
+  border-color: #0b6b5d;
+  background: #e6f4f0;
+  color: #064f45;
+  box-shadow: 0 0 0 2px rgba(11, 107, 93, 0.1);
+}
+.rafiq-precision-correction {
+  margin: 0.7rem 0 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 12px;
+  background: #fff1ec;
+  color: #7f412f;
+  line-height: 1.7;
+  font-weight: 700;
+}
+.rafiq-precision-test {
+  justify-self: start;
+  padding: 0.82rem 1.15rem;
+  border: 0;
+  border-radius: 14px;
+  background: #d9a91f;
+  color: #2e310c;
+  font: inherit;
+  font-weight: 950;
+  cursor: pointer;
+}
+.rafiq-precision-test:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.rafiq-precision-confidence {
+  display: grid;
+  gap: 0.65rem;
+  padding: 1rem;
+  border-radius: 18px;
+  border: 1px solid #e0c889;
+  background: #fff8df;
+}
+.rafiq-precision-confidence.is-trusted {
+  border-color: #91c6b4;
+  background: #eef8f4;
+}
+.rafiq-precision-confidence > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.rafiq-precision-confidence p {
+  margin: 0;
+  line-height: 1.75;
+  color: #455c58;
+}
+.rafiq-precision-confidence button {
+  justify-self: start;
+  padding: 0.68rem 0.95rem;
+  border: 0;
+  border-radius: 12px;
+  background: #086357;
+  color: #fff;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+.rafiq-precision-confidence-bar {
+  height: 12px;
+  border-radius: 999px;
+  background: #e7ecea;
+  overflow: hidden;
+}
+.rafiq-precision-confidence-bar span {
+  display: block;
+  height: 100%;
+  background: #d4a42b;
+  border-radius: inherit;
+  transition: width 0.2s ease;
+}
+.rafiq-precision-confidence.is-trusted .rafiq-precision-confidence-bar span {
+  background: #3f8b72;
+}
+.rafiq-precision-complete {
+  display: grid;
+  gap: 0.55rem;
+  padding: 1.25rem;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #eef8f4, #fff8de);
+  border: 1px solid #bad7ce;
+}
+.rafiq-precision-complete p,
+.rafiq-precision-complete h2,
+.rafiq-precision-complete span {
+  margin: 0;
+}
+.rafiq-precision-complete p {
+  color: #806516;
+  font-weight: 900;
+}
+.rafiq-precision-complete h2 {
+  color: #064f45;
+}
+.rafiq-precision-complete span {
+  color: #4d625f;
+  line-height: 1.75;
+}
+@media (max-width: 760px) {
+  .rafiq-precision-hero,
+  .rafiq-precision-mission {
+    grid-template-columns: 1fr;
+  }
+  .rafiq-precision-hero {
+    display: grid;
+  }
+  .rafiq-precision-hero > strong {
+    justify-self: start;
+  }
+  .rafiq-precision-options {
+    grid-template-columns: 1fr;
+  }
+}

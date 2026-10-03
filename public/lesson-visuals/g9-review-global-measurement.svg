@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-label="Two laboratories exchanging measurements">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1"><stop stop-color="#eef8f5"/><stop offset="1" stop-color="#fffaf0"/></linearGradient>
+    <filter id="s"><feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#004d40" flood-opacity=".12"/></filter>
+  </defs>
+  <rect width="1200" height="675" rx="36" fill="url(#bg)"/>
+  <circle cx="600" cy="340" r="170" fill="#d9f1ea" stroke="#78afa1" stroke-width="4"/>
+  <path d="M485 282c55-75 178-90 236-15M470 378c76 68 185 80 258 20" fill="none" stroke="#2d8f7d" stroke-width="16" stroke-linecap="round"/>
+  <g filter="url(#s)">
+    <rect x="90" y="155" width="320" height="350" rx="28" fill="#fff" stroke="#b8d5cd" stroke-width="3"/>
+    <rect x="790" y="155" width="320" height="350" rx="28" fill="#fff" stroke="#b8d5cd" stroke-width="3"/>
+  </g>
+  <g fill="#00695c">
+    <path d="M145 255h210l-105-70z"/>
+    <path d="M845 255h210l-105-70z"/>
+  </g>
+  <g fill="#e7f4f0">
+    <rect x="145" y="255" width="210" height="150" rx="8"/>
+    <rect x="845" y="255" width="210" height="150" rx="8"/>
+  </g>
+  <g fill="#004d40"><rect x="205" y="305" width="90" height="100" rx="8"/><rect x="905" y="305" width="90" height="100" rx="8"/></g>
+  <rect x="160" y="435" width="180" height="48" rx="12" fill="#fff3bd"/>
+  <rect x="860" y="435" width="180" height="48" rx="12" fill="#fff3bd"/>
+  <text x="250" y="469" text-anchor="middle" font-family="Arial,sans-serif" font-size="30" font-weight="700" fill="#574300">2.0 m</text>
+  <text x="950" y="469" text-anchor="middle" font-family="Arial,sans-serif" font-size="30" font-weight="700" fill="#574300">200 cm</text>
+  <path d="M405 340h135M660 340h135" stroke="#ffb300" stroke-width="12" stroke-linecap="round"/>
+  <path d="M520 315l28 25-28 25M680 315l-28 25 28 25" fill="none" stroke="#ffb300" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -106,6 +106,44 @@ afterEach(() => {
 });
 
 describe('StudentActivityHub', () => {
+  it('يعرض مسار الأنشطة المرجعي لدرس أهمية القياس بدل حشر catalog عام', () => {
+    mockedUseActivitiesByLesson.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+      reload: vi.fn(),
+    });
+
+    render(<StudentActivityHub lessonId="g9-phy-s1-u1-l1" onBackToLesson={vi.fn()} />);
+
+    expect(screen.getByRole('heading', { name: 'الأنشطة العلمية' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'الاستقصاء العلمي' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'المحاكاة' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'نشاط البيانات' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'التجربة الموجهة' })).toBeInTheDocument();
+    expect(screen.getByText('غير متوفر في هذا الدرس')).toBeInTheDocument();
+  });
+
+  it('يعرض درس 1-2 بأربع فئات علمية ثابتة دون بطاقة خامسة', () => {
+    mockedUseActivitiesByLesson.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+      reload: vi.fn(),
+    });
+
+    render(<StudentActivityHub lessonId="g9-phy-s1-u1-l2" onBackToLesson={vi.fn()} />);
+
+    const grid = screen.getByLabelText('فئات الأنشطة العلمية الأربع');
+    expect(within(grid).getAllByRole('article')).toHaveLength(4);
+    expect(screen.getByRole('heading', { name: 'الاستقصاء العلمي' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'المحاكاة' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'نشاط البيانات' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'التجربة الموجهة' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'استقصاء متقدم' })).not.toBeInTheDocument();
+    expect(mockedUseObjectivesByIds).not.toHaveBeenCalled();
+  });
+
   it('يحمل catalog بالـlessonId الصحيح', () => {
     mockActivitiesSuccess([]);
     render(<StudentActivityHub lessonId="lesson-one" onBackToLesson={vi.fn()} />);

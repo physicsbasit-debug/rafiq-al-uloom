@@ -1,4 +1,5 @@
 import { ChoiceButton } from '@design-system/components/ChoiceButton';
+import { ScientificText } from '@design-system/components/ScientificText';
 import { colors } from '@design-system/theme/colors';
 import { radius } from '@design-system/theme/radius';
 import { spacing } from '@design-system/theme/spacing';
@@ -50,7 +51,7 @@ export function MultipleChoiceQuestionCard({
           lineHeight: typography.lineHeight.xl,
         }}
       >
-        {question.prompt}
+        <ScientificText text={question.prompt} />
       </h3>
 
       <div style={{ display: 'grid', gap: spacing.sm }}>

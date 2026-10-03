@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">دفتر بيانات قياس</title>
+  <desc id="desc">دفتر وجدول فارغ جزئيا وأدوات قياس دون حلول أو إجابات.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#eef8f5"/><stop offset="1" stop-color="#fff8de"/></linearGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#003e36" flood-opacity=".14"/></filter>
+  </defs>
+  <rect width="960" height="540" rx="36" fill="url(#bg)"/>
+  <circle cx="110" cy="105" r="78" fill="#8fd9b8" opacity=".25"/>
+  <circle cx="840" cy="400" r="115" fill="#ffca28" opacity=".2"/>
+  <g filter="url(#shadow)">
+    <rect x="250" y="75" width="470" height="390" rx="24" fill="#fff" stroke="#bfd6cf" stroke-width="5"/>
+    <rect x="250" y="75" width="470" height="76" rx="24" fill="#00695c"/>
+    <rect x="250" y="125" width="470" height="26" fill="#00695c"/>
+    <g stroke="#d6e4e0" stroke-width="4"><path d="M300 205h370M300 265h370M300 325h370M300 385h370"/><path d="M430 170v245M560 170v245"/></g>
+    <g fill="#9eb7b0"><rect x="320" y="185" width="75" height="12" rx="6"/><rect x="455" y="185" width="75" height="12" rx="6"/><rect x="585" y="185" width="60" height="12" rx="6"/><rect x="320" y="245" width="65" height="12" rx="6"/><rect x="455" y="245" width="50" height="12" rx="6"/><rect x="585" y="245" width="70" height="12" rx="6"/></g>
+    <g transform="translate(126 260) rotate(-18)">
+      <rect x="0" y="0" width="340" height="68" rx="16" fill="#f8d65c" stroke="#a87d00" stroke-width="5"/>
+      <path d="M22 0v30M52 0v20M82 0v30M112 0v20M142 0v30M172 0v20M202 0v30M232 0v20M262 0v30M292 0v20" stroke="#6d5b1f" stroke-width="4"/>
+    </g>
+    <g transform="translate(710 160) rotate(16)">
+      <rect x="0" y="0" width="38" height="240" rx="18" fill="#2f6fed"/>
+      <polygon points="0,240 38,240 19,286" fill="#f0c6a4"/>
+      <polygon points="12,268 26,268 19,286" fill="#243649"/>
+    </g>
+  </g>
+</svg>

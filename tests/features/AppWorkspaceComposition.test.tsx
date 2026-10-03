@@ -55,6 +55,13 @@ vi.mock('@features/student/unit-selection/UnitSelection', () => ({
     </button>
   ),
 }));
+vi.mock('@features/student/unit-selection/PhysicsUnitSelection', () => ({
+  PhysicsUnitSelection: ({ onSelectUnit }: { onSelectUnit: (id: string) => void }) => (
+    <button type="button" onClick={() => onSelectUnit('waves')}>
+      الوحدة التجريبية
+    </button>
+  ),
+}));
 vi.mock('@features/student/lesson-list/LessonList', () => ({
   LessonList: ({ onSelectLesson }: { onSelectLesson: (id: string) => void }) => (
     <button type="button" onClick={() => onSelectLesson('lesson-3')}>
@@ -131,7 +138,6 @@ function activeSession(role: UserRole): AuthSessionContextValue {
 function reachLesson() {
   fireEvent.click(screen.getByRole('button', { name: 'الصف التجريبي' }));
   fireEvent.click(screen.getByRole('button', { name: 'الفصل التجريبي' }));
-  fireEvent.click(screen.getByRole('button', { name: 'المادة التجريبية' }));
   fireEvent.click(screen.getByRole('button', { name: 'الوحدة التجريبية' }));
   fireEvent.click(screen.getByRole('button', { name: 'الدرس الثالث' }));
   expect(screen.getByText('صفحة الدرس lesson-3')).toBeInTheDocument();
@@ -154,6 +160,15 @@ describe('App workspace authorization composition', () => {
     expect(screen.queryByRole('button', { name: 'مساحة المراجع' })).not.toBeInTheDocument();
     expect(workspaceSpies.teacher).not.toHaveBeenCalled();
     expect(workspaceSpies.reviewer).not.toHaveBeenCalled();
+  });
+
+  it('يستخدم الرجوع السياقي من الدرس إلى قائمة الدروس بدل القفز إلى البداية', () => {
+    mockedUseAuthSession.mockReturnValue(activeSession('student'));
+    render(<AppContent />);
+    reachLesson();
+    fireEvent.click(screen.getByRole('button', { name: 'العودة إلى الدروس' }));
+    expect(screen.getByRole('button', { name: 'الدرس الثالث' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'العودة إلى الوحدات' })).toBeInTheDocument();
   });
 
   it('يفتح للمعلم النشط مساحة المعلم فقط ولا يشغّل مساحة المراجع', () => {

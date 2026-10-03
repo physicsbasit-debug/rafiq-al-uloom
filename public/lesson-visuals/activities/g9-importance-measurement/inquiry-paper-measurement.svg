@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">موقف استقصاء قياس جسم رقيق</title>
+  <desc id="desc">رزمة أوراق ومسطرة وأداة قياس في مشهد محايد لا يكشف الطريقة الصحيحة.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#eef9f5"/><stop offset="1" stop-color="#d9efe7"/></linearGradient>
+    <linearGradient id="desk" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f7e8c6"/><stop offset="1" stop-color="#e4c995"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#003e36" flood-opacity=".16"/></filter>
+  </defs>
+  <rect width="960" height="540" rx="36" fill="url(#bg)"/>
+  <circle cx="830" cy="100" r="110" fill="#ffca28" opacity=".18"/>
+  <rect x="70" y="330" width="820" height="150" rx="24" fill="url(#desk)"/>
+  <g filter="url(#shadow)">
+    <g transform="translate(180 170)">
+      <rect x="0" y="112" width="330" height="28" rx="5" fill="#d5dde4"/>
+      <rect x="8" y="96" width="330" height="28" rx="5" fill="#edf1f4"/>
+      <rect x="16" y="80" width="330" height="28" rx="5" fill="#fff"/>
+      <rect x="24" y="64" width="330" height="28" rx="5" fill="#e7ecef"/>
+      <rect x="32" y="48" width="330" height="28" rx="5" fill="#fff"/>
+      <rect x="40" y="32" width="330" height="28" rx="5" fill="#f4f7f8"/>
+      <path d="M58 56h220" stroke="#b4c6c1" stroke-width="5" stroke-linecap="round" opacity=".7"/>
+      <path d="M58 73h170" stroke="#b4c6c1" stroke-width="5" stroke-linecap="round" opacity=".45"/>
+    </g>
+    <g transform="translate(500 135) rotate(8)">
+      <rect x="0" y="0" width="320" height="74" rx="18" fill="#f9d65c" stroke="#bb8b00" stroke-width="5"/>
+      <path d="M22 0v35M52 0v23M82 0v35M112 0v23M142 0v35M172 0v23M202 0v35M232 0v23M262 0v35M292 0v23" stroke="#6e5a18" stroke-width="4"/>
+    </g>
+    <g transform="translate(550 258)">
+      <path d="M0 42c46-34 93-48 150-40l55 8c22 3 38 24 35 46-3 24-26 41-50 36l-60-12c-29-6-57-2-82 14L0 124Z" fill="#8eb8d6" stroke="#406c86" stroke-width="6"/>
+      <circle cx="194" cy="50" r="26" fill="#f2f7fa" stroke="#406c86" stroke-width="6"/>
+      <circle cx="194" cy="50" r="8" fill="#406c86"/>
+    </g>
+  </g>
+  <g fill="none" stroke="#00796b" stroke-width="8" stroke-linecap="round" opacity=".75">
+    <path d="M100 120c20-25 45-40 74-48"/>
+    <path d="M820 260c20 14 34 31 42 52"/>
+  </g>
+  <g fill="#00796b" opacity=".75"><circle cx="92" cy="132" r="7"/><circle cx="177" cy="70" r="7"/><circle cx="816" cy="254" r="7"/><circle cx="866" cy="318" r="7"/></g>
+</svg>

@@ -6,6 +6,8 @@ import { radius } from '@design-system/theme/radius';
 import { spacing } from '@design-system/theme/spacing';
 import { getActivityRegistryEntry } from '@features/activities/activity-registry';
 import { StudentActivityHost } from '@features/activities/StudentActivityHost';
+import { MeasurementTrustMission } from '@features/activities/measurement-trust/MeasurementTrustMission';
+import { Grade9LengthVolumeActivities } from '@features/activities/length-volume/Grade9LengthVolumeActivities';
 import { getStudentExperimentSafetyDecision } from '@features/activities/student-experiment-safety';
 import { StudentBackAction } from '@features/student/navigation/StudentBackAction';
 import { StudentIcon, type StudentIconName } from '@features/student/navigation/StudentIcon';
@@ -222,6 +224,14 @@ function ActivityHubObjectivesLoader({
 
 export function StudentActivityHub({ lessonId, onBackToLesson }: StudentActivityHubProps) {
   const activitiesQuery = useActivitiesByLesson(lessonId);
+
+  if (lessonId === 'g9-phy-s1-u1-l1') {
+    return <MeasurementTrustMission />;
+  }
+
+  if (lessonId === 'g9-phy-s1-u1-l2') {
+    return <Grade9LengthVolumeActivities onBackToLesson={onBackToLesson} />;
+  }
 
   return (
     <QueryBoundary

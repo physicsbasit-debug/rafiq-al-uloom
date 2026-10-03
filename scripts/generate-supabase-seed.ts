@@ -9,6 +9,14 @@ import {
   learningCatalogUnits,
 } from '../src/content/seed/learning-catalog.seed';
 import { publicContentVisibility } from '../src/content/seed/public-content-visibility.seed';
+import { semester1CurriculumLessons } from '../src/content/seed/semester1-curriculum-lessons.seed';
+import {
+  semester1ReferenceExperiments,
+  semester1ReferenceGames,
+  semester1ReferenceMasteryQuestions,
+  semester1ReferenceObjectives,
+  semester1ReferenceReviewQuestions,
+} from '../src/content/seed/semester1-reference-lessons.seed';
 import {
   grade10PhysicsWavesExperiments,
   grade10PhysicsWavesGames,
@@ -50,10 +58,14 @@ export const currentSeedData: SeedData = {
   semesters: learningCatalogSemesters,
   subjects: learningCatalogSubjects,
   units: learningCatalogUnits,
-  lessons: grade10PhysicsWavesLessons,
-  objectives: grade10PhysicsWavesObjectives,
+  lessons: [...grade10PhysicsWavesLessons, ...semester1CurriculumLessons],
+  objectives: [...grade10PhysicsWavesObjectives, ...semester1ReferenceObjectives],
   questions: [
     ...grade10PhysicsWavesReviewQuestions.map((question) => ({
+      ...question,
+      purpose: 'review' as const,
+    })),
+    ...semester1ReferenceReviewQuestions.map((question) => ({
       ...question,
       purpose: 'review' as const,
     })),
@@ -61,9 +73,13 @@ export const currentSeedData: SeedData = {
       ...question,
       purpose: 'mastery' as const,
     })),
+    ...semester1ReferenceMasteryQuestions.map((question) => ({
+      ...question,
+      purpose: 'mastery' as const,
+    })),
   ],
-  games: grade10PhysicsWavesGames,
-  experiments: grade10PhysicsWavesExperiments,
+  games: [...grade10PhysicsWavesGames, ...semester1ReferenceGames],
+  experiments: [...grade10PhysicsWavesExperiments, ...semester1ReferenceExperiments],
   simulations: grade10PhysicsWavesSimulations,
   inquiries: grade10PhysicsWavesInquiries,
   dataActivities: grade10PhysicsWavesDataActivities,

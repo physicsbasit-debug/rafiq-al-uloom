@@ -5,6 +5,7 @@ import {
   learningCatalogSubjects,
   learningCatalogUnits,
 } from '@content/seed/learning-catalog.seed';
+import { semester1CurriculumLessons } from '@content/seed/semester1-curriculum-lessons.seed';
 import {
   grade10PhysicsWavesGames,
   grade10PhysicsWavesLessons,
@@ -78,7 +79,9 @@ describe('catalog: سلامة مفاتيح الربط', () => {
 describe('catalog: تطابق الكتالوج مع محتوى 1-A', () => {
   it('كل unitId مستخدم في الدروس له وحدة مطابقة في الكتالوج', () => {
     const catalogUnitIds = new Set(learningCatalogUnits.map((unit) => unit.id));
-    const lessonUnitIds = new Set(grade10PhysicsWavesLessons.map((lesson) => lesson.unitId));
+    const lessonUnitIds = new Set(
+      [...grade10PhysicsWavesLessons, ...semester1CurriculumLessons].map((lesson) => lesson.unitId)
+    );
 
     for (const unitId of lessonUnitIds) {
       expect(catalogUnitIds.has(unitId)).toBe(true);
@@ -128,8 +131,9 @@ describe('repository: القراءة', () => {
     }
   });
 
-  it('getSubjectsBySemester لفصل بلا وحدات يعيد فارغًا', () => {
-    expect(getSubjectsBySemester('g10-sem1').length).toBe(0);
+  it('getSubjectsBySemester يعيد الفيزياء للفصل الأول الرسمي', () => {
+    expect(getSubjectsBySemester('g10-sem1').map(({ id }) => id)).toEqual(['g10-physics']);
+    expect(getSubjectsBySemester('g9-sem1').map(({ id }) => id)).toEqual(['g9-physics']);
   });
 
   it('getUnitsBySubject يصفّي حسب المادة', () => {

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 380" role="img" aria-labelledby="title desc">
+  <title id="title">أجسام من مواقف قياس متنوعة</title>
+  <desc id="desc">كتاب وزجاجة وطريق وساعة إيقاف لدعم قرار الوحدة دون كشف الإجابة.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1"><stop stop-color="#f4fbf8"/><stop offset="1" stop-color="#fff9ea"/></linearGradient>
+    <filter id="s"><feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#23443e" flood-opacity=".15"/></filter>
+  </defs>
+  <rect width="760" height="380" rx="36" fill="url(#bg)"/>
+  <g filter="url(#s)">
+    <g transform="translate(70 92)">
+      <rect x="0" y="38" width="138" height="170" rx="12" fill="#1f6f8c"/>
+      <rect x="10" y="26" width="138" height="170" rx="12" fill="#f1d26b"/>
+      <rect x="20" y="14" width="138" height="170" rx="12" fill="#ffffff" stroke="#d4dde1" stroke-width="3"/>
+      <path d="M46 60h86M46 88h72M46 116h82" stroke="#9caeb5" stroke-width="7" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(270 76)">
+      <rect x="42" y="0" width="96" height="44" rx="12" fill="#dadfe1"/>
+      <rect x="28" y="38" width="124" height="190" rx="34" fill="#b96528"/>
+      <rect x="42" y="92" width="96" height="78" rx="10" fill="#fff7df"/>
+      <circle cx="90" cy="132" r="20" fill="#f0c74b"/>
+    </g>
+    <g transform="translate(458 72)">
+      <path d="M22 230 88 0h92l72 230Z" fill="#536875"/>
+      <path d="M86 230 120 0h28l38 230Z" fill="#f8f5e7"/>
+      <path d="M128 16v34M133 82v34M139 148v34" stroke="#d6b849" stroke-width="8" stroke-linecap="round"/>
+      <g transform="translate(186 14)">
+        <circle cx="36" cy="36" r="34" fill="#0c6a5b"/>
+        <circle cx="36" cy="36" r="24" fill="#eefaf8"/>
+        <path d="M36 36 50 24M36 36 29 18" stroke="#0c6a5b" stroke-width="5" stroke-linecap="round"/>
+        <rect x="25" y="-14" width="22" height="16" rx="4" fill="#f0bd39"/>
+      </g>
+    </g>
+  </g>
+</svg>

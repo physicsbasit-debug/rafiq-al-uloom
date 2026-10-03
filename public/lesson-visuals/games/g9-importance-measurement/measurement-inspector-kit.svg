@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" role="img" aria-labelledby="title desc">
+  <title id="title">عدة مفتش القياس</title>
+  <desc id="desc">رسم تعليمي لخُوذة ومكبرة ومسطرة وأداة قياس.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#073f39"/><stop offset="1" stop-color="#0c6a5b"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" x2="1">
+      <stop stop-color="#f9b62e"/><stop offset="1" stop-color="#ffd867"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#c9f4ef" stop-opacity=".9"/><stop offset="1" stop-color="#75c7c0" stop-opacity=".75"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="12" flood-color="#001d19" flood-opacity=".28"/>
+    </filter>
+  </defs>
+  <rect width="720" height="360" rx="42" fill="url(#bg)"/>
+  <circle cx="110" cy="70" r="48" fill="#0d7d6c" opacity=".42"/>
+  <circle cx="640" cy="290" r="88" fill="#0b5a4e" opacity=".4"/>
+  <g filter="url(#shadow)" transform="translate(90 58)">
+    <path d="M70 126c0-67 45-112 108-112 63 0 108 45 108 112H70Z" fill="url(#gold)"/>
+    <path d="M126 28c21-15 46-22 73-20v117h-42c-6-45-19-77-31-97Z" fill="#de8b21" opacity=".75"/>
+    <rect x="48" y="118" width="262" height="30" rx="15" fill="#f0a62a"/>
+    <path d="M84 151h202l-25 45H105Z" fill="#ffc448"/>
+  </g>
+  <g transform="translate(330 48) rotate(-7 120 120)" filter="url(#shadow)">
+    <circle cx="126" cy="108" r="78" fill="#f4bd2e"/>
+    <circle cx="126" cy="108" r="58" fill="url(#glass)" stroke="#eefefc" stroke-width="8"/>
+    <rect x="168" y="164" width="34" height="112" rx="17" transform="rotate(-38 185 220)" fill="#183f3b"/>
+    <rect x="176" y="181" width="18" height="82" rx="9" transform="rotate(-38 185 220)" fill="#0d2825"/>
+    <path d="M88 84c18-26 46-35 70-23" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" opacity=".55"/>
+  </g>
+  <g transform="translate(160 244) rotate(8 210 26)">
+    <rect x="0" y="0" width="392" height="54" rx="15" fill="#ffc73f"/>
+    <path d="M24 0v22M58 0v14M92 0v22M126 0v14M160 0v22M194 0v14M228 0v22M262 0v14M296 0v22M330 0v14M364 0v22" stroke="#4e3a00" stroke-width="6"/>
+  </g>
+</svg>

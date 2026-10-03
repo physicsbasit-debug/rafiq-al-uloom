@@ -18,6 +18,14 @@ import {
   learningCatalogSubjects,
   learningCatalogUnits,
 } from '@content/seed/learning-catalog.seed';
+import { semester1CurriculumLessons } from '@content/seed/semester1-curriculum-lessons.seed';
+import {
+  semester1ReferenceExperiments,
+  semester1ReferenceGames,
+  semester1ReferenceMasteryQuestions,
+  semester1ReferenceObjectives,
+  semester1ReferenceReviewQuestions,
+} from '@content/seed/semester1-reference-lessons.seed';
 import { grade10PhysicsWavesDataActivities } from '@content/seed/grade10-physics-waves-data';
 import {
   grade10PhysicsWavesExperiments,
@@ -44,6 +52,25 @@ import { orderEntitiesByIds, uniqueIdsInOrder } from './content-ordering';
  * - لا AI.
  * - لا اشتقاق Grade/Subject/Unit من unitId.
  */
+
+const localLessons: Lesson[] = [...semester1CurriculumLessons, ...grade10PhysicsWavesLessons];
+const localObjectives: Objective[] = [
+  ...grade10PhysicsWavesObjectives,
+  ...semester1ReferenceObjectives,
+];
+const localReviewQuestions: Question[] = [
+  ...grade10PhysicsWavesReviewQuestions,
+  ...semester1ReferenceReviewQuestions,
+];
+const localMasteryQuestions: Question[] = [
+  ...grade10PhysicsWavesMasteryQuestions,
+  ...semester1ReferenceMasteryQuestions,
+];
+const localGames: Game[] = [...grade10PhysicsWavesGames, ...semester1ReferenceGames];
+const localExperiments: Experiment[] = [
+  ...grade10PhysicsWavesExperiments,
+  ...semester1ReferenceExperiments,
+];
 
 export function getGrades(): Grade[] {
   return learningCatalogGrades.slice().sort((a, b) => a.order - b.order);
@@ -79,37 +106,37 @@ export function getUnitsBySubject(subjectId: string): Unit[] {
 }
 
 export function getLessonsByUnit(unitId: string): Lesson[] {
-  return grade10PhysicsWavesLessons
+  return localLessons
     .filter((lesson) => lesson.unitId === unitId)
     .sort((a, b) => a.order - b.order);
 }
 
 export function getLessonById(lessonId: string): Lesson | undefined {
-  return grade10PhysicsWavesLessons.find((lesson) => lesson.id === lessonId);
+  return localLessons.find((lesson) => lesson.id === lessonId);
 }
 
 export function getObjectivesByLesson(lessonId: string): Objective[] {
-  return grade10PhysicsWavesObjectives.filter((objective) => objective.lessonId === lessonId);
+  return localObjectives.filter((objective) => objective.lessonId === lessonId);
 }
 
 export function getObjectivesByIds(objectiveIds: string[]): Objective[] {
-  return orderEntitiesByIds(grade10PhysicsWavesObjectives, objectiveIds);
+  return orderEntitiesByIds(localObjectives, objectiveIds);
 }
 
 export function getExperimentsByLesson(lessonId: string): Experiment[] {
-  return grade10PhysicsWavesExperiments.filter((experiment) => experiment.lessonId === lessonId);
+  return localExperiments.filter((experiment) => experiment.lessonId === lessonId);
 }
 
 export function getReviewQuestionsByLesson(lessonId: string): Question[] {
-  return grade10PhysicsWavesReviewQuestions.filter((question) => question.lessonId === lessonId);
+  return localReviewQuestions.filter((question) => question.lessonId === lessonId);
 }
 
 export function getMasteryQuestionsByLesson(lessonId: string): Question[] {
-  return grade10PhysicsWavesMasteryQuestions.filter((question) => question.lessonId === lessonId);
+  return localMasteryQuestions.filter((question) => question.lessonId === lessonId);
 }
 
 export function getGamesByLesson(lessonId: string): Game[] {
-  return grade10PhysicsWavesGames.filter((game) => game.lessonId === lessonId);
+  return localGames.filter((game) => game.lessonId === lessonId);
 }
 
 export function getSimulationsByLesson(lessonId: string): Simulation[] {

@@ -18,8 +18,7 @@ import { StudentBackAction } from '@features/student/navigation/StudentBackActio
 import { StudentJourneyAccordion } from '@features/student/navigation/StudentJourneyAccordion';
 import { ReviewQuestionsView } from '@features/student/review-questions/ReviewQuestionsView';
 import { SemesterSelection } from '@features/student/semester-selection/SemesterSelection';
-import { SubjectSelection } from '@features/student/subject-selection/SubjectSelection';
-import { UnitSelection } from '@features/student/unit-selection/UnitSelection';
+import { PhysicsUnitSelection } from '@features/student/unit-selection/PhysicsUnitSelection';
 import { VirtualLabHub } from '@features/virtual-labs/VirtualLabHub';
 import { DeferredWorkspace } from '@features/workspace/DeferredWorkspace';
 
@@ -31,15 +30,16 @@ type AppSurface = 'student' | 'teacher' | 'reviewer';
 type Step =
   | { name: 'grade' }
   | { name: 'semester'; gradeId: string }
-  | { name: 'subject'; semesterId: string }
-  | { name: 'unit'; semesterId: string; subjectId: string }
-  | { name: 'lessons'; unitId: string }
-  | { name: 'lesson'; lessonId: string; unitId: string }
-  | { name: 'review'; lessonId: string; unitId: string }
-  | { name: 'activities'; lessonId: string; unitId: string }
-  | { name: 'game'; lessonId: string; unitId: string }
-  | { name: 'labs'; lessonId: string; unitId: string }
-  | { name: 'mastery'; lessonId: string; unitId: string };
+  | { name: 'unit'; gradeId: string; semesterId: string }
+  | { name: 'lessons'; gradeId: string; semesterId: string; unitId: string }
+  | { name: 'lesson'; gradeId: string; semesterId: string; unitId: string; lessonId: string }
+  | {
+      name: 'review' | 'activities' | 'game' | 'labs' | 'mastery';
+      gradeId: string;
+      semesterId: string;
+      unitId: string;
+      lessonId: string;
+    };
 
 interface StudentExperienceProps {
   readonly step: Step;
@@ -48,123 +48,226 @@ interface StudentExperienceProps {
 
 const loadTeacherWorkspaceSurface = () =>
   import('@features/teacher/workspace/TeacherWorkspaceSurface');
-
 const loadReviewerWorkspace = () =>
   import('@features/reviewer/workspace/ReviewerWorkspace').then(({ ReviewerWorkspace }) => ({
     default: ReviewerWorkspace,
   }));
 
+function StudentContextualBackAction({ step, setStep }: StudentExperienceProps) {
+  if (step.name === 'grade') return null;
+  if (step.name === 'semester')
+    return (
+      <StudentBackAction label="العودة إلى الصفوف" onClick={() => setStep({ name: 'grade' })} />
+    );
+  if (step.name === 'unit')
+    return (
+      <StudentBackAction
+        label="العودة إلى الفصول"
+        onClick={() => setStep({ name: 'semester', gradeId: step.gradeId })}
+      />
+    );
+  if (step.name === 'lessons')
+    return (
+      <StudentBackAction
+        label="العودة إلى الوحدات"
+        onClick={() =>
+          setStep({ name: 'unit', gradeId: step.gradeId, semesterId: step.semesterId })
+        }
+      />
+    );
+  if (step.name === 'lesson')
+    return (
+      <StudentBackAction
+        label="العودة إلى الدروس"
+        onClick={() =>
+          setStep({
+            name: 'lessons',
+            gradeId: step.gradeId,
+            semesterId: step.semesterId,
+            unitId: step.unitId,
+          })
+        }
+      />
+    );
+  return (
+    <StudentBackAction
+      label="العودة إلى الدرس"
+      onClick={() =>
+        setStep({
+          name: 'lesson',
+          gradeId: step.gradeId,
+          semesterId: step.semesterId,
+          unitId: step.unitId,
+          lessonId: step.lessonId,
+        })
+      }
+    />
+  );
+}
+
 function StudentExperience({ step, setStep }: StudentExperienceProps) {
   return (
     <section className="rafiq-student-shell">
       <StudentJourneyAccordion currentStep={step.name} />
-
-      {step.name !== 'grade' ? (
-        <StudentBackAction
-          label="الرجوع إلى البداية"
-          kind="home"
-          onClick={() => setStep({ name: 'grade' })}
-        />
-      ) : null}
-
+      <StudentContextualBackAction step={step} setStep={setStep} />
       {step.name === 'grade' ? (
         <GradeSelection onSelectGrade={(gradeId) => setStep({ name: 'semester', gradeId })} />
       ) : null}
-
       {step.name === 'semester' ? (
         <SemesterSelection
           gradeId={step.gradeId}
-          onSelectSemester={(semesterId) => setStep({ name: 'subject', semesterId })}
-        />
-      ) : null}
-
-      {step.name === 'subject' ? (
-        <SubjectSelection
-          semesterId={step.semesterId}
-          onSelectSubject={(subjectId) =>
-            setStep({ name: 'unit', semesterId: step.semesterId, subjectId })
+          onSelectSemester={(semesterId) =>
+            setStep({ name: 'unit', gradeId: step.gradeId, semesterId })
           }
         />
       ) : null}
-
       {step.name === 'unit' ? (
-        <UnitSelection
+        <PhysicsUnitSelection
           semesterId={step.semesterId}
-          subjectId={step.subjectId}
-          onSelectUnit={(unitId) => setStep({ name: 'lessons', unitId })}
+          onSelectUnit={(unitId) =>
+            setStep({ name: 'lessons', gradeId: step.gradeId, semesterId: step.semesterId, unitId })
+          }
         />
       ) : null}
-
       {step.name === 'lessons' ? (
         <LessonList
           unitId={step.unitId}
-          onSelectLesson={(lessonId) => setStep({ name: 'lesson', lessonId, unitId: step.unitId })}
+          onSelectLesson={(lessonId) =>
+            setStep({
+              name: 'lesson',
+              gradeId: step.gradeId,
+              semesterId: step.semesterId,
+              unitId: step.unitId,
+              lessonId,
+            })
+          }
         />
       ) : null}
-
       {step.name === 'lesson' ? (
         <LessonView
           lessonId={step.lessonId}
-          onBackToLessons={() => setStep({ name: 'lessons', unitId: step.unitId })}
+          onBackToLessons={() =>
+            setStep({
+              name: 'lessons',
+              gradeId: step.gradeId,
+              semesterId: step.semesterId,
+              unitId: step.unitId,
+            })
+          }
           onOpenReviewQuestions={() =>
-            setStep({ name: 'review', lessonId: step.lessonId, unitId: step.unitId })
+            setStep({
+              name: 'review',
+              gradeId: step.gradeId,
+              semesterId: step.semesterId,
+              lessonId: step.lessonId,
+              unitId: step.unitId,
+            })
           }
           onOpenActivities={() =>
-            setStep({ name: 'activities', lessonId: step.lessonId, unitId: step.unitId })
+            setStep({
+              name: 'activities',
+              gradeId: step.gradeId,
+              semesterId: step.semesterId,
+              lessonId: step.lessonId,
+              unitId: step.unitId,
+            })
           }
           onOpenMatchingGame={() =>
-            setStep({ name: 'game', lessonId: step.lessonId, unitId: step.unitId })
+            setStep({
+              name: 'game',
+              gradeId: step.gradeId,
+              semesterId: step.semesterId,
+              lessonId: step.lessonId,
+              unitId: step.unitId,
+            })
           }
           onOpenVirtualLabs={() =>
-            setStep({ name: 'labs', lessonId: step.lessonId, unitId: step.unitId })
+            setStep({
+              name: 'labs',
+              gradeId: step.gradeId,
+              semesterId: step.semesterId,
+              lessonId: step.lessonId,
+              unitId: step.unitId,
+            })
           }
           onOpenMasteryTest={() =>
-            setStep({ name: 'mastery', lessonId: step.lessonId, unitId: step.unitId })
+            setStep({
+              name: 'mastery',
+              gradeId: step.gradeId,
+              semesterId: step.semesterId,
+              lessonId: step.lessonId,
+              unitId: step.unitId,
+            })
           }
         />
       ) : null}
-
       {step.name === 'review' ? (
         <ReviewQuestionsView
           lessonId={step.lessonId}
           onBackToLesson={() =>
-            setStep({ name: 'lesson', lessonId: step.lessonId, unitId: step.unitId })
+            setStep({
+              name: 'lesson',
+              gradeId: step.gradeId,
+              semesterId: step.semesterId,
+              unitId: step.unitId,
+              lessonId: step.lessonId,
+            })
           }
         />
       ) : null}
-
       {step.name === 'activities' ? (
         <StudentActivityHub
           lessonId={step.lessonId}
           onBackToLesson={() =>
-            setStep({ name: 'lesson', lessonId: step.lessonId, unitId: step.unitId })
+            setStep({
+              name: 'lesson',
+              gradeId: step.gradeId,
+              semesterId: step.semesterId,
+              unitId: step.unitId,
+              lessonId: step.lessonId,
+            })
           }
         />
       ) : null}
-
       {step.name === 'game' ? (
         <MatchingGameView
           lessonId={step.lessonId}
           onBackToLesson={() =>
-            setStep({ name: 'lesson', lessonId: step.lessonId, unitId: step.unitId })
+            setStep({
+              name: 'lesson',
+              gradeId: step.gradeId,
+              semesterId: step.semesterId,
+              unitId: step.unitId,
+              lessonId: step.lessonId,
+            })
           }
         />
       ) : null}
-
       {step.name === 'labs' ? (
         <VirtualLabHub
           lessonId={step.lessonId}
           onBackToLesson={() =>
-            setStep({ name: 'lesson', lessonId: step.lessonId, unitId: step.unitId })
+            setStep({
+              name: 'lesson',
+              gradeId: step.gradeId,
+              semesterId: step.semesterId,
+              unitId: step.unitId,
+              lessonId: step.lessonId,
+            })
           }
         />
       ) : null}
-
       {step.name === 'mastery' ? (
         <MasteryTestView
           lessonId={step.lessonId}
           onBackToLesson={() =>
-            setStep({ name: 'lesson', lessonId: step.lessonId, unitId: step.unitId })
+            setStep({
+              name: 'lesson',
+              gradeId: step.gradeId,
+              semesterId: step.semesterId,
+              unitId: step.unitId,
+              lessonId: step.lessonId,
+            })
           }
         />
       ) : null}
@@ -177,7 +280,6 @@ export function AppContent() {
   const [appSurface, setAppSurface] = useState<AppSurface>('student');
   const [guestLearningStarted, setGuestLearningStarted] = useState(false);
   const session = useAuthSession();
-
   const authenticated = session.authState.status === 'authenticated';
   const isGuest = session.authState.status === 'guest';
 
@@ -208,7 +310,7 @@ export function AppContent() {
       >
         <div
           style={{
-            maxWidth: '760px',
+            maxWidth: '1180px',
             margin: '0 auto',
             display: 'flex',
             gap: '1rem',
@@ -223,7 +325,6 @@ export function AppContent() {
               الفيزياء • الصفان التاسع والعاشر
             </p>
           </div>
-
           {isGuest ? (
             <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
               <button
@@ -241,7 +342,6 @@ export function AppContent() {
               </button>
             </div>
           ) : null}
-
           {authenticated && session.authorizationState?.status === 'authorized' ? (
             <AccountControls
               mode="authenticated"
@@ -251,14 +351,8 @@ export function AppContent() {
           ) : null}
         </div>
       </header>
-
       <main
-        style={{
-          maxWidth: '760px',
-          margin: '0 auto',
-          padding: '1rem',
-          color: colors.textPrimary,
-        }}
+        style={{ maxWidth: '1180px', margin: '0 auto', padding: '1rem', color: colors.textPrimary }}
       >
         {session.authState.status === 'loading' ? (
           <AccountStatusView
@@ -267,7 +361,6 @@ export function AppContent() {
             onSignOut={session.signOut}
           />
         ) : null}
-
         {session.authState.status === 'error' ? (
           <AccountStatusView
             state={{ status: 'session_error', message: session.authState.error.message }}
@@ -275,7 +368,6 @@ export function AppContent() {
             onSignOut={session.signOut}
           />
         ) : null}
-
         {authenticated && !session.authorizationState ? (
           <AccountStatusView
             state={{ status: 'session_loading' }}
@@ -283,7 +375,6 @@ export function AppContent() {
             onSignOut={session.signOut}
           />
         ) : null}
-
         {authenticated && session.authorizationState?.status === 'loading_profile' ? (
           <AccountStatusView
             state={session.authorizationState}
@@ -291,7 +382,6 @@ export function AppContent() {
             onSignOut={session.signOut}
           />
         ) : null}
-
         {authenticated &&
         session.authorizationState &&
         session.authorizationState.status !== 'authorized' &&
@@ -302,11 +392,9 @@ export function AppContent() {
             onSignOut={session.signOut}
           />
         ) : null}
-
         {isGuest && guestLearningStarted ? (
           <StudentExperience step={step} setStep={setStep} />
         ) : null}
-
         {authenticated && session.authorizationState?.status === 'authorized' ? (
           <>
             {appSurface === 'student' ? (
@@ -329,7 +417,6 @@ export function AppContent() {
                       />
                     </div>
                   </RequireCapability>
-
                   <RequireCapability operation="access_reviewer_workspace" fallback={<></>}>
                     <div style={{ width: '190px' }}>
                       <AppButton
@@ -340,7 +427,6 @@ export function AppContent() {
                     </div>
                   </RequireCapability>
                 </div>
-
                 <RequireCapability operation="access_student_experience">
                   <StudentExperience step={step} setStep={setStep} />
                 </RequireCapability>
@@ -354,7 +440,6 @@ export function AppContent() {
                     onClick={() => setAppSurface('student')}
                   />
                 </div>
-
                 {appSurface === 'teacher' ? (
                   <RequireCapability operation="access_teacher_workspace">
                     <DeferredWorkspace
@@ -363,7 +448,6 @@ export function AppContent() {
                     />
                   </RequireCapability>
                 ) : null}
-
                 {appSurface === 'reviewer' ? (
                   <RequireCapability operation="access_reviewer_workspace">
                     <DeferredWorkspace

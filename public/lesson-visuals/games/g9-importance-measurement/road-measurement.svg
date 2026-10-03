@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 380" role="img" aria-labelledby="title desc">
+  <title id="title">طريق لقياس مسافة</title>
+  <desc id="desc">طريق يمتد في مشهد خارجي لاستخدامه كسياق بصري لقياس المسافة.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#91d5ef"/><stop offset="1" stop-color="#e9f8fb"/></linearGradient>
+    <linearGradient id="road" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#4d5d67"/><stop offset="1" stop-color="#263943"/></linearGradient>
+  </defs>
+  <rect width="760" height="380" rx="36" fill="url(#sky)"/>
+  <path d="M0 190c128-55 235-48 350 0 117 48 257 48 410-5v195H0Z" fill="#78b96d"/>
+  <path d="M268 380 345 158h74l91 222Z" fill="url(#road)"/>
+  <path d="M379 176v40M381 248v48M384 332v36" stroke="#f5d856" stroke-width="10" stroke-linecap="round"/>
+  <g fill="#3d7e4c">
+    <circle cx="108" cy="228" r="36"/><circle cx="166" cy="214" r="27"/><circle cx="620" cy="218" r="40"/><circle cx="676" cy="238" r="30"/>
+  </g>
+  <g fill="#295f3b"><rect x="99" y="230" width="16" height="62"/><rect x="612" y="220" width="18" height="70"/></g>
+</svg>
