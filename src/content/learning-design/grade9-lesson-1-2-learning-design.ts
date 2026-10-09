@@ -51,3 +51,65 @@ export const grade9Lesson12ReviewDesign: Readonly<Record<string, Grade9Lesson12R
       sourceBasis: ['student_book_1_2_curved_line_string_method'],
     },
   } as const;
+
+export type Grade9Lesson12MasteryCognitiveLevel = 'apply' | 'analyze' | 'transfer';
+
+export interface Grade9Lesson12MasteryDesignItem {
+  readonly stageLabel: string;
+  readonly cognitiveLevel: Grade9Lesson12MasteryCognitiveLevel;
+  readonly visualRole: 'reference' | 'evidence';
+  readonly masteryDimension: string;
+  readonly sourceBasis: readonly string[];
+}
+
+/**
+ * عقد إتقان درس 1-2.
+ * المواقف جديدة ولا تعيد أسئلة المراجعة حرفيًا، ولا تعرض تلميحات أثناء الحل.
+ */
+export const grade9Lesson12MasteryDesign: Readonly<
+  Record<string, Grade9Lesson12MasteryDesignItem>
+> = {
+  'g9-s1-u1-l2-mq1': {
+    stageLabel: 'موقف قياس جديد',
+    cognitiveLevel: 'apply',
+    visualRole: 'evidence',
+    masteryDimension: 'القياس بالمسطرة وتصحيح نقطة البداية',
+    sourceBasis: ['student_book_1_2_ruler_alignment'],
+  },
+  'g9-s1-u1-l2-mq2': {
+    stageLabel: 'استدلال غير مباشر',
+    cognitiveLevel: 'analyze',
+    visualRole: 'evidence',
+    masteryDimension: 'القياس غير المباشر للأبعاد الصغيرة',
+    sourceBasis: ['student_book_1_2_indirect_measurement'],
+  },
+  'g9-s1-u1-l2-mq3': {
+    stageLabel: 'قراءة أداة جديدة',
+    cognitiveLevel: 'apply',
+    visualRole: 'evidence',
+    masteryDimension: 'قراءة الميكرومتر',
+    sourceBasis: ['student_book_1_2_micrometer'],
+  },
+  'g9-s1-u1-l2-mq4': {
+    stageLabel: 'استدلال إزاحة مركب',
+    cognitiveLevel: 'analyze',
+    visualRole: 'evidence',
+    masteryDimension: 'استنتاج حجم مجهول من الإزاحة الكلية',
+    sourceBasis: ['student_book_1_2_graduated_cylinder', 'student_book_1_2_displacement'],
+  },
+  'g9-s1-u1-l2-mq5': {
+    stageLabel: 'استدلال هندسي عكسي',
+    cognitiveLevel: 'transfer',
+    visualRole: 'evidence',
+    masteryDimension: 'استنتاج بعد مجهول من حجم معلوم',
+    sourceBasis: ['student_book_1_2_regular_volume'],
+  },
+} as const;
+
+export function getGrade9Lesson12MasteryDimension(questionId: string): string | undefined {
+  return grade9Lesson12MasteryDesign[questionId]?.masteryDimension;
+}
+
+export function getGrade9Lesson12MasteryStageLabel(questionId: string): string | undefined {
+  return grade9Lesson12MasteryDesign[questionId]?.stageLabel;
+}

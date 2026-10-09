@@ -20,7 +20,7 @@ describe('Grade 9 lesson 1-2 Golden review contract', () => {
       'g9-s1-u1-l2-rq4',
       'g9-s1-u1-l2-rq5',
     ]);
-    expect(review.every(({ status }) => status === 'draft')).toBe(true);
+    expect(review.every(({ status }) => status === 'approved')).toBe(true);
     expect(review.map(({ id }) => grade9Lesson12ReviewDesign[id]?.reviewRole)).toEqual([
       'recall',
       'apply',
@@ -43,7 +43,7 @@ describe('Grade 9 lesson 1-2 Golden review contract', () => {
     expect(new Set(reviewMoments.map(({ contextKey }) => contextKey)).size).toBe(5);
   });
 
-  it('allows intentional spaced-practice repetition of skill while keeping question, visual, and cognitive keys unique', () => {
+  it('allows intentional spaced-practice repetition of skill while keeping question, visual, cognitive, and context keys unique', () => {
     const reviewMoment = grade9Lesson12GoldenExperience[0];
     const futureMasteryMoment = {
       ...reviewMoment,
@@ -52,6 +52,7 @@ describe('Grade 9 lesson 1-2 Golden review contract', () => {
       questionKey: 'future-new-tool-choice-context',
       visualKey: 'g9-l12-future-new-tool-visual-v1',
       cognitiveFunction: 'future-transfer-tool-choice',
+      contextKey: 'future-thin-wire-tool-choice-transfer',
     };
 
     expect(futureMasteryMoment.skill).toBe(reviewMoment.skill);

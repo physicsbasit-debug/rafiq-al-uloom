@@ -6,16 +6,16 @@ import {
 import { isStudentReferencePreviewLesson } from '@content/student-reference-preview';
 
 describe('Grade 9 lesson 1-2 source lock', () => {
-  it('يحفظ الدرس مسودة قابلة للمعاينة حتى تكتمل بقية المسارات', () => {
+  it('يحفظ الدرس معتمدًا بعد اكتمال مساراته واعتماده للنشر الطلابي', () => {
     expect(grade9LengthVolumeReferenceLesson).toMatchObject({
       id: 'g9-phy-s1-u1-l2',
       unitId: 'g9-phy-s1-u1-length-time',
       title: '1-2 قياس الطول والحجم',
       order: 2,
-      status: 'draft',
+      status: 'approved',
       source: 'curriculum_seed',
     });
-    expect(isStudentReferencePreviewLesson('g9-phy-s1-u1-l2')).toBe(true);
+    expect(isStudentReferencePreviewLesson('g9-phy-s1-u1-l2')).toBe(false);
   });
 
   it('يستخدم الهدفين الرسميين المشتركين دون اختلاق هدف جديد', () => {

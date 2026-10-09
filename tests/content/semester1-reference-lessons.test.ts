@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   grade9ImportanceMeasurementReferenceLesson,
   grade9LengthVolumeReferenceLesson,
+  grade9TimeMeasurementReferenceLesson,
   grade10StaticElectricityReferenceLesson,
   semester1ReferenceExperiments,
   semester1ReferenceGames,
@@ -13,14 +14,17 @@ import { isStudentReferencePreviewLesson } from '@content/student-reference-prev
 import { publicContentVisibility } from '@content/seed/public-content-visibility.seed';
 
 describe('Phase 6-7C4 reference lessons', () => {
-  it('يعتمد درس أهمية القياس رسميًا ويبقي الكهرباء الساكنة في المعاينة المؤقتة', () => {
+  it('يعتمد درسي أهمية القياس وقياس الطول والحجم رسميًا ويبقي الكهرباء الساكنة في المعاينة المؤقتة', () => {
     expect(grade9ImportanceMeasurementReferenceLesson.status).toBe('approved');
-    expect(grade9LengthVolumeReferenceLesson.status).toBe('draft');
+    expect(grade9LengthVolumeReferenceLesson.status).toBe('approved');
+    expect(grade9TimeMeasurementReferenceLesson.status).toBe('draft');
     expect(grade10StaticElectricityReferenceLesson.status).toBe('draft');
     expect(isStudentReferencePreviewLesson('g9-phy-s1-u1-l1')).toBe(false);
     expect(isStudentReferencePreviewLesson('g10-phy-s1-u1-l1')).toBe(true);
-    expect(isStudentReferencePreviewLesson('g9-phy-s1-u1-l2')).toBe(true);
+    expect(isStudentReferencePreviewLesson('g9-phy-s1-u1-l3')).toBe(true);
+    expect(isStudentReferencePreviewLesson('g9-phy-s1-u1-l2')).toBe(false);
     expect(publicContentVisibility.lessonIds).toContain('g9-phy-s1-u1-l1');
+    expect(publicContentVisibility.lessonIds).toContain('g9-phy-s1-u1-l2');
     expect(publicContentVisibility.lessonIds).not.toContain('g10-phy-s1-u1-l1');
   });
 
@@ -60,6 +64,9 @@ describe('Phase 6-7C4 reference lessons', () => {
     ).toHaveLength(2);
     expect(
       semester1ReferenceObjectives.filter(({ lessonId }) => lessonId === 'g9-phy-s1-u1-l2')
+    ).toHaveLength(2);
+    expect(
+      semester1ReferenceObjectives.filter(({ lessonId }) => lessonId === 'g9-phy-s1-u1-l3')
     ).toHaveLength(2);
     expect(
       semester1ReferenceObjectives.filter(({ lessonId }) => lessonId === 'g10-phy-s1-u1-l1')

@@ -293,3 +293,46 @@ export const grade9Lesson12GameReservations: readonly LearningExperienceReservat
     skill: 'فحص اتساق بروتوكول القياس',
   },
 ] as const;
+
+/**
+ * Phase 6-7C4N approved MQ4/MQ5 A/B mastery reservations.
+ * A/B share a cognitive function only inside the same mastery path; question/visual/context keys differ.
+ */
+export const grade9Lesson12MasteryReservations: readonly LearningExperienceReservation[] = [
+  {
+    id: 'g9-s1-u1-l2-mq4-a',
+    path: 'mastery',
+    questionKey: 'infer-metal-key-volume-from-combined-displacement',
+    visualKey: 'g9-l12-mastery-steel-sphere-key-displacement-v1',
+    cognitiveFunction: 'subtract-known-object-volume-from-combined-displacement',
+    contextKey: 'steel-sphere-and-metal-key-combined-displacement',
+    skill: 'استنتاج حجم مجهول من الإزاحة الكلية',
+  },
+  {
+    id: 'g9-s1-u1-l2-mq4-b',
+    path: 'mastery',
+    questionKey: 'infer-alloy-piece-volume-with-reference-cube',
+    visualKey: 'g9-l12-mastery-reference-cube-alloy-displacement-v1',
+    cognitiveFunction: 'subtract-known-object-volume-from-combined-displacement',
+    contextKey: 'quality-control-reference-cube-and-alloy-piece',
+    skill: 'استنتاج حجم مجهول من الإزاحة الكلية',
+  },
+  {
+    id: 'g9-s1-u1-l2-mq5-a',
+    path: 'mastery',
+    questionKey: 'infer-missing-height-from-known-prism-volume',
+    visualKey: 'g9-l12-mastery-orthographic-missing-height-v1',
+    cognitiveFunction: 'infer-missing-dimension-from-volume-and-two-dimensions',
+    contextKey: 'orthographic-solid-eight-four-volume-ninety-six',
+    skill: 'استنتاج بعد مجهول من حجم معلوم',
+  },
+  {
+    id: 'g9-s1-u1-l2-mq5-b',
+    path: 'mastery',
+    questionKey: 'infer-soap-block-thickness-from-target-volume',
+    visualKey: 'g9-l12-mastery-soap-block-production-plan-v1',
+    cognitiveFunction: 'infer-missing-dimension-from-volume-and-two-dimensions',
+    contextKey: 'soap-production-ten-six-volume-one-eighty',
+    skill: 'استنتاج بعد مجهول من حجم معلوم',
+  },
+] as const;

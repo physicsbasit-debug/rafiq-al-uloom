@@ -682,3 +682,31 @@
     width: 100%;
   }
 }
+
+/* Phase 6-7C4n Block 4 — lesson 1-3 unlock chain */
+.rafiq-lesson-action-card:disabled,
+.rafiq-lesson-action-card.is-locked {
+  cursor: not-allowed;
+  opacity: 0.62;
+  transform: none;
+  box-shadow: none;
+  filter: grayscale(0.15);
+}
+
+.rafiq-lesson-action-card:disabled:hover,
+.rafiq-lesson-action-card.is-locked:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.rafiq-lesson-action-lock {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 0.45rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(45, 55, 72, 0.1);
+  color: #475569;
+  font-size: 0.76rem;
+  font-weight: 800;
+}

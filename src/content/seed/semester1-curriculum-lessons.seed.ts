@@ -2,6 +2,7 @@ import type { Lesson } from '@shared-types/content.types';
 import {
   grade9ImportanceMeasurementReferenceLesson,
   grade9LengthVolumeReferenceLesson,
+  grade9TimeMeasurementReferenceLesson,
   grade10StaticElectricityReferenceLesson,
 } from './semester1-reference-lessons.seed';
 
@@ -34,7 +35,7 @@ function plannedLesson(id: string, unitId: string, title: string, order: number)
 export const grade9Semester1CurriculumLessons: Lesson[] = [
   grade9ImportanceMeasurementReferenceLesson,
   grade9LengthVolumeReferenceLesson,
-  plannedLesson('g9-phy-s1-u1-l3', 'g9-phy-s1-u1-length-time', '1-3 قياس الزمن', 3),
+  grade9TimeMeasurementReferenceLesson,
   plannedLesson('g9-phy-s1-u2-l1', 'g9-phy-s1-u2-motion', '2-1 فهم السرعة', 1),
   plannedLesson('g9-phy-s1-u2-l2', 'g9-phy-s1-u2-motion', '2-2 التمثيل البياني (المسافة/الزمن)', 2),
   plannedLesson('g9-phy-s1-u2-l3', 'g9-phy-s1-u2-motion', '2-3 فهم التسارع', 3),

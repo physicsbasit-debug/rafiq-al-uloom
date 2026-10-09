@@ -22,5 +22,5 @@ export const publicContentVisibility = {
   unitIds: learningCatalogUnits
     .filter((unit) => visibleSemesterIds.has(unit.semesterId))
     .map((unit) => unit.id) as readonly string[],
-  lessonIds: ['g9-phy-s1-u1-l1'] as readonly string[],
+  lessonIds: ['g9-phy-s1-u1-l1', 'g9-phy-s1-u1-l2'] as readonly string[],
 };

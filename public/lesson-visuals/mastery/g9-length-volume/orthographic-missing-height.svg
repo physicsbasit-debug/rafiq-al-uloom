@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">متوازي مستطيلات بأبعاد معلومة وبعد مجهول</title>
+  <desc id="desc">إنفوجرافيك هندسي لمتوازي مستطيلات يوضح الطول 8 سنتيمترات والعرض 4 سنتيمترات والارتفاع المجهول بعلامة استفهام.</desc>
+
+  <rect width="1200" height="675" rx="28" fill="#f7fbff"/>
+
+  <!-- Keep the whole infographic inside a generous safe area so CSS cropping cannot hide labels -->
+  <g stroke="#1f5f93" stroke-width="6" stroke-linejoin="round">
+    <!-- top face -->
+    <polygon points="285,225 710,225 840,160 415,160" fill="#dbeafc"/>
+    <!-- front face -->
+    <polygon points="285,225 710,225 710,475 285,475" fill="#b9d6ef"/>
+    <!-- side face -->
+    <polygon points="710,225 840,160 840,410 710,475" fill="#9fc4e3"/>
+  </g>
+
+  <!-- Infographic label -->
+  <g font-family="Arial, sans-serif">
+    <rect x="70" y="68" width="250" height="54" rx="27" fill="#eef5fb" stroke="#b8cee0" stroke-width="2"/>
+    <text x="195" y="104" text-anchor="middle" font-size="25" font-weight="700" fill="#173a5d">متوازي مستطيلات</text>
+  </g>
+
+  <!-- Length: label and measure kept inside image -->
+  <g stroke="#d87800" stroke-width="5" fill="none">
+    <path d="M285 520H710"/>
+    <path d="M285 500V540M710 500V540"/>
+  </g>
+  <rect x="430" y="535" width="135" height="50" rx="25" fill="#fff4df" stroke="#e5b865" stroke-width="2"/>
+  <text x="497" y="570" text-anchor="middle" font-family="Arial, sans-serif"
+        font-size="30" font-weight="700" fill="#9b5400">8 cm</text>
+
+  <!-- Width/depth: use top face itself so it stays visible -->
+  <g stroke="#2f7f72" stroke-width="5" fill="none">
+    <path d="M425 140L835 140"/>
+    <path d="M425 124V156M835 124V156"/>
+  </g>
+  <rect x="565" y="78" width="130" height="48" rx="24" fill="#e8f7f4" stroke="#8cc5bc" stroke-width="2"/>
+  <text x="630" y="111" text-anchor="middle" font-family="Arial, sans-serif"
+        font-size="29" font-weight="700" fill="#17685d">4 cm</text>
+
+  <!-- Unknown height, completely inside right side safe area -->
+  <g stroke="#7a5aa6" stroke-width="5" fill="none">
+    <path d="M900 160V410"/>
+    <path d="M880 160H920M880 410H920"/>
+  </g>
+  <rect x="935" y="255" width="76" height="76" rx="38" fill="#f2ebfb" stroke="#b9a2d5" stroke-width="2"/>
+  <text x="973" y="309" text-anchor="middle" font-family="Arial, sans-serif"
+        font-size="46" font-weight="700" fill="#65458f">?</text>
+</svg>

@@ -199,14 +199,14 @@ describe('LessonList', () => {
     expect(onSelectLesson).toHaveBeenCalledWith('g9-phy-s1-u1-l1');
   });
 
-  it('يبقي درس قياس الطول والحجم في المعاينة أثناء بناء بقية المسارات', () => {
+  it('يعرض درس قياس الطول والحجم المعتمد كدرس طبيعي دون شارة معاينة', () => {
     const onSelectLesson = vi.fn();
     const previewLesson = {
       ...lessons[0],
       id: 'g9-phy-s1-u1-l2',
       title: '1-2 قياس الطول والحجم',
       order: 2,
-      status: 'draft' as const,
+      status: 'approved' as const,
     };
     mockedUseLessonsByUnit.mockReturnValue({
       data: [previewLesson],
@@ -218,7 +218,8 @@ describe('LessonList', () => {
     const card = screen.getByRole('button', { name: '1-2 قياس الطول والحجم' });
     expect(card).not.toBeDisabled();
     expect(card).toHaveTextContent('الدرس 2');
-    expect(card).toHaveTextContent('معاينة');
+    expect(card).toHaveTextContent('جاهز للتعلّم');
+    expect(card).not.toHaveTextContent('معاينة');
     fireEvent.click(card);
     expect(onSelectLesson).toHaveBeenCalledWith('g9-phy-s1-u1-l2');
   });

@@ -28,6 +28,26 @@ const VISUALS: Readonly<Record<string, StudentQuestionVisual>> = {
     src: '/lesson-visuals/mastery/g9-importance-measurement/aircraft-component.svg',
     alt: 'مشهد تصنيع جزء لطائرة بين شركتين مع مخطط هندسي يحتاج إلى تسجيل قياس مكتمل',
   },
+  'g9-s1-u1-l2-mq1': {
+    src: '/lesson-visuals/mastery/g9-length-volume/ruler-offset.svg',
+    alt: 'مسطرة قياس مع جسم يبدأ من علامة داخلية بدل الصفر لتحديد طوله من فرق القراءتين',
+  },
+  'g9-s1-u1-l2-mq2': {
+    src: '/lesson-visuals/mastery/g9-length-volume/wire-turns.svg',
+    alt: 'سلك رفيع ملفوف في لفات متجاورة لاستخدام قياس غير مباشر لقطره',
+  },
+  'g9-s1-u1-l2-mq3': {
+    src: '/lesson-visuals/mastery/g9-length-volume/micrometer-reading.svg',
+    alt: 'ميكرومتر مكبر يظهر التدريج الرئيسي والتدريج الكسري دون كشف القراءة النهائية',
+  },
+  'g9-s1-u1-l2-mq4': {
+    src: '/lesson-visuals/mastery/g9-length-volume/combined-displacement-key.svg',
+    alt: 'مخبار مدرج قبل الغمر وبعد غمر كرة فولاذية ومفتاح معدني بالكامل لقراءة الإزاحة الكلية',
+  },
+  'g9-s1-u1-l2-mq5': {
+    src: '/lesson-visuals/mastery/g9-length-volume/orthographic-missing-height.svg',
+    alt: 'مخطط هندسي مسطح لمتوازي مستطيلات يوضح بعدين معلومين والبعد الثالث بعلامة استفهام',
+  },
 };
 
 export function getStudentQuestionVisual(questionId: string): StudentQuestionVisual | undefined {

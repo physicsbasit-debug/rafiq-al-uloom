@@ -15,11 +15,13 @@ import {
 interface ReviewQuestionsViewProps {
   lessonId: string;
   onBackToLesson: () => void;
+  onComplete?: () => void;
 }
 
 interface ReviewQuestionsContentProps {
   questions: Question[];
   onBackToLesson: () => void;
+  onComplete?: () => void;
 }
 
 interface ReviewResponse {
@@ -42,7 +44,11 @@ const REVIEW_ROLE_LABELS: Readonly<Record<InternalReviewRole, string>> = {
   concept_link: 'ربط المفهوم',
 };
 
-export function ReviewQuestionsView({ lessonId, onBackToLesson }: ReviewQuestionsViewProps) {
+export function ReviewQuestionsView({
+  lessonId,
+  onBackToLesson,
+  onComplete,
+}: ReviewQuestionsViewProps) {
   const questionsQuery = useReviewQuestions(lessonId);
 
   return (
@@ -54,7 +60,11 @@ export function ReviewQuestionsView({ lessonId, onBackToLesson }: ReviewQuestion
       {lessonId === 'g9-phy-s1-u1-l2' ? (
         <Grade9LengthVolumeReview questions={questionsQuery.data} onBackToLesson={onBackToLesson} />
       ) : (
-        <ReviewQuestionsContent questions={questionsQuery.data} onBackToLesson={onBackToLesson} />
+        <ReviewQuestionsContent
+          questions={questionsQuery.data}
+          onBackToLesson={onBackToLesson}
+          onComplete={onComplete}
+        />
       )}
     </QueryBoundary>
   );
@@ -74,7 +84,11 @@ function buildSummaryGroups(questions: Question[]): ReviewSummaryGroup[] {
   return Array.from(groups, ([label, questionIds]) => ({ label, questionIds }));
 }
 
-function ReviewQuestionsContent({ questions, onBackToLesson }: ReviewQuestionsContentProps) {
+function ReviewQuestionsContent({
+  questions,
+  onBackToLesson,
+  onComplete,
+}: ReviewQuestionsContentProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [responses, setResponses] = useState<Record<string, ReviewResponse>>({});
   const [isComplete, setIsComplete] = useState(false);
@@ -213,6 +227,7 @@ function ReviewQuestionsContent({ questions, onBackToLesson }: ReviewQuestionsCo
 
     if (currentIndex === questions.length - 1) {
       setIsComplete(true);
+      onComplete?.();
       return;
     }
 

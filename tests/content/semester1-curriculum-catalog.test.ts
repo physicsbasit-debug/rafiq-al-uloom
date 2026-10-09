@@ -40,15 +40,18 @@ describe('Phase 6-7C3c official semester-1 catalog', () => {
     );
   });
 
-  it('يحمل موضوعات الفصل الأول كمسودات ويستثني النموذجين المرجعيين من الفراغ الهيكلي', () => {
+  it('يحمل موضوعات الفصل الأول ويحافظ على اعتماد الدروس المرجعية المنشورة', () => {
     expect(grade9Semester1CurriculumLessons).toHaveLength(26);
     expect(grade10Semester1CurriculumLessons).toHaveLength(29);
-    const referenceIds = new Set(['g9-phy-s1-u1-l1', 'g9-phy-s1-u1-l2', 'g10-phy-s1-u1-l1']);
+    const referenceIds = new Set(['g9-phy-s1-u1-l1', 'g9-phy-s1-u1-l2', 'g9-phy-s1-u1-l3', 'g10-phy-s1-u1-l1']);
     for (const lesson of [
       ...grade9Semester1CurriculumLessons,
       ...grade10Semester1CurriculumLessons,
     ]) {
-      if (lesson.id === 'g9-phy-s1-u1-l1') {
+      if (
+        lesson.id === 'g9-phy-s1-u1-l1' ||
+        lesson.id === 'g9-phy-s1-u1-l2'
+      ) {
         expect(lesson.status).toBe('approved');
       } else {
         expect(lesson.status).toBe('draft');
@@ -69,7 +72,10 @@ describe('Phase 6-7C3c official semester-1 catalog', () => {
     expect(publicContentVisibility.gradeIds).toEqual(['g9', 'g10']);
     expect(publicContentVisibility.semesterIds).toEqual(['g9-sem1', 'g10-sem1']);
     expect(publicContentVisibility.unitIds).toHaveLength(21);
-    expect(publicContentVisibility.lessonIds).toEqual(['g9-phy-s1-u1-l1']);
+    expect(publicContentVisibility.lessonIds).toEqual([
+      'g9-phy-s1-u1-l1',
+      'g9-phy-s1-u1-l2',
+    ]);
   });
 
   it('يربط المختبرات المنشورة بدروسها الحقيقية في الفصل الأول', () => {

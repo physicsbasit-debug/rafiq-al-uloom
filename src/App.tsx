@@ -14,6 +14,13 @@ import { MasteryTestView } from '@features/mastery/MasteryTestView';
 import { GradeSelection } from '@features/student/grade-selection/GradeSelection';
 import { LessonList } from '@features/student/lesson-list/LessonList';
 import { LessonView } from '@features/student/lesson-view/LessonView';
+import {
+  advanceLessonUnlockProgress,
+  getLessonActionAccess,
+  INITIAL_LESSON_UNLOCK_PROGRESS,
+  type LessonUnlockEvent,
+  type LessonUnlockProgress,
+} from '@features/student/lesson-progress/lesson-unlock';
 import { StudentBackAction } from '@features/student/navigation/StudentBackAction';
 import { StudentJourneyAccordion } from '@features/student/navigation/StudentJourneyAccordion';
 import { ReviewQuestionsView } from '@features/student/review-questions/ReviewQuestionsView';
@@ -106,6 +113,29 @@ function StudentContextualBackAction({ step, setStep }: StudentExperienceProps) 
 }
 
 function StudentExperience({ step, setStep }: StudentExperienceProps) {
+  const gatedLessonId = 'g9-phy-s1-u1-l3';
+  const [unlockByLesson, setUnlockByLesson] = useState<Record<string, LessonUnlockProgress>>({});
+
+  const activeProgress =
+    'lessonId' in step && step.lessonId === gatedLessonId
+      ? (unlockByLesson[step.lessonId] ?? INITIAL_LESSON_UNLOCK_PROGRESS)
+      : INITIAL_LESSON_UNLOCK_PROGRESS;
+
+  const activeActionAccess =
+    'lessonId' in step && step.lessonId === gatedLessonId
+      ? getLessonActionAccess(activeProgress)
+      : undefined;
+
+  function markProgress(lessonId: string, event: LessonUnlockEvent) {
+    if (lessonId !== gatedLessonId) return;
+
+    setUnlockByLesson((current) => {
+      const previous = current[lessonId] ?? INITIAL_LESSON_UNLOCK_PROGRESS;
+      const next = advanceLessonUnlockProgress(previous, event);
+      return next === previous ? current : { ...current, [lessonId]: next };
+    });
+  }
+
   return (
     <section className="rafiq-student-shell">
       <StudentJourneyAccordion currentStep={step.name} />
@@ -154,33 +184,41 @@ function StudentExperience({ step, setStep }: StudentExperienceProps) {
               unitId: step.unitId,
             })
           }
-          onOpenReviewQuestions={() =>
+          actionAccess={activeActionAccess}
+          explanationComplete={activeProgress.explanationComplete}
+          onExplanationComplete={() => markProgress(step.lessonId, 'explanation_complete')}
+          onOpenReviewQuestions={() => {
+            if (activeActionAccess && !activeActionAccess.review) return;
             setStep({
               name: 'review',
               gradeId: step.gradeId,
               semesterId: step.semesterId,
               lessonId: step.lessonId,
               unitId: step.unitId,
-            })
-          }
-          onOpenActivities={() =>
+            });
+          }}
+          onOpenActivities={() => {
+            if (activeActionAccess && !activeActionAccess.activities) return;
+            markProgress(step.lessonId, 'activities_entered');
             setStep({
               name: 'activities',
               gradeId: step.gradeId,
               semesterId: step.semesterId,
               lessonId: step.lessonId,
               unitId: step.unitId,
-            })
-          }
-          onOpenMatchingGame={() =>
+            });
+          }}
+          onOpenMatchingGame={() => {
+            if (activeActionAccess && !activeActionAccess.game) return;
+            markProgress(step.lessonId, 'game_entered');
             setStep({
               name: 'game',
               gradeId: step.gradeId,
               semesterId: step.semesterId,
               lessonId: step.lessonId,
               unitId: step.unitId,
-            })
-          }
+            });
+          }}
           onOpenVirtualLabs={() =>
             setStep({
               name: 'labs',
@@ -190,20 +228,22 @@ function StudentExperience({ step, setStep }: StudentExperienceProps) {
               unitId: step.unitId,
             })
           }
-          onOpenMasteryTest={() =>
+          onOpenMasteryTest={() => {
+            if (activeActionAccess && !activeActionAccess.mastery) return;
             setStep({
               name: 'mastery',
               gradeId: step.gradeId,
               semesterId: step.semesterId,
               lessonId: step.lessonId,
               unitId: step.unitId,
-            })
-          }
+            });
+          }}
         />
       ) : null}
       {step.name === 'review' ? (
         <ReviewQuestionsView
           lessonId={step.lessonId}
+          onComplete={() => markProgress(step.lessonId, 'review_complete')}
           onBackToLesson={() =>
             setStep({
               name: 'lesson',

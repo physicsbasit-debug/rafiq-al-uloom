@@ -1,4 +1,4 @@
-export type GoldenLearningPath = 'review' | 'activity' | 'game' | 'lab' | 'mastery';
+export type GoldenLearningPath = 'review' | 'activity' | 'game' | 'lab' | 'mastery' | 'explanation';
 
 export interface GoldenLearningMoment {
   readonly id: string;
@@ -16,11 +16,12 @@ export interface GoldenLearningMoment {
    * الفعل العقلي الدقيق الذي يقوم به الطالب في هذه اللحظة التعليمية.
    */
   readonly cognitiveFunction: string;
+  readonly contextKey?: string;
   readonly objectiveKey: string;
   readonly skill: string;
 }
 
-export type GoldenConflictKind = 'question' | 'visual' | 'cognitive';
+export type GoldenConflictKind = 'question' | 'visual' | 'cognitive' | 'context';
 
 export interface GoldenLearningConflict {
   readonly kind: GoldenConflictKind;
@@ -86,6 +87,7 @@ export function findGoldenLearningConflicts(
     ...findCrossPathDuplicates(moments, 'question', (moment) => moment.questionKey),
     ...findCrossPathDuplicates(moments, 'visual', (moment) => moment.visualKey),
     ...findCrossPathDuplicates(moments, 'cognitive', (moment) => moment.cognitiveFunction),
+    ...findCrossPathDuplicates(moments, 'context', (moment) => moment.contextKey),
   ];
 }
 

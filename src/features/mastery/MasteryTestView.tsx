@@ -11,6 +11,7 @@ import { spacing } from '@design-system/theme/spacing';
 import { typography } from '@design-system/theme/typography';
 import { getStudentQuestionVisual } from '@content/student-question-visuals';
 import { getGrade9Lesson11MasteryDimension } from '@content/learning-design/grade9-lesson-1-1-learning-design';
+import { Grade9LengthVolumeMastery } from './Grade9LengthVolumeMastery';
 import { getQuestionFeedback } from '@features/quiz/quiz-engine';
 import type { MasteryResult } from '@shared-types/mastery.types';
 import type { Question } from '@shared-types/quiz.types';
@@ -178,8 +179,7 @@ const G9_REVIEW_TARGETS: Readonly<Record<string, string>> = {
   'فهم القياس المكتمل': 'راجع فكرة: القياس = قيمة عددية + وحدة مناسبة.',
   'استخدام الوحدات المشتركة والتواصل العلمي':
     'راجع فكرة: توحيد الوحدة قبل المقارنة وأهمية لغة قياس مشتركة.',
-  'الدقة والموثوقية في القياس':
-    'راجع فقرة: الدقة في القياس، ولا تحكم من شكل الأداة وحده.',
+  'الدقة والموثوقية في القياس': 'راجع فقرة: الدقة في القياس، ولا تحكم من شكل الأداة وحده.',
   'تطبيق المفهوم في موقف جديد':
     'راجع فكرة: لماذا يجب أن يكون القياس واضحًا وقابلًا للنقل بين فرق مختلفة.',
 };
@@ -270,20 +270,29 @@ function Grade9Lesson11MasteryExperience({
           <div className="rafiq-mastery-intro-copy">
             <span className="rafiq-mastery-eyebrow">اختبار الإتقان</span>
             <h2>إتقان مرحلي: أهمية القياس</h2>
-            <p>
-              استخدم ما تعلمته في مواقف جديدة، ثم تعرّف على جوانب القوة وما يحتاج إلى مراجعة.
-            </p>
+            <p>استخدم ما تعلمته في مواقف جديدة، ثم تعرّف على جوانب القوة وما يحتاج إلى مراجعة.</p>
             <div className="rafiq-mastery-intro-facts" aria-label="خصائص اختبار الإتقان">
-              <div><strong>5</strong><span>مواقف جديدة</span></div>
-              <div><strong>لا توجد</strong><span>تلميحات أثناء الحل</span></div>
-              <div><strong>بعد النهاية</strong><span>يظهر التقرير التشخيصي</span></div>
+              <div>
+                <strong>5</strong>
+                <span>مواقف جديدة</span>
+              </div>
+              <div>
+                <strong>لا توجد</strong>
+                <span>تلميحات أثناء الحل</span>
+              </div>
+              <div>
+                <strong>بعد النهاية</strong>
+                <span>يظهر التقرير التشخيصي</span>
+              </div>
             </div>
             <button type="button" className="rafiq-mastery-start" onClick={() => setStarted(true)}>
               ابدأ اختبار الإتقان
             </button>
           </div>
           <div className="rafiq-mastery-intro-visual" aria-hidden="true">
-            <div className="rafiq-mastery-target-mark"><span>✓</span></div>
+            <div className="rafiq-mastery-target-mark">
+              <span>✓</span>
+            </div>
             <div className="rafiq-mastery-orbit one" />
             <div className="rafiq-mastery-orbit two" />
           </div>
@@ -296,21 +305,30 @@ function Grade9Lesson11MasteryExperience({
   if (result) {
     const level = getMasteryLevel(correctCount, attemptQuestions.length);
     const reviewTarget = review.length
-      ? G9_REVIEW_TARGETS[review[0]] ?? 'راجع الفكرة التي لم تتقنها ثم أعد التحقق.'
+      ? (G9_REVIEW_TARGETS[review[0]] ?? 'راجع الفكرة التي لم تتقنها ثم أعد التحقق.')
       : 'أكملت أهداف هذا الجزء بنجاح. انتقل إلى التعلم التالي وواصل نقل الفكرة إلى مواقف جديدة.';
 
     return (
       <section className="rafiq-mastery-stage-shell">
         <div className="rafiq-mastery-report">
           <div className="rafiq-mastery-report-hero">
-            <div className="rafiq-mastery-report-mark" aria-hidden="true">✓</div>
+            <div className="rafiq-mastery-report-mark" aria-hidden="true">
+              ✓
+            </div>
             <div>
               <span>تقرير إتقانك</span>
               <h2>{level}</h2>
               <p>أكملت اختبار الإتقان. هذه خريطة أدائك حسب المهارات، وليست مجرد درجة.</p>
             </div>
-            <div className="rafiq-mastery-score-ring" aria-label={`النتيجة ${correctCount} من ${attemptQuestions.length}`}>
-              <strong><bdi dir="ltr">{correctCount}/{attemptQuestions.length}</bdi></strong>
+            <div
+              className="rafiq-mastery-score-ring"
+              aria-label={`النتيجة ${correctCount} من ${attemptQuestions.length}`}
+            >
+              <strong>
+                <bdi dir="ltr">
+                  {correctCount}/{attemptQuestions.length}
+                </bdi>
+              </strong>
               <span>مواقف صحيحة</span>
             </div>
           </div>
@@ -320,7 +338,9 @@ function Grade9Lesson11MasteryExperience({
               const ok = mastered.includes(dimension);
               return (
                 <div key={dimension} className={ok ? 'is-mastered' : 'is-review'}>
-                  <span className="rafiq-mastery-skill-icon" aria-hidden="true">{ok ? '✓' : '!'}</span>
+                  <span className="rafiq-mastery-skill-icon" aria-hidden="true">
+                    {ok ? '✓' : '!'}
+                  </span>
                   <strong>{dimension}</strong>
                   <span>{ok ? 'متقن' : 'يحتاج مراجعة'}</span>
                 </div>
@@ -340,11 +360,19 @@ function Grade9Lesson11MasteryExperience({
             </div>
             <div className="rafiq-mastery-report-actions">
               {review.length ? (
-                <button type="button" className="rafiq-mastery-primary-action" onClick={onBackToLesson}>
+                <button
+                  type="button"
+                  className="rafiq-mastery-primary-action"
+                  onClick={onBackToLesson}
+                >
                   راجع الفكرة في الدرس
                 </button>
               ) : null}
-              <button type="button" className="rafiq-mastery-secondary-action" onClick={startRetake}>
+              <button
+                type="button"
+                className="rafiq-mastery-secondary-action"
+                onClick={startRetake}
+              >
                 إعادة التحقق بمواقف جديدة
               </button>
               <button type="button" className="rafiq-mastery-ghost-action" onClick={onBackToLesson}>
@@ -374,23 +402,46 @@ function Grade9Lesson11MasteryExperience({
   return (
     <section className="rafiq-mastery-stage-shell">
       <div className="rafiq-mastery-progress-row">
-        <strong aria-label={`السؤال ${currentIndex + 1} من ${attemptQuestions.length}`}>السؤال <bdi dir="ltr">{currentIndex + 1}</bdi> من <bdi dir="ltr">{attemptQuestions.length}</bdi></strong>
+        <strong aria-label={`السؤال ${currentIndex + 1} من ${attemptQuestions.length}`}>
+          السؤال <bdi dir="ltr">{currentIndex + 1}</bdi> من{' '}
+          <bdi dir="ltr">{attemptQuestions.length}</bdi>
+        </strong>
         <div className="rafiq-mastery-dots" aria-label="تقدم اختبار الإتقان">
           {attemptQuestions.map((question, index) => (
-            <span key={question.id} className={index === currentIndex ? 'is-current' : index < currentIndex ? 'is-past' : ''} />
+            <span
+              key={question.id}
+              className={
+                index === currentIndex ? 'is-current' : index < currentIndex ? 'is-past' : ''
+              }
+            />
           ))}
         </div>
       </div>
-      <div className="rafiq-mastery-progress-track" role="progressbar" aria-label="تقدم اختبار الإتقان" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress)}>
+      <div
+        className="rafiq-mastery-progress-track"
+        role="progressbar"
+        aria-label="تقدم اختبار الإتقان"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(progress)}
+      >
         <span style={{ width: `${progress}%` }} />
       </div>
 
       <article className="rafiq-mastery-scenario-card">
         <div className="rafiq-mastery-scenario-label">{scenarioLabel}</div>
         {visual ? (
-          <img className="rafiq-mastery-scenario-visual" src={visual.src} alt={visual.alt} width="1200" height="675" />
+          <img
+            className="rafiq-mastery-scenario-visual"
+            src={visual.src}
+            alt={visual.alt}
+            width="1200"
+            height="675"
+          />
         ) : null}
-        <h2><ScientificText text={currentQuestion.prompt} /></h2>
+        <h2>
+          <ScientificText text={currentQuestion.prompt} />
+        </h2>
         <div className="rafiq-mastery-choice-list" aria-label="اختيارات الموقف">
           {currentQuestion.choices.map((choice, choiceIndex) => (
             <button
@@ -422,7 +473,9 @@ function Grade9Lesson11MasteryExperience({
             type="button"
             className="rafiq-mastery-primary-action"
             disabled={selectedIndex === undefined}
-            onClick={() => setCurrentIndex((current) => Math.min(attemptQuestions.length - 1, current + 1))}
+            onClick={() =>
+              setCurrentIndex((current) => Math.min(attemptQuestions.length - 1, current + 1))
+            }
           >
             السؤال التالي
           </button>
@@ -446,10 +499,17 @@ function MasteryTestContentRouter(props: MasteryTestContentProps) {
   if (props.lessonId === G9_LESSON_11_ID) {
     return <Grade9Lesson11MasteryExperience {...props} />;
   }
+  if (props.lessonId === 'g9-phy-s1-u1-l2') {
+    return <Grade9LengthVolumeMastery {...props} />;
+  }
   return <GenericMasteryTestContent {...props} />;
 }
 
-function GenericMasteryTestContent({ questions, lessonId, onBackToLesson }: MasteryTestContentProps) {
+function GenericMasteryTestContent({
+  questions,
+  lessonId,
+  onBackToLesson,
+}: MasteryTestContentProps) {
   const [answers, setAnswers] = useState<AnswersByQuestionId>({});
   const [result, setResult] = useState<MasteryResult | null>(null);
   const persistence = useMasteryResultPersistence(lessonId);

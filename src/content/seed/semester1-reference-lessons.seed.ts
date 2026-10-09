@@ -63,6 +63,34 @@ export const grade9LengthVolumeReferenceLesson: Lesson = {
     'الاعتقاد أن المخبار الأكبر هو الأفضل دائمًا؛ والصحيح أن اختيار المدى والتدرج يجب أن يناسب مقدار السائل المراد قياسه.',
     'الاعتقاد أن قراءة السائل تؤخذ من أي زاوية؛ والصحيح أن قراءة الماء تؤخذ عند أسفل السطح المقعر وبمستوى نظر أفقي.',
   ],
+  status: 'approved',
+  source: 'curriculum_seed',
+};
+
+export const grade9TimeMeasurementReferenceLesson: Lesson = {
+  id: 'g9-phy-s1-u1-l3',
+  unitId: 'g9-phy-s1-u1-length-time',
+  title: '1-3 قياس الزمن',
+  order: 3,
+  objectiveIds: ['g9-s1-u1-l3-o2', 'g9-s1-u1-l3-o3'],
+  summary:
+    'تُقاس الفترات الزمنية بساعات وأجهزة تناظرية ورقمية، لكن جودة القياس لا تعتمد على عدد المنازل المعروضة وحده. عند قياس الفترات القصيرة يمكن أن يؤثر زمن استجابة الإنسان، ويمكن تحسين القياس بتكراره أو بقياس عدد من الأحداث الدورية ثم حساب متوسط زمن الحدث الواحد.',
+  keyConcepts: [
+    'يختلف مستوى التفصيل المطلوب في قياس الزمن بحسب الموقف الذي نريد دراسته.',
+    'تُقرأ ساعة الإيقاف التناظرية من تدريجها، بينما تعطي الساعة الرقمية قراءة مباشرة بالأرقام.',
+    'قد تعرض الساعة الرقمية أجزاء صغيرة جدًا من الثانية، لكن القياس اليدوي يظل متأثرًا بزمن استجابة الإنسان.',
+    'يمكن توقع لحظة بدء حدث دوري واستخدام العد التنازلي لتحسين بدء التوقيت.',
+    'الزمن الدوري للبندول هو زمن تأرجح كامل واحد يعود فيه البندول إلى حالة البداية.',
+    'يمكن قياس زمن عدد من التأرجحات الكاملة ثم قسمة الزمن الكلي على عددها لإيجاد متوسط زمن التأرجح الواحد.',
+  ],
+  examples: [
+    'في سباق قصير قد تفصل أجزاء صغيرة من الثانية بين المراكز، بينما يمكن في حدث طويل تسجيل الزمن بأقل تفصيل.',
+    'الفترة 2 min 14.37 s تظهر على تدريج يسمح بأقرب 0.1 s بصورة تقارب 2 min 14.4 s.',
+    'إذا استغرقت 12 تأرجحًا كاملًا 14.76 s فإن متوسط زمن التأرجح الواحد يساوي 1.23 s.',
+  ],
+  misconceptions: [
+    'الاعتقاد أن عرض الساعة الرقمية منزلتين عشريتين يعني أن القياس اليدوي نفسه دقيق إلى 0.01 s؛ والصحيح أن زمن استجابة الإنسان قد يحد جودة القياس الفعلي.',
+  ],
   status: 'draft',
   source: 'curriculum_seed',
 };
@@ -114,6 +142,16 @@ export const semester1ReferenceObjectives: Objective[] = [
     id: 'g9-s1-u1-l2-o4',
     lessonId: 'g9-phy-s1-u1-l2',
     text: 'يفهم كيف يستخدم أداة الميكرومتر لقياس الأبعاد الصغيرة جدًا.',
+  },
+  {
+    id: 'g9-s1-u1-l3-o2',
+    lessonId: 'g9-phy-s1-u1-l3',
+    text: 'يستخدم الساعات والأجهزة التناظرية والرقمية لقياس الفترات الزمنية ويصف استخدامها.',
+  },
+  {
+    id: 'g9-s1-u1-l3-o3',
+    lessonId: 'g9-phy-s1-u1-l3',
+    text: 'يجد القيمة المتوسطة لمسافة قصيرة ولفترة زمنية قصيرة من خلال القياس لعدة مرات (بما في ذلك الزمن الدوري للبندول).',
   },
   {
     id: 'g10-s1-u1-l1-o1',
@@ -223,7 +261,7 @@ export const semester1ReferenceReviewQuestions: Question[] = [
       'الميكرومتر مناسب لقياس قطر السلك لأن هذا البعد صغير جدًا مقارنة بما يمكن قراءته بوضوح على المسطرة.',
     objectiveId: 'g9-s1-u1-l2-o4',
     difficulty: 'easy',
-    status: 'draft',
+    status: 'approved',
     source: 'curriculum_seed',
   },
   {
@@ -237,7 +275,7 @@ export const semester1ReferenceReviewQuestions: Question[] = [
       'القياس 8.0 mm يخص 100 ورقة؛ لذلك نقسمه على 100 فنحصل على 0.08 mm لسمك ورقة واحدة.',
     objectiveId: 'g9-s1-u1-l2-o1',
     difficulty: 'medium',
-    status: 'draft',
+    status: 'approved',
     source: 'curriculum_seed',
   },
   {
@@ -252,7 +290,7 @@ export const semester1ReferenceReviewQuestions: Question[] = [
       'التدريج الرئيسي 3.00 mm، والتدريج الكسري 28 × 0.01 mm = 0.28 mm؛ إذن القراءة الكلية 3.28 mm.',
     objectiveId: 'g9-s1-u1-l2-o4',
     difficulty: 'medium',
-    status: 'draft',
+    status: 'approved',
     source: 'curriculum_seed',
   },
   {
@@ -271,7 +309,7 @@ export const semester1ReferenceReviewQuestions: Question[] = [
       'عندما يكون أصغر تقسيم 10 mL فإن 6 mL تقع بين علامتين ولا يمكن قراءتها مباشرة من التدريج؛ نختار مخبارًا بمدى وتدرج يناسبان الكمية الصغيرة.',
     objectiveId: 'g9-s1-u1-l2-o1',
     difficulty: 'hard',
-    status: 'draft',
+    status: 'approved',
     source: 'curriculum_seed',
   },
   {
@@ -290,7 +328,7 @@ export const semester1ReferenceReviewQuestions: Question[] = [
       'لأن المسار مثبت ولا يمكن تقويمه، نتتبعه بخيط مرن من البداية إلى النهاية، نحدد هذا الجزء من الخيط، ثم نفرده على المسطرة لقياس طوله.',
     objectiveId: 'g9-s1-u1-l2-o1',
     difficulty: 'hard',
-    status: 'draft',
+    status: 'approved',
     source: 'curriculum_seed',
   },
   {
@@ -448,6 +486,79 @@ export const semester1ReferenceMasteryQuestions: Question[] = [
     explanation:
       'القياس بلا وحدة قد يُفسر بمقادير مختلفة؛ تسجيل القيمة مع وحدة واضحة ومتفق عليها يمنع سوء الفهم بين فرق التصنيع.',
     objectiveId: 'g9-s1-u1-l1-o1',
+    difficulty: 'hard',
+    status: 'approved',
+    source: 'curriculum_seed',
+  },
+  {
+    id: 'g9-s1-u1-l2-mq1',
+    lessonId: 'g9-phy-s1-u1-l2',
+    type: 'multiple_choice',
+    prompt:
+      'مسطرة طرفها عند الصفر متآكل. وُضعت بداية قضيب عند 2.4 cm ونهايته عند 11.8 cm. ما طول القضيب الصحيح؟',
+    choices: ['9.4 cm', '11.8 cm', '14.2 cm', '2.4 cm'],
+    correctAnswerIndex: 0,
+    explanation:
+      'عند تعذر البدء من الصفر نطرح قراءة البداية من قراءة النهاية: 11.8 cm - 2.4 cm = 9.4 cm.',
+    objectiveId: 'g9-s1-u1-l2-o1',
+    difficulty: 'medium',
+    status: 'approved',
+    source: 'curriculum_seed',
+  },
+  {
+    id: 'g9-s1-u1-l2-mq2',
+    lessonId: 'g9-phy-s1-u1-l2',
+    type: 'multiple_choice',
+    prompt:
+      'لإيجاد قطر سلك رفيع، لُفَّت 20 لفة متجاورة منه بإحكام فشغلت عرضًا كليًا مقداره 12.0 mm. ما قطر السلك تقريبًا؟',
+    choices: ['0.60 mm', '1.67 mm', '12.0 mm', '240 mm'],
+    correctAnswerIndex: 0,
+    explanation: 'هذا قياس غير مباشر: نقسم العرض الكلي على عدد اللفات، 12.0 mm ÷ 20 = 0.60 mm.',
+    objectiveId: 'g9-s1-u1-l2-o1',
+    difficulty: 'hard',
+    status: 'approved',
+    source: 'curriculum_seed',
+  },
+  {
+    id: 'g9-s1-u1-l2-mq3',
+    lessonId: 'g9-phy-s1-u1-l2',
+    type: 'multiple_choice',
+    prompt:
+      'في ميكرومتر، آخر قراءة ظاهرة على التدريج الرئيسي هي 4.5 mm، وخط المرجع يطابق 23 تقسيمًا، قيمة كل تقسيم 0.01 mm. ما القراءة النهائية؟',
+    choices: ['4.73 mm', '4.23 mm', '4.50 mm', '23.5 mm'],
+    correctAnswerIndex: 0,
+    explanation: 'قراءة التدريج الكسري = 23 × 0.01 mm = 0.23 mm، ثم 4.5 mm + 0.23 mm = 4.73 mm.',
+    objectiveId: 'g9-s1-u1-l2-o4',
+    difficulty: 'hard',
+    status: 'approved',
+    source: 'curriculum_seed',
+  },
+  {
+    id: 'g9-s1-u1-l2-mq4',
+    lessonId: 'g9-phy-s1-u1-l2',
+    type: 'multiple_choice',
+    prompt:
+      'كان مستوى الماء في مخبار مدرج 40 mL. غُمِرت كرة فولاذية حجمها معلوم 3 mL مع مفتاح معدني صغير مجهول الحجم، وكان الجسمان مغمورين بالكامل دون ملامسة قاع المخبار. أصبح مستوى الماء 45 mL. ما حجم المفتاح المعدني؟',
+    choices: ['2 mL', '3 mL', '5 mL', '8 mL'],
+    correctAnswerIndex: 0,
+    explanation:
+      'الإزاحة الكلية 5 mL، وهي مجموع حجمي الجسمين؛ وبطرح حجم الكرة المعلوم 3 mL يكون حجم المفتاح 2 mL.',
+    objectiveId: 'g9-s1-u1-l2-o1',
+    difficulty: 'hard',
+    status: 'approved',
+    source: 'curriculum_seed',
+  },
+  {
+    id: 'g9-s1-u1-l2-mq5',
+    lessonId: 'g9-phy-s1-u1-l2',
+    type: 'multiple_choice',
+    prompt:
+      'يوضح مخطط هندسي لجسم على شكل متوازي مستطيلات أن طوله 8 cm وعرضه 4 cm، بينما ارتفاعه غير معلوم. إذا كان حجم الجسم 96 cm³، فما ارتفاعه؟',
+    choices: ['3 cm', '4 cm', '8 cm', '12 cm'],
+    correctAnswerIndex: 0,
+    explanation:
+      'حجم متوازي المستطيلات = الطول × العرض × الارتفاع؛ لذلك الارتفاع = 96 ÷ (8 × 4) = 3 cm.',
+    objectiveId: 'g9-s1-u1-l2-o1',
     difficulty: 'hard',
     status: 'approved',
     source: 'curriculum_seed',

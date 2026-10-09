@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675">
+<rect width="1200" height="675" rx="28" fill="#fffaf6"/>
+<g stroke="#315f7a" stroke-width="6" stroke-linejoin="round"><polygon points="260,250 720,250 900,165 440,165" fill="#fde4cf"/><polygon points="260,250 720,250 720,485 260,485" fill="#f7cda8"/><polygon points="720,250 900,165 900,400 720,485" fill="#eebd94"/></g>
+<g stroke="#d87800" stroke-width="5" fill="none"><path d="M260 545H720"/><path d="M260 525v40M720 525v40"/></g><text x="490" y="605" text-anchor="middle" font-family="Arial" font-size="34" font-weight="700" fill="#9b5400">10 cm</text>
+<g stroke="#2f7f72" stroke-width="5" fill="none"><path d="M415 120H885"/><path d="M415 103v34M885 103v34"/></g><text x="650" y="84" text-anchor="middle" font-family="Arial" font-size="34" font-weight="700" fill="#17685d">6 cm</text>
+<g stroke="#7a5aa6" stroke-width="5" fill="none"><path d="M955 165V400"/><path d="M935 165h40M935 400h40"/></g><text x="1015" y="300" text-anchor="middle" font-family="Arial" font-size="48" font-weight="700" fill="#65458f">?</text>
+<rect x="70" y="72" width="250" height="58" rx="29" fill="#fff0e1" stroke="#e9c8aa" stroke-width="2"/><text x="195" y="110" text-anchor="middle" font-family="Arial" font-size="27" font-weight="700" fill="#71451e">مخطط قالب صابون</text>
+</svg>

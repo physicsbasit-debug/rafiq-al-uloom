@@ -15,6 +15,8 @@ import {
 } from '@services/queries/content-query.hooks';
 import { Grade9ImportanceMeasurementLesson } from './Grade9ImportanceMeasurementLesson';
 import { Grade9LengthVolumeLesson } from './Grade9LengthVolumeLesson';
+import type { LessonActionAccess } from '@features/student/lesson-progress/lesson-unlock';
+import { Grade9TimeMeasurementLesson } from './Grade9TimeMeasurementLesson';
 import { LessonActionGrid } from './LessonActionGrid';
 import { LessonVisualStory } from './LessonVisualStory';
 
@@ -26,6 +28,9 @@ interface LessonViewProps {
   onOpenMatchingGame: () => void;
   onOpenVirtualLabs: () => void;
   onOpenMasteryTest: () => void;
+  actionAccess?: LessonActionAccess;
+  explanationComplete?: boolean;
+  onExplanationComplete?: () => void;
 }
 interface LessonViewContentProps extends Omit<LessonViewProps, 'lessonId'> {
   lesson: Lesson | undefined;
@@ -43,6 +48,9 @@ function LessonViewContent({
   onOpenMatchingGame,
   onOpenVirtualLabs,
   onOpenMasteryTest,
+  actionAccess,
+  explanationComplete,
+  onExplanationComplete,
 }: LessonViewContentProps) {
   if (!lesson)
     return (
@@ -75,6 +83,21 @@ function LessonViewContent({
         onOpenMasteryTest={onOpenMasteryTest}
       />
     );
+  if (lesson.id === 'g9-phy-s1-u1-l3')
+    return (
+      <Grade9TimeMeasurementLesson
+        objectives={objectives}
+        onBackToLessons={onBackToLessons}
+        onOpenReviewQuestions={onOpenReviewQuestions}
+        onOpenActivities={onOpenActivities}
+        onOpenMatchingGame={onOpenMatchingGame}
+        onOpenVirtualLabs={onOpenVirtualLabs}
+        onOpenMasteryTest={onOpenMasteryTest}
+        actionAccess={actionAccess}
+        explanationComplete={explanationComplete}
+        onExplanationComplete={onExplanationComplete}
+      />
+    );
   return (
     <article className="rafiq-lesson-view">
       <header className="rafiq-lesson-hero">
@@ -98,6 +121,7 @@ function LessonViewContent({
         onOpenVirtualLabs={onOpenVirtualLabs}
         onOpenMasteryTest={onOpenMasteryTest}
         onBackToLessons={onBackToLessons}
+        actionAccess={actionAccess}
       />
     </article>
   );
@@ -111,6 +135,9 @@ export function LessonView({
   onOpenMatchingGame,
   onOpenVirtualLabs,
   onOpenMasteryTest,
+  actionAccess,
+  explanationComplete,
+  onExplanationComplete,
 }: LessonViewProps) {
   const lessonQuery = useLesson(lessonId);
   const objectivesQuery = useLessonObjectives(lessonId);
@@ -135,6 +162,9 @@ export function LessonView({
         onOpenMatchingGame={onOpenMatchingGame}
         onOpenVirtualLabs={onOpenVirtualLabs}
         onOpenMasteryTest={onOpenMasteryTest}
+        actionAccess={actionAccess}
+        explanationComplete={explanationComplete}
+        onExplanationComplete={onExplanationComplete}
       />
     </QueryBoundary>
   );
