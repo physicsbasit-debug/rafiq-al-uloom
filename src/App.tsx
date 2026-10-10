@@ -199,7 +199,6 @@ function StudentExperience({ step, setStep }: StudentExperienceProps) {
           }}
           onOpenActivities={() => {
             if (activeActionAccess && !activeActionAccess.activities) return;
-            markProgress(step.lessonId, 'activities_entered');
             setStep({
               name: 'activities',
               gradeId: step.gradeId,
@@ -210,7 +209,6 @@ function StudentExperience({ step, setStep }: StudentExperienceProps) {
           }}
           onOpenMatchingGame={() => {
             if (activeActionAccess && !activeActionAccess.game) return;
-            markProgress(step.lessonId, 'game_entered');
             setStep({
               name: 'game',
               gradeId: step.gradeId,
@@ -219,15 +217,16 @@ function StudentExperience({ step, setStep }: StudentExperienceProps) {
               unitId: step.unitId,
             });
           }}
-          onOpenVirtualLabs={() =>
+          onOpenVirtualLabs={() => {
+            if (activeActionAccess && !activeActionAccess.labs) return;
             setStep({
               name: 'labs',
               gradeId: step.gradeId,
               semesterId: step.semesterId,
               lessonId: step.lessonId,
               unitId: step.unitId,
-            })
-          }
+            });
+          }}
           onOpenMasteryTest={() => {
             if (activeActionAccess && !activeActionAccess.mastery) return;
             setStep({

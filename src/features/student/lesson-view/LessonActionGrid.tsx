@@ -69,6 +69,7 @@ export function LessonActionGrid({
       onClick: onOpenVirtualLabs,
       featured: true,
       enabled: access.labs,
+      lockedDescription: 'غير متوفر حاليًا.',
     },
     {
       label: 'اختبار الإتقان',

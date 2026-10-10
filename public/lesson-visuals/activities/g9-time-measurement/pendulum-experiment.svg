@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 340" role="img" aria-labelledby="t d">
+  <title id="t">تجربة البندول</title>
+  <desc id="d">حامل بندول وساعة توقيت ودفتر قياس لتمهيد تجربة قياس الزمن الدوري</desc>
+  <rect width="640" height="340" rx="34" fill="#eef8f5"/>
+  <path d="M96 274h292M156 274V72M156 72h232" stroke="#5f7f7b" stroke-width="16" stroke-linecap="round"/>
+  <path d="M326 74v128" stroke="#315e5a" stroke-width="5"/>
+  <circle cx="326" cy="224" r="28" fill="#e5b64a" stroke="#9c7b2d" stroke-width="6"/>
+  <path d="M326 202c-24 13-45 32-60 55M326 202c25 10 50 27 70 48" fill="none" stroke="#b7d8cf" stroke-width="4" stroke-dasharray="8 8"/>
+  <circle cx="496" cy="132" r="66" fill="#fff" stroke="#00695c" stroke-width="8"/>
+  <rect x="476" y="48" width="40" height="24" rx="8" fill="#00695c"/>
+  <path d="M496 132l30-25M496 132V92" stroke="#00695c" stroke-width="8" stroke-linecap="round"/>
+  <rect x="410" y="232" width="154" height="72" rx="15" fill="#fff9e8" stroke="#ddc06a" stroke-width="5"/>
+  <path d="M432 252h110M432 272h82M432 292h96" stroke="#baa35c" stroke-width="4" stroke-linecap="round"/>
+</svg>

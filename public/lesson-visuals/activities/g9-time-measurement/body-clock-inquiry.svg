@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 340" role="img" aria-labelledby="t d">
+  <title id="t">ساعة الجسم</title>
+  <desc id="d">معصم ونبض وساعة توقيت لتمهيد استقصاء قياس الزمن بالنبض</desc>
+  <rect width="640" height="340" rx="34" fill="#eef8f5"/>
+  <circle cx="540" cy="72" r="46" fill="#fff0bd" opacity=".7"/>
+  <circle cx="94" cy="276" r="54" fill="#dff3ea"/>
+  <path d="M94 212c54-44 117-54 164-18 25 19 43 47 70 58 30 12 68 0 99-17" fill="none" stroke="#e5b64a" stroke-width="18" stroke-linecap="round"/>
+  <path d="M83 196c48 12 89 34 125 68" fill="none" stroke="#6c8f89" stroke-width="34" stroke-linecap="round"/>
+  <rect x="172" y="192" width="76" height="72" rx="20" fill="#fff" stroke="#00695c" stroke-width="6"/>
+  <path d="M210 210v36M192 228h36" stroke="#00695c" stroke-width="5" stroke-linecap="round"/>
+  <path d="M275 194c20-42 47-60 80-54 39 7 50 49 84 51 24 1 39-24 57-24 24 0 29 42 53 42" fill="none" stroke="#e75858" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="500" cy="132" r="67" fill="#fff" stroke="#00695c" stroke-width="8"/>
+  <rect x="480" y="47" width="40" height="22" rx="8" fill="#00695c"/>
+  <path d="M500 132l30-22M500 132v-42" stroke="#00695c" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="500" cy="132" r="8" fill="#f3b51a"/>
+</svg>

@@ -5,33 +5,34 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ReviewQuestionsView } from '@features/student/review-questions/ReviewQuestionsView';
 import { useReviewQuestions } from '@services/queries/content-query.hooks';
-import type { Question } from '@shared-types/quiz.types';
+import { semester1ReferenceReviewQuestions } from '@content/seed/semester1-reference-lessons.seed';
 
 vi.mock('@services/queries/content-query.hooks', () => ({
   useReviewQuestions: vi.fn(),
 }));
 
 const mockedUseReviewQuestions = vi.mocked(useReviewQuestions);
-
-const questions: Question[] = Array.from({ length: 5 }, (_, index) => ({
-  id: `l13-review-${index + 1}`,
-  lessonId: 'g9-phy-s1-u1-l3',
-  type: 'multiple_choice' as const,
-  prompt: `سؤال ${index + 1}`,
-  choices: [`صحيح ${index + 1}`, `خطأ ${index + 1}`],
-  correctAnswerIndex: 0,
-  explanation: `شرح ${index + 1}`,
-  objectiveId: `objective-${index + 1}`,
-  difficulty: index < 2 ? ('easy' as const) : ('medium' as const),
-  status: 'approved' as const,
-  source: 'curriculum_seed' as const,
-}));
+const questions = semester1ReferenceReviewQuestions.filter(
+  (question) => question.lessonId === 'g9-phy-s1-u1-l3'
+);
 
 function currentCard() {
-  const heading = screen.getByRole('heading', { level: 3 });
-  const article = heading.closest('article');
-  expect(article).not.toBeNull();
-  return article as HTMLElement;
+  const cards = screen.getAllByRole('article');
+  return cards[cards.length - 1];
+}
+
+function clickCorrectAndAdvance() {
+  const card = currentCard();
+  const correct = within(card)
+    .getAllByRole('button')
+    .find((button) => button.getAttribute('data-correct') === 'true');
+  expect(correct).toBeDefined();
+  fireEvent.click(correct as HTMLButtonElement);
+  fireEvent.click(
+    within(card).getByRole('button', {
+      name: /السؤال التالي|الخطوة التالية|إنهاء المراجعة/,
+    })
+  );
 }
 
 beforeEach(() => {
@@ -43,12 +44,10 @@ beforeEach(() => {
   });
 });
 
-afterEach(() => {
-  cleanup();
-});
+afterEach(() => cleanup());
 
-describe('ReviewQuestionsView completion signal', () => {
-  it('يعتبر needs_review حالة نهائية ويبلغ باكتمال الأسئلة الخمسة', () => {
+describe('ReviewQuestionsView lesson 1-3 completion signal', () => {
+  it('يعتبر needs_review حالة نهائية ويبلغ بعد إنهاء RQ1-RQ5 بكل خطوات RQ5', () => {
     const onComplete = vi.fn();
 
     render(
@@ -59,19 +58,29 @@ describe('ReviewQuestionsView completion signal', () => {
       />
     );
 
-    fireEvent.click(within(currentCard()).getByRole('button', { name: 'خطأ 1' }));
+    const first = currentCard();
+    let wrong = within(first)
+      .getAllByRole('button')
+      .filter(
+        (button) =>
+          button.getAttribute('aria-pressed') !== null &&
+          button.getAttribute('data-correct') !== 'true'
+      );
+
+    fireEvent.click(wrong[0]);
     fireEvent.click(screen.getByRole('button', { name: 'حاول مرة أخرى' }));
-    fireEvent.click(within(currentCard()).getByRole('button', { name: 'خطأ 1' }));
+    wrong = within(currentCard())
+      .getAllByRole('button')
+      .filter(
+        (button) =>
+          button.getAttribute('aria-pressed') !== null &&
+          button.getAttribute('data-correct') !== 'true'
+      );
+    fireEvent.click(wrong[1]);
     fireEvent.click(screen.getByRole('button', { name: 'السؤال التالي' }));
 
-    for (let index = 2; index <= 5; index += 1) {
-      fireEvent.click(within(currentCard()).getByRole('button', { name: `صحيح ${index}` }));
-      fireEvent.click(
-        screen.getByRole('button', {
-          name: index === 5 ? 'إنهاء المراجعة' : 'السؤال التالي',
-        })
-      );
-    }
+    for (let index = 0; index < 3; index += 1) clickCorrectAndAdvance();
+    for (let index = 0; index < 3; index += 1) clickCorrectAndAdvance();
 
     expect(screen.getByText('يحتاج مراجعة')).toBeInTheDocument();
     expect(onComplete).toHaveBeenCalledTimes(1);

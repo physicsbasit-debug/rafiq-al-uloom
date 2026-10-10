@@ -7,6 +7,7 @@ import { useReviewQuestions } from '@services/queries/content-query.hooks';
 import type { Question } from '@shared-types/quiz.types';
 import { getStudentQuestionVisual } from '@content/student-question-visuals';
 import { Grade9LengthVolumeReview } from './Grade9LengthVolumeReview';
+import { Grade9TimeMeasurementReview } from './Grade9TimeMeasurementReview';
 import {
   grade9Lesson11QuestionDesign,
   type InternalReviewRole,
@@ -59,6 +60,12 @@ export function ReviewQuestionsView({
     >
       {lessonId === 'g9-phy-s1-u1-l2' ? (
         <Grade9LengthVolumeReview questions={questionsQuery.data} onBackToLesson={onBackToLesson} />
+      ) : lessonId === 'g9-phy-s1-u1-l3' ? (
+        <Grade9TimeMeasurementReview
+          questions={questionsQuery.data}
+          onBackToLesson={onBackToLesson}
+          onComplete={onComplete}
+        />
       ) : (
         <ReviewQuestionsContent
           questions={questionsQuery.data}

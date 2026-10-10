@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 340" role="img" aria-labelledby="t d">
+  <title id="t">المحاكاة غير متوفرة</title>
+  <desc id="d">ساعة توقيت وموجة زمنية باهتة للدلالة على عدم توفر محاكاة في هذا الدرس</desc>
+  <rect width="640" height="340" rx="34" fill="#f2f5f6"/>
+  <circle cx="320" cy="170" r="92" fill="#fff" stroke="#9aa7ad" stroke-width="9"/>
+  <rect x="296" y="52" width="48" height="26" rx="9" fill="#9aa7ad"/>
+  <path d="M320 170l44-31M320 170V105" stroke="#7e8b91" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="320" cy="170" r="9" fill="#aeb8bd"/>
+  <path d="M82 253c44 0 44-54 88-54s44 54 88 54 44-54 88-54 44 54 88 54 44-54 88-54 44 54 88 54" fill="none" stroke="#b7c1c5" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="550" cy="88" r="34" fill="#dfe5e8"/>
+  <path d="M534 88h32" stroke="#7c8a90" stroke-width="8" stroke-linecap="round"/>
+</svg>

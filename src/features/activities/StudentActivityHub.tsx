@@ -8,6 +8,7 @@ import { getActivityRegistryEntry } from '@features/activities/activity-registry
 import { StudentActivityHost } from '@features/activities/StudentActivityHost';
 import { MeasurementTrustMission } from '@features/activities/measurement-trust/MeasurementTrustMission';
 import { Grade9LengthVolumeActivities } from '@features/activities/length-volume/Grade9LengthVolumeActivities';
+import { Grade9TimeMeasurementActivities } from '@features/activities/time-measurement/Grade9TimeMeasurementActivities';
 import { getStudentExperimentSafetyDecision } from '@features/activities/student-experiment-safety';
 import { StudentBackAction } from '@features/student/navigation/StudentBackAction';
 import { StudentIcon, type StudentIconName } from '@features/student/navigation/StudentIcon';
@@ -231,6 +232,10 @@ export function StudentActivityHub({ lessonId, onBackToLesson }: StudentActivity
 
   if (lessonId === 'g9-phy-s1-u1-l2') {
     return <Grade9LengthVolumeActivities onBackToLesson={onBackToLesson} />;
+  }
+
+  if (lessonId === 'g9-phy-s1-u1-l3') {
+    return <Grade9TimeMeasurementActivities onBackToLesson={onBackToLesson} />;
   }
 
   return (

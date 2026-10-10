@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 340" role="img" aria-labelledby="t d">
+  <title id="t">بيانات النبض</title>
+  <desc id="d">دفتر بيانات ومجموعتان من نقاط النبض للمقارنة بين الراحة والنشاط الخفيف</desc>
+  <rect width="640" height="340" rx="34" fill="#f4faef"/>
+  <rect x="72" y="64" width="286" height="220" rx="24" fill="#fff" stroke="#b8d7bd" stroke-width="6"/>
+  <rect x="72" y="64" width="286" height="46" rx="24" fill="#007d6d"/>
+  <path d="M128 142h176M128 184h176M128 226h176M166 122v132M220 122v132M274 122v132" stroke="#d9e8dd" stroke-width="4"/>
+  <path d="M414 121c13-22 48-10 48 14 0 27-48 54-48 54s-48-27-48-54c0-24 35-36 48-14Z" fill="#e96b64"/>
+  <line x1="390" y1="263" x2="574" y2="263" stroke="#557967" stroke-width="5" stroke-linecap="round"/>
+  <g fill="#3d8c70">
+    <circle cx="408" cy="224" r="11"/><circle cx="432" cy="216" r="11"/><circle cx="458" cy="222" r="11"/>
+  </g>
+  <g fill="#d47d62">
+    <circle cx="500" cy="178" r="11"/><circle cx="528" cy="166" r="11"/><circle cx="556" cy="174" r="11"/>
+  </g>
+</svg>

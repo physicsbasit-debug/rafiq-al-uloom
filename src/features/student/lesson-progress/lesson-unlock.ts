@@ -43,11 +43,15 @@ export function advanceLessonUnlockProgress(
 }
 
 export function getLessonActionAccess(progress: LessonUnlockProgress): LessonActionAccess {
+  // Access and completion are intentionally separate for lesson 1-3.
+  // The progress object is preserved for real completion signals, not as a navigation gate.
+  void progress;
+
   return {
-    review: progress.explanationComplete,
-    activities: progress.reviewComplete,
-    game: progress.activitiesEntered,
-    labs: true,
-    mastery: progress.gameEntered,
+    review: true,
+    activities: true,
+    game: true,
+    labs: false,
+    mastery: true,
   };
 }

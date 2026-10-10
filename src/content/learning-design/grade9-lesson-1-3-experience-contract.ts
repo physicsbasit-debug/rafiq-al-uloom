@@ -65,3 +65,73 @@ export const grade9Lesson13GoldenExplanation: readonly GoldenLearningMoment[] = 
     skill: 'تقييم وتحسين طريقة قياس فترة زمنية قصيرة',
   },
 ] as const;
+
+export const grade9Lesson13GoldenReview: readonly GoldenLearningMoment[] = [
+  {
+    id: 'g9-s1-u1-l3-rq1',
+    path: 'review',
+    questionKey: 'period-meaning-review-only',
+    visualKey: 'g9-l13-review-period-timeline-v1',
+    cognitiveFunction: 'recall-meaning-of-time-interval',
+    contextKey: 'numberless-start-end-timeline',
+    objectiveKey: OBJECTIVE_TIME_DEVICES,
+    skill: 'استرجاع معنى الفترة الزمنية دون تحويلها إلى مسألة فرق عددي',
+  },
+  {
+    id: 'g9-s1-u1-l3-rq2',
+    path: 'review',
+    questionKey: '5-1-review-only',
+    visualKey: 'g9-l13-review-tv-25-frames-v1',
+    cognitiveFunction: 'calculate-single-frame-time-from-images-per-second',
+    contextKey: 'television-25-images-per-second',
+    objectiveKey: OBJECTIVE_TIME_DEVICES,
+    skill: 'حساب زمن الصورة الواحدة من عدد الصور في الثانية',
+  },
+  {
+    id: 'g9-s1-u1-l3-rq3',
+    path: 'review',
+    questionKey: 'repeated-time-mean-review-only',
+    visualKey: 'g9-l13-review-repeated-readings-v1',
+    cognitiveFunction: 'calculate-mean-of-repeated-time-readings',
+    contextKey: 'three-repeated-time-readings',
+    objectiveKey: OBJECTIVE_REPEATED_TIME,
+    skill: 'إيجاد القيمة المتوسطة لقياسات زمنية متكررة',
+  },
+  {
+    id: 'g9-s1-u1-l3-rq4',
+    path: 'review',
+    questionKey: 'pendulum-full-cycle-misconception-review-only',
+    visualKey: 'g9-l13-review-pendulum-path-v1',
+    cognitiveFunction: 'detect-half-cycle-counting-error',
+    contextKey: 'start-opposite-return-pendulum-path',
+    objectiveKey: OBJECTIVE_REPEATED_TIME,
+    skill: 'كشف خطأ عد نصف التأرجح على أنه تأرجح كامل',
+  },
+  {
+    id: 'g9-s1-u1-l3-rq5',
+    path: 'review',
+    questionKey: '6-1-review-only',
+    visualKey: 'g9-l13-review-pendulum-data-table-v1',
+    cognitiveFunction: 'calculate-evaluate-and-diagnose-period-timing',
+    contextKey: 'twenty-versus-fifty-pendulum-oscillations',
+    objectiveKey: OBJECTIVE_REPEATED_TIME,
+    skill: 'حساب الزمن الدوري وتقييم القياس الأدق وتحديد أسباب الخطأ',
+  },
+] as const;
+
+/**
+ * تعديل رسمي بطلب المستخدم - 2026-10-10.
+ *
+ * الوصول إلى مسارات الدرس 1-3 أصبح مباشرًا، بينما يبقى الإنجاز منفصلًا
+ * عن مجرد فتح المسار. المختبر الافتراضي D مستثنى حتى مراجعته العلمية.
+ */
+export const grade9Lesson13DirectAccessPolicy = {
+  requestedByUserOn: '2026-10-10',
+  review: 'direct',
+  activities: 'direct',
+  game: 'direct',
+  mastery: 'direct',
+  virtualLab: 'unavailable_pending_scientific_review',
+  accessDoesNotImplyCompletion: true,
+  suggestedOrderIsGuidanceOnly: true,
+} as const;
