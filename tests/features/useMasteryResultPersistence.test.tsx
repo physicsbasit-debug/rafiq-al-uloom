@@ -351,4 +351,52 @@ describe('useMasteryResultPersistence', () => {
     unmount();
     expect(signal?.aborted).toBe(true);
   });
+
+  it('يمرر experienceContext إلى الخدمة ضمن لقطة المحاولة', async () => {
+    const service = createService(async () => ({
+      status: 'saved',
+      result: officialResult(),
+      reconciliation: 'matched_local_result',
+    }));
+
+    const experienceContext = {
+      schema: 'g9-l13-time-mastery-v1',
+      scoreNof5: '4/5',
+      lessonMasteryLevel: 'good',
+      objective2_1Status: 'mastered',
+      objective3_1Status: 'needs_reinforcement',
+      allObjectivesMastered: false,
+      diagnostics: [null, 'manual-reaction-limit', null, null, 'correct-position-wrong-direction'],
+      attemptCount: 2,
+      variantHistory: {
+        mq1: ['water-vessel-target-mark', 'sand-funnel-target-mark'],
+        mq2: ['ramp-release-1_27', 'ramp-two-marks-2_43'],
+        mq3: ['ball-drop-1_8m', 'ball-drop-1_2m'],
+        mq4: ['spring-cart-8-in-5_92', 'spring-cart-10-cycles-7_30'],
+        mq5: ['flex-platform-reference-up', 'spring-seat-reference-down'],
+      },
+    };
+
+    const { result } = renderHook(() =>
+      useMasteryResultPersistence('lesson-1', activeDependencies(service))
+    );
+
+    act(() => {
+      result.current.submitAttempt({
+        questions,
+        answersByQuestionId: { 'question-1': 0 },
+        experienceContext,
+      });
+    });
+
+    await waitFor(() => expect(result.current.state.status).toBe('saved'));
+
+    expect(service.submitAttempt).toHaveBeenCalledTimes(1);
+
+    const persistedSubmission = service.submitAttempt.mock.calls[0][0];
+
+    expect(persistedSubmission.experienceContext).toEqual(experienceContext);
+
+    expect(persistedSubmission.experienceContext).not.toBe(experienceContext);
+  });
 });

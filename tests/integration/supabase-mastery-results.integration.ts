@@ -91,6 +91,39 @@ async function submit(
   return { data: data as RpcResult | null, error };
 }
 
+async function submitWithExperienceContext(
+  identity: AuthIdentity,
+  lessonId: string,
+  questions: TestQuestion[],
+  experienceContext: unknown,
+  options: {
+    submissionId?: string;
+    fingerprint?: string;
+    answers?: Array<{
+      questionId: string;
+      selectedChoiceIndex: number;
+    }>;
+  } = {}
+): Promise<{
+  data: RpcResult | null;
+  error: { code?: string; message?: string } | null;
+}> {
+  const { data, error } = await identity.client.rpc('submit_mastery_attempt', {
+    p_submission_id: options.submissionId ?? randomUUID(),
+    p_lesson_id: lessonId,
+    p_started_at: new Date(Date.now() - 30_000).toISOString(),
+    p_expected_scoring_fingerprint:
+      options.fingerprint ?? buildScoringFingerprint(lessonId, questions),
+    p_answers: options.answers ?? answersFor(questions),
+    p_experience_context: experienceContext,
+  });
+
+  return {
+    data: data as RpcResult | null,
+    error,
+  };
+}
+
 function expectPermissionDenied(error: { code?: string; message?: string } | null): void {
   expect(error).not.toBeNull();
   expect(error?.code).toBe('42501');
@@ -199,6 +232,174 @@ describeIntegration('Phase 2-D1 mastery result persistence', { concurrent: false
       );
     }
   );
+
+  it('preserves the legacy request fingerprint when explicit null context retries the same submission', async () => {
+    const submissionId = randomUUID();
+
+    const legacy = await submit(activeStudent, lessonId, questions, { submissionId });
+
+    expect(legacy.error).toBeNull();
+    expect(legacy.data?.status).toBe('saved');
+
+    const explicitNull = await submitWithExperienceContext(
+      activeStudent,
+      lessonId,
+      questions,
+      null,
+      { submissionId }
+    );
+
+    expect(explicitNull.error).toBeNull();
+    expect(explicitNull.data?.status).toBe('already_saved');
+
+    if (legacy.data?.status !== 'saved' || explicitNull.data?.status !== 'already_saved') {
+      throw new Error('Expected legacy saved then explicit-null already_saved.');
+    }
+
+    expect(explicitNull.data.result.attemptId).toBe(legacy.data.result.attemptId);
+
+    const stored = await fixtures.adminClient
+      .from('mastery_attempts')
+      .select('experience_context, request_fingerprint')
+      .eq('id', legacy.data.result.attemptId)
+      .single();
+
+    expect(stored.error).toBeNull();
+    expect(stored.data?.experience_context).toBeNull();
+    expect(stored.data?.request_fingerprint).toMatch(/^[0-9a-f]{64}$/);
+  });
+
+  it.each([
+    ['array', ['not-an-object']],
+    ['scalar', 'not-an-object'],
+    [
+      'missing schema',
+      {
+        scoreNof5: '1/5',
+      },
+    ],
+    [
+      'blank schema',
+      {
+        schema: '   ',
+      },
+    ],
+    [
+      'larger than 16 KiB',
+      {
+        schema: 'g9-l13-time-mastery-v1',
+        payload: 'x'.repeat(16 * 1024),
+      },
+    ],
+  ])('rejects invalid mastery experience context: %s', async (_label, experienceContext) => {
+    const response = await submitWithExperienceContext(
+      activeStudent,
+      lessonId,
+      questions,
+      experienceContext
+    );
+
+    expect(response.error).toBeNull();
+    expect(response.data).toEqual({
+      status: 'rejected',
+      reason: 'invalid_response_set',
+    });
+  });
+
+  it('stores optional mastery experience context with idempotency', async () => {
+    const submissionId = randomUUID();
+
+    const experienceContext = {
+      schema: 'g9-l13-time-mastery-v1',
+      scoreNof5: '2/5',
+      lessonMasteryLevel: 'focused_review',
+      objective2_1Status: 'needs_review',
+      objective3_1Status: 'needs_review',
+      allObjectivesMastered: false,
+      diagnostics: [
+        'incorrect-start-boundary',
+        'manual-reaction-limit',
+        null,
+        'reversed-division',
+        null,
+      ],
+      attemptCount: 2,
+      variantHistory: {
+        mq1: ['water-vessel-target-mark', 'sand-funnel-target-mark'],
+        mq2: ['ramp-release-1_27', 'ramp-two-marks-2_43'],
+        mq3: ['ball-drop-1_8m', 'ball-drop-1_2m'],
+        mq4: ['spring-cart-8-in-5_92', 'spring-cart-10-cycles-7_30'],
+        mq5: ['flex-platform-reference-up', 'spring-seat-reference-down'],
+      },
+    };
+
+    const first = await submitWithExperienceContext(
+      activeStudent,
+      lessonId,
+      questions,
+      experienceContext,
+      {
+        submissionId,
+        answers: answersFor(questions, [0, 0, 0]),
+      }
+    );
+
+    const retry = await submitWithExperienceContext(
+      activeStudent,
+      lessonId,
+      questions,
+      experienceContext,
+      {
+        submissionId,
+        answers: answersFor(questions, [0, 0, 0]),
+      }
+    );
+
+    expect(first.error).toBeNull();
+    expect(retry.error).toBeNull();
+
+    expect(first.data?.status).toBe('saved');
+    expect(retry.data?.status).toBe('already_saved');
+
+    if (first.data?.status !== 'saved' || retry.data?.status !== 'already_saved') {
+      throw new Error('Expected saved then already_saved.');
+    }
+
+    expect(retry.data.result.attemptId).toBe(first.data.result.attemptId);
+
+    expect(first.data.result.scoringFingerprint).toBe(buildScoringFingerprint(lessonId, questions));
+
+    const stored = await fixtures.adminClient
+      .from('mastery_attempts')
+      .select('experience_context, scoring_fingerprint, request_fingerprint')
+      .eq('id', first.data.result.attemptId)
+      .single();
+
+    expect(stored.error).toBeNull();
+    expect(stored.data?.experience_context).toEqual(experienceContext);
+    expect(stored.data?.scoring_fingerprint).toBe(buildScoringFingerprint(lessonId, questions));
+    expect(stored.data?.request_fingerprint).toMatch(/^[0-9a-f]{64}$/);
+
+    const changedContext = await submitWithExperienceContext(
+      activeStudent,
+      lessonId,
+      questions,
+      {
+        ...experienceContext,
+        attemptCount: 3,
+      },
+      {
+        submissionId,
+        answers: answersFor(questions, [0, 0, 0]),
+      }
+    );
+
+    expect(changedContext.error).toBeNull();
+    expect(changedContext.data).toEqual({
+      status: 'rejected',
+      reason: 'submission_conflict',
+    });
+  });
 
   it('returns the same attempt for an identical idempotent retry', async () => {
     const submissionId = randomUUID();

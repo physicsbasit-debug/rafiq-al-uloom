@@ -77,6 +77,7 @@ describe('Supabase mastery results repository', () => {
       p_started_at: submission.startedAt,
       p_expected_scoring_fingerprint: submission.expectedScoringFingerprint,
       p_answers: submission.answers,
+      p_experience_context: null,
     });
     expect(mock.rpc.mock.calls[0]?.[1]).not.toHaveProperty('user_id');
     expect(mock.rpc.mock.calls[0]?.[1]).not.toHaveProperty('score');
@@ -175,6 +176,83 @@ describe('Supabase mastery results repository', () => {
 
     await expect(repository.submitAttempt(validSubmission())).rejects.toMatchObject({
       name: 'AbortError',
+    });
+  });
+
+  describe('يمرر experienceContext إلى RPC ويستخدم null عند غيابه', () => {
+    it('يرسل experienceContext نفسه في p_experience_context عند وجوده', async () => {
+      const mock = createRpcMock({
+        data: validResult(),
+        error: null,
+      });
+
+      const repository = createSupabaseMasteryResultsRepository(mock.client);
+
+      const experienceContext = {
+        schema: 'g9-l13-time-mastery-v1',
+        scoreNof5: '4/5',
+        lessonMasteryLevel: 'good',
+        objective2_1Status: 'mastered',
+        objective3_1Status: 'needs_reinforcement',
+        allObjectivesMastered: false,
+        diagnostics: [null, 'manual-reaction-limit', null, null, null],
+        attemptCount: 2,
+        variantHistory: {
+          mq1: ['water-vessel-target-mark'],
+          mq2: ['ramp-release-1_27'],
+          mq3: ['ball-drop-1_8m'],
+          mq4: ['spring-cart-8-in-5_92'],
+          mq5: ['flex-platform-reference-up'],
+        },
+      } as const;
+
+      const submission = {
+        ...validSubmission(),
+        experienceContext,
+      };
+
+      await repository.submitAttempt(submission);
+
+      expect(mock.rpc).toHaveBeenCalledTimes(1);
+
+      expect(mock.rpc).toHaveBeenCalledWith(
+        'submit_mastery_attempt',
+        expect.objectContaining({
+          p_submission_id: submission.submissionId,
+          p_lesson_id: submission.lessonId,
+          p_started_at: submission.startedAt,
+          p_expected_scoring_fingerprint: submission.expectedScoringFingerprint,
+          p_answers: submission.answers,
+          p_experience_context: experienceContext,
+        })
+      );
+    });
+
+    it('يرسل p_experience_context=null صراحة عند غياب السياق', async () => {
+      const mock = createRpcMock({
+        data: validResult(),
+        error: null,
+      });
+
+      const repository = createSupabaseMasteryResultsRepository(mock.client);
+
+      const submission = validSubmission();
+
+      await repository.submitAttempt(submission);
+
+      expect(mock.rpc).toHaveBeenCalledTimes(1);
+
+      expect(mock.rpc).toHaveBeenCalledWith(
+        'submit_mastery_attempt',
+        expect.objectContaining({
+          p_submission_id: submission.submissionId,
+          p_lesson_id: submission.lessonId,
+          p_started_at: submission.startedAt,
+          p_expected_scoring_fingerprint: submission.expectedScoringFingerprint,
+          p_answers: submission.answers,
+          p_experience_context: null,
+        })
+      );
     });
   });
 });

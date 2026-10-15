@@ -11,7 +11,7 @@ const authenticatedExecuteAllowlist = [
   'public.review_lesson_revision(uuid, text, text)',
   'public.save_lesson_revision(uuid, jsonb)',
   'public.submit_lesson_revision(uuid)',
-  'public.submit_mastery_attempt(uuid, text, timestamp with time zone, text, jsonb)',
+  'public.submit_mastery_attempt(uuid, text, timestamp with time zone, text, jsonb, jsonb)',
 ].sort();
 
 const anonContentSelectAllowlist = [

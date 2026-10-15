@@ -7,6 +7,8 @@ import type { AuthorizationState } from '@services/auth/authorization.types';
 import {
   masteryResultsService,
   type MasteryAttemptServiceSubmission,
+  type MasteryExperienceContext,
+  type MasteryExperienceContextValue,
   type MasteryResultsService,
 } from '@services/mastery-results';
 import {
@@ -33,6 +35,7 @@ export interface MasteryResultPersistenceDependencies {
 export interface MasteryResultPersistenceSubmission {
   readonly questions: readonly Question[];
   readonly answersByQuestionId: AnswersByQuestionId;
+  readonly experienceContext?: MasteryExperienceContext;
 }
 
 export interface MasteryResultPersistenceController {
@@ -52,6 +55,28 @@ function createSubmissionId(): string {
 
 function nowIso(): string {
   return new Date().toISOString();
+}
+
+function cloneExperienceContextValue(
+  value: MasteryExperienceContextValue
+): MasteryExperienceContextValue {
+  if (Array.isArray(value)) {
+    return value.map((item) => cloneExperienceContextValue(item));
+  }
+
+  if (typeof value === 'object' && value !== null) {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, item]) => [key, cloneExperienceContextValue(item)])
+    );
+  }
+
+  return value;
+}
+
+function cloneExperienceContext(context: MasteryExperienceContext): MasteryExperienceContext {
+  return Object.fromEntries(
+    Object.entries(context).map(([key, value]) => [key, cloneExperienceContextValue(value)])
+  );
 }
 
 function isAbortError(error: unknown): boolean {
@@ -78,6 +103,11 @@ function copySubmission(
       choices: [...question.choices],
     })),
     answersByQuestionId: { ...submission.answersByQuestionId },
+    ...(submission.experienceContext
+      ? {
+          experienceContext: cloneExperienceContext(submission.experienceContext),
+        }
+      : {}),
   };
 }
 

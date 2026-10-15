@@ -12,6 +12,7 @@ import { typography } from '@design-system/theme/typography';
 import { getStudentQuestionVisual } from '@content/student-question-visuals';
 import { getGrade9Lesson11MasteryDimension } from '@content/learning-design/grade9-lesson-1-1-learning-design';
 import { Grade9LengthVolumeMastery } from './Grade9LengthVolumeMastery';
+import { Grade9TimeMeasurementMastery } from './Grade9TimeMeasurementMastery';
 import { getQuestionFeedback } from '@features/quiz/quiz-engine';
 import type { MasteryResult } from '@shared-types/mastery.types';
 import type { Question } from '@shared-types/quiz.types';
@@ -501,6 +502,9 @@ function MasteryTestContentRouter(props: MasteryTestContentProps) {
   }
   if (props.lessonId === 'g9-phy-s1-u1-l2') {
     return <Grade9LengthVolumeMastery {...props} />;
+  }
+  if (props.lessonId === 'g9-phy-s1-u1-l3') {
+    return <Grade9TimeMeasurementMastery {...props} />;
   }
   return <GenericMasteryTestContent {...props} />;
 }

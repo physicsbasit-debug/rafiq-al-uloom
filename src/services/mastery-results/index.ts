@@ -19,6 +19,8 @@ export {
 export {
   MASTERY_SCORING_POLICY_VERSION,
   type MasteryAnswerSubmission,
+  type MasteryExperienceContext,
+  type MasteryExperienceContextValue,
   type MasteryAttemptRejectionReason,
   type MasteryAttemptRepositoryResult,
   type MasteryAttemptRepositorySubmission,

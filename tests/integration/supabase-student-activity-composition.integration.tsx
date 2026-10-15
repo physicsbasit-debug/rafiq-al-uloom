@@ -213,7 +213,7 @@ describeIntegration('Phase 5-6B canonical → student activity composition', () 
 
     fireEvent.click(matchingLeftButton);
 
-    expect(screen.getByRole('heading', { name: 'اختر المقابل' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: '2. اختر المقابل' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: fixture.matchingRight })).toBeInTheDocument();
     await returnToHub();
 

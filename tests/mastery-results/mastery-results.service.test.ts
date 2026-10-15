@@ -216,4 +216,61 @@ describe('Mastery results service', () => {
     ).rejects.toMatchObject({ name: 'AbortError' });
     expect(repository.submitAttempt).not.toHaveBeenCalled();
   });
+
+  it('يمرر experienceContext إلى Repository دون إدخاله في عقد التصحيح', async () => {
+    const repository = repositoryReturning({
+      status: 'saved',
+      result: officialResult(),
+    });
+
+    const digestSha256Hex = vi.fn(async () => 'a'.repeat(64));
+
+    const service = createMasteryResultsService(repository, {
+      digestSha256Hex,
+    });
+
+    const experienceContext = {
+      schema: 'g9-l13-time-mastery-v1',
+      scoreNof5: '4/5',
+      lessonMasteryLevel: 'good',
+      objective2_1Status: 'mastered',
+      objective3_1Status: 'needs_reinforcement',
+      allObjectivesMastered: false,
+      diagnostics: [null, 'manual-reaction-limit', null, null, null],
+      attemptCount: 2,
+      variantHistory: {
+        mq1: ['water-vessel-target-mark'],
+        mq2: ['ramp-release-1_27'],
+        mq3: ['ball-drop-1_8m'],
+        mq4: ['spring-cart-8-in-5_92'],
+        mq5: ['flex-platform-reference-up'],
+      },
+    } as const;
+
+    await expect(
+      service.submitAttempt({
+        ...serviceInput(),
+        experienceContext,
+      })
+    ).resolves.toEqual({
+      status: 'saved',
+      result: officialResult(),
+      reconciliation: 'matched_local_result',
+    });
+
+    expect(repository.submitAttempt).toHaveBeenCalledTimes(1);
+
+    expect(repository.submitAttempt).toHaveBeenCalledWith(
+      expect.objectContaining({
+        submissionId: '10000000-0000-4000-8000-000000000001',
+        lessonId: 'lesson-1',
+        startedAt: '2026-08-06T00:00:00.000Z',
+        expectedScoringFingerprint: 'a'.repeat(64),
+        experienceContext,
+      }),
+      {}
+    );
+
+    expect(digestSha256Hex).toHaveBeenCalled();
+  });
 });

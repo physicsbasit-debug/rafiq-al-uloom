@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { PrecisionEngineerGame } from '@features/games/precision-engineer/PrecisionEngineerGame';
+import { TimeRaceGame } from '@features/games/time-race/TimeRaceGame';
 import { QueryBoundary } from '@design-system/components/QueryBoundary';
 import { MeasurementMissionGame } from '@features/games/measurement-mission/MeasurementMissionGame';
 import { MatchingGameRunner } from '@features/games/matching/MatchingGameRunner';
@@ -49,6 +50,10 @@ function BaseMatchingGameView({ lessonId, onBackToLesson }: MatchingGameViewProp
 }
 
 export function MatchingGameView(props: MatchingGameViewProps) {
+  if (props.lessonId === 'g9-phy-s1-u1-l3') {
+    return <TimeRaceGame onBack={props.onBackToLesson} />;
+  }
+
   if (props.lessonId === 'g9-phy-s1-u1-l2') {
     return <PrecisionEngineerGame onBack={props.onBackToLesson} />;
   }

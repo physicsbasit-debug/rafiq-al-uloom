@@ -3,6 +3,16 @@ import type { AnswersByQuestionId } from '@utils/scoring';
 
 export const MASTERY_SCORING_POLICY_VERSION = 'mastery-equal-weight-v1' as const;
 
+export type MasteryExperienceContextValue =
+  | string
+  | number
+  | boolean
+  | null
+  | readonly MasteryExperienceContextValue[]
+  | { readonly [key: string]: MasteryExperienceContextValue };
+
+export type MasteryExperienceContext = Readonly<Record<string, MasteryExperienceContextValue>>;
+
 export type MasteryAttemptRejectionReason =
   | 'not_authenticated'
   | 'not_authorized'
@@ -27,6 +37,7 @@ export interface MasteryAttemptRepositorySubmission {
   readonly startedAt: string;
   readonly expectedScoringFingerprint: string;
   readonly answers: readonly MasteryAnswerSubmission[];
+  readonly experienceContext?: MasteryExperienceContext;
 }
 
 export interface MasteryAttemptServiceSubmission {
@@ -35,6 +46,7 @@ export interface MasteryAttemptServiceSubmission {
   readonly startedAt: string;
   readonly questions: readonly Question[];
   readonly answersByQuestionId: AnswersByQuestionId;
+  readonly experienceContext?: MasteryExperienceContext;
 }
 
 export interface OfficialMasteryAttemptResult {

@@ -165,6 +165,7 @@ function callSubmitRpc(
     p_started_at: submission.startedAt,
     p_expected_scoring_fingerprint: submission.expectedScoringFingerprint,
     p_answers: submission.answers,
+    p_experience_context: submission.experienceContext ?? null,
   }) as unknown as RpcQuery;
 }
 

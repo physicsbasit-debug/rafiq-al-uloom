@@ -152,6 +152,9 @@ export function createMasteryResultsService(
             startedAt: submission.startedAt,
             expectedScoringFingerprint,
             answers,
+            ...(submission.experienceContext
+              ? { experienceContext: submission.experienceContext }
+              : {}),
           },
           requestOptions
         );
