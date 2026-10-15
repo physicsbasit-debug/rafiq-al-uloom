@@ -51,7 +51,7 @@ export function getLessonActionAccess(progress: LessonUnlockProgress): LessonAct
     review: true,
     activities: true,
     game: true,
-    labs: false,
+    labs: true,
     mastery: true,
   };
 }

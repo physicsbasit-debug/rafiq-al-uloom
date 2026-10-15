@@ -119,7 +119,7 @@ remains the recommended visual learning order and guidance only. It is not an un
 
 Opening a path does not by itself mark that path complete.
 
-Virtual Lab D remains unavailable pending its separate scientific review and does not gate the other paths.
+Virtual Lab D is available through the shared Grade 9 measurement lab linked to Lessons 1-1, 1-2, and 1-3, and does not gate the other paths.
 
 ## Lesson 1-3 game contract retirement note
 
@@ -220,19 +220,19 @@ No mastery question implementation begins before the updated `05_MASTERY_L13_CON
 
 These reservations belong to mastery only. They must not be reused by explanation, review, activities, or the game.
 
-| MQ  | variantKey                   | contextKey                                 | visualKey                                   | status |
-| --- | ---------------------------- | ------------------------------------------ | ------------------------------------------- | ------ |
-| MQ1 | `water-vessel-target-mark`   | `mastery-water-fill-to-mark`               | `g9-l13-mastery-water-fill-analog-v2`      | base   |
-| MQ1 | `sand-funnel-target-mark`    | `mastery-sand-funnel-fill-to-mark`  | `g9-l13-mastery-sand-funnel-analog-v1`     | NEW    |
-| MQ2 | `ramp-release-1_27`          | `mastery-toy-car-short-ramp`               | `g9-l13-mastery-toy-car-digital-timer-v1`        | base   |
-| MQ2 | `ramp-two-marks-2_43`        | `mastery-toy-car-two-mark-ramp`              | `g9-l13-mastery-toy-car-two-mark-digital-v1`        | NEW    |
-| MQ3 | `ball-drop-1_8m`             | `mastery-ball-drop-five-trial-investigation`        | `g9-l13-mastery-ball-drop-notebook-v2`     | base   |
-| MQ3 | `ball-drop-1_2m`             | `mastery-ball-drop-five-trial-1-2m`        | `g9-l13-mastery-ball-drop-notebook-v2b`     | NEW    |
-| MQ3 | `ball-drop-0_8m`             | `mastery-ball-drop-five-trial-0-8m`        | `g9-l13-mastery-ball-drop-notebook-v2c`     | NEW    |
-| MQ4 | `spring-cart-8-in-5_92`      | `mastery-horizontal-spring-cart-period`  | `g9-l13-mastery-horizontal-spring-cart-v1` | base   |
-| MQ4 | `spring-cart-10-cycles-7_30`     | `mastery-horizontal-spring-cart-ten-cycles` | `g9-l13-mastery-horizontal-spring-cart-v1b` | NEW    |
-| MQ5 | `flex-platform-reference-up` | `mastery-flexible-platform-vertical-cycle`  | `g9-l13-mastery-flex-platform-cycle-v1`    | base   |
-| MQ5 | `spring-seat-reference-down` | `mastery-spring-seat-vertical-cycle`  | `g9-l13-mastery-spring-seat-cycle-v1`      | NEW    |
+| MQ  | variantKey                   | contextKey                                   | visualKey                                    | status |
+| --- | ---------------------------- | -------------------------------------------- | -------------------------------------------- | ------ |
+| MQ1 | `water-vessel-target-mark`   | `mastery-water-fill-to-mark`                 | `g9-l13-mastery-water-fill-analog-v2`        | base   |
+| MQ1 | `sand-funnel-target-mark`    | `mastery-sand-funnel-fill-to-mark`           | `g9-l13-mastery-sand-funnel-analog-v1`       | NEW    |
+| MQ2 | `ramp-release-1_27`          | `mastery-toy-car-short-ramp`                 | `g9-l13-mastery-toy-car-digital-timer-v1`    | base   |
+| MQ2 | `ramp-two-marks-2_43`        | `mastery-toy-car-two-mark-ramp`              | `g9-l13-mastery-toy-car-two-mark-digital-v1` | NEW    |
+| MQ3 | `ball-drop-1_8m`             | `mastery-ball-drop-five-trial-investigation` | `g9-l13-mastery-ball-drop-notebook-v2`       | base   |
+| MQ3 | `ball-drop-1_2m`             | `mastery-ball-drop-five-trial-1-2m`          | `g9-l13-mastery-ball-drop-notebook-v2b`      | NEW    |
+| MQ3 | `ball-drop-0_8m`             | `mastery-ball-drop-five-trial-0-8m`          | `g9-l13-mastery-ball-drop-notebook-v2c`      | NEW    |
+| MQ4 | `spring-cart-8-in-5_92`      | `mastery-horizontal-spring-cart-period`      | `g9-l13-mastery-horizontal-spring-cart-v1`   | base   |
+| MQ4 | `spring-cart-10-cycles-7_30` | `mastery-horizontal-spring-cart-ten-cycles`  | `g9-l13-mastery-horizontal-spring-cart-v1b`  | NEW    |
+| MQ5 | `flex-platform-reference-up` | `mastery-flexible-platform-vertical-cycle`   | `g9-l13-mastery-flex-platform-cycle-v1`      | base   |
+| MQ5 | `spring-seat-reference-down` | `mastery-spring-seat-vertical-cycle`         | `g9-l13-mastery-spring-seat-cycle-v1`        | NEW    |
 
 Rules:
 

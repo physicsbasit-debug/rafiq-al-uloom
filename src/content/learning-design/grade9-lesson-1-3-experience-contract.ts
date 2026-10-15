@@ -122,8 +122,9 @@ export const grade9Lesson13GoldenReview: readonly GoldenLearningMoment[] = [
 /**
  * تعديل رسمي بطلب المستخدم - 2026-10-10.
  *
- * الوصول إلى مسارات الدرس 1-3 أصبح مباشرًا، بينما يبقى الإنجاز منفصلًا
- * عن مجرد فتح المسار. المختبر الافتراضي D مستثنى حتى مراجعته العلمية.
+ * الوصول إلى مسارات الدرس 1-3 مباشر، بينما يبقى الإنجاز منفصلًا
+ * عن مجرد فتح المسار. المختبر الافتراضي يستخدم مختبر القياس المشترك
+ * المرتبط أصلًا بالدروس 1-1 و1-2 و1-3، ولا يشكل شرطًا لمسار الإتقان.
  */
 export const grade9Lesson13DirectAccessPolicy = {
   requestedByUserOn: '2026-10-10',
@@ -131,7 +132,7 @@ export const grade9Lesson13DirectAccessPolicy = {
   activities: 'direct',
   game: 'direct',
   mastery: 'direct',
-  virtualLab: 'unavailable_pending_scientific_review',
+  virtualLab: 'direct',
   accessDoesNotImplyCompletion: true,
   suggestedOrderIsGuidanceOnly: true,
 } as const;

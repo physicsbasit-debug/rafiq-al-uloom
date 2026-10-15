@@ -14,17 +14,18 @@ import { isStudentReferencePreviewLesson } from '@content/student-reference-prev
 import { publicContentVisibility } from '@content/seed/public-content-visibility.seed';
 
 describe('Phase 6-7C4 reference lessons', () => {
-  it('يعتمد درسي أهمية القياس وقياس الطول والحجم رسميًا ويبقي الكهرباء الساكنة في المعاينة المؤقتة', () => {
+  it('يعتمد دروس القياس الثلاثة رسميًا ويبقي الكهرباء الساكنة في المعاينة المؤقتة', () => {
     expect(grade9ImportanceMeasurementReferenceLesson.status).toBe('approved');
     expect(grade9LengthVolumeReferenceLesson.status).toBe('approved');
-    expect(grade9TimeMeasurementReferenceLesson.status).toBe('draft');
+    expect(grade9TimeMeasurementReferenceLesson.status).toBe('approved');
     expect(grade10StaticElectricityReferenceLesson.status).toBe('draft');
     expect(isStudentReferencePreviewLesson('g9-phy-s1-u1-l1')).toBe(false);
     expect(isStudentReferencePreviewLesson('g10-phy-s1-u1-l1')).toBe(true);
-    expect(isStudentReferencePreviewLesson('g9-phy-s1-u1-l3')).toBe(true);
+    expect(isStudentReferencePreviewLesson('g9-phy-s1-u1-l3')).toBe(false);
     expect(isStudentReferencePreviewLesson('g9-phy-s1-u1-l2')).toBe(false);
     expect(publicContentVisibility.lessonIds).toContain('g9-phy-s1-u1-l1');
     expect(publicContentVisibility.lessonIds).toContain('g9-phy-s1-u1-l2');
+    expect(publicContentVisibility.lessonIds).toContain('g9-phy-s1-u1-l3');
     expect(publicContentVisibility.lessonIds).not.toContain('g10-phy-s1-u1-l1');
   });
 

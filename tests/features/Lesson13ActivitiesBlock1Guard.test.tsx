@@ -27,12 +27,12 @@ describe('Lesson 1-3 direct access guards', () => {
       review: true,
       activities: true,
       game: true,
-      labs: false,
+      labs: true,
       mastery: true,
     });
   });
 
-  it('يبقي المختبر غير قابل للنقر بالنص المعتمد', () => {
+  it('يفتح المختبر الافتراضي المشترك مباشرة في درس 1-3', () => {
     const callbacks = handlers();
     render(
       <LessonActionGrid
@@ -41,17 +41,19 @@ describe('Lesson 1-3 direct access guards', () => {
           review: true,
           activities: true,
           game: true,
-          labs: false,
+          labs: true,
           mastery: true,
         }}
       />
     );
 
     const labs = screen.getByRole('button', { name: 'المختبرات الافتراضية' });
-    expect(labs).toBeDisabled();
-    expect(screen.getByText('غير متوفر حاليًا.')).toBeInTheDocument();
+    expect(labs).toBeEnabled();
+    expect(screen.queryByText('غير متوفر حاليًا.')).not.toBeInTheDocument();
+
     fireEvent.click(labs);
-    expect(callbacks.onOpenVirtualLabs).not.toHaveBeenCalled();
+
+    expect(callbacks.onOpenVirtualLabs).toHaveBeenCalledTimes(1);
   });
 
   it('لا يحتسب App مجرد دخول الأنشطة أو اللعبة كإنجاز', () => {

@@ -27,6 +27,24 @@ describe('VirtualLabHub', () => {
     expect(screen.getByText('مرتبطة بالدرس الحالي')).toBeInTheDocument();
   });
 
+  it('يربط مختبر القياس نفسه بدروس القياس الثلاثة 1-1 و1-2 و1-3', () => {
+    const onBackToLesson = vi.fn();
+    const { rerender } = render(
+      <VirtualLabHub lessonId="g9-phy-s1-u1-l1" onBackToLesson={onBackToLesson} />
+    );
+
+    expect(screen.getByRole('heading', { name: 'قياس الطول والحجم والزمن' })).toBeInTheDocument();
+
+    rerender(<VirtualLabHub lessonId="g9-phy-s1-u1-l2" onBackToLesson={onBackToLesson} />);
+
+    expect(screen.getByRole('heading', { name: 'قياس الطول والحجم والزمن' })).toBeInTheDocument();
+
+    rerender(<VirtualLabHub lessonId="g9-phy-s1-u1-l3" onBackToLesson={onBackToLesson} />);
+
+    expect(screen.getByRole('heading', { name: 'قياس الطول والحجم والزمن' })).toBeInTheDocument();
+    expect(screen.getByText('مرتبطة بالدرس الحالي')).toBeInTheDocument();
+  });
+
   it('يعرض الصف والوحدة والدرس على بطاقة المختبر بدل دمج الكتالوج بلا سياق', () => {
     render(<VirtualLabHub lessonId="g10-phy-waves-l2" onBackToLesson={vi.fn()} />);
 

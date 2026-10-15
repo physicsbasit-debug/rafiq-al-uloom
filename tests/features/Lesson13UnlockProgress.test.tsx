@@ -21,12 +21,12 @@ function handlers() {
 }
 
 describe('Lesson 1-3 direct access policy', () => {
-  it('يفتح المراجعة والأنشطة واللعبة والإتقان مباشرة من حالة جديدة ويبقي المختبر D مغلقًا', () => {
+  it('يفتح المراجعة والأنشطة واللعبة والمختبر والإتقان مباشرة من حالة جديدة', () => {
     expect(getLessonActionAccess(INITIAL_LESSON_UNLOCK_PROGRESS)).toEqual({
       review: true,
       activities: true,
       game: true,
-      labs: false,
+      labs: true,
       mastery: true,
     });
   });
@@ -41,7 +41,7 @@ describe('Lesson 1-3 direct access policy', () => {
           review: true,
           activities: true,
           game: true,
-          labs: false,
+          labs: true,
           mastery: true,
         }}
       />
@@ -51,6 +51,7 @@ describe('Lesson 1-3 direct access policy', () => {
       'أسئلة المراجعة',
       'الأنشطة العلمية',
       'الألعاب التعليمية',
+      'المختبرات الافتراضية',
       'اختبار الإتقان',
     ]) {
       expect(screen.getByRole('button', { name })).toBeEnabled();
@@ -59,15 +60,13 @@ describe('Lesson 1-3 direct access policy', () => {
     fireEvent.click(screen.getByRole('button', { name: 'أسئلة المراجعة' }));
     fireEvent.click(screen.getByRole('button', { name: 'الأنشطة العلمية' }));
     fireEvent.click(screen.getByRole('button', { name: 'الألعاب التعليمية' }));
+    fireEvent.click(screen.getByRole('button', { name: 'المختبرات الافتراضية' }));
     fireEvent.click(screen.getByRole('button', { name: 'اختبار الإتقان' }));
 
     expect(callbacks.onOpenReviewQuestions).toHaveBeenCalledTimes(1);
     expect(callbacks.onOpenActivities).toHaveBeenCalledTimes(1);
     expect(callbacks.onOpenMatchingGame).toHaveBeenCalledTimes(1);
+    expect(callbacks.onOpenVirtualLabs).toHaveBeenCalledTimes(1);
     expect(callbacks.onOpenMasteryTest).toHaveBeenCalledTimes(1);
-
-    const labs = screen.getByRole('button', { name: 'المختبرات الافتراضية' });
-    expect(labs).toBeDisabled();
-    expect(screen.getByText('غير متوفر حاليًا.')).toBeInTheDocument();
   });
 });

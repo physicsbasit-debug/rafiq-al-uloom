@@ -91,7 +91,7 @@ export const grade9TimeMeasurementReferenceLesson: Lesson = {
   misconceptions: [
     'الاعتقاد أن عرض الساعة الرقمية منزلتين عشريتين يعني أن القياس اليدوي نفسه دقيق إلى 0.01 s؛ والصحيح أن زمن استجابة الإنسان قد يحد جودة القياس الفعلي.',
   ],
-  status: 'draft',
+  status: 'approved',
   source: 'curriculum_seed',
 };
 

@@ -43,14 +43,20 @@ describe('Phase 6-7C3c official semester-1 catalog', () => {
   it('يحمل موضوعات الفصل الأول ويحافظ على اعتماد الدروس المرجعية المنشورة', () => {
     expect(grade9Semester1CurriculumLessons).toHaveLength(26);
     expect(grade10Semester1CurriculumLessons).toHaveLength(29);
-    const referenceIds = new Set(['g9-phy-s1-u1-l1', 'g9-phy-s1-u1-l2', 'g9-phy-s1-u1-l3', 'g10-phy-s1-u1-l1']);
+    const referenceIds = new Set([
+      'g9-phy-s1-u1-l1',
+      'g9-phy-s1-u1-l2',
+      'g9-phy-s1-u1-l3',
+      'g10-phy-s1-u1-l1',
+    ]);
     for (const lesson of [
       ...grade9Semester1CurriculumLessons,
       ...grade10Semester1CurriculumLessons,
     ]) {
       if (
         lesson.id === 'g9-phy-s1-u1-l1' ||
-        lesson.id === 'g9-phy-s1-u1-l2'
+        lesson.id === 'g9-phy-s1-u1-l2' ||
+        lesson.id === 'g9-phy-s1-u1-l3'
       ) {
         expect(lesson.status).toBe('approved');
       } else {
@@ -75,6 +81,7 @@ describe('Phase 6-7C3c official semester-1 catalog', () => {
     expect(publicContentVisibility.lessonIds).toEqual([
       'g9-phy-s1-u1-l1',
       'g9-phy-s1-u1-l2',
+      'g9-phy-s1-u1-l3',
     ]);
   });
 
